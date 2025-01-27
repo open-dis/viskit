@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="ServerGeneric" package="examples" version="$Id: ServerGeneric.xml 1590 2007-10-07 05:41:19Z tdnorbra $" author="ahbuss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="totalNumberServers" type="int">
-        <Comment></Comment>
+        <Comment>total number of servers available to serve customers</Comment>
     </Parameter>
     <Parameter name="serviceTimeGenerator" type="simkit.random.RandomVariate">
-        <Comment></Comment>
+        <Comment>random value for latest time duration to serve customer</Comment>
     </Parameter>
     <StateVariable name="numberAvailableServers" type="int">
-        <Comment></Comment>
+        <Comment>how many servers can serve customers</Comment>
     </StateVariable>
     <StateVariable name="queue" type="java.util.LinkedList&lt;simkit.Entity&gt;">
-        <Comment></Comment>
+        <Comment>the queue holds customers who are waiting in line</Comment>
     </StateVariable>
     <StateVariable name="delayInQueue" type="double">
-        <Comment></Comment>
+        <Comment>any fixed waiting time that all customers encounter</Comment>
     </StateVariable>
     <StateVariable name="timeInSystem" type="double">
-        <Comment></Comment>
+        <Comment>how much time did the current customer need</Comment>
     </StateVariable>
     <Event name="Run">
         <Comment></Comment>
