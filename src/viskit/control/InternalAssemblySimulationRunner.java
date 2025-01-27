@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -714,7 +714,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         }
     }
 
-    private final String namePrefix = "Viskit Assembly Runner";
+    private final String namePrefix = "Assembly Simulation Run";
     private StringBuilder currentTitle = new StringBuilder();
 
     public void doTitle(String nm) {
