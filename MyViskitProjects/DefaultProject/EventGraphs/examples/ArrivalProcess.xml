@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="ArrivalProcess" package="examples" version="0.1" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter name="interarrivalTime" type="simkit.random.RandomVariate"/>
-    <StateVariable name="numberArrivals" type="int"/>
+    <Parameter name="interarrivalTime" type="simkit.random.RandomVariate">
+        <Comment>typical time duration between arrivals</Comment>
+    </Parameter>
+    <StateVariable name="numberArrivals" type="int">
+        <Comment>how many customers have arrived</Comment>
+    </StateVariable>
     <Event name="Run">
         <StateTransition state="numberArrivals">
             <Assignment value="0"/>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="ArrayTester" package="examples" version="1.0" author="Terry D. Norbraten" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>Test Viskit's capability to create primative type arrays</Comment>
+    <Comment>Test Viskit's capability to create primitive type arrays</Comment>
     <Parameter name="param_0" type="int[]">
-        <Comment></Comment>
+        <Comment>example parameter</Comment>
     </Parameter>
     <StateVariable name="state_0" type="int[param_0.length]">
-        <Comment></Comment>
+        <Comment>example state variable</Comment>
     </StateVariable>
     <Event name="Run">
         <Schedule delay="0.0" event="Init" condition="true" priority="DEFAULT">

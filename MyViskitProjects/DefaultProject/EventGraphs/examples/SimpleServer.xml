@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="SimpleServer" package="examples" version="0.1" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter name="serviceTime" type="simkit.random.RandomVariate"/>
-    <Parameter name="totalNumberServers" type="int"/>
+    <Comment>One of the most fundamental examples, a simple server</Comment>
+    <Parameter name="serviceTime" type="simkit.random.RandomVariate">
+        <Comment>time duration to perform service</Comment>
+    </Parameter>
+    <Parameter name="totalNumberServers" type="int">
+        <Comment>how many servers are provided</Comment>
+    </Parameter>
     <StateVariable name="numberInQueue" type="int">
         <Comment>number of customers in queue</Comment>
     </StateVariable>
