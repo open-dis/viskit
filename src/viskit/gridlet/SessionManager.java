@@ -70,7 +70,8 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
     public SessionManager() { // public?
         sessions = new Hashtable<>();
         try {
-            jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
+                jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         } catch (JAXBException e) {
             LOG.error(e);
         }

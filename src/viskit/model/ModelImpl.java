@@ -46,7 +46,7 @@ import viskit.mvc.MvcController;
  * @version $Id$
  */
 public class ModelImpl extends MvcAbstractModel implements Model {
-    JAXBContext jc;
+    JAXBContext jaxbContext;
     ObjectFactory oFactory;
     SimEntity jaxbRoot;
     File currentFile;
@@ -73,7 +73,8 @@ public class ModelImpl extends MvcAbstractModel implements Model {
     @Override
     public void init() {
         try {
-            jc = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
+            if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
+                jaxbContext = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
             oFactory = new ObjectFactory();
             jaxbRoot = oFactory.createSimEntity(); // to start with empty graph
         } catch (JAXBException e) {
@@ -120,7 +121,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
             try {
                 currentFile = f;
 
-                Unmarshaller u = jc.createUnmarshaller();
+                Unmarshaller u = jaxbContext.createUnmarshaller();
                 jaxbRoot = (SimEntity) u.unmarshal(currentFile);
 
                 GraphMetadata mymetaData = new GraphMetadata(this);
@@ -151,8 +152,8 @@ public class ModelImpl extends MvcAbstractModel implements Model {
             } catch (JAXBException ee) {
                 // want a clear way to know if they're trying to load an assembly vs. some unspecified XML.
                 try {
-                    JAXBContext assemblyContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-                    Unmarshaller um = assemblyContext.createUnmarshaller();
+                    JAXBContext jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+                    Unmarshaller um = jaxbContext.createUnmarshaller();
                     um.unmarshal(f);
                     // If we get here, we've tried to load an assembly.
                     controller.messageUser(JOptionPane.ERROR_MESSAGE,
@@ -201,7 +202,7 @@ public class ModelImpl extends MvcAbstractModel implements Model {
         FileWriter fw = null;
         try {
             fw = new FileWriter(tmpF);
-            Marshaller m = jc.createMarshaller();
+            Marshaller m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
 

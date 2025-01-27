@@ -513,8 +513,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 return (fa != null || fa != null && fa.length != 0);
             }
 
-            return f.isFile()
-                    && (f.getName().endsWith(".class") || (f.getName().endsWith(".xml")));
+            return f.isFile() &&
+                  (f.getName().toLowerCase().endsWith(".class") || 
+                   f.getName().toLowerCase().endsWith(".xml"));
         }
     }
 

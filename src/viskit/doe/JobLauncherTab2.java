@@ -136,9 +136,11 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private JDialog configurationDialog;
     private JAXBContext jaxbContext;
 
-    public JobLauncherTab2(DoeController controller, String file, String title, JFrame mainFrame) {
+    public JobLauncherTab2(DoeController controller, String file, String title, JFrame mainFrame)
+    {
         try {
-            jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
+                jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             unmarshaller = jaxbContext.createUnmarshaller();
         } catch (JAXBException je) {
             LogUtils.getLogger(JobLauncherTab2.class).error(je);
@@ -1370,7 +1372,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                         SampleStatistics sampleStatistics = (SampleStatistics) unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));
 
                         statisticsGraph.addSampleStatistic(sampleStatistics, designPointStatistics.designPtIndex, designPointStatistics.sampleIndex);
-                    } catch (JAXBException ex) {
+                    } 
+                    catch (JAXBException ex) {
                         LogUtils.getLogger(GraphUpdater.class).error(ex);
                     }
                 }

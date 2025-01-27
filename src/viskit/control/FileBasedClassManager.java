@@ -108,8 +108,10 @@ public class FileBasedClassManager {
     public FileBasedAssemblyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
 
         // if it is cached, cacheXML directory exists and will be loaded on start
-        if (f.getName().toLowerCase().endsWith(".xml")) {
-            jaxbContext = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
+        if (f.getName().toLowerCase().endsWith(".xml"))
+        {
+            if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
+                jaxbContext = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
             um = jaxbContext.createUnmarshaller();
 
             // Did we cacheXML the EventGraph XML and Class?

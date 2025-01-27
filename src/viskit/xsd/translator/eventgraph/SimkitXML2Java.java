@@ -72,8 +72,10 @@ public class SimkitXML2Java {
     /** Default to initialize the JAXBContext only */
     private SimkitXML2Java() {
         try {
-            jaxbContext = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
-        } catch (JAXBException ex) {
+            if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
+                jaxbContext = JAXBContext.newInstance(EVENT_GRAPH_BINDINGS);
+        } 
+        catch (JAXBException ex) {
             LOG.error(ex);
             error(ex.getMessage());
         }
@@ -113,8 +115,9 @@ public class SimkitXML2Java {
             setUnMarshaller(jaxbContext.createUnmarshaller());
             setUnMarshalledObject(getUnMarshaller().unmarshal(fileInputStream));
             root = (SimEntity) getUnMarshalledObject();
-        } catch (JAXBException ex) {
-
+        } 
+        catch (JAXBException ex)
+        {
             // Silence attempting to unmarshal an Assembly here
             LOG.debug("Error occuring in SimkitXML2Java.unmarshal(): " + ex);
         }

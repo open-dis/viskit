@@ -55,9 +55,11 @@ public class SimkitAssemblyXML2Java {
     /** Default constructor that creates the JAXBContext */
     public SimkitAssemblyXML2Java() {
         try {
-            this.jaxbContext = JAXBContext.newInstance(ASSEMBLY_BINDINGS);
-        } catch (JAXBException ex) {
-            LOG.error(ex);
+            if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
+                jaxbContext = JAXBContext.newInstance(ASSEMBLY_BINDINGS);
+        } 
+        catch (JAXBException ex) {
+            LOG.error(ex); // TODO failing on retry
         }
     }
 
@@ -97,7 +99,8 @@ public class SimkitAssemblyXML2Java {
             if (DEBUG) {
                 marshalRoot();
             }
-        } catch (JAXBException ex) {
+        } 
+        catch (JAXBException ex) {
             LOG.error(ex);
 //            ex.printStackTrace();
         }
@@ -130,7 +133,8 @@ public class SimkitAssemblyXML2Java {
             Marshaller m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.marshal(this.root, System.out);
-        } catch (JAXBException ex) {
+        } 
+        catch (JAXBException ex) {
             LOG.error(ex);
         }
     }

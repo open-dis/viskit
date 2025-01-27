@@ -36,7 +36,7 @@ import viskit.mvc.MvcController;
  */
 public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel {
 
-    private JAXBContext jc;
+    private JAXBContext jaxbContext;
     private ObjectFactory oFactory;
     private SimkitAssembly jaxbRoot;
     private File currentFile;
@@ -59,7 +59,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     public void init() {
         try {
-            jc = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
+                jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
             oFactory = new ObjectFactory();
             jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
         } catch (JAXBException e) {
@@ -110,7 +111,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         else 
         {
             try {
-                Unmarshaller u = jc.createUnmarshaller();
+                Unmarshaller u = jaxbContext.createUnmarshaller();
 
                 // Check for inadvertant opening of an Event Graph, tough to do, yet possible (bugfix 1248)
                 try {
@@ -192,7 +193,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         try {
             fw = new FileWriter(tmpF);
-            Marshaller m = jc.createMarshaller();
+            Marshaller m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
 

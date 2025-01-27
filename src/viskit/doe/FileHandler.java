@@ -129,7 +129,8 @@ public class FileHandler {
         }
     }
 
-    public static void marshallJaxb(File of) throws Exception {
+    public static void marshallJaxb(File of) throws Exception
+    {
         JAXBContext jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         try (Writer fw = new FileWriter(of)) {
             Marshaller m = jaxbContext.createMarshaller();

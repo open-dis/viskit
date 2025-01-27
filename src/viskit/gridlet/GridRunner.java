@@ -279,8 +279,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
         try {
 
-            JAXBContext jc = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-            Unmarshaller u = jc.createUnmarshaller();
+            JAXBContext jaxbContext = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            Unmarshaller u = jaxbContext.createUnmarshaller();
             Results r = (Results) ( u.unmarshal(strsrc) );
             int sample = parseInt(r.getSample());
             int designPt = parseInt(r.getDesignPoint());
@@ -459,8 +459,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     public Boolean addDesignPointStat(int sampleIndex, int designPtIndex, int numberOfStats, String stat) {
         try {
             this.numberOfStats = numberOfStats; // this really only needs to be set the first time
-            JAXBContext jc = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-            Unmarshaller u = jc.createUnmarshaller();
+            JAXBContext jaxbContext = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            Unmarshaller u = jaxbContext.createUnmarshaller();
             Sample sample = root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = sample.getDesignPoint().get(designPtIndex);
             JAXBElement<?> stats = (JAXBElement<?>) u.unmarshal(new ByteArrayInputStream(stat.getBytes()));
@@ -485,8 +485,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
 
     public Boolean addReplicationStat(int sampleIndex, int designPtIndex, int replicationIndex, String stat) {
         try {
-            JAXBContext jc = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-            Unmarshaller u = jc.createUnmarshaller();
+            JAXBContext jaxbContext = newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            Unmarshaller u = jaxbContext.createUnmarshaller();
             Sample sample = root.getExperiment().getSample().get(sampleIndex);
             DesignPoint designPoint = sample.getDesignPoint().get(designPtIndex);
             Replication rep = designPoint.getReplication().get(replicationIndex);

@@ -54,12 +54,14 @@ public class AssemblyHandler implements XmlRpcHandler {
         this(port, new SessionManager());
     }
 
-    public AssemblyHandler(int port, SessionManager sessionManager) {
+    public AssemblyHandler(int port, SessionManager sessionManager)
+    {
         this.port = port;
         this.sessionManager = sessionManager;
         gridRuns = new Hashtable<>();
         try {
-            jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
+            if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
+                jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
         } catch (JAXBException e) {
             LOG.error("Classpath error loading jaxb bindings?", e);
         }
