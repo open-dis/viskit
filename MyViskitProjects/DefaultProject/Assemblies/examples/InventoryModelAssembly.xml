@@ -29,11 +29,11 @@
         <TerminalParameter name="p[0] : " value="numberArrivals" type="java.lang.String"/>
         <Coordinate x="100.0" y="310.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="demandStat" type="simkit.stat.SimpleStatsTally" mode="replicationStat" meanStatistics="true" countStatistics="false" description="">
+    <PropertyChangeListener name="demandStat" type="simkit.stat.SimpleStatsTally" mode="replicationStat" meanStatistics="true" countStatistics="false" description="demand statistic">
         <TerminalParameter name="p[0] : " value="demand" type="java.lang.String"/>
         <Coordinate x="410.0" y="90.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="inventoryOnHandStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="true" countStatistics="false" description="">
+    <PropertyChangeListener name="inventoryOnHandStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="true" countStatistics="false" description="inventory on hand statistics">
         <TerminalParameter name="p[0] : " value="I" type="java.lang.String"/>
         <Coordinate x="290.0" y="90.0"/>
     </PropertyChangeListener>
@@ -45,7 +45,7 @@
         <TerminalParameter name="p[0] : " value="T" type="java.lang.String"/>
         <Coordinate x="610.0" y="200.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="immedServedCustStat" type="simkit.stat.SimpleStatsTally" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
+    <PropertyChangeListener name="immedServedCustStat" type="simkit.stat.SimpleStatsTally" mode="replicationStat" meanStatistics="false" countStatistics="true" description="immediately served customers statistic">
         <TerminalParameter name="p[0] : " value="immediatelyServedCustomers" type="java.lang.String"/>
         <Coordinate x="410.0" y="330.0"/>
     </PropertyChangeListener>
