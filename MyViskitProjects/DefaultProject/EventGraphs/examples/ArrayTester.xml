@@ -8,21 +8,22 @@
         <Comment>example state variable</Comment>
     </StateVariable>
     <Event name="Run">
+        <Comment>The run event is started automatically by Simkit when execution starts.</Comment>
         <Schedule delay="0.0" event="Init" condition="true" priority="DEFAULT">
-            <Comment></Comment>
+            <Comment>always schedule event to initialize index at 0</Comment>
             <EdgeParameter value="0"/>
         </Schedule>
         <Code></Code>
         <Coordinate x="30.0" y="30.0"/>
     </Event>
     <Event name="Init">
-        <Comment></Comment>
+        <Comment>Initialize the event graph</Comment>
         <Argument name="i" type="int"/>
         <StateTransition state="state_0" index="i">
             <Assignment value="param_0[i]"/>
         </StateTransition>
         <Schedule delay="0.0" event="Init" condition="i &lt; (param_0.length - 1)" priority="DEFAULT">
-            <Comment></Comment>
+            <Comment>Continue looping until array length reached</Comment>
             <EdgeParameter value="i + 1"/>
         </Schedule>
         <Code></Code>
