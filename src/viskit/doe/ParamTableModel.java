@@ -60,8 +60,8 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         "Type",
         "Value",
         "Is factor?",
-        "Min",
-        "Max"
+        "Minimum",
+        "Maximum"
     };
     public static final int NAME_COL = 0;
     public static final int TYPE_COL = 1;

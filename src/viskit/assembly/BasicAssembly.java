@@ -539,8 +539,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         buf.append(String.format("%-" + nameCW + "s%" + countCW + "s%" 
                 + minCW + "s%" + maxCW + "s%" + meanCW + "s%" + stdDevCW 
                 + "s%" + varCW + "s", 
-                "Name", "Count", "Min", 
-                "Max", "Mean", "Std Dev", "Var"));
+                "Name", "Count", "Minimum", 
+                "Maximum", "Mean", "Standard Deviation", "Variance"));
         buf.append(System.getProperty("line.separator"));
         buf.append("-".repeat(nameCW+countCW+minCW+maxCW+meanCW+stdDevCW+varCW));
 

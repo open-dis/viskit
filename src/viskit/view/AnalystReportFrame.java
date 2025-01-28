@@ -684,14 +684,14 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         }
     }
     JCheckBox wantStatisticsDescriptionAnalysis;
-    JCheckBox wantStatsReplications;
+    JCheckBox wantStatisticsReplications;
     JCheckBox wantStatisticsSummary;
     JTextArea statisticsComments;
     JTextArea statisticsConclusions;
-    JPanel statsSummaryPanel;
-    JPanel statisticsRepPanel;
+    JPanel statisticsSummaryPanel;
+    JPanel statisticsReplicationReportsPanel;
     JScrollPane repsJsp;
-    JScrollPane summJsp;
+    JScrollPane statisticsSummaryScrollPane;
 
     private JPanel makeStatisticsPanel() {
         JPanel p = new JPanel();
@@ -701,25 +701,24 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         wantStatisticsDescriptionAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantStatisticsDescriptionAnalysis);
 
-        JScrollPane jsp = new JScrollPane(statisticsComments = new WrappingTextArea());
-        jsp.setBorder(new TitledBorder("Description of Expected Results"));
-        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(jsp);
+        JScrollPane scrollPane = new JScrollPane(statisticsComments = new WrappingTextArea());
+        scrollPane.setBorder(new TitledBorder("Description of Expected Results"));
+        scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(scrollPane);
 
-        jsp = new JScrollPane(statisticsConclusions = new WrappingTextArea());
-        jsp.setBorder(new TitledBorder("Analysis of Experimental Results"));
-        jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(jsp);
+        scrollPane = new JScrollPane(statisticsConclusions = new WrappingTextArea());
+        scrollPane.setBorder(new TitledBorder("Analysis of Experimental Results"));
+        scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(scrollPane);
 
-        wantStatsReplications = new JCheckBox("Include replication statistics", true);
-        wantStatsReplications.setToolTipText("Include entries in output report");
-        wantStatsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(wantStatsReplications);
+        wantStatisticsReplications = new JCheckBox("Include replication statistics", true);
+        wantStatisticsReplications.setToolTipText("Include entries in output report");
+        wantStatisticsReplications.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(wantStatisticsReplications);
 
-        repsJsp = new JScrollPane(statisticsRepPanel = new JPanel());
+        repsJsp = new JScrollPane(statisticsReplicationReportsPanel = new JPanel());
         repsJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statisticsRepPanel.setLayout(new BoxLayout(statisticsRepPanel, BoxLayout.Y_AXIS));
+        statisticsReplicationReportsPanel.setLayout(new BoxLayout(statisticsReplicationReportsPanel, BoxLayout.Y_AXIS));
         p.add(repsJsp);
 
         wantStatisticsSummary = new JCheckBox("Include summary statistics", true);
@@ -727,10 +726,10 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         wantStatisticsSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(wantStatisticsSummary);
 
-        summJsp = new JScrollPane(statsSummaryPanel = new JPanel());
-        summJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statsSummaryPanel.setLayout(new BoxLayout(statsSummaryPanel, BoxLayout.Y_AXIS));
-        p.add(summJsp);
+        statisticsSummaryScrollPane = new JScrollPane(statisticsSummaryPanel = new JPanel());
+        statisticsSummaryScrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        statisticsSummaryPanel.setLayout(new BoxLayout(statisticsSummaryPanel, BoxLayout.Y_AXIS));
+        p.add(statisticsSummaryScrollPane);
 
         p.setBorder(new EmptyBorder(10, 10, 10, 10));
         return p;
@@ -745,29 +744,29 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         statisticsConclusions.setEnabled(bool);
 
         bool = analystReportModel.isPrintReplicationStatistics();
-        wantStatsReplications.setSelected(bool);
+        wantStatisticsReplications.setSelected(bool);
         bool = analystReportModel.isPrintSummaryStatistics();
         wantStatisticsSummary.setSelected(bool);
 
         List replicationsList = analystReportModel.getStatisticsReplicationsList();
-        statisticsRepPanel.removeAll();
-        JLabel lab;
+        statisticsReplicationReportsPanel.removeAll();
+        JLabel label;
         JScrollPane jsp;
         JTable tab;
 
-        statisticsRepPanel.add(lab = new JLabel("Replication Reports"));
-        lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statisticsRepPanel.add(Box.createVerticalStrut(10));
-        String[] colNames = new String[] {"Run #", "Count", "Min", "Max", "Mean", "Std Deviation", "Variance"};
+        statisticsReplicationReportsPanel.add(label = new JLabel("Replication Reports"));
+        label.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        statisticsReplicationReportsPanel.add(Box.createVerticalStrut(10));
+        String[] columnNames = new String[] {"Replication #", "Count", "Minimum", "Maximum", "Mean", "Standard Deviation", "Variance"};
 
-        for (Iterator repItr = replicationsList.iterator(); repItr.hasNext();) {
-            List r = (List) repItr.next();
-            String nm = (String) r.get(0);
-            String prop = (String) r.get(1);
-            statisticsRepPanel.add(lab = new JLabel("Entity: " + nm));
-            lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-            statisticsRepPanel.add(lab = new JLabel("Property: " + prop));
-            lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        for (Iterator replicationsListIterator = replicationsList.iterator(); replicationsListIterator.hasNext();) {
+            List r = (List) replicationsListIterator.next();
+            String entityName = (String) r.get(0); // TODO not getting set...
+            String property = (String) r.get(1);
+            statisticsReplicationReportsPanel.add(label = new JLabel("Entity: " + entityName));
+            label.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            statisticsReplicationReportsPanel.add(label = new JLabel("Property: " + property));
+            label.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
             List vals = (List) r.get(2);
             String[][] saa = new String[vals.size()][];
@@ -775,41 +774,41 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
             for (Iterator r2 = vals.iterator(); r2.hasNext();) {
                 saa[i++] = (String[]) r2.next();
             }
-            statisticsRepPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
+            statisticsReplicationReportsPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, columnNames)));
             tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
             jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
             jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-            statisticsRepPanel.add(Box.createVerticalStrut(20));
+            statisticsReplicationReportsPanel.add(Box.createVerticalStrut(20));
         }
         List summs = analystReportModel.getStastSummaryList();
 
-        colNames = new String[] {"Entity", "Property", "# Runs", "Min", "Max", "Mean", "Std Deviation", "Variance"};
+        columnNames = new String[] {"Entity", "Property", "# Replications", "Minimum", "Maximum", "Mean", "Standard Deviation", "Variance"};
         String[][] saa = new String[summs.size()][];
         int i = 0;
         for (Iterator sumItr = summs.iterator(); sumItr.hasNext();) {
             saa[i++] = (String[]) sumItr.next();
         }
 
-        statsSummaryPanel.removeAll();
-        statsSummaryPanel.add(lab = new JLabel("Summary Report"));
-        lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statsSummaryPanel.add(Box.createVerticalStrut(10));
+        statisticsSummaryPanel.removeAll();
+        statisticsSummaryPanel.add(label = new JLabel("Summary Report"));
+        label.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        statisticsSummaryPanel.add(Box.createVerticalStrut(10));
 
-        statsSummaryPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, colNames)));
+        statisticsSummaryPanel.add(jsp = new JScrollPane(tab = new ROTable(saa, columnNames)));
         tab.setPreferredScrollableViewportSize(new Dimension(tab.getPreferredSize()));
         jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
         repsJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
-        summJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+        statisticsSummaryScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
     }
 
     private void unFillStatsPan() {
         analystReportModel.setPrintStatisticsComments(wantStatisticsDescriptionAnalysis.isSelected());
         analystReportModel.setStatisticsDescription(statisticsComments.getText());
         analystReportModel.setStatisticsConclusions(statisticsConclusions.getText());
-        analystReportModel.setPrintReplicationStatistics(wantStatsReplications.isSelected());
+        analystReportModel.setPrintReplicationStatistics(wantStatisticsReplications.isSelected());
         analystReportModel.setPrintSummaryStatistics(wantStatisticsSummary.isSelected());
     }
     JCheckBox wantConclusionsRecommendations;
@@ -940,14 +939,28 @@ class WrappingTextArea extends JTextArea {
     }
 }
 
-class ROTable extends JTable {
+class ROTable extends JTable 
+{
+    // https://stackoverflow.com/questions/3467052/set-right-alignment-in-jtable-column
+    DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 
-    ROTable(Vector<? extends Vector> v, Vector<?> c) {
+    ROTable(Vector<? extends Vector> v, Vector<?> c) 
+    {
+        // initializer
         super(v, c);
+        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+    }
+    
+    @Override
+    public TableCellRenderer getCellRenderer (int arg0, int arg1) {
+        return rightRenderer;
     }
 
-    ROTable(Object[][] oa, Object[] cols) {
+    ROTable(Object[][] oa, Object[] cols)
+    {
+        // initializer
         super(oa, cols);
+        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
     }
 
     @Override
