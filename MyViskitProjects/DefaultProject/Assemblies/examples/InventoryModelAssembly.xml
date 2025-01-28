@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimkitAssembly name="InventoryModelAssembly" version="1.0" package="examples" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <SimEntity name="arrivalProcess_0" type="examples.ArrivalProcess" description="">
+    <SimEntity name="arrivalProcess_0" type="examples.ArrivalProcess" description="arrival process producing new customers">
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter name="" value="Uniform" type="String"/>
             <TerminalParameter name="" value="0.9, 2.2" type="Object..."/>
@@ -25,7 +25,7 @@
         <TerminalParameter name="littleS" value="5" type="int"/>
         <Coordinate x="410.0" y="200.0"/>
     </SimEntity>
-    <PropertyChangeListener name="numArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="">
+    <PropertyChangeListener name="numArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="number of arrivals statistic">
         <TerminalParameter name="p[0] : " value="numberArrivals" type="java.lang.String"/>
         <Coordinate x="100.0" y="310.0"/>
     </PropertyChangeListener>
@@ -37,11 +37,11 @@
         <TerminalParameter name="p[0] : " value="I" type="java.lang.String"/>
         <Coordinate x="290.0" y="90.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="inventoryOnBackOrderStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="true" countStatistics="false" description="">
+    <PropertyChangeListener name="inventoryOnBackOrderStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="true" countStatistics="false" description="inventory on back order statistic">
         <TerminalParameter name="p[0] : " value="B" type="java.lang.String"/>
         <Coordinate x="540.0" y="90.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="inventoryOnOrderStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="true" countStatistics="false" description="">
+    <PropertyChangeListener name="inventoryOnOrderStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="true" countStatistics="false" description="inventory on order statistic">
         <TerminalParameter name="p[0] : " value="T" type="java.lang.String"/>
         <Coordinate x="610.0" y="200.0"/>
     </PropertyChangeListener>
