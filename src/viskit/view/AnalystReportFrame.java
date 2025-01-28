@@ -210,11 +210,13 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         analystReportModel.setAccessLabel((String) documentLabelTF.getSelectedItem());
     }
 
-    private void setLayout() {
-
+    private void setLayout()
+    {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        getContentPane().setBackground(Color.white);
 
         JTabbedPane tabs = new JTabbedPane();
+        tabs.setBackground(Color.white);
 
         JPanel headerPanel = new JPanel(new SpringLayout());
         headerPanel.add(new JLabel("Title"));
