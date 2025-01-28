@@ -552,10 +552,10 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
             ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Analyst Report Panel not visible",
                     "<html><body><p align='center'>" +
-                    "The Analyst Report tab has not been set to be visible.<br>To " +
-                    "view on next Viskit opening, select File -> Viskit Settings -> " +
-                    "Tab visibility -> Select Analyst report -> Close, then Exit" +
-                    " the application. On re-startup, it will appear.</p></body></html>"
+                    "The Analyst Report tab has not been set to be visible.<br>" +
+                    "To view on next Viskit opening, select File -> Viskit User Preferences -> " +
+                    "Tab visibility -> Select Analyst report -> Close, " +
+                    "then Exit the application. On re-startup, the panel will appear.</p></body></html>"
             );
         }
     }
@@ -714,7 +714,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         }
     }
 
-    private final String namePrefix = "Assembly Simulation Run";
+    private final String namePrefix = "awaiting initialization by Assembly Editor...";
     private StringBuilder currentTitle = new StringBuilder();
 
     public void doTitle(String nm) {

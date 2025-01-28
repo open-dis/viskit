@@ -58,8 +58,8 @@ public class CodeBlockPanel extends JPanel {
     private JTextComponent jtc;
     private final Window owner;
     private final String title;
-    private final JButton editButt;
-    private static final String TOOL_TIP = "Please remember to enter fullly qualified class names and include terminating semi-colons";
+    private final JButton editButton;
+    private static final String CODEBLOCK_HINT = "Please remember to enter fully qualified class names and include terminating semicolons";
 
     public CodeBlockPanel(Window owner, boolean multilined, String title) {
         this.owner = owner;
@@ -93,17 +93,17 @@ public class CodeBlockPanel extends JPanel {
             d.width = Integer.MAX_VALUE;
             setMaximumSize(d);
         }
-        editButt = new JButton(" ... ");
-        editButt.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        editButt.setToolTipText("Click to edit a long code block");
-        Dimension dd = new Dimension(editButt.getPreferredSize());
+        editButton = new JButton(" ... ");
+        editButton.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        editButton.setToolTipText("Click to edit a long code block");
+        Dimension dd = new Dimension(editButton.getPreferredSize());
         if (!multilined) {
             dd.height = getPreferredSize().height;
         }
-        editButt.setMaximumSize(dd);
-        add(editButt);
+        editButton.setMaximumSize(dd);
+        add(editButton);
 
-        editButt.addActionListener(new buttListener());
+        editButton.addActionListener(new buttonListener());
     }
 
     /**
@@ -115,7 +115,7 @@ public class CodeBlockPanel extends JPanel {
         if (jtc instanceof JTextArea) {
             ((JTextArea) jtc).setRows(n);
             Dimension d = new Dimension(jtc.getPreferredScrollableViewportSize());
-            int ph = Math.max(d.height, editButt.getPreferredSize().height);
+            int ph = Math.max(d.height, editButton.getPreferredSize().height);
             ph += getInsets().top + getInsets().bottom;
             setPreferredSize(new Dimension(getPreferredSize().width, ph));
             invalidate();
@@ -136,7 +136,7 @@ public class CodeBlockPanel extends JPanel {
         jtc.setText(s);
     }
 
-    class buttListener implements ActionListener {
+    class buttonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -167,7 +167,7 @@ public class CodeBlockPanel extends JPanel {
 
         @Override
         public String getToolTipText(MouseEvent event) {
-            return "<html><pre>" + TOOL_TIP + "</pre></html>";
+            return "<html><pre>" + CODEBLOCK_HINT + "</pre></html>";
         }
 
         @Override
@@ -197,7 +197,7 @@ public class CodeBlockPanel extends JPanel {
 
         @Override
         public String getToolTipText(MouseEvent event) {
-            return "<html><pre>" + TOOL_TIP + "</pre></html>";
+            return "<html><pre>" + CODEBLOCK_HINT + "</pre></html>";
         }
 
         @Override

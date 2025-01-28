@@ -130,12 +130,12 @@ public abstract class ViskitSmallDialog extends JDialog {
     class WindowClosingListener extends WindowAdapter {
 
         private final Component parent;
-        private final JButton okButt;
+        private final JButton okButton;
         private final JButton cancelButt;
 
-        WindowClosingListener(Component parent, JButton okButt, JButton cancelButt) {
+        WindowClosingListener(Component parent, JButton okButton, JButton cancelButt) {
             this.parent = parent;
-            this.okButt = okButt;
+            this.okButton = okButton;
             this.cancelButt = cancelButt;
         }
 
@@ -145,7 +145,7 @@ public abstract class ViskitSmallDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(parent, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
                     cancelButt.doClick();
                 }

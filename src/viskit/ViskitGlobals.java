@@ -811,7 +811,7 @@ public class ViskitGlobals {
             currentViskitProject.setProjectRoot(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
 
         if (currentViskitProject.initProject()) {
-            SettingsDialog.saveExtraClassPathEntries(currentViskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
+            SettingsDialog.saveExtraClasspathEntries(currentViskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
         } else {
             LOG.warn("Unable to create project directory, returning");
             return;

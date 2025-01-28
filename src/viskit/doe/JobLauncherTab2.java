@@ -218,8 +218,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         buttPan.setBorder(new EmptyBorder(5, 10, 10, 10));
         buttPan.add(Box.createHorizontalGlue());
         JButton cancelButt = new JButton("Cancel");
-        JButton okButt = new JButton("Apply changes");
-        buttPan.add(okButt);
+        JButton okButton = new JButton("Apply changes");
+        buttPan.add(okButton);
         buttPan.add(cancelButt);
 
         JPanel allPan = new JPanel();
@@ -232,7 +232,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             configurationDialog.dispose();
             configurationDialog = null;
         });
-        okButt.addActionListener((ActionEvent e) -> {
+        okButton.addActionListener((ActionEvent e) -> {
             clusterConfigurationReturn = true;
             configurationDialog.dispose();
             configurationDialog = null;

@@ -24,6 +24,7 @@ import viskit.model.EventGraphNode;
 import viskit.model.PropertyChangeEdge;
 import viskit.model.PropertyChangeListenerNode;
 import viskit.model.ViskitElement;
+import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -37,21 +38,21 @@ import viskit.model.ViskitElement;
  */
 public class PclEdgeInspectorDialog extends JDialog {
 
-    private final JLabel sourceLab;
+    private final JLabel sourceLabel;
 
-    private JLabel targetLab,  propertyLab,  descLab;
+    private JLabel targetLabel,  propertyLabel,  descriptionLabel;
     private final JTextField sourceTF;
-    private JTextField targetTF,  propertyTF,  descTF;
-    private final JPanel propertyTFPan;
+    private JTextField targetTF,  propertyTF,  descriptionTF;
+    private final JPanel propertyTFPanel;
     private final JLabel emptyLab;
-    private JLabel emptyTF;
+    private JLabel emptyTFLabel;
     private static PclEdgeInspectorDialog dialog;
     private static boolean modified = false;
     private PropertyChangeEdge pclEdge;
-    private final JButton okButt;
-    private JButton canButt;
-    private final JButton propButt;
-    private final JPanel buttPan;
+    private final JButton okButton;
+    private JButton cancelButton;
+    private final JButton propertyButton;
+    private final JPanel buttonPanel;
     private final enableApplyButtonListener lis;
 
     public static boolean showDialog(JFrame f, PropertyChangeEdge parm) {
@@ -73,42 +74,44 @@ public class PclEdgeInspectorDialog extends JDialog {
         this.addWindowListener(new myCloseListener());
 
         lis = new enableApplyButtonListener();
-        propButt = new JButton("...");
-        propButt.addActionListener(new findPropertiesAction());
-        propButt.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
-        sourceLab = new JLabel("source event graph", JLabel.TRAILING);
-        targetLab = new JLabel("property change listener", JLabel.TRAILING);
-        propertyLab = new JLabel("property", JLabel.TRAILING);
+        propertyButton = new JButton("...");
+        propertyButton.addActionListener(new findPropertiesAction());
+        propertyButton.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
+        sourceLabel = new JLabel("source event graph", JLabel.TRAILING);
+        targetLabel = new JLabel("property change listener", JLabel.TRAILING);
+        propertyLabel = new JLabel("property", JLabel.TRAILING);
         emptyLab = new JLabel();
-        descLab = new JLabel("description");
+        descriptionLabel = new JLabel("description", JLabel.TRAILING);
+        descriptionLabel.setToolTipText(DESCRIPTION_HINT);  
 
         sourceTF = new JTextField();
         targetTF = new JTextField();
         propertyTF = new JTextField();
-        descTF = new JTextField();
+        descriptionTF = new JTextField();
+        descriptionTF.setToolTipText(DESCRIPTION_HINT);   
 
-        emptyTF = new JLabel("(an empty entry signifies ALL properties in source)");
-        int fsz = emptyTF.getFont().getSize();
-        emptyTF.setFont(emptyTF.getFont().deriveFont(fsz - 2));
-        propertyTFPan = new JPanel();
-        propertyTFPan.setLayout(new BoxLayout(propertyTFPan, BoxLayout.X_AXIS));
-        propertyTFPan.add(propertyTF);
-        propertyTFPan.add(propButt);
-        pairWidgets(sourceLab, sourceTF, false);
-        pairWidgets(targetLab, targetTF, false);
-        pairWidgets(propertyLab, propertyTFPan, true);
+        emptyTFLabel = new JLabel("(an empty entry signifies ALL properties in source)");
+        int fsz = emptyTFLabel.getFont().getSize();
+        emptyTFLabel.setFont(emptyTFLabel.getFont().deriveFont(fsz - 2));
+        propertyTFPanel = new JPanel();
+        propertyTFPanel.setLayout(new BoxLayout(propertyTFPanel, BoxLayout.X_AXIS));
+        propertyTFPanel.add(propertyTF);
+        propertyTFPanel.add(propertyButton);
+        pairWidgets(sourceLabel, sourceTF, false);
+        pairWidgets(targetLabel, targetTF, false);
+        pairWidgets(propertyLabel, propertyTFPanel, true);
         propertyTF.addCaretListener(lis);
-        pairWidgets(emptyLab, emptyTF, false);
-        pairWidgets(descLab, descTF, true);
+        pairWidgets(emptyLab, emptyTFLabel, false);
+        pairWidgets(descriptionLabel, descriptionTF, true);
 
-        buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
-        buttPan.add(canButt);
-        buttPan.add(Box.createHorizontalStrut(5));
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(Box.createHorizontalStrut(5));
 
         // Make the first display a minimum of 400 width
         Dimension d = getSize();
@@ -116,8 +119,8 @@ public class PclEdgeInspectorDialog extends JDialog {
         setSize(d);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         setParams(parent, ed);
     }
@@ -139,9 +142,9 @@ public class PclEdgeInspectorDialog extends JDialog {
         fillWidgets();
 
         modified = (p == null);
-        okButt.setEnabled((p == null));
+        okButton.setEnabled((p == null));
 
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
         pack();
         setLocationRelativeTo(c);
     }
@@ -151,12 +154,12 @@ public class PclEdgeInspectorDialog extends JDialog {
             sourceTF.setText(pclEdge.getFrom().toString());
             targetTF.setText(pclEdge.getTo().toString());
             propertyTF.setText(pclEdge.getProperty());
-            descTF.setText(pclEdge.getDescriptionString());
+            descriptionTF.setText(pclEdge.getDescriptionString());
         } else {
             propertyTF.setText("listened-to property");
             sourceTF.setText("unset...shouldn't see this");
             targetTF.setText("unset...shouldn't see this");
-            descTF.setText("");
+            descriptionTF.setText("");
         }
 
         JPanel content = new JPanel();
@@ -164,20 +167,20 @@ public class PclEdgeInspectorDialog extends JDialog {
         content.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
         JPanel cont = new JPanel(new SpringLayout());
-        cont.add(sourceLab);
+        cont.add(sourceLabel);
         cont.add(sourceTF);
-        cont.add(targetLab);
+        cont.add(targetLabel);
         cont.add(targetTF);
-        cont.add(propertyLab);
-        cont.add(propertyTFPan);
+        cont.add(propertyLabel);
+        cont.add(propertyTFPanel);
         cont.add(emptyLab);
-        cont.add(emptyTF);
-        cont.add(descLab);
-        cont.add(descTF);
+        cont.add(emptyTFLabel);
+        cont.add(descriptionLabel);
+        cont.add(descriptionTF);
         SpringUtilities.makeCompactGrid(cont, 5, 2, 10, 10, 5, 5);
         content.add(cont);
 
-        content.add(buttPan);
+        content.add(buttonPanel);
         content.add(Box.createVerticalStrut(5));
         setContentPane(content);
     }
@@ -185,7 +188,7 @@ public class PclEdgeInspectorDialog extends JDialog {
     private void unloadWidgets() {
         if (pclEdge != null) {
             pclEdge.setProperty(propertyTF.getText().trim());
-            pclEdge.setDescriptionString(descTF.getText().trim());
+            pclEdge.setDescriptionString(descriptionTF.getText().trim());
         }
     }
 
@@ -214,8 +217,8 @@ public class PclEdgeInspectorDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
 
         @Override
@@ -296,12 +299,12 @@ public class PclEdgeInspectorDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(PclEdgeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

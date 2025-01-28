@@ -18,6 +18,7 @@ import viskit.ViskitConfiguration;
 import viskit.control.EventGraphController;
 import viskit.model.Model;
 import viskit.model.ViskitStateVariable;
+import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -30,12 +31,12 @@ import viskit.model.ViskitStateVariable;
 public class StateVariableDialog extends ViskitSmallDialog {
 
     private final JTextField stateVarNameField;    // Text field that holds the parameter name
-    private final JTextField commentField;          // Text field that holds the comment
+    private final JTextField descriptionField;          // Text field that holds the comment
     private final JTextField arraySizeField;
     private final JComboBox stateVarTypeCombo;    // Editable combo box that lets us select a type
-    private final JLabel arrSizeLab;
+    private final JLabel arraySizeLabel;
     private ViskitStateVariable stVar;
-    private final JButton okButt;
+    private final JButton okButton;
     private final JButton canButt;
     public static String newName,  newType,  newComment;
     private final myFocusListener focList;
@@ -62,21 +63,23 @@ public class StateVariableDialog extends ViskitSmallDialog {
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
 
-        JLabel nameLab = new JLabel("name");
-        JLabel initLab = new JLabel("initial value");
-        JLabel typeLab = new JLabel("type");
-        JLabel commLab = new JLabel("description");
-        arrSizeLab = new JLabel("array size");
+        JLabel nameLabel = new JLabel("name");
+        JLabel initLabel = new JLabel("initial value");
+        JLabel typeLabel = new JLabel("type");
+        JLabel descriptionLabel = new JLabel("description");
+        descriptionLabel.setToolTipText(DESCRIPTION_HINT);
+        arraySizeLabel = new JLabel("array size");
 
-        int w = OneLinePanel.maxWidth(new JComponent[] {nameLab, initLab, typeLab, commLab});
+        int w = OneLinePanel.maxWidth(new JComponent[] {nameLabel, initLabel, typeLabel, descriptionLabel});
 
         stateVarNameField = new JTextField(15);
         stateVarNameField.addFocusListener(focList);
         setMaxHeight(stateVarNameField);
 
-        commentField = new JTextField(25);
-        commentField.addFocusListener(focList);
-        setMaxHeight(commentField);
+        descriptionField = new JTextField(25);
+        descriptionField.setToolTipText(DESCRIPTION_HINT);
+        descriptionField.addFocusListener(focList);
+        setMaxHeight(descriptionField);
 
         stateVarTypeCombo = ViskitGlobals.instance().getTypeCB();
         stateVarTypeCombo.getEditor().getEditorComponent().addFocusListener(focList);
@@ -85,19 +88,19 @@ public class StateVariableDialog extends ViskitSmallDialog {
         arraySizeField = new JTextField(15);
         arraySizeField.addFocusListener(focList);
 
-        fieldsPanel.add(new OneLinePanel(nameLab, w, stateVarNameField));
-        fieldsPanel.add(new OneLinePanel(typeLab, w, stateVarTypeCombo));
-        fieldsPanel.add(new OneLinePanel(arrSizeLab, w, arraySizeField));
-        fieldsPanel.add(new OneLinePanel(commLab, w, commentField));
+        fieldsPanel.add(new OneLinePanel(nameLabel, w, stateVarNameField));
+        fieldsPanel.add(new OneLinePanel(typeLabel, w, stateVarTypeCombo));
+        fieldsPanel.add(new OneLinePanel(arraySizeLabel, w, arraySizeField));
+        fieldsPanel.add(new OneLinePanel(descriptionLabel, w, descriptionField));
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
 
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
+        buttPan.add(okButton);
         buttPan.add(canButt);
         con.add(buttPan);
         con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
@@ -105,17 +108,17 @@ public class StateVariableDialog extends ViskitSmallDialog {
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new StateVarApplyButtonListener());//applyButtonListener());
+        okButton.addActionListener(new StateVarApplyButtonListener());//applyButtonListener());
 
-        enableApplyButtonListener lis = new enableApplyButtonListener(okButt);
+        enableApplyButtonListener lis = new enableApplyButtonListener(okButton);
         stateVarNameField.getDocument().addDocumentListener(lis);//addCaretListener(lis);
-        commentField.getDocument().addDocumentListener(lis);// addCaretListener(lis);
+        descriptionField.getDocument().addDocumentListener(lis);// addCaretListener(lis);
         stateVarTypeCombo.addActionListener(lis);
 
         myTyperComponent = stateVarTypeCombo.getEditor().getEditorComponent();
 
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        addWindowListener(new WindowClosingListener(this, okButt, canButt));
+        addWindowListener(new WindowClosingListener(this, okButton, canButt));
 
         setParams(parent, param);
     }
@@ -125,7 +128,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
      * @param b if true, then enable
      */
     private void toggleArraySizeFields(boolean b) {
-        arrSizeLab.setEnabled(b);
+        arraySizeLabel.setEnabled(b);
         arraySizeField.setEnabled(b);
         arraySizeField.setEditable(b);     // grays background if false
     }
@@ -137,10 +140,10 @@ public class StateVariableDialog extends ViskitSmallDialog {
         fillWidgets();
 
         modified = (p == null);
-        okButt.setEnabled(p == null);
+        okButton.setEnabled(p == null);
 
         if (p == null) {
-            getRootPane().setDefaultButton(okButt);
+            getRootPane().setDefaultButton(okButton);
         } else {
             getRootPane().setDefaultButton(canButt);
         }
@@ -173,13 +176,13 @@ public class StateVariableDialog extends ViskitSmallDialog {
             ty = stVar.getType();
             stateVarTypeCombo.setSelectedItem(stripArraySize(ty));
             arraySizeField.setText(getArraySize(ty));
-            commentField.setText(stVar.getComment());
+            descriptionField.setText(stVar.getComment());
             isArray = ViskitGlobals.instance().isArray(stVar.getType());
         } else {
             stateVarNameField.setText(((Model) ViskitGlobals.instance().getEventGraphEditor().getModel()).generateStateVariableName()); //"state_"+count++);
             ty = (String) stateVarTypeCombo.getSelectedItem();
             isArray = ViskitGlobals.instance().isArray(ty);
-            commentField.setText("");
+            descriptionField.setText("");
             arraySizeField.setText("");
         }
         toggleArraySizeFields(isArray);
@@ -201,11 +204,11 @@ public class StateVariableDialog extends ViskitSmallDialog {
         if (stVar != null) {
             stVar.setName(nm);
             stVar.setType(ty);
-            stVar.setComment(this.commentField.getText().trim());
+            stVar.setComment(this.descriptionField.getText().trim());
         } else {
             newName = nm;
             newType = ty;
-            newComment = commentField.getText().trim();
+            newComment = descriptionField.getText().trim();
         }
     }
 
@@ -248,7 +251,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
             if (isAr) {
                 arraySizeField.requestFocus();
             } else {
-                commentField.requestFocus();
+                descriptionField.requestFocus();
             }
         }
 

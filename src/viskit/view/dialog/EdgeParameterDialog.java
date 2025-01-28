@@ -29,7 +29,7 @@ public class EdgeParameterDialog extends JDialog {
     private static boolean modified = false;
     private ViskitEdgeParameter param;
     private String type;
-    private final JButton okButt;
+    private final JButton okButton;
     private JButton canButt;
     public static String newValue;
 
@@ -79,9 +79,9 @@ public class EdgeParameterDialog extends JDialog {
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
+        buttPan.add(okButton);
         buttPan.add(canButt);
         con.add(buttPan);
         con.add(Box.createVerticalGlue());           // takes up space when dialog is expanded vertically
@@ -89,7 +89,7 @@ public class EdgeParameterDialog extends JDialog {
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
         this.valueField.addCaretListener(lis);
@@ -110,7 +110,7 @@ public class EdgeParameterDialog extends JDialog {
         fillWidgets();
 
         modified = (p == null);
-        okButt.setEnabled((p == null));
+        okButton.setEnabled((p == null));
 
         getRootPane().setDefaultButton(canButt);
         pack();
@@ -155,8 +155,8 @@ public class EdgeParameterDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
 
         @Override
@@ -173,7 +173,7 @@ public class EdgeParameterDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(EdgeParameterDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
                     canButt.doClick();
                 }

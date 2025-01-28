@@ -29,6 +29,7 @@ import viskit.model.ViskitElement;
 import viskit.model.ViskitEdgeParameter;
 import viskit.view.ConditionalExpressionPanel;
 import viskit.view.EdgeParametersPanel;
+import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -48,7 +49,7 @@ public class EdgeInspectorDialog extends JDialog {
     private Edge edge;
     private boolean schedulingType = true; // true = scheduling, false = cancelling
     private final JButton canButt;
-    private final JButton okButt;
+    private final JButton okButton;
     private final JLabel srcEvent;
     private final JLabel targEvent;
     private EdgeParametersPanel parameters;
@@ -165,7 +166,9 @@ public class EdgeInspectorDialog extends JDialog {
         edgeInspectorPanel.add(Box.createVerticalStrut(5));
 
         descriptionJta = new JTextArea(2, 25);
+        descriptionJta.setToolTipText(DESCRIPTION_HINT);
         descriptionJsp = new JScrollPane(descriptionJta);
+        descriptionJsp.setToolTipText(DESCRIPTION_HINT);
         descriptionJsp.setBorder(new CompoundBorder(
                 new EmptyBorder(0, 0, 5, 0),
                 BorderFactory.createTitledBorder("Description")));
@@ -249,8 +252,9 @@ public class EdgeInspectorDialog extends JDialog {
         JPanel addButtonPanel = new JPanel();
         addButtonPanel.setLayout(new BoxLayout(addButtonPanel, BoxLayout.X_AXIS));
         addButtonPanel.setBorder(new TitledBorder("add"));
-        addDescriptionButton = new JButton("description"); //add description");
-        addConditionalButton = new JButton("conditional"); //add conditional");
+        addDescriptionButton = new JButton("description");
+        addDescriptionButton.setToolTipText(DESCRIPTION_HINT);        
+        addConditionalButton = new JButton("conditional");
 
         addButtonPanel.add(Box.createHorizontalGlue());
         addButtonPanel.add(addDescriptionButton);
@@ -262,9 +266,9 @@ public class EdgeInspectorDialog extends JDialog {
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());
-        buttPan.add(okButt);
+        buttPan.add(okButton);
         buttPan.add(canButt);
         twoRowButtonPanel.add(buttPan);
 
@@ -273,7 +277,7 @@ public class EdgeInspectorDialog extends JDialog {
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         final myChangeListener chlis = new myChangeListener();
         descriptionJta.addKeyListener(chlis);
@@ -316,7 +320,7 @@ public class EdgeInspectorDialog extends JDialog {
         if (!allGood) {return;}
 
         modified = false;
-        okButt.setEnabled(false);
+        okButton.setEnabled(false);
 
         getRootPane().setDefaultButton(canButt);
         pack();
@@ -706,8 +710,8 @@ public class EdgeInspectorDialog extends JDialog {
         @Override
         public void stateChanged(ChangeEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
             dotLabel.setVisible(!((ViskitElement) timeDelayVarsCB.getSelectedItem()).getName().isEmpty());
 
             // Set the ComboBox width to accomodate the string length
@@ -754,7 +758,7 @@ public class EdgeInspectorDialog extends JDialog {
     public void setDescription(String s) {
         descriptionJta.setText(s);
         modified = true;
-        okButt.setEnabled(true);
+        okButton.setEnabled(true);
     }
 
     public String getDescription() {
@@ -770,7 +774,7 @@ public class EdgeInspectorDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
                     canButt.doClick();
                 }

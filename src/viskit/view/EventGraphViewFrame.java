@@ -108,7 +108,7 @@ import viskit.mvc.MvcRecentFileListener;
  */
 public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventGraphView
 {
-    public static String TODO_DESCRIPTION_WARNING = "(Use \"Edit > Edit Properties\" or (Ctrl-E) to modify event graph description)";
+    public static String DESCRIPTION_HINT = "Good descriptions reveal model meaning and author intent";
 
     private static final Logger LOG = LogUtils.getLogger(EventGraphViewFrame.class);
 
@@ -273,8 +273,9 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
             if (gmd != null) {
                 setSelectedEventGraphName(gmd.name);
                 setSelectedEventGraphDescription(gmd.description);
+                
             } else if (viskit.ViskitStatics.debug) {
-                System.err.println("error: EventGraphViewFrame gmd null..");
+                System.err.println("error: EventGraphViewFrame metadata null...");
             }
         }
     }
@@ -320,16 +321,24 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
 
-        JLabel descriptionLabel = new JLabel("Event Graph Description (Ctrl-E to Edit)"); // TODO fix this functionality
+        JLabel descriptionLabel = new JLabel("Event Graph Description"); // TODO fix this functionality
+        descriptionLabel.setToolTipText(DESCRIPTION_HINT);
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        descriptionLabel.setToolTipText(TODO_DESCRIPTION_WARNING);
-
         parametersPanel.add(descriptionLabel);
-        parametersPanel.add(Box.createVerticalStrut(5));
+//        parametersPanel.add(Box.createVerticalStrut(5));
+        
+        JLabel instructions = new JLabel("Edit Properties or Ctrl-E to Edit");
+        instructions.setToolTipText(DESCRIPTION_HINT);
+        instructions.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        int bigSz = descriptionLabel.getFont().getSize();
+        instructions.setFont(descriptionLabel.getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
+        parametersPanel.add(instructions);
+//        parametersPanel.add(Box.createVerticalStrut(5));
 
         JTextArea descriptionTA = new JTextArea();
+        descriptionTA.setToolTipText(DESCRIPTION_HINT);
         descriptionTA.setEditable(false);
-        descriptionTA.setText(TODO_DESCRIPTION_WARNING);
+        descriptionTA.setText(DESCRIPTION_HINT); // initial value, hopefully overwritten by loaded value
         descriptionTA.setWrapStyleWord(true);
         descriptionTA.setLineWrap(true);
         descriptionTA.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -382,13 +391,13 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         stateCblockSplt.setMinimumSize(new Dimension(20, 20));
 
         // Split pane that has description, parameters, state variables and code block.
-        JSplitPane spltPn = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 parametersPanel,
                 stateCblockSplt);
-        spltPn.setResizeWeight(0.75);
-        spltPn.setMinimumSize(new Dimension(20, 20));
+        splitPane.setResizeWeight(0.75);
+        splitPane.setMinimumSize(new Dimension(20, 20));
 
-        vgcw.stateParamSplitPane = spltPn;
+        vgcw.stateParameterSplitPane = splitPane;
         vgcw.paramPan = pp;
         vgcw.varPan = vp;
         vgcw.codeBlockPan = codeblockPan;
@@ -405,22 +414,21 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         return cbp;
     }
 
-    private JComponent buildCodeBlockComponent(CodeBlockPanel cbp) {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        JLabel lab = new JLabel("Global Code Block");
-        lab.setToolTipText("Use of this code block will be for delcaring "
-                + "global variables, static variables, static methods, etc.");
-        lab.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        p.add(lab);
-        cbp.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-        p.add(cbp);
-        p.setBorder(new EmptyBorder(5, 5, 5, 2));
-        Dimension d = new Dimension(p.getPreferredSize());
+    private JComponent buildCodeBlockComponent(CodeBlockPanel codeBlockPanel) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JLabel globalCodeBlockLabel = new JLabel("Global Code Block");
+        globalCodeBlockLabel.setToolTipText("Code block source code can declare global variables, static variables, static methods, etc.");
+        globalCodeBlockLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        panel.add(globalCodeBlockLabel);
+        codeBlockPanel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        panel.add(codeBlockPanel);
+        panel.setBorder(new EmptyBorder(5, 5, 5, 2));
+        Dimension d = new Dimension(panel.getPreferredSize());
         d.width = Integer.MAX_VALUE;
-        p.setMaximumSize(d);
+        panel.setMaximumSize(d);
 
-        return p;
+        return panel;
     }
 
     @Override
@@ -433,7 +441,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
     @Override
     public void setSelectedEventGraphDescription(String description) {
-        JSplitPane jsp = getCurrentVgraphComponentWrapper().stateParamSplitPane;
+        JSplitPane jsp = getCurrentVgraphComponentWrapper().stateParameterSplitPane;
         JPanel jp = (JPanel) jsp.getTopComponent();
         Component[] components = jp.getComponents();
         for (Component c : components) {
@@ -458,7 +466,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
         JScrollPane jsp = new JScrollPane(graphPane);
 
-        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jsp, graphPane.stateParamSplitPane);
+        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jsp, graphPane.stateParameterSplitPane);
 
         // This is the key to getting the jgraph half to come up appropriately
         // wide by giving the left component (JGraph side) most of the usable
@@ -748,14 +756,15 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mnemonic, KeyStroke accelerator)
+    {
         Action a = ActionIntrospector.getAction(source, method);
         Map<String, Object> map = new HashMap<>();
-        if (mn != null) {
-            map.put(Action.MNEMONIC_KEY, mn);
+        if (mnemonic != null) {
+            map.put(Action.MNEMONIC_KEY, mnemonic);
         }
-        if (accel != null) {
-            map.put(Action.ACCELERATOR_KEY, accel);
+        if (accelerator != null) {
+            map.put(Action.ACCELERATOR_KEY, accelerator);
         }
         if (name != null) {
             map.put(Action.NAME, name);

@@ -22,6 +22,7 @@ import viskit.model.ViskitElement;
 import viskit.model.ViskitStateVariable;
 import viskit.view.ArgumentsPanel;
 import viskit.view.LocalVariablesPanel;
+import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -50,7 +51,7 @@ public class EventStateTransitionDialog extends JDialog {
     private final JRadioButton assTo;
     private final JRadioButton opOn;
     private EventStateTransition param;
-    private final JButton okButt;
+    private final JButton okButton;
     private final JButton canButt;
     private final JButton newSVButt;
     private final JLabel actionLab1;
@@ -97,7 +98,8 @@ public class EventStateTransitionDialog extends JDialog {
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.PAGE_AXIS));
 
-        JLabel commLab = new JLabel("description");
+        JLabel descriptionLabel = new JLabel("description");
+        descriptionLabel.setToolTipText(DESCRIPTION_HINT);
         JLabel localAssignLab = new JLabel("local assignment");
         JLabel nameLab = new JLabel("state variable");
         JLabel arrayIdxLab = new JLabel("index variable");
@@ -128,6 +130,7 @@ public class EventStateTransitionDialog extends JDialog {
         stateVarsCB.setBackground(Color.white);
         newSVButt = new JButton("new");
         descriptionField = new JTextField(25);
+        descriptionField.setToolTipText(DESCRIPTION_HINT);
         setMaxHeight(descriptionField);
         actionField = new JTextField(15);
         actionField.setToolTipText("Use this field to provide a method "
@@ -146,11 +149,11 @@ public class EventStateTransitionDialog extends JDialog {
                 + "declared local variable, or an argument");
         setMaxHeight(localInvocationField);
 
-        int w = OneLinePanel.maxWidth(new JComponent[]{commLab, localAssignLab,
+        int w = OneLinePanel.maxWidth(new JComponent[]{descriptionLabel, localAssignLab,
             nameLab, arrayIdxLab, assTo, opOn, stateTranInvokeLab,
             localInvokeLab, methodLab});
 
-        fieldsPanel.add(new OneLinePanel(commLab, w, descriptionField));
+        fieldsPanel.add(new OneLinePanel(descriptionLabel, w, descriptionField));
         fieldsPanel.add(Box.createVerticalStrut(10));
 
         JSeparator divider = new JSeparator(JSeparator.HORIZONTAL);
@@ -201,9 +204,9 @@ public class EventStateTransitionDialog extends JDialog {
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
+        buttPan.add(okButton);
         buttPan.add(canButt);
 
         con.add(buttPan);
@@ -211,7 +214,7 @@ public class EventStateTransitionDialog extends JDialog {
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
         descriptionField.addCaretListener(lis);
@@ -224,7 +227,7 @@ public class EventStateTransitionDialog extends JDialog {
             JComboBox cb = (JComboBox) e.getSource();
             ViskitStateVariable sv = (ViskitStateVariable) cb.getSelectedItem();
             descriptionField.setText(sv.getComment());
-            okButt.setEnabled(true);
+            okButton.setEnabled(true);
             indexPanel.setVisible(ViskitGlobals.instance().isArray(sv.getType()));
             modified = true;
             pack();
@@ -243,11 +246,11 @@ public class EventStateTransitionDialog extends JDialog {
             }
         });
         stateTranMethodsCB.addActionListener((ActionEvent e) -> {
-            okButt.setEnabled(true);
+            okButton.setEnabled(true);
             modified = true;
         });
         localVarMethodsCB.addActionListener((ActionEvent e) -> {
-            okButt.setEnabled(true);
+            okButton.setEnabled(true);
             modified = true;
         });
 
@@ -399,7 +402,7 @@ public class EventStateTransitionDialog extends JDialog {
         if (!allGood) {return;}
 
         modified = (p == null);
-        okButt.setEnabled(p == null);
+        okButton.setEnabled(p == null);
 
         getRootPane().setDefaultButton(canButt);
         pack(); // do this prior to next
@@ -615,7 +618,7 @@ public class EventStateTransitionDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             modified = true;
-            okButt.setEnabled(true);
+            okButton.setEnabled(true);
 
             Dimension d = actionLab1.getPreferredSize();
             if (assTo.isSelected()) {
@@ -675,8 +678,8 @@ public class EventStateTransitionDialog extends JDialog {
             localInvocationPanel.setVisible(!localInvocationField.getText().isEmpty());
             localInvokeDot.setEnabled(!localInvocationField.getText().isEmpty());
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
             pack();
         }
 
@@ -694,7 +697,7 @@ public class EventStateTransitionDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
                     canButt.doClick();
                 }

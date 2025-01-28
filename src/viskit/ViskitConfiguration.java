@@ -64,13 +64,13 @@ public class ViskitConfiguration {
     public static final String EVENTGRAPH_HISTORY_KEY = RECENT_EVENTGRAPH_CLEAR_KEY + ".EventGraphFile";
     public static final String ASSEMBLY_HISTORY_KEY = RECENT_ASSEMBLY_CLEAR_KEY + ".AssemblyFile";
     public static final String PROJECT_HISTORY_KEY = RECENT_PROJECT_CLEAR_KEY + ".Project";
-    public static final String EVENTGRAPH_EDIT_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
-    public static final String ASSEMBLY_EDIT_VISIBLE_KEY = "app.tabs.AssemblyEditor[@visible]";
-    public static final String ASSEMBLY_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
+    public static final String EVENTGRAPH_EDITOR_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
+    public static final String ASSEMBLY_EDITOR_VISIBLE_KEY = "app.tabs.AssemblyEditor[@visible]";
+    public static final String ASSEMBLY_SIMULATION_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
     public static final String ANALYST_REPORT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
-    public static final String DOE_EDIT_VISIBLE_KEY = "app.tabs.DesignOfExperiments[@visible]";
-    public static final String CLUSTER_RUN_VISIBLE_KEY = "app.tabs.ClusterRun[@visible]";
-    public static final String DEBUG_MESSAGES_KEY = "app.debug";
+    public static final String DESIGNOFEXPERIMENTS_DOE_EDITOR_VISIBLE_KEY = "app.tabs.DesignOfExperiments[@visible]";
+    public static final String CLOUD_SIMULATION_RUN_VISIBLE_KEY = "app.tabs.ClusterRun[@visible]";
+    public static final String VERBOSE_DEBUG_MESSAGES_KEY = "app.debug";
 
     /** A cached path to satisfactorily compiled, or not, XML EventGraphs and their respective .class versions */
     public static final String CACHED_CLEAR_KEY = "Cached";
@@ -109,7 +109,8 @@ public class ViskitConfiguration {
         return me;
     }
 
-    private ViskitConfiguration() {
+    private ViskitConfiguration() 
+    {
         try {
             if (!VISKIT_CONFIGURATION_DIR.exists()) {
                 VISKIT_CONFIGURATION_DIR.mkdirs();
@@ -130,11 +131,11 @@ public class ViskitConfiguration {
         
         xmlConfigurations = new HashMap<>();
         sessionHM = new HashMap<>();
-        setDefaultConfig();
+        setDefaultConfiguration();
     }
 
     /** Builds, or rebuilds a default configuration */
-    private void setDefaultConfig() {
+    private void setDefaultConfiguration() {
         try {
             Parameters params = new Parameters();
             FileBasedConfigurationBuilder<XMLConfiguration> bldr1
@@ -174,7 +175,7 @@ public class ViskitConfiguration {
     }
 
     /**
-     * Rather screwy.A decent design would allow the CombinedConfiguration obj
+     * Rather screwy - a decent design would allow the CombinedConfiguration object
  to do the saving, but it won't.
      *
      * @param key the ViskitConfiguration named key to set
@@ -199,7 +200,7 @@ public class ViskitConfiguration {
         return combinedConfiguration.getString(key);
     }
 
-    public String[] getConfigValues(String key) {
+    public String[] getConfigurationValues(String key) {
         return combinedConfiguration.getStringArray(key);
     }
 

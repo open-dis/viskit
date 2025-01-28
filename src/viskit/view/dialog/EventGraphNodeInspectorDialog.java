@@ -14,6 +14,7 @@ import viskit.ViskitGlobals;
 import viskit.model.EventGraphNode;
 import viskit.model.ViskitModelInstantiator;
 import viskit.ViskitStatics;
+import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 import viskit.view.InstantiationPanel;
 
 /**
@@ -94,8 +95,10 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         outputCheck.setToolTipText("Enable a list dump of all entity names to the console");
 
         descriptionField = new JTextField();
+        descriptionField.setToolTipText(DESCRIPTION_HINT);
         ViskitStatics.clampHeight(descriptionField);
         descriptionLabel = new JLabel("description", JLabel.TRAILING);
+        descriptionLabel.setToolTipText(DESCRIPTION_HINT);
         descriptionLabel.setLabelFor(descriptionField);
 
         ViskitStatics.cloneSize(handleLabel, descriptionLabel);    // make handle same size

@@ -250,7 +250,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
             viskitView.setSelectedEventGraphName(modelImplementation.getMetadata().name);
             if  (modelImplementation.getMetadata().description.isBlank())
-                 viskitView.setSelectedEventGraphDescription(EventGraphViewFrame.TODO_DESCRIPTION_WARNING);
+                 viskitView.setSelectedEventGraphDescription(EventGraphViewFrame.DESCRIPTION_HINT);
             else viskitView.setSelectedEventGraphDescription(modelImplementation.getMetadata().description);
             adjustRecentEventGraphFileSet(file);
             markEventGraphFilesAsOpened();
@@ -574,7 +574,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         Model mod = (Model) getModel();
         EventGraphView view = (EventGraphView) getView();
         GraphMetadata graphMetadata = mod.getMetadata();
-        if (graphMetadata.description.equals(EventGraphViewFrame.TODO_DESCRIPTION_WARNING))
+        if (graphMetadata.description.equals(EventGraphViewFrame.DESCRIPTION_HINT))
             graphMetadata.description = "";
 
         // Allow the user to type specific package names

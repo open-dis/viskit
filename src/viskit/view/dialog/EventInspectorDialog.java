@@ -16,6 +16,7 @@ import viskit.ViskitGlobals;
 import viskit.model.*;
 import viskit.view.ArgumentsPanel;
 import viskit.view.CodeBlockPanel;
+import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 import viskit.view.LocalVariablesPanel;
 import viskit.view.TransitionsPanel;
 
@@ -35,7 +36,7 @@ public class EventInspectorDialog extends JDialog {
     private EventNode node;
     private static boolean modified = false;
     private final JTextField name;
-    private final JTextField description;
+    private final JTextField descriptionTF;
     private final JPanel descriptionPanel;
     private TransitionsPanel transitions;
     private ArgumentsPanel arguments;
@@ -105,15 +106,18 @@ public class EventInspectorDialog extends JDialog {
         descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.X_AXIS));
         descriptionPanel.setOpaque(false);
         descriptionPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Description")));
-        description = new JTextField("");
-        description.setOpaque(true);
-        description.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        descriptionPanel.add(description);
+        descriptionPanel.setToolTipText(DESCRIPTION_HINT);
+        descriptionTF = new JTextField("");
+        descriptionTF.setToolTipText(DESCRIPTION_HINT);
+        descriptionTF.setOpaque(true);
+        descriptionTF.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        descriptionPanel.add(descriptionTF);
         d = descriptionPanel.getPreferredSize();
         d.width = Integer.MAX_VALUE;
         descriptionPanel.setMaximumSize(new Dimension(d));
 
         JButton editDescriptionButton = new JButton(" ... ");
+        editDescriptionButton.setToolTipText(DESCRIPTION_HINT);
         editDescriptionButton.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         editDescriptionButton.setToolTipText("Click to edit a long description");
         Dimension dd = editDescriptionButton.getPreferredSize();
@@ -202,7 +206,7 @@ public class EventInspectorDialog extends JDialog {
         //name.addActionListener(chlis);
         KeyListener klis = new myKeyListener();
         name.addKeyListener(klis);
-        description.addKeyListener(klis);
+        descriptionTF.addKeyListener(klis);
         editDescriptionButton.addActionListener(new commentListener());
 
         arguments.addPlusListener(myChangeListener);
@@ -285,11 +289,11 @@ public class EventInspectorDialog extends JDialog {
         setTitle("Event Inspector: " + nmSt);
         name.setText(nmSt);
 
-        Dimension d = description.getPreferredSize();
+        Dimension d = descriptionTF.getPreferredSize();
         String s = fillString(node.getComments());
-        description.setText(s);
-        description.setCaretPosition(0);
-        description.setPreferredSize(d);
+        descriptionTF.setText(s);
+        descriptionTF.setCaretPosition(0);
+        descriptionTF.setPreferredSize(d);
 
         hideShowDescription(s != null && !s.isEmpty());
 
@@ -359,7 +363,7 @@ public class EventInspectorDialog extends JDialog {
             }
             en.setLocalVariables(localVariables.getData());
             en.getComments().clear();
-            en.getComments().add(description.getText().trim());
+            en.getComments().add(descriptionTF.getText().trim());
             en.setCodeBLock(codeBlock.getData());
         }
     }
@@ -536,12 +540,12 @@ public class EventInspectorDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            StringBuffer sb = new StringBuffer(EventInspectorDialog.this.description.getText().trim());
+            StringBuffer sb = new StringBuffer(EventInspectorDialog.this.descriptionTF.getText().trim());
             boolean modded = TextAreaDialog.showTitledDialog("Event Description",
                     EventInspectorDialog.this, sb);
             if (modded) {
-                EventInspectorDialog.this.description.setText(sb.toString().trim());
-                EventInspectorDialog.this.description.setCaretPosition(0);
+                EventInspectorDialog.this.descriptionTF.setText(sb.toString().trim());
+                EventInspectorDialog.this.descriptionTF.setCaretPosition(0);
                 setModified(true);
             }
         }

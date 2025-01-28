@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import viskit.ViskitGlobals;
+import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -30,7 +31,7 @@ public class EventArgumentDialog extends JDialog {
     private static EventArgumentDialog dialog;
     private static boolean modified = false;
     private EventArgument myEA;
-    private final JButton okButt;
+    private final JButton okButton;
     private JButton canButt;
     public static String newName,  newType,  newDescription;
 
@@ -67,11 +68,13 @@ public class EventArgumentDialog extends JDialog {
         JLabel initLab = new JLabel("initial value");
         JLabel typeLab = new JLabel("type");
         JLabel descriptionLabel = new JLabel("description");
+        descriptionLabel.setToolTipText(DESCRIPTION_HINT);
         int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, descriptionLabel});
 
         nameField = new JTextField(15);
         setMaxHeight(nameField);
         descriptionField = new JTextField(25);
+        descriptionField.setToolTipText(DESCRIPTION_HINT);
         setMaxHeight(descriptionField);
         parameterTypeCombo = ViskitGlobals.instance().getTypeCB();
         setMaxHeight(parameterTypeCombo);
@@ -85,9 +88,9 @@ public class EventArgumentDialog extends JDialog {
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
+        buttPan.add(okButton);
         buttPan.add(canButt);
         panel.add(buttPan);
         panel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
@@ -95,7 +98,7 @@ public class EventArgumentDialog extends JDialog {
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener listener = new enableApplyButtonListener();
         this.nameField.addCaretListener(listener);
@@ -117,7 +120,7 @@ public class EventArgumentDialog extends JDialog {
         fillWidgets();
 
         modified = (p == null);
-        okButt.setEnabled(p == null);
+        okButton.setEnabled(p == null);
 
         getRootPane().setDefaultButton(canButt);
         pack();
@@ -185,8 +188,8 @@ public class EventArgumentDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
 
         @Override
@@ -203,7 +206,7 @@ public class EventArgumentDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(EventArgumentDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
                     canButt.doClick();
                 }

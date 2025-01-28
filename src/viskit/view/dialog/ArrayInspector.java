@@ -27,7 +27,7 @@ public class ArrayInspector extends JDialog {
 
     public boolean modified = false;
     private final JButton canButt;
-    private final JButton okButt;
+    private final JButton okButton;
     private final JPanel buttPan;
     private final JPanel contentP;
     private final JTextField typeTF;
@@ -70,9 +70,9 @@ public class ArrayInspector extends JDialog {
         buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
+        buttPan.add(okButton);
         buttPan.add(canButt);
 
         // attach listeners
@@ -81,8 +81,8 @@ public class ArrayInspector extends JDialog {
         sizeTF.addCaretListener(listnr);
         sizeTF.addActionListener(new sizeListener());
         canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
-        okButt.setEnabled(false);
+        okButton.addActionListener(new applyButtonListener());
+        okButton.setEnabled(false);
     }
     ObjListPanel olp;
 
@@ -182,8 +182,8 @@ public class ArrayInspector extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
 
         @Override

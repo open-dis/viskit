@@ -526,9 +526,9 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         entityParamCommentsTA.setText(analystReportModel.getParameterComments());
 
         Vector<String> colNames = new Vector<>();
-        colNames.add("Category");
-        colNames.add("Name");
-        colNames.add("Description");
+        colNames.add("category");
+        colNames.add("name");
+        colNames.add("description");
 
         Vector<Object[]> v = analystReportModel.getParameterTables();
 

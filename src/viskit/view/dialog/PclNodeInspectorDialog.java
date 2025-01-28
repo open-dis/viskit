@@ -14,6 +14,7 @@ import javax.swing.event.CaretListener;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.model.PropertyChangeListenerNode;
+import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 import viskit.view.InstantiationPanel;
 
 /**
@@ -29,7 +30,7 @@ import viskit.view.InstantiationPanel;
 public class PclNodeInspectorDialog extends JDialog {
 
     private final JLabel nameLabel;
-    private final JLabel typeLab;
+    private final JLabel typeLabel;
     private final JTextField nameField;    // Text field that holds the parameter name
     private final JTextField typeField;
     private InstantiationPanel ip;
@@ -37,15 +38,15 @@ public class PclNodeInspectorDialog extends JDialog {
     private static PclNodeInspectorDialog dialog;
     private static boolean modified = false;
     private PropertyChangeListenerNode pclNode;
-    private final JButton okButt;
+    private final JButton okButton;
     private final JButton canButt;
     private final enableApplyButtonListener lis;
     JPanel buttPan;
     private final JCheckBox clearStatsCB;
     private final JCheckBox getMeanStatsCB;
     private final JCheckBox getCountStatsCB;
-    private final JTextField descTF;
-    private final JLabel descLab;
+    private final JTextField descriptionTF;
+    private final JLabel descriptionLabel;
 
     public static boolean showDialog(JFrame f, PropertyChangeListenerNode parm) {
         try {
@@ -91,17 +92,19 @@ public class PclNodeInspectorDialog extends JDialog {
         nameLabel = new JLabel("name", JLabel.TRAILING);
         nameLabel.setLabelFor(nameField);
 
-        descTF = new JTextField();
-        ViskitStatics.clampHeight(descTF);
-        descTF.addCaretListener(lis);
-        descLab = new JLabel("description", JLabel.TRAILING);
-        descLab.setLabelFor(descTF);
+        descriptionTF = new JTextField();
+        descriptionTF.setToolTipText(DESCRIPTION_HINT);     
+        ViskitStatics.clampHeight(descriptionTF);
+        descriptionTF.addCaretListener(lis);
+        descriptionLabel = new JLabel("description", JLabel.TRAILING);
+        descriptionLabel.setToolTipText(DESCRIPTION_HINT);     
+        descriptionLabel.setLabelFor(descriptionTF);
 
-        typeLab = new JLabel("type", JLabel.TRAILING);
+        typeLabel = new JLabel("type", JLabel.TRAILING);
         typeField = new JTextField();
         ViskitStatics.clampHeight(typeField);
         typeField.setEditable(false);
-        typeLab.setLabelFor(typeField);
+        typeLabel.setLabelFor(typeField);
 
         clearStatsCB = new JCheckBox("Clear statistics after each replication");
         clearStatsCB.setSelected(true); // bug 706
@@ -119,14 +122,14 @@ public class PclNodeInspectorDialog extends JDialog {
         buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
+        buttPan.add(okButton);
         buttPan.add(canButt);
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         setParams(parent, lv);
     }
@@ -137,7 +140,7 @@ public class PclNodeInspectorDialog extends JDialog {
         fillWidgets();
 
         modified = (p == null);
-        okButt.setEnabled(p == null);
+        okButton.setEnabled(p == null);
 
         getRootPane().setDefaultButton(canButt);
         pack();
@@ -154,7 +157,7 @@ public class PclNodeInspectorDialog extends JDialog {
 
             nameField.setText(pclNode.getName());
             typeField.setText(pclNode.getType());
-            descTF.setText(pclNode.getDescriptionString());
+            descriptionTF.setText(pclNode.getDescriptionString());
 
             ip = new InstantiationPanel(this, lis, true);
             setupIP();
@@ -171,10 +174,10 @@ public class PclNodeInspectorDialog extends JDialog {
             cont.add(nameLabel);
             cont.add(nameField);
 
-            cont.add(descLab);
-            cont.add(descTF);
+            cont.add(descriptionLabel);
+            cont.add(descriptionTF);
 
-            cont.add(typeLab);
+            cont.add(typeLabel);
             cont.add(typeField);
             SpringUtilities.makeCompactGrid(cont, 3, 2, 10, 10, 5, 5);
 
@@ -214,7 +217,7 @@ public class PclNodeInspectorDialog extends JDialog {
         nm = nm.replaceAll("\\s", "");
         if (pclNode != null) {
             pclNode.setName(nm);
-            pclNode.setDescriptionString(descTF.getText().trim());
+            pclNode.setDescriptionString(descriptionTF.getText().trim());
             pclNode.setInstantiator(ip.getData());
             if (pclNode.isSampleStats()) {
                 pclNode.setClearStatsAfterEachRun(clearStatsCB.isSelected());
@@ -237,8 +240,8 @@ public class PclNodeInspectorDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
         @Override
         public void actionPerformed(ActionEvent ae) {
@@ -252,8 +255,8 @@ public class PclNodeInspectorDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
         @Override
         public void actionPerformed(ActionEvent ae) {
@@ -288,8 +291,8 @@ public class PclNodeInspectorDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
 
         @Override
@@ -306,7 +309,7 @@ public class PclNodeInspectorDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(PclNodeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
                     canButt.doClick();
                 }

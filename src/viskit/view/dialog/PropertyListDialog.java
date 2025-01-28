@@ -33,7 +33,7 @@ public class PropertyListDialog extends JDialog {
     private static PropertyListDialog dialog;
     private static int selection = -1;
     private String[][] pnamesTypes;
-    private final JButton okButt;
+    private final JButton okButton;
     private JButton canButt;
     private final JTable table;
     private final JPanel buttPan;
@@ -64,15 +64,15 @@ public class PropertyListDialog extends JDialog {
         buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
+        buttPan.add(okButton);
         buttPan.add(canButt);
         buttPan.add(Box.createHorizontalStrut(5));
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         setParams(parent, namesTypes);
     }
@@ -85,7 +85,7 @@ public class PropertyListDialog extends JDialog {
         if (pnamesTypes == null) {
             selection = 0;
         }
-        okButt.setEnabled(pnamesTypes == null);
+        okButton.setEnabled(pnamesTypes == null);
 
         getRootPane().setDefaultButton(canButt);
         pack();
@@ -144,8 +144,8 @@ public class PropertyListDialog extends JDialog {
             ListSelectionModel lsm = (ListSelectionModel) e.getSource();
             if (!lsm.isSelectionEmpty()) {
                 selection = lsm.getMinSelectionIndex();
-                okButt.setEnabled(true);
-                getRootPane().setDefaultButton(okButt);
+                okButton.setEnabled(true);
+                getRootPane().setDefaultButton(okButton);
             }
         }
     }
@@ -158,7 +158,7 @@ public class PropertyListDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(PropertyListDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
                     canButt.doClick();
                 }

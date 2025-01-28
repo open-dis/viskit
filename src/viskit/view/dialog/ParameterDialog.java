@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import viskit.ViskitGlobals;
+import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -33,11 +34,11 @@ public class ParameterDialog extends JDialog {
 
     private final JTextField parameterNameField;    // Text field that holds the parameter name
     private final JTextField expressionField;       // Text field that holds the expression
-    private final JTextField commentField;          // Text field that holds the comment
-    private final JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
+    private final JTextField descriptionField;      // Text field that holds the description
+    private final JComboBox parameterTypeCombo;     // Editable combo box that lets us select a type
     private ViskitParameter param;
-    private final JButton okButt;
-    private JButton canButt;
+    private final JButton okButton;
+    private JButton cancelButton;
 
     public static boolean showDialog(JFrame f, ViskitParameter parm) {
         if (dialog == null) {
@@ -72,43 +73,45 @@ public class ParameterDialog extends JDialog {
         JLabel nameLab = new JLabel("name");
         JLabel initLab = new JLabel("initial value");
         JLabel typeLab = new JLabel("type");
-        JLabel commLab = new JLabel("description");
-        int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, commLab});
+        JLabel descriptionLabel = new JLabel("description");
+        descriptionLabel.setToolTipText(DESCRIPTION_HINT);
+        int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, descriptionLabel});
 
         parameterNameField = new JTextField(15);
         setMaxHeight(parameterNameField);
         expressionField = new JTextField(25);
         setMaxHeight(expressionField);
-        commentField = new JTextField(25);
-        setMaxHeight(commentField);
+        descriptionField = new JTextField(25);
+        descriptionField.setToolTipText(DESCRIPTION_HINT);
+        setMaxHeight(descriptionField);
 
         parameterTypeCombo = ViskitGlobals.instance().getTypeCB();
         setMaxHeight(parameterTypeCombo);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, parameterNameField));
         fieldsPanel.add(new OneLinePanel(typeLab, w, parameterTypeCombo));
-        fieldsPanel.add(new OneLinePanel(commLab, w, commentField));
+        fieldsPanel.add(new OneLinePanel(descriptionLabel, w, descriptionField));
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
 
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
-        buttPan.add(canButt);
+        buttPan.add(okButton);
+        buttPan.add(cancelButton);
         con.add(buttPan);
         con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
         cont.add(con);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
         parameterNameField.addCaretListener(lis);
-        commentField.addCaretListener(lis);
+        descriptionField.addCaretListener(lis);
         expressionField.addCaretListener(lis);
         parameterTypeCombo.addActionListener(lis);
 
@@ -126,9 +129,9 @@ public class ParameterDialog extends JDialog {
 
         fillWidgets();
 
-        okButt.setEnabled((p == null));
+        okButton.setEnabled((p == null));
 
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
         pack();
         setLocationRelativeTo(c);
     }
@@ -137,10 +140,10 @@ public class ParameterDialog extends JDialog {
         if (param != null) {
             parameterNameField.setText(param.getName());
             parameterTypeCombo.setSelectedItem(param.getType());
-            commentField.setText(param.getComment());
+            descriptionField.setText(param.getComment());
         } else {
             parameterNameField.setText("param_" + count++);
-            commentField.setText("");
+            descriptionField.setText("");
         }
     }
 
@@ -156,11 +159,11 @@ public class ParameterDialog extends JDialog {
                 ty = "java.lang." + ty;
             }
             param.setType(ty);
-            param.setComment(commentField.getText());
+            param.setComment(descriptionField.getText());
         } else {
             newName = nm;
             newType = ty;
-            newComment = commentField.getText().trim();
+            newComment = descriptionField.getText().trim();
         }
     }
 
@@ -189,8 +192,8 @@ public class ParameterDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
 
         @Override
@@ -207,12 +210,12 @@ public class ParameterDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(ParameterDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

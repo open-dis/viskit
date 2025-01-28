@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.view.dialog;
 
+import static edu.nps.util.BoxLayoutUtils.clampWidth;
 import edu.nps.util.LogUtils;
 
 import java.awt.BorderLayout;
@@ -74,23 +75,23 @@ import viskit.control.AssemblyController;
  * @since 11:24:06 AM
  * @version $Id$
  */
-public class SettingsDialog extends JDialog {
-
+public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences, watch out: tricky due to method reflection
+{
     static final Logger LOG = LogUtils.getLogger(SettingsDialog.class);
 
-    private static SettingsDialog dialog;
+    private static SettingsDialog settingsDialog;
     private static boolean modified = false;
-    private final JButton canButt;
-    private final JButton okButt;
+    private final JButton cancelButton;
+    private final JButton okButton;
     private final JTabbedPane tabbedPane;
-    private JList<String> classPathJlist;
-    private JCheckBox evGrCB;
+    private JList<String> classpathJList;
+    private JCheckBox eventGraphCB;
     private JCheckBox assemblyCB;
-    private JCheckBox runCB;
-    private JCheckBox doeCB;
-    private JCheckBox clusterRunCB;
+    private JCheckBox simulationRunCB;
     private JCheckBox analystReportCB;
-    private JCheckBox debugMsgsCB;
+    private JCheckBox designOfExperimentsCB;
+    private JCheckBox cloudSimulationRunCB;
+    private JCheckBox dverboseDebugMessagesCB;
 
     private JRadioButton defaultLafRB;
     private JRadioButton platformLafRB;
@@ -98,18 +99,19 @@ public class SettingsDialog extends JDialog {
     private JTextField otherTF;
 
     public static boolean showDialog(JFrame mother) {
-        if (dialog == null) {
-            dialog = new SettingsDialog(mother);
+        if (settingsDialog == null) {
+            settingsDialog = new SettingsDialog(mother);
         } else {
-            dialog.setParams();
+            settingsDialog.setParams();
         }
-        dialog.setVisible(true);
+        settingsDialog.setVisible(true);
         // above call blocks
         return modified;
     }
 
-    private SettingsDialog(JFrame mother) {
-        super(mother, "Viskit Application Settings", true);
+    private SettingsDialog(JFrame mother)
+    {
+        super(mother, "Viskit Settings", true);
 
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -123,37 +125,35 @@ public class SettingsDialog extends JDialog {
         tabbedPane = new JTabbedPane();
         buildWidgets();
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButt = new JButton("Close");
-        buttPan.add(Box.createHorizontalGlue());
-        buttPan.add(okButt);
-        //buttPan.add(canButt);
-        //buttPan.add(Box.createHorizontalGlue());
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+        okButton = new JButton("Close");
+        buttonPanel.add(Box.createHorizontalGlue());
+        buttonPanel.add(okButton);
 
         content.add(tabbedPane);
         content.add(Box.createVerticalStrut(5));
-        content.add(buttPan);
+        content.add(buttonPanel);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
-        VisibilityHandler vis = new VisibilityHandler();
-        evGrCB.addActionListener(vis);
-        assemblyCB.addActionListener(vis);
-        runCB.addActionListener(vis);
-        doeCB.addActionListener(vis);
-        clusterRunCB.addActionListener(vis);
-        analystReportCB.addActionListener(vis);
-        debugMsgsCB.addActionListener(vis);
+        cancelButton.addActionListener(new cancelButtonListener());
+        okButton.addActionListener(new applyButtonListener());
+        VisibilityHandler visibilityHandler = new VisibilityHandler();
+        eventGraphCB.addActionListener(visibilityHandler);
+        assemblyCB.addActionListener(visibilityHandler);
+        simulationRunCB.addActionListener(visibilityHandler);
+        analystReportCB.addActionListener(visibilityHandler);
+        designOfExperimentsCB.addActionListener(visibilityHandler);
+        cloudSimulationRunCB.addActionListener(visibilityHandler);
+        dverboseDebugMessagesCB.addActionListener(visibilityHandler);
 
         setParams();
     }
 
     private void setParams() {
         fillWidgets();
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
 
         modified = false;
 
@@ -164,98 +164,87 @@ public class SettingsDialog extends JDialog {
         setLocationRelativeTo(getParent());
     }
 
-    private void buildWidgets() {
-        JPanel classpathP = new JPanel();
-        classpathP.setLayout(new BoxLayout(classpathP, BoxLayout.Y_AXIS));
-        classPathJlist = new JList<>(new DefaultListModel<>());
-        JScrollPane jsp = new JScrollPane(classPathJlist);
-        jsp.setPreferredSize(new Dimension(70, 70)); // don't want it to control size of dialog
-        classpathP.add(jsp);
-        JPanel bPan = new JPanel();
-        bPan.setLayout(new BoxLayout(bPan, BoxLayout.X_AXIS));
-        bPan.add(Box.createHorizontalGlue());
-        JButton upCPButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/upArrow.png")));
-        upCPButt.setBorder(null);
-        upCPButt.addActionListener(new upCPhandler());
-        JButton addCPButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/plus.png")));
-        addCPButt.addActionListener(new addCPhandler());
-        JButton removeCPButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minus.png")));
-        removeCPButt.addActionListener(new delCPhandler());
-        JButton dnCPButt = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/downArrow.png")));
-        dnCPButt.setBorder(null);
-        dnCPButt.addActionListener(new downCPhandler());
-        bPan.add(upCPButt);
-        bPan.add(addCPButt);
-        bPan.add(removeCPButt);
-        bPan.add(dnCPButt);
-        bPan.add(Box.createHorizontalGlue());
-        classpathP.add(bPan);
+    private void buildWidgets() 
+    {
+        JPanel authorPanel = new JPanel(); // TODO
+        
+        // name, affilation, email; where does this information get saved? .viskit somewhere?
+        
+//        tabbedPane.addTab("Author", authorPanel);
+              
+        
+        JPanel additionalClasspathPanel = new JPanel();
+        additionalClasspathPanel.setLayout(new BoxLayout(additionalClasspathPanel, BoxLayout.Y_AXIS));
+        JLabel additionalClasspathLabel = new JLabel ("Additional classpath entries");
+        additionalClasspathLabel.setToolTipText("Add classpath entries if other jars or classes are needed to compile and run");
+        additionalClasspathPanel.add(Box.createVerticalStrut(10));
+        additionalClasspathPanel.add(additionalClasspathLabel);
+        additionalClasspathPanel.add(Box.createVerticalStrut(10));
+        
+        classpathJList = new JList<>(new DefaultListModel<>());
+        JScrollPane jScrollPane = new JScrollPane(classpathJList);
+        jScrollPane.setPreferredSize(new Dimension(70, 70)); // don't want it to control size of dialog
+        additionalClasspathPanel.add(jScrollPane);
+        
+        JPanel classpathButtonPanel = new JPanel();
+        classpathButtonPanel.setLayout(new BoxLayout(classpathButtonPanel, BoxLayout.X_AXIS));
+        classpathButtonPanel.add(Box.createHorizontalGlue());
+        JButton upClasspathButton = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/upArrow.png")));
+        upClasspathButton.setBorder(null);
+        upClasspathButton.addActionListener(new upClasspathHandler());
+        JButton addClasspathButton = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/plus.png")));
+        addClasspathButton.addActionListener(new addClasspathHandler());
+        JButton removeClasspathButton = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minus.png")));
+        removeClasspathButton.addActionListener(new deleteClasspathHandler());
+        JButton downClasspathButton = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/downArrow.png")));
+        downClasspathButton.setBorder(null);
+        downClasspathButton.addActionListener(new downClasspathHandler());
+        classpathButtonPanel.add(upClasspathButton);
+        classpathButtonPanel.add(addClasspathButton);
+        classpathButtonPanel.add(removeClasspathButton);
+        classpathButtonPanel.add(downClasspathButton);
+        classpathButtonPanel.add(Box.createHorizontalGlue());
+        additionalClasspathPanel.add(classpathButtonPanel);
 
-        tabbedPane.addTab("Additional classpath entries", classpathP);
+        tabbedPane.addTab("Classpath", additionalClasspathPanel);
 
-        JPanel recentP = new JPanel();
-        recentP.setLayout(new BoxLayout(recentP, BoxLayout.Y_AXIS));
+        JPanel recentListsPanel = new JPanel();
+        recentListsPanel.setLayout(new BoxLayout(recentListsPanel, BoxLayout.Y_AXIS));
 
-        JButton clearEventGraphRecent = new JButton("Clear recent event graphs list");
-        clearEventGraphRecent.addActionListener(new ClearEventGraphHandler());
-        clearEventGraphRecent.setAlignmentX(Box.CENTER_ALIGNMENT);
-        JButton clearAssRecent = new JButton("Clear recent assemblies list");
-        clearAssRecent.addActionListener(new clearAssHandler());
-        clearAssRecent.setAlignmentX(Box.CENTER_ALIGNMENT);
-        recentP.add(Box.createVerticalGlue());
-        recentP.add(clearEventGraphRecent);
-        recentP.add(clearAssRecent);
-        recentP.add(Box.createVerticalGlue());
+        JButton clearRecentEventGraphListsButton = new JButton("Clear recent event graphs list");
+        clearRecentEventGraphListsButton.addActionListener(new ClearEventGraphListHandler());
+        clearRecentEventGraphListsButton.setAlignmentX(Box.CENTER_ALIGNMENT);
+        
+        recentListsPanel.add(Box.createVerticalStrut(10));
+        
+        JButton clearRecentAssembliesListButton = new JButton(" Clear recent assemblies list ");
+        clearRecentAssembliesListButton.addActionListener(new ClearAssemblyListHandler());
+        clearRecentAssembliesListButton.setAlignmentX(Box.CENTER_ALIGNMENT);
+        recentListsPanel.add(Box.createVerticalGlue());
+        recentListsPanel.add(clearRecentEventGraphListsButton);
+        recentListsPanel.add(Box.createVerticalStrut(20));
+        recentListsPanel.add(clearRecentAssembliesListButton);
+        recentListsPanel.add(Box.createVerticalGlue());
+        clampWidth(clearRecentAssembliesListButton, clearRecentEventGraphListsButton); // TODO working?
 
-        tabbedPane.addTab("Recent files", recentP);
+        tabbedPane.addTab("Clear recent-file lists", recentListsPanel);
 
-        JPanel visibleP = new JPanel();
-        visibleP.setLayout(new BoxLayout(visibleP, BoxLayout.Y_AXIS));
-        visibleP.add(Box.createVerticalGlue());
-        JPanel innerP = new JPanel();
-        innerP.setLayout(new BoxLayout(innerP, BoxLayout.Y_AXIS));
-        innerP.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        evGrCB = new JCheckBox("Event Graph Editor");
-        innerP.add(evGrCB);
-        assemblyCB = new JCheckBox("Assembly Editor");
-        innerP.add(assemblyCB);
-        runCB = new JCheckBox("Assembly Run");
-        innerP.add(runCB);
-        doeCB = new JCheckBox("Design Of Experiments");
-        innerP.add(doeCB);
-        clusterRunCB = new JCheckBox("Cluster Run");
-        innerP.add(clusterRunCB);
-        analystReportCB = new JCheckBox("Analyst Report");
-        innerP.add(analystReportCB);
-        debugMsgsCB = new JCheckBox("Verbose debug messages");
-        innerP.add(debugMsgsCB);
-        innerP.setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(3, 3, 3, 3)));
-
-        visibleP.add(innerP, BorderLayout.CENTER);
-        visibleP.add(Box.createVerticalStrut(3));
-        JLabel lab = new JLabel("Changes are in effect at next Viskit launch.", JLabel.CENTER);
-        lab.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        visibleP.add(lab);
-        visibleP.add(Box.createVerticalGlue());
-
-        tabbedPane.addTab("Tab visibility", visibleP);
-
-        JPanel lookAndFeelP = new JPanel();
-        lookAndFeelP.setLayout(new BoxLayout(lookAndFeelP, BoxLayout.Y_AXIS));
-        lookAndFeelP.add(Box.createVerticalGlue());
-        JPanel lAndFeelInnerP = new JPanel();
-        lAndFeelInnerP.setLayout(new BoxLayout(lAndFeelInnerP, BoxLayout.Y_AXIS));
-        lAndFeelInnerP.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        defaultLafRB = new JRadioButton("Default");
+        JPanel lookAndFeelPanel = new JPanel();
+        lookAndFeelPanel.setLayout(new BoxLayout(lookAndFeelPanel, BoxLayout.Y_AXIS));
+        lookAndFeelPanel.add(Box.createVerticalGlue());
+        JPanel lookAndFeelInnerPanel = new JPanel();
+        lookAndFeelInnerPanel.setLayout(new BoxLayout(lookAndFeelInnerPanel, BoxLayout.Y_AXIS));
+        lookAndFeelInnerPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        defaultLafRB = new JRadioButton("Default Look and Feel (LAF)");
         defaultLafRB.setToolTipText("Best for WIN to render Event Graph editor status color");
         defaultLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        lAndFeelInnerP.add(defaultLafRB);
-        platformLafRB = new JRadioButton("Platform");
+        lookAndFeelInnerPanel.add(defaultLafRB);
+        platformLafRB = new JRadioButton("Platform Look and Feel (LAF)");
         platformLafRB.setToolTipText("Best for macOS to render Event Graph editor status color");
         platformLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        lAndFeelInnerP.add(platformLafRB);
+        lookAndFeelInnerPanel.add(platformLafRB);
         otherLafRB = new JRadioButton("Other");
-        otherLafRB.setToolTipText("Set to a supported L&F for your platform");
+        otherLafRB.setToolTipText("Set to a supported Look and Feel for your platform");
         JPanel otherPan = new JPanel();
         otherPan.setLayout(new BoxLayout(otherPan,BoxLayout.X_AXIS));
         otherPan.add(otherLafRB);
@@ -264,17 +253,52 @@ public class SettingsDialog extends JDialog {
         ViskitStatics.clampHeight(otherTF);
         otherPan.add(otherTF);
         otherPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        lAndFeelInnerP.add(otherPan);
-        lAndFeelInnerP.setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(3,3,3,3)));
-        ViskitStatics.clampHeight(lAndFeelInnerP);
-        lookAndFeelP.add(lAndFeelInnerP);
-        lookAndFeelP.add(Box.createVerticalStrut(3));
-        lab = new JLabel("Changes are in effect at next Viskit launch.", JLabel.CENTER);
-        lab.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        lookAndFeelP.add(lab);
-        lookAndFeelP.add(Box.createVerticalGlue());
+        lookAndFeelInnerPanel.add(otherPan);
+        lookAndFeelInnerPanel.setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(3,3,3,3)));
+        ViskitStatics.clampHeight(lookAndFeelInnerPanel);
+        lookAndFeelPanel.add(lookAndFeelInnerPanel);
+        lookAndFeelPanel.add(Box.createVerticalStrut(3));
+        
+        // TODO fix:
+        JLabel whiningLabel = new JLabel("Changes are in effect at next Viskit launch.", JLabel.CENTER);
+        whiningLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        lookAndFeelPanel.add(whiningLabel);
+        lookAndFeelPanel.add(Box.createVerticalGlue());
 
-        tabbedPane.addTab("Look and Feel",lookAndFeelP);
+        tabbedPane.addTab("Look and Feel",lookAndFeelPanel);
+
+        JPanel tabVisibilityPanel = new JPanel();
+        tabVisibilityPanel.setLayout(new BoxLayout(tabVisibilityPanel, BoxLayout.Y_AXIS));
+        tabVisibilityPanel.add(Box.createVerticalGlue());
+        JPanel innerPanel = new JPanel();
+        innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.Y_AXIS));
+        innerPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        eventGraphCB = new JCheckBox("Event Graph Editor");
+        innerPanel.add(eventGraphCB);
+        assemblyCB = new JCheckBox("Assembly Editor");
+        innerPanel.add(assemblyCB);
+        simulationRunCB = new JCheckBox("Assembly Simulation Run");
+        innerPanel.add(simulationRunCB);
+        analystReportCB = new JCheckBox("Analyst Report");
+        innerPanel.add(analystReportCB);
+        designOfExperimentsCB = new JCheckBox("Design Of Experiments (DOE)");
+        designOfExperimentsCB.setEnabled(false);
+        innerPanel.add(designOfExperimentsCB);
+        cloudSimulationRunCB = new JCheckBox("Cloud Simulation Run");
+        cloudSimulationRunCB.setEnabled(false);
+        innerPanel.add(cloudSimulationRunCB);
+        dverboseDebugMessagesCB = new JCheckBox("Verbose debug messages");
+        innerPanel.add(dverboseDebugMessagesCB);
+        innerPanel.setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(3, 3, 3, 3)));
+
+        tabVisibilityPanel.add(innerPanel, BorderLayout.CENTER);
+        tabVisibilityPanel.add(Box.createVerticalStrut(3));
+        whiningLabel = new JLabel("Changes are in effect at next Viskit launch.", JLabel.CENTER);
+        whiningLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        tabVisibilityPanel.add(whiningLabel);
+        tabVisibilityPanel.add(Box.createVerticalGlue());
+
+        tabbedPane.addTab("Tab visibility", tabVisibilityPanel);
 
         ButtonGroup bg = new ButtonGroup();
         defaultLafRB.setSelected(true);
@@ -287,6 +311,9 @@ public class SettingsDialog extends JDialog {
         defaultLafRB.addActionListener(lis);
         otherLafRB.addActionListener(lis);
         otherTF.addActionListener(lis);
+        
+        // TODO when implemented, prefer author pane if not yet filled out
+        tabbedPane.setSelectedIndex(3); // Tab visibility pane
      }
 
     class lafListener implements ActionListener {
@@ -324,32 +351,32 @@ public class SettingsDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             JCheckBox src = (JCheckBox) e.getSource();
-            if (src == evGrCB) {
-                appConfig.setProperty(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY, evGrCB.isSelected());
+            if (src == eventGraphCB) {
+                appConfig.setProperty(ViskitConfiguration.EVENTGRAPH_EDITOR_VISIBLE_KEY, eventGraphCB.isSelected());
             } else if (src == assemblyCB) {
-                appConfig.setProperty(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY, assemblyCB.isSelected());
-            } else if (src == runCB) {
-                if (runCB.isSelected()) {
+                appConfig.setProperty(ViskitConfiguration.ASSEMBLY_EDITOR_VISIBLE_KEY, assemblyCB.isSelected());
+            } else if (src == simulationRunCB) {
+                if (simulationRunCB.isSelected()) {
                     // if we turn on the assembly runner, we also need the assembly editor
                     if (!assemblyCB.isSelected()) {
                         assemblyCB.doClick();
                     } // reenter here
                 }
-                appConfig.setProperty(ViskitConfiguration.ASSEMBLY_RUN_VISIBLE_KEY, runCB.isSelected());
-            } else if (src == debugMsgsCB) {
-                appConfig.setProperty(ViskitConfiguration.DEBUG_MESSAGES_KEY, debugMsgsCB.isSelected());
-                ViskitStatics.debug = debugMsgsCB.isSelected();
+                appConfig.setProperty(ViskitConfiguration.ASSEMBLY_SIMULATION_RUN_VISIBLE_KEY, simulationRunCB.isSelected());
+            } else if (src == dverboseDebugMessagesCB) {
+                appConfig.setProperty(ViskitConfiguration.VERBOSE_DEBUG_MESSAGES_KEY, dverboseDebugMessagesCB.isSelected());
+                ViskitStatics.debug = dverboseDebugMessagesCB.isSelected();
             } else if (src == analystReportCB) {
                 appConfig.setProperty(ViskitConfiguration.ANALYST_REPORT_VISIBLE_KEY, analystReportCB.isSelected());
-            } else if (src == doeCB) {
-                appConfig.setProperty(ViskitConfiguration.DOE_EDIT_VISIBLE_KEY, doeCB.isSelected());
-            } else if (src == clusterRunCB) {
-                appConfig.setProperty(ViskitConfiguration.CLUSTER_RUN_VISIBLE_KEY, clusterRunCB.isSelected());
+            } else if (src == designOfExperimentsCB) {
+                appConfig.setProperty(ViskitConfiguration.DESIGNOFEXPERIMENTS_DOE_EDITOR_VISIBLE_KEY, designOfExperimentsCB.isSelected());
+            } else if (src == cloudSimulationRunCB) {
+                appConfig.setProperty(ViskitConfiguration.CLOUD_SIMULATION_RUN_VISIBLE_KEY, cloudSimulationRunCB.isSelected());
             }
         }
     }
 
-    class ClearEventGraphHandler implements ActionListener {
+    class ClearEventGraphListHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -358,7 +385,7 @@ public class SettingsDialog extends JDialog {
         }
     }
 
-    class clearAssHandler implements ActionListener {
+    class ClearAssemblyListHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
@@ -367,7 +394,7 @@ public class SettingsDialog extends JDialog {
         }
     }
 
-    private static void clearClassPathEntries() {
+    private static void clearClasspathEntries() {
         // Always reinitialize the prop config. We may have changed projects
         initConfigs();
         projectConfig.clearTree(ViskitConfiguration.X_CLASSPATHS_CLEAR_KEY);
@@ -376,12 +403,12 @@ public class SettingsDialog extends JDialog {
     /** Method to facilitate putting project/lib entries on the classpath
      * @param extraPaths a list of (jar/.class) entries to include in extraClassPaths.path[@value]
      */
-    public static void saveExtraClassPathEntries(String[] extraPaths) {
+    public static void saveExtraClasspathEntries(String[] extraPaths) {
         String[] cpaths = getExtraClassPath();
         if (Arrays.equals(extraPaths, cpaths))
             return; // no need to rebuild the LEGO tree
 
-        clearClassPathEntries();
+        clearClasspathEntries();
 
         int ix = 0;
         for (String s : extraPaths) {
@@ -421,7 +448,7 @@ public class SettingsDialog extends JDialog {
     }
 
     private void fillWidgets() {
-        DefaultListModel<String> mod = (DefaultListModel<String>) classPathJlist.getModel();
+        DefaultListModel<String> mod = (DefaultListModel<String>) classpathJList.getModel();
         mod.clear();
         if (getExtraClassPath() != null) {
             String[] sa = getExtraClassPath();
@@ -429,16 +456,16 @@ public class SettingsDialog extends JDialog {
                 if (!mod.contains(s))
                     mod.addElement(s);
             }
-            classPathJlist.setModel(mod);
+            classpathJList.setModel(mod);
         }
 
-        evGrCB.setSelected(isEventGraphEditorVisible());
+        eventGraphCB.setSelected(isEventGraphEditorVisible());
         assemblyCB.setSelected(isAssemblyEditorVisible());
-        runCB.setSelected(isAssemblyRunVisible());
-        doeCB.setSelected(isDOEVisible());
-        clusterRunCB.setSelected(isClusterRunVisible());
+        simulationRunCB.setSelected(isAssemblySimulationRunVisible());
+        designOfExperimentsCB.setSelected(isDesignOfExperimentsVisible());
+        cloudSimulationRunCB.setSelected(isCloudSimulationRunVisible());
         analystReportCB.setSelected(isAnalystReportVisible());
-        debugMsgsCB.setSelected(ViskitStatics.debug = isVerboseDebug());
+        dverboseDebugMessagesCB.setSelected(ViskitStatics.debug = isVerboseDebug());
 
         String laf = getLookAndFeel();
         if(null == laf) {
@@ -491,18 +518,18 @@ public class SettingsDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(SettingsDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }
     JFileChooser addChooser;
 
-    class addCPhandler implements ActionListener {
+    class addClasspathHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -541,41 +568,41 @@ public class SettingsDialog extends JDialog {
             if (retv == JFileChooser.APPROVE_OPTION) {
                 File selFile = addChooser.getSelectedFile();
                 String absPath = selFile.getAbsolutePath();
-                ((DefaultListModel<String>) classPathJlist.getModel()).addElement(absPath.replaceAll("\\\\", "/"));
-                installExtraClassPathIntoConfig();
+                ((DefaultListModel<String>) classpathJList.getModel()).addElement(absPath.replaceAll("\\\\", "/"));
+                installExtraClasspathIntoConfig();
             }
         }
     }
 
-    private void installExtraClassPathIntoConfig() {
-        Object[] oa = ((DefaultListModel) classPathJlist.getModel()).toArray();
+    private void installExtraClasspathIntoConfig() {
+        Object[] oa = ((DefaultListModel) classpathJList.getModel()).toArray();
         String[] sa = new String[oa.length];
 
         System.arraycopy(oa, 0, sa, 0, oa.length);
 
-        saveExtraClassPathEntries(sa);
+        saveExtraClasspathEntries(sa);
     }
 
-    class delCPhandler implements ActionListener {
+    class deleteClasspathHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int[] selected = classPathJlist.getSelectedIndices();
+            int[] selected = classpathJList.getSelectedIndices();
             if (selected == null || selected.length <= 0) {
                 return;
             }
             for (int i = selected.length - 1; i >= 0; i--) {
-                ((DefaultListModel) classPathJlist.getModel()).remove(selected[i]);
+                ((DefaultListModel) classpathJList.getModel()).remove(selected[i]);
             }
-            installExtraClassPathIntoConfig();
+            installExtraClasspathIntoConfig();
         }
     }
 
-    class upCPhandler implements ActionListener {
+    class upClasspathHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int[] selected = classPathJlist.getSelectedIndices();
+            int[] selected = classpathJList.getSelectedIndices();
             if (selected == null || selected.length <= 0 || selected[0] <= 0) {
                 return;
             }
@@ -584,21 +611,21 @@ public class SettingsDialog extends JDialog {
     }
 
     private void moveLine(int idx, int polarity) {
-        classPathJlist.clearSelection();
-        DefaultListModel<String> mod = (DefaultListModel<String>) classPathJlist.getModel();
+        classpathJList.clearSelection();
+        DefaultListModel<String> mod = (DefaultListModel<String>) classpathJList.getModel();
         Object o = mod.get(idx);
         mod.remove(idx);
         mod.add(idx + polarity, (String) o);
-        installExtraClassPathIntoConfig();
-        classPathJlist.setSelectedIndex(idx + polarity);
+        installExtraClasspathIntoConfig();
+        classpathJList.setSelectedIndex(idx + polarity);
     }
 
-    class downCPhandler implements ActionListener {
+    class downClasspathHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int[] selected = classPathJlist.getSelectedIndices();
-            int listLen = classPathJlist.getModel().getSize();
+            int[] selected = classpathJList.getSelectedIndices();
+            int listLen = classpathJList.getModel().getSize();
 
             if (selected == null || selected.length <= 0 || selected[0] >= (listLen - 1)) {
                 return;
@@ -671,7 +698,7 @@ public class SettingsDialog extends JDialog {
      * @return if the Event Graph Editor is to be visible
      */
     public static boolean isEventGraphEditorVisible() {
-        return getVisibilitySense(ViskitConfiguration.EVENTGRAPH_EDIT_VISIBLE_KEY);
+        return getVisibilitySense(ViskitConfiguration.EVENTGRAPH_EDITOR_VISIBLE_KEY);
     }
 
     /**
@@ -679,15 +706,15 @@ public class SettingsDialog extends JDialog {
      * @return if the Assembly Editor is to be visible
      */
     public static boolean isAssemblyEditorVisible() {
-        return getVisibilitySense(ViskitConfiguration.ASSEMBLY_EDIT_VISIBLE_KEY);
+        return getVisibilitySense(ViskitConfiguration.ASSEMBLY_EDITOR_VISIBLE_KEY);
     }
 
     /**
      * Return if the Assembly Runner is to be visible
      * @return if the Assembly Runner is to be visible
      */
-    public static boolean isAssemblyRunVisible() {
-        return getVisibilitySense(ViskitConfiguration.ASSEMBLY_RUN_VISIBLE_KEY);
+    public static boolean isAssemblySimulationRunVisible() {
+        return getVisibilitySense(ViskitConfiguration.ASSEMBLY_SIMULATION_RUN_VISIBLE_KEY);
     }
 
     /**
@@ -703,22 +730,22 @@ public class SettingsDialog extends JDialog {
      * @return if verbose debug message are to be printed
      */
     public static boolean isVerboseDebug() {
-        return getVisibilitySense(ViskitConfiguration.DEBUG_MESSAGES_KEY);
+        return getVisibilitySense(ViskitConfiguration.VERBOSE_DEBUG_MESSAGES_KEY);
     }
 
     /**
      * Return if the Design of Experiments Editor is to be visible
      * @return if the Design of Experiments Editor is to be visible
      */
-    public static boolean isDOEVisible() {
-        return getVisibilitySense(ViskitConfiguration.DOE_EDIT_VISIBLE_KEY);
+    public static boolean isDesignOfExperimentsVisible() {
+        return getVisibilitySense(ViskitConfiguration.DESIGNOFEXPERIMENTS_DOE_EDITOR_VISIBLE_KEY);
     }
 
     /**
      * Return if the Cluster Runner is to be visible
      * @return if the Cluster Runner is to be visible
      */
-    public static boolean isClusterRunVisible() {
-        return getVisibilitySense(ViskitConfiguration.CLUSTER_RUN_VISIBLE_KEY);
+    public static boolean isCloudSimulationRunVisible() {
+        return getVisibilitySense(ViskitConfiguration.CLOUD_SIMULATION_RUN_VISIBLE_KEY);
     }
 }

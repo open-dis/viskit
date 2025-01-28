@@ -56,7 +56,7 @@ public class TextAreaDialog extends JDialog
 
   private static TextAreaDialog dialog;
   private static boolean modified = false;
-  private JButton okButt, canButt;
+  private JButton okButton, cancelButton;
 
   public static StringBuffer newComment;
   public StringBuffer param;
@@ -114,16 +114,16 @@ public class TextAreaDialog extends JDialog
 
     JPanel buttPan = new JPanel();
     buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-    canButt = new JButton("Cancel");
-    okButt = new JButton("Apply changes");
+    cancelButton = new JButton("Cancel");
+    okButton = new JButton("Apply changes");
     buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-    buttPan.add(okButt);
-    buttPan.add(canButt);
+    buttPan.add(okButton);
+    buttPan.add(cancelButton);
     cont.add(buttPan);
 
     // attach listeners
-    canButt.addActionListener(new cancelButtonListener());
-    okButt .addActionListener(new applyButtonListener());
+    cancelButton.addActionListener(new cancelButtonListener());
+    okButton .addActionListener(new applyButtonListener());
 
     enableApplyButtonListener lis = new enableApplyButtonListener();
     this.commentArea.addCaretListener(lis);
@@ -138,9 +138,9 @@ public class TextAreaDialog extends JDialog
     fillWidgets();
 
     modified = (p.length() == 0);
-    okButt.setEnabled((p.length() == 0));
+    okButton.setEnabled((p.length() == 0));
 
-    getRootPane().setDefaultButton(canButt);
+    getRootPane().setDefaultButton(cancelButton);
     pack();
     setLocationRelativeTo(c);
   }
@@ -191,8 +191,8 @@ public class TextAreaDialog extends JDialog
     public void caretUpdate(CaretEvent event)
     {
       modified = true;
-      okButt.setEnabled(true);
-      getRootPane().setDefaultButton(okButt);
+      okButton.setEnabled(true);
+      getRootPane().setDefaultButton(okButton);
     }
 
     @Override
@@ -211,12 +211,12 @@ public class TextAreaDialog extends JDialog
         int ret = JOptionPane.showConfirmDialog(TextAreaDialog.this, "Apply changes?",
             "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (ret == JOptionPane.YES_OPTION)
-          okButt.doClick();
+          okButton.doClick();
         else
-          canButt.doClick();
+          cancelButton.doClick();
       }
       else
-        canButt.doClick();
+        cancelButton.doClick();
     }
   }
 

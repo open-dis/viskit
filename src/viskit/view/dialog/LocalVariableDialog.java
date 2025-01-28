@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import viskit.ViskitGlobals;
+import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
@@ -35,12 +36,12 @@ public class LocalVariableDialog extends JDialog {
     
     private final JTextField nameField;    // Text field that holds the parameter name
     private final JTextField valueField;       // Text field that holds the expression
-    private final JTextField commentField;          // Text field that holds the comment
+    private final JTextField descriptionField;          // Text field that holds the description
     private final JComboBox typeCombo;    // Editable combo box that lets us select a type
     private static LocalVariableDialog dialog;
     private static boolean modified = false;
     private EventLocalVariable locVar;
-    private final JButton okButt;
+    private final JButton okButton;
     private final JButton canButt;
 
     public static boolean showDialog(JFrame f, EventLocalVariable parm) {
@@ -75,31 +76,33 @@ public class LocalVariableDialog extends JDialog {
         JLabel nameLab = new JLabel("name");
         JLabel initLab = new JLabel("initial value");
         JLabel typeLab = new JLabel("type");
-        JLabel commLab = new JLabel("description");
-        int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, commLab});
+        JLabel descriptionLabel = new JLabel("description");
+        descriptionLabel.setToolTipText(DESCRIPTION_HINT);
+        int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, descriptionLabel});
 
         nameField = new JTextField(15);
         setMaxHeight(nameField);
         valueField = new JTextField(25);
         setMaxHeight(valueField);
-        commentField = new JTextField(25);
-        setMaxHeight(commentField);
+        descriptionField = new JTextField(25);
+        descriptionField.setToolTipText(DESCRIPTION_HINT);
+        setMaxHeight(descriptionField);
         typeCombo = ViskitGlobals.instance().getTypeCB();
         setMaxHeight(typeCombo);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, nameField));
         fieldsPanel.add(new OneLinePanel(typeLab, w, typeCombo));
         fieldsPanel.add(new OneLinePanel(initLab, w, valueField));
-        fieldsPanel.add(new OneLinePanel(commLab, w, commentField));
+        fieldsPanel.add(new OneLinePanel(descriptionLabel, w, descriptionField));
         con.add(fieldsPanel);
         con.add(Box.createVerticalStrut(5));
 
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
+        buttPan.add(okButton);
         buttPan.add(canButt);
         con.add(buttPan);
         con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
@@ -107,11 +110,11 @@ public class LocalVariableDialog extends JDialog {
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
         this.nameField.addCaretListener(lis);
-        this.commentField.addCaretListener(lis);
+        this.descriptionField.addCaretListener(lis);
         this.valueField.addCaretListener(lis);
         this.typeCombo.addActionListener(lis);
 
@@ -130,7 +133,7 @@ public class LocalVariableDialog extends JDialog {
         fillWidgets();
 
         modified = (p == null);
-        okButt.setEnabled(p == null);
+        okButton.setEnabled(p == null);
 
         getRootPane().setDefaultButton(canButt);
         pack();
@@ -142,10 +145,10 @@ public class LocalVariableDialog extends JDialog {
             nameField.setText(locVar.getName());
             typeCombo.setSelectedItem(locVar.getType());
             valueField.setText(locVar.getValue());
-            commentField.setText(locVar.getComment());
+            descriptionField.setText(locVar.getComment());
         } else {
             nameField.setText("locVar name");
-            commentField.setText("comments here");
+            descriptionField.setText("comments here");
         }
     }
 
@@ -158,12 +161,12 @@ public class LocalVariableDialog extends JDialog {
             locVar.setName(nm);
             locVar.setType(ty);
             locVar.setValue(valueField.getText().trim());
-            locVar.setComment(commentField.getText().trim());
+            locVar.setComment(descriptionField.getText().trim());
         } else {
             newName = nm;
             newType = ty;
             newValue = valueField.getText().trim();
-            newComment = commentField.getText().trim();
+            newComment = descriptionField.getText().trim();
         }
     }
 
@@ -192,8 +195,8 @@ public class LocalVariableDialog extends JDialog {
         @Override
         public void caretUpdate(CaretEvent event) {
             modified = true;
-            okButt.setEnabled(true);
-            getRootPane().setDefaultButton(okButt);
+            okButton.setEnabled(true);
+            getRootPane().setDefaultButton(okButton);
         }
 
         @Override
@@ -210,7 +213,7 @@ public class LocalVariableDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(LocalVariableDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
                     canButt.doClick();
                 }

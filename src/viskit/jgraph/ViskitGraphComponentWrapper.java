@@ -56,7 +56,7 @@ public class ViskitGraphComponentWrapper extends ViskitGraphComponent {
 
     public Model model;
     public JSplitPane drawingSplitPane;
-    public JSplitPane stateParamSplitPane;
+    public JSplitPane stateParameterSplitPane;
     public ParametersPanel paramPan;
     public StateVariablesPanel varPan;
     public CodeBlockPanel codeBlockPan;

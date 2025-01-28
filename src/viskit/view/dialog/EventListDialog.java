@@ -33,7 +33,7 @@ public class EventListDialog extends JDialog {
     private static EventListDialog dialog;
     private static int selection = -1;
     private String[] names;
-    private final JButton okButt;
+    private final JButton okButton;
     private JButton canButt;
     private final JList<String> list;
     private final JPanel buttPan;
@@ -64,15 +64,15 @@ public class EventListDialog extends JDialog {
         buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
         canButt = new JButton("Cancel");
-        okButt = new JButton("Apply changes");
+        okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButt);
+        buttPan.add(okButton);
         buttPan.add(canButt);
         buttPan.add(Box.createHorizontalStrut(5));
 
         // attach listeners
         canButt.addActionListener(new cancelButtonListener());
-        okButt.addActionListener(new applyButtonListener());
+        okButton.addActionListener(new applyButtonListener());
 
         setParams(parent, names);
     }
@@ -85,7 +85,7 @@ public class EventListDialog extends JDialog {
         if (names == null) {
             selection = 0;
         }
-        okButt.setEnabled(names == null);
+        okButton.setEnabled(names == null);
 
         getRootPane().setDefaultButton(canButt);
         pack();
@@ -147,8 +147,8 @@ public class EventListDialog extends JDialog {
             if (!lsm.isSelectionEmpty()) {
 
                 selection = lsm.getMinSelectionIndex();
-                okButt.setEnabled(true);
-                getRootPane().setDefaultButton(okButt);
+                okButton.setEnabled(true);
+                getRootPane().setDefaultButton(okButton);
             }
         }
     }
@@ -161,7 +161,7 @@ public class EventListDialog extends JDialog {
                 int ret = JOptionPane.showConfirmDialog(EventListDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButt.doClick();
+                    okButton.doClick();
                 } else {
                     canButt.doClick();
                 }

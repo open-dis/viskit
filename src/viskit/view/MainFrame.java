@@ -219,7 +219,7 @@ public class MainFrame extends JFrame {
         runTabbedPanePanel.add(simulationRunTabbedPane, BorderLayout.CENTER);
 
         // Always selected as visible
-        if (SettingsDialog.isAssemblyRunVisible()) {
+        if (SettingsDialog.isAssemblySimulationRunVisible()) {
             topTabbedPane.add(runTabbedPanePanel);
             idx = topTabbedPane.indexOfComponent(runTabbedPanePanel);
             topTabbedPane.setTitleAt(idx, "Assembly Simulation Run");
@@ -282,7 +282,7 @@ public class MainFrame extends JFrame {
 
         // Design of experiments
         DoeMainFrame doeFrame = null;
-        boolean isDOEVisible = SettingsDialog.isDOEVisible();
+        boolean isDOEVisible = SettingsDialog.isDesignOfExperimentsVisible();
         if (isDOEVisible) {
             doeMain = DoeMain.main2();
             doeFrame = doeMain.getMainFrame();
@@ -303,7 +303,7 @@ public class MainFrame extends JFrame {
         }
 
         // Grid run panel
-        if (SettingsDialog.isClusterRunVisible() && isDOEVisible) {
+        if (SettingsDialog.isCloudSimulationRunVisible() && isDOEVisible) {
             runGridComponent = new JobLauncherTab2(doeMain.getController(), null, null, this);
             if (doeFrame != null)
                 doeFrame.getController().setJobLauncher(runGridComponent);
@@ -417,18 +417,18 @@ public class MainFrame extends JFrame {
     }
 
     private void jamSettingsHandler(JMenuBar mb) {
-        JMenu men;
+        JMenu menu;
         Component c;
-        JMenuItem jmi;
+        JMenuItem menuItem;
         for (int i = 0; i < mb.getMenuCount(); i++) {
-            men = mb.getMenu(i);
-            if (men.getText().equalsIgnoreCase("File")) {
-                for (int j = 0; j < men.getMenuComponentCount(); j++) {
-                    c = men.getMenuComponent(j);
+            menu = mb.getMenu(i);
+            if (menu.getText().equalsIgnoreCase("File")) {
+                for (int j = 0; j < menu.getMenuComponentCount(); j++) {
+                    c = menu.getMenuComponent(j);
                     if (c instanceof JMenuItem) {
-                        jmi = (JMenuItem) c;
-                        if (jmi.getText().toLowerCase().contains("settings")) {
-                            jmi.addActionListener(mySettingsHandler);
+                        menuItem = (JMenuItem) c;
+                        if (menuItem.getText().toLowerCase().contains("settings")) {
+                            menuItem.addActionListener(mySettingsHandler);
                             return;
                         }
                     }
