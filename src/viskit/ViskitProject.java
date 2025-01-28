@@ -194,7 +194,7 @@ public class ViskitProject {
 
         setClassesDir(new File(getBuildDir(), CLASSES_DIRECTORY_NAME));
         if (!classesDir.exists()) {
-            getClassesDir().mkdirs();
+            getClassesDirectory().mkdirs();
         }
 
         setLibDir(new File(projectRoot, LIB_DIRECTORY_NAME));
@@ -368,9 +368,9 @@ public class ViskitProject {
             generateSource();
         }
         if (!classesDir.exists()) {
-            getClassesDir().mkdir();
+            getClassesDirectory().mkdir();
         }
-        System.out.println("Compile Source to " + getClassesDir());
+        System.out.println("Compile Source to " + getClassesDirectory());
     }
 
     public void deleteProject() {
@@ -455,7 +455,7 @@ public class ViskitProject {
         this.srcDir = srcDir;
     }
 
-    public File getClassesDir() {
+    public File getClassesDirectory() {
         return classesDir;
     }
 

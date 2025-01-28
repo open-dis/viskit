@@ -131,21 +131,22 @@ public final class AnalystReportModel extends MvcAbstractModel
      * This done after the statistic report is incorporated into the basic
      * Analyst Report and further annotations are to be written by the analyst
      * to finalize the report.</p>
-     * @param aRPanel a reference to the Analyst Report Frame
+     * @param analystReportFrame a reference to the Analyst Report Frame
      * @param xmlFile an existing temp Analyst Report
      * @param newAssemblyFile the current assembly file to process a report from
      * @throws java.lang.Exception general catchall
      */
-    public AnalystReportModel(JFrame aRPanel, File xmlFile, File newAssemblyFile) throws Exception {
+    public AnalystReportModel(JFrame analystReportFrame, File xmlFile, File newAssemblyFile) throws Exception {
         this(xmlFile);
 
         // TODO: This doesn't seem to be doing anything correctly
         progressBar = new JProgressBar();
-        aRPanel.add(progressBar);
-        aRPanel.validate();
+        analystReportFrame.add(progressBar);
+        analystReportFrame.validate();
 
         LOG.debug("Successful parseXML");
-        if (newAssemblyFile != null) {
+        if (newAssemblyFile != null)
+        {
             setAssemblyFile(newAssemblyFile);
             LOG.debug("Successful setting of assembly file");
             postProcessing();

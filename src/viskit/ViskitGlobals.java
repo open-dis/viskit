@@ -794,7 +794,8 @@ public class ViskitGlobals {
      * class loader, project space, extra classpaths and identifies the path for
      * .class files of the projects Event Graphs
      */
-    public final void createWorkingDirectory() {
+    public final void createWorkingDirectory()
+    {
         ViskitConfiguration vConfig = ViskitConfiguration.instance();
         if (vConfig.getViskitAppConfiguration() == null)
             return;
@@ -816,7 +817,7 @@ public class ViskitGlobals {
             LOG.warn("Unable to create project directory, returning");
             return;
         }
-        workingDirectory = currentViskitProject.getClassesDir();
+        workingDirectory = currentViskitProject.getClassesDirectory();
     }
 
     private ClassLoader workLoader, freshLoader;

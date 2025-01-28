@@ -1514,7 +1514,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             OutputStream baosOut = new ByteArrayOutputStream();
             Compiler.setOutPutStream(baosOut);
 
-            File classesDir = viskitProject.getClassesDir();
+            File classesDir = viskitProject.getClassesDirectory();
 
             LOG.info("Test compiling " + javaFile.getCanonicalPath());
 

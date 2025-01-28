@@ -104,13 +104,13 @@ public class ViskitStatics {
 
     /** Utility method to configure a Viskit project
      *
-     * @param projFile the base directory of a Viskit project
+     * @param newProjectFile the base directory of a Viskit project
      */
     @SuppressWarnings("unchecked")
-    public static void setViskitProjectFile(File projFile) {
-        ViskitProject.VISKIT_PROJECTS_DIR = projFile.getParent().replaceAll("\\\\", "/");
+    public static void setViskitProjectFile(File newProjectFile) {
+        ViskitProject.VISKIT_PROJECTS_DIR = newProjectFile.getParent().replaceAll("\\\\", "/");
         ViskitConfiguration.instance().setVal(ViskitConfiguration.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIR);
-        ViskitProject.DEFAULT_PROJECT_NAME = projFile.getName();
+        ViskitProject.DEFAULT_PROJECT_NAME = newProjectFile.getName();
         ViskitConfiguration.instance().setVal(ViskitConfiguration.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
     }
 

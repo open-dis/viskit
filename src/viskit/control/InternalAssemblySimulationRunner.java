@@ -714,19 +714,22 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         }
     }
 
-    private final String namePrefix = "awaiting initialization by Assembly Editor...";
+    private final String initialValue = "awaiting initialization by Assembly Editor..."; // TODO unscramble logic
     private StringBuilder currentTitle = new StringBuilder();
 
-    public void doTitle(String nm) {
-        currentTitle.append(namePrefix);
-        if (nm != null && nm.length() > 0) {
-            currentTitle = currentTitle.append(": ").append(nm);
+    public void doTitle(String newName)
+    {
+        currentTitle.setLength(0); // reset
+       
+        if (newName != null && newName.length() > 0)
+        { 
+             currentTitle = currentTitle.append(": ").append(newName);
         }
+        else currentTitle.append(initialValue);
 
         if (titlList != null) {
             titlList.setTitle(currentTitle.toString(), titlkey);
         }
-        currentTitle.setLength(0); // reset
     }
     private TitleListener titlList;
     private int titlkey;
@@ -734,7 +737,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
     public void setTitleListener(TitleListener lis, int key) {
         titlList = lis;
         titlkey = key;
-        doTitle(null);
+//        doTitle(null); // TODO why is this here?
     }
 
     StringBuilder nowRunningsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
