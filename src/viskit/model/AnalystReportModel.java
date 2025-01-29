@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -87,7 +87,8 @@ public final class AnalystReportModel extends MvcAbstractModel
     private Document reportJdomDocument;
 
     /** The file name selected by the user from "SAVE AS" menu option */
-    private String fileName;
+    private String  analystReportFileName;
+    private File    analystReportFile;
 
     /** The root element of the report xml document */
     private Element rootElement;
@@ -979,17 +980,21 @@ public final class AnalystReportModel extends MvcAbstractModel
     public Document   getReportJdomDocument()    {return reportJdomDocument;}
     public Document   getStatisiticsReport()     {return statisiticsReportDocument;}
     public Element    getRootElement()           {return rootElement;}
-    public String     getFileName()              {return fileName;}
+    public String     getFileName()              {return analystReportFileName;}
+    public File       getFile()                  {
+        return new File(analystReportFileName);
+    }
     public String     getAuthor()                {return rootElement.getAttributeValue("author");}
-    public String     getAccess()        {return rootElement.getAttributeValue("access");}
+    public String     getAccess()                {return rootElement.getAttributeValue("access");}
     public String     getDateOfReport()          {return rootElement.getAttributeValue("date");}
     public String     getReportName()            {return rootElement.getAttributeValue("name");}
 
     /**
-     * Called twice.  Once for preliminary AR, then for full integration AR.
+     * Called twice.  Once for preliminary Analyst Report, then for full integration Analyst Report.
      * @param newAssemblyFile the Assembly File to parse for information
      */
-    public void setAssemblyFile(File newAssemblyFile) {
+    public void setAssemblyFile(File newAssemblyFile) 
+    {
         assemblyFile = newAssemblyFile;
 
         // Subsequent calls within the same runtime require a cleared cache
@@ -1103,7 +1108,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         LOG.debug(getLocationImage());
     }
 
-    public void setFileName          (String fileName)           { this.fileName = fileName; }
+    public void setFileName          (String fileName)           { this.analystReportFileName = fileName; }
     public void setStatisticsReport       (Document statisticsReportDocument)      { this.statisiticsReportDocument = statisticsReportDocument; }
     public void setStatisticsReportPath   (String filename)           { this.statisticsReportPath = filename; }
     public void setAuthor                   (String s) { rootElement.setAttribute("author", s); };

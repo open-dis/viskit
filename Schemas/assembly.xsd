@@ -186,7 +186,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="numberReplications" default="1"/>
+      <xs:attribute name="numberReplications" default="30"/><!-- many occurrences throughout multiple schema -->
       <xs:attribute name="printReplicationReports" default="true">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -322,7 +322,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="replicationsPerDesignPoint" default="1"/>
+      <xs:attribute name="replicationsPerDesignPoint" default="30"/>
       <xs:attribute name="totalSamples" default="1"/>
       <xs:attribute name="jitter" default="true">
         <xs:simpleType>

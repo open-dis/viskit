@@ -44,7 +44,6 @@ import javax.swing.event.CaretListener;
 import viskit.ViskitConfiguration;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import viskit.control.InternalAssemblySimulationRunner;
 
 /**
  * A VCR-controls and TextArea panel.  Sends Simkit output to TextArea
@@ -59,6 +58,8 @@ import viskit.control.InternalAssemblySimulationRunner;
  */
 public class AssemblySimulationRunPanel extends JPanel
 {
+    public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 30; // also defined twice in viskit.xsd schema
+    
     public boolean dump = true;
     public boolean search;
     public String lineEnd = System.getProperty("line.separator");
@@ -200,13 +201,15 @@ public class AssemblySimulationRunPanel extends JPanel
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
         numberReplicationsLabel.setBorder(new EmptyBorder(0,2,0,10));
         numberReplicationsTF = new JTextField(10);
+        numberReplicationsTF.setToolTipText("How many simulation repetitions are run to get statistics");
+        numberReplicationsTF.setText(Integer.toString(DEFAULT_NUMBER_OF_REPLICATIONS));
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
         numberReplicationsTF.setBorder(new EmptyBorder(0,2,0,0));
         numberReplicationsTF.addActionListener((ActionEvent e) -> {
-            int numReplications = Integer.parseInt(numberReplicationsTF.getText().trim());
-            if (numReplications < 1) 
+            int numberReplications = Integer.parseInt(numberReplicationsTF.getText().trim());
+            if (numberReplications < 1) 
             {
-                numberReplicationsTF.setText("1");
+                numberReplicationsTF.setText(Integer.toString(DEFAULT_NUMBER_OF_REPLICATIONS));
             }
         });
         ViskitStatics.clampSize(numberReplicationsTF, numberReplicationsTF, numberReplicationsTF);

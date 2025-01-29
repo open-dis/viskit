@@ -1,3 +1,38 @@
+
+/*
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer
+      in the documentation and/or other materials provided with the
+      distribution.
+    * Neither the names of the Naval Postgraduate School (NPS)
+      Modeling, Virtual Environments and Simulation (MOVES) Institute
+      (http://www.nps.edu and https://my.nps.edu/web/moves)
+      nor the names of its contributors may be used to endorse or
+      promote products derived from this software without specific
+      prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+*/
+
 package viskit.view;
 
 import edu.nps.util.LogUtils;
@@ -32,8 +67,8 @@ public class XMLTreeComponent extends JTree
 
     DefaultTreeModel mod;
 
-    static XTreePanel getTreeInPanel(File xmlFile) throws Exception {
-        return new XTreePanel(xmlFile);
+    static XmlTreePanel getTreeInPanel(File xmlFile) throws Exception {
+        return new XmlTreePanel(xmlFile);
     }
 
     public XMLTreeComponent(File xmlFile) throws Exception 
@@ -268,7 +303,8 @@ public class XMLTreeComponent extends JTree
         return sa;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         SwingUtilities.invokeLater(() -> {
             
             JFrame f = new JFrame("XML Tree Widget Test");
@@ -286,7 +322,7 @@ public class XMLTreeComponent extends JTree
             
             //XTree xt = new XMLTreeComponent(fil);
             //c.add(new JScrollPane(xt), BorderLayout.CENTER);
-            XTreePanel p = null;
+            XmlTreePanel p = null;
             try {
                 p = XMLTreeComponent.getTreeInPanel(fil);
             } catch (Exception e) {
@@ -294,7 +330,7 @@ public class XMLTreeComponent extends JTree
             }
             
             if (p != null)
-                System.out.println(p.xmlTree.getXML());
+                System.out.println(p.xmlTreeComponent.getXML());
             
             c.add(p, BorderLayout.CENTER);
             f.setSize(500, 400);
@@ -317,21 +353,21 @@ public class XMLTreeComponent extends JTree
     }
 }
 
-class XTreePanel extends JPanel {
-
-    public XMLTreeComponent xmlTree;
+class XmlTreePanel extends JPanel
+{
+    public XMLTreeComponent xmlTreeComponent;
     public JTextArea sourceXmlTextArea;
 
-    XTreePanel(File xmlFile) throws Exception 
+    XmlTreePanel(File xmlFile) throws Exception 
     {
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         try {
-            xmlTree = new XMLTreeComponent(xmlFile);
+            xmlTreeComponent = new XMLTreeComponent(xmlFile);
         } 
         catch (Exception e) {
-            xmlTree = null;
+            xmlTreeComponent = null;
             throw (e);
         }
 
@@ -342,10 +378,10 @@ class XTreePanel extends JPanel {
         sourceXmlTextArea.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         Font oldF = sourceXmlTextArea.getFont();
         sourceXmlTextArea.setFont(new Font("Monospaced", oldF.getStyle(), oldF.getSize()));
-        sourceXmlTextArea.setText(getElementText((DefaultMutableTreeNode) xmlTree.mod.getRoot()));
+        sourceXmlTextArea.setText(getElementText((DefaultMutableTreeNode) xmlTreeComponent.mod.getRoot()));
         sourceXmlTextArea.setCaretPosition(0);
 
-        JScrollPane xmlTreeScrollPane = new JScrollPane(xmlTree);
+        JScrollPane xmlTreeScrollPane = new JScrollPane(xmlTreeComponent);
         JScrollPane xmlTextScrollPane = new JScrollPane(sourceXmlTextArea);
         xmlTextScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // because we wrap
 
@@ -353,14 +389,14 @@ class XTreePanel extends JPanel {
         xmlViewSplitPane.setOneTouchExpandable(false);
         xmlViewSplitPane.setResizeWeight(0.75);
 
-        Dimension d1 = xmlTree.getPreferredSize();
+        Dimension d1 = xmlTreeComponent.getPreferredSize();
         Dimension d2 = sourceXmlTextArea.getPreferredSize();
         xmlViewSplitPane.setPreferredSize(new Dimension(d1.width, d1.height + d2.height));
         add(xmlViewSplitPane);
         add(Box.createVerticalGlue());
 
-        xmlTree.getSelectionModel().addTreeSelectionListener((TreeSelectionEvent e) -> {
-            DefaultMutableTreeNode dmt = (DefaultMutableTreeNode) xmlTree.getLastSelectedPathComponent();
+        xmlTreeComponent.getSelectionModel().addTreeSelectionListener((TreeSelectionEvent e) -> {
+            DefaultMutableTreeNode dmt = (DefaultMutableTreeNode) xmlTreeComponent.getLastSelectedPathComponent();
             if (dmt == null) {
                 return;
             }
@@ -374,7 +410,7 @@ class XTreePanel extends JPanel {
         Object o = dmt.getUserObject();
         if (o instanceof XMLTreeComponent.nElement) {
             Element elm = ((XMLTreeComponent.nElement) o).elem;
-            return xmlTree.xmlOutputter.outputString(elm);
+            return xmlTreeComponent.xmlOutputter.outputString(elm);
         } else {
             return "";
         }

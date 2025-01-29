@@ -62,7 +62,6 @@ import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcModel;
 import edu.nps.util.SystemExitHandler;
 import viskit.assembly.AssemblySimulationRunPlug;
-import viskit.model.AssemblyModelImpl;
 
 /**
  * MOVES Institute
@@ -612,7 +611,7 @@ public class MainFrame extends JFrame
                     "-----------------------" + runnerPanel.lineEnd);
             runnerPanel.vcrStartTimeTF.setText("");
             runnerPanel.vcrStopTimeTF.setText("");
-            runnerPanel.numberReplicationsTF.setText("");
+            runnerPanel.numberReplicationsTF.setText(Integer.toString(AssemblySimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS)); // initialized in XML and panel
             runnerPanel.vcrVerboseCB.setSelected(false);
             runnerPanel.printReplicationReportsCB.setSelected(false);
             runnerPanel.printSummaryReportsCB.setSelected(false);

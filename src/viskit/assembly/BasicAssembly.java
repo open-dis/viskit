@@ -76,6 +76,7 @@ import viskit.ViskitConfiguration;
 import viskit.model.AssemblyNode;
 
 import viskit.reports.ReportStatisticsConfiguration;
+import viskit.view.AssemblySimulationRunPanel;
 
 /**
  * Base class for creating Simkit scenarios.
@@ -117,7 +118,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     private final ReportStatisticsConfiguration reportStatisticsConfiguration;
     private int designPointID;
-    private final DecimalFormat df1, df4;
+    private final DecimalFormat decimalFormat1, decimalFormat4;
     private List<String> entitiesWithStatisticsList;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
@@ -132,9 +133,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * numberReplications = 1
      * </pre>
      */
-    public BasicAssembly() {
-        df1 = new DecimalFormat("0.0; -0.0");
-        df4 = new DecimalFormat("0.0000; -0.000");
+    public BasicAssembly() 
+    {
+        decimalFormat1 = new DecimalFormat("0.0; -0.0");
+        decimalFormat4 = new DecimalFormat("0.0000; -0.000");
         setPrintReplicationReports(false);
         setPrintSummaryReport(true);
         replicationDataSavedStatisticsList = new LinkedHashMap<>();
@@ -142,7 +144,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         replicationStatisticsPropertyChangeListenerArray = new PropertyChangeListener[0];
         designPointSimpleStatisticsTally = new SampleStatistics[0];
         propertyChangeListenerArray = new PropertyChangeListener[0];
-        setNumberReplications(1);
+        setNumberReplications(AssemblySimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
         hookupsCalled = false;
 
         // Creates a report statistics config object and names it based on the name
@@ -359,7 +361,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public boolean isEnableAnalystReports() {return enableAnalystReports;}
 
-    public final void setNumberReplications(int newNumberReplications) {
+    public final void setNumberReplications(int newNumberReplications) 
+    {
         if (newNumberReplications < 1) {
             throw new IllegalArgumentException("Number replications must be > 0: " + newNumberReplications);
         }
@@ -552,11 +555,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             buf.append(System.getProperty("line.separator"));
             buf.append(String.format("%-" + nameCW   + "s",sampleStatistics.getName()));
             buf.append(String.format("%"  + countCW  + "d",sampleStatistics.getCount()));
-            buf.append(String.format("%"  + minCW    + "s",df1.format(sampleStatistics.getMinObs())));
-            buf.append(String.format("%"  + maxCW    + "s",df1.format(sampleStatistics.getMaxObs())));
-            buf.append(String.format("%"  + meanCW   + "s",df4.format(sampleStatistics.getMean())));
-            buf.append(String.format("%"  + stdDevCW + "s",df4.format(sampleStatistics.getStandardDeviation())));
-            buf.append(String.format("%"  + varCW    + "s",df4.format(sampleStatistics.getVariance())));
+            buf.append(String.format("%"  + minCW    + "s",decimalFormat1.format(sampleStatistics.getMinObs())));
+            buf.append(String.format("%"  + maxCW    + "s",decimalFormat1.format(sampleStatistics.getMaxObs())));
+            buf.append(String.format("%"  + meanCW   + "s",decimalFormat4.format(sampleStatistics.getMean())));
+            buf.append(String.format("%"  + stdDevCW + "s",decimalFormat4.format(sampleStatistics.getStandardDeviation())));
+            buf.append(String.format("%"  + varCW    + "s",decimalFormat4.format(sampleStatistics.getVariance())));
 
             ((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i++]).reset();
         }

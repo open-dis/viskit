@@ -63,6 +63,7 @@ import org.jdom.Text;
 import viskit.*;
 import viskit.util.TitleListener;
 import viskit.util.OpenAssembly;
+import viskit.view.AssemblySimulationRunPanel;
 import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.bindings.assembly.Experiment;
 import viskit.xsd.bindings.assembly.SampleStatistics;
@@ -118,7 +119,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private JTextField portTF;
     private JTextField numberReplicationsTF;
     private JTextField numberDPsTF;
-    private JTextField tmo;
+    private JTextField replicationsTimeOut;
     private JTextField unameTF;
     private JCheckBox doAnalystReports;
     private JCheckBox doLocalRun;
@@ -287,10 +288,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         JLabel sampLab = new JLabel("Hypercubes");
         numberCubesTF = new ttJTextField(20);
 
+        JLabel replicationsLabel = new JLabel("Replications");
         numberReplicationsTF = new JTextField(6);
-        JLabel repLab = new JLabel("Replications");
-        tmo = new JTextField(6);
-        JLabel tmoLab = new JLabel("Replication time out (ms)");
+        replicationsTimeOut = new JTextField(6);
+        JLabel tmoLab = new JLabel("Replication time out (ms)"); // TODO for local simulation
 
         JLabel analystReportLab = new JLabel("Analyst report each run");
         doAnalystReports = new JCheckBox((String) null, false);
@@ -301,10 +302,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         topPan.add(numberDPsTF);
         topPan.add(sampLab);
         topPan.add(numberCubesTF);
-        topPan.add(repLab);
+        topPan.add(replicationsLabel);
         topPan.add(numberReplicationsTF);
         topPan.add(tmoLab);
-        topPan.add(tmo);
+        topPan.add(replicationsTimeOut);
         topPan.add(analystReportLab); // tooltip this with warning
         topPan.add(doAnalystReports);
         //topPan.add(doGraphLab);
@@ -458,7 +459,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
             s = exp.getTimeout();
             if (s != null) {
-                tmo.setText(s);
+                replicationsTimeOut.setText(s);
             }
         } else {
             exp = OpenAssembly.inst().jaxbFactory.createExperiment();
@@ -467,10 +468,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
             exp.setTotalSamples("1");
             numberCubesTF.setText("1");
-            exp.setReplicationsPerDesignPoint("1");
-            numberReplicationsTF.setText("1");
+            exp.setReplicationsPerDesignPoint(Integer.toString(AssemblySimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS));
+            numberReplicationsTF.setText(        Integer.toString(AssemblySimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS));
             exp.setTimeout("5000");
-            tmo.setText("5000");
+            replicationsTimeOut.setText("5000");
             int numDesignPts = jaxbRoot.getDesignParameters().size();
             numberDPsTF.setText("" + numDesignPts);
         }
@@ -531,7 +532,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         exp.setJitter("true");
         exp.setType("latin-hypercube");
 
-        String stopTime = tmo.getText().trim();
+        String stopTime = replicationsTimeOut.getText().trim();
         try {
             Double.valueOf(stopTime);
         } catch (NumberFormatException e) {
@@ -560,7 +561,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         numberCubesTF.addKeyListener(myEditListener);
         numberReplicationsTF.addKeyListener(myEditListener);
-        tmo.addKeyListener(myEditListener);
+        replicationsTimeOut.addKeyListener(myEditListener);
     }
 
     /**
