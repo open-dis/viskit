@@ -192,7 +192,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="numberReplications" default="1"/>
+      <xs:attribute name="numberReplications" default="30"/>
       <xs:attribute name="printReplicationReports" default="true">
         <xs:simpleType>
           <xs:restriction base="xs:token">
