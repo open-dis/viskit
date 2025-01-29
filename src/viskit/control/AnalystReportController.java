@@ -71,7 +71,7 @@ public class AnalystReportController extends MvcAbstractController {
 
     private AnalystReportViewFrame analystReportFrame;
     private File analystReportFile;
-    private File currentAssembyFile;
+    private File currentAssemblyFile;
     private AnalystReportModel analystReportModel;
 
     /** Creates a new instance of AnalystReportController */
@@ -155,11 +155,11 @@ public class AnalystReportController extends MvcAbstractController {
         openAnalystReport(openAnalystReportChooser.getSelectedFile());
     }
 
-    public void setCurrentAssembyFile(File f) {
-        currentAssembyFile = f;
+    public void setCurrentAssemblyFile(File f) {
+        currentAssemblyFile = f;
 
         if (analystReportModel != null) {
-            analystReportModel.setAssemblyFile(currentAssembyFile);
+            analystReportModel.setAssemblyFile(currentAssemblyFile);
         }
     }
 
@@ -172,12 +172,11 @@ public class AnalystReportController extends MvcAbstractController {
         saveAnalystReportXmlChooser.setFileFilter(filter);
         saveAnalystReportXmlChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-        int resp = saveAnalystReportXmlChooser.showSaveDialog(analystReportFrame);
+        int response = saveAnalystReportXmlChooser.showSaveDialog(analystReportFrame);
 
-        if (resp != JFileChooser.APPROVE_OPTION) {
+        if (response != JFileChooser.APPROVE_OPTION) { // cancel
             return;
         }
-
         analystReportFrame.unFillLayout();
 
         // Ensure user can save a unique name for Analyst Report (Bug fix: 1260)
@@ -263,7 +262,7 @@ public class AnalystReportController extends MvcAbstractController {
         LOG.debug("TargetFile is: {}", targetFile);
         AnalystReportModel analystReportModelLocal;
         try {
-            analystReportModelLocal = new AnalystReportModel(analystReportFrame, targetFile, currentAssembyFile);
+            analystReportModelLocal = new AnalystReportModel(analystReportFrame, targetFile, currentAssemblyFile);
         } 
         catch (Exception e) {
             LOG.error("Error parsing analyst report: {}", e);
@@ -324,13 +323,10 @@ public class AnalystReportController extends MvcAbstractController {
     }
 
 //    @Override
-    public void viewXML() {
-//        AnalystReportModel analystReportModel = (AnalystReportModel) getModel();
-//        if (!checkSaveForSourceCompile() || analystReportModel.getLastFile() == null) {
-//            return;
-//        }
-//        ((AssemblyViewFrame)ViskitGlobals.instance().getAssemblyController().getView()).displayXML(new File(analystReportModel.getFileName()));
-        ViskitGlobals.instance().getAssemblyEditor().displayXML(((Model) getModel()).getLastFile());
+    public void viewXML() 
+    {
+        // bravely ignoring error checking here...
+        ViskitGlobals.instance().getAssemblyEditor().displayXML(analystReportFile);
     }
 
 } // end class file AnalystReportController.java

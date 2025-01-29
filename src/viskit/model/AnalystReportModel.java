@@ -80,7 +80,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     private File assemblyFile;
 
     /** The viskit.reports.ReportStatisticsDOM object for this report */
-    private Document statisiticsReportDocument;
+    private Document statisticsReportDocument;
     private String   statisticsReportPath;
 
     /** The jdom.Document object that is used to build the report */
@@ -122,7 +122,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         if (newDocument == null)
             return; // statistics XML was not written to, not selected for recording
 
-        setStatisticsReport(newDocument);
+        setStatisticsReportDocument(newDocument);
         setPclNodeCache(map);
         initializeDocument();
     }
@@ -327,7 +327,7 @@ public final class AnalystReportModel extends MvcAbstractModel
             statisticalResultsElement.setAttribute("file", statisticsReportPath);
 
             Element sumReport = new Element("SummaryReport");
-            List<Element> itr = statisiticsReportDocument.getRootElement().getChildren("SimEntity");
+            List<Element> itr = statisticsReportDocument.getRootElement().getChildren("SimEntity");
             List<Element> summItr;
             Element temp, summaryRecord, summStats;
             for (Element entity : itr) {
@@ -698,7 +698,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     private Element makeReplicationReport() 
     {
         Element repReports = new Element("ReplicationReports");
-        List<Element> simEntities = statisiticsReportDocument.getRootElement().getChildren("SimEntity");
+        List<Element> simEntities = statisticsReportDocument.getRootElement().getChildren("SimEntity");
 
         // variables for JFreeChart construction
         HistogramChart histogramChart = new HistogramChart();
@@ -978,7 +978,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     public boolean isDebug()                     {return debug;}
 
     public Document   getReportJdomDocument()    {return reportJdomDocument;}
-    public Document   getStatisiticsReport()     {return statisiticsReportDocument;}
+    public Document   getStatisiticsReport()     {return statisticsReportDocument;}
     public Element    getRootElement()           {return rootElement;}
     public String     getFileName()              {return analystReportFileName;}
     public File       getFile()                  {
@@ -1085,7 +1085,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         announcement = announcement +  " performed</p><br />" +
                   // Elapsed clock time: TODO
                 "<p align='center'>Analyst Report " + assemblyName + "</p><br />" +
-                "<p align='center'> is loaded and ready for further editing</p></body></html>";
+                "<p align='center'> is loaded and ready for further editing</p><br /></body></html>";
                 
         ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Analyst Report Ready", announcement);
@@ -1109,7 +1109,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     }
 
     public void setFileName          (String fileName)           { this.analystReportFileName = fileName; }
-    public void setStatisticsReport       (Document statisticsReportDocument)      { this.statisiticsReportDocument = statisticsReportDocument; }
+    public void setStatisticsReportDocument       (Document newStatisticsReportDocument)      { this.statisticsReportDocument = newStatisticsReportDocument; }
     public void setStatisticsReportPath   (String filename)           { this.statisticsReportPath = filename; }
     public void setAuthor                   (String s) { rootElement.setAttribute("author", s); };
     public void setAccessLabel           (String s) { rootElement.setAttribute("access", s);}

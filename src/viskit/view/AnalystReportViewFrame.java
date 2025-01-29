@@ -125,7 +125,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
             case NEW_ASSEMBLY:
                 currentAssemblyFile = (File) param;
                 AnalystReportController cntlr = (AnalystReportController) getController();
-                cntlr.setCurrentAssembyFile(currentAssemblyFile);
+                cntlr.setCurrentAssemblyFile(currentAssemblyFile);
                 break;
 
             case CLOSE_ASSEMBLY:
@@ -155,8 +155,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         dirty = b;
     }
 
-    public void setReportBuilder(AnalystReportModel b) {
-        analystReportModel = b;
+    public void setReportBuilder(AnalystReportModel newAnalystReportModel) {
+        analystReportModel = newAnalystReportModel;
         setModel(analystReportModel); // hold on locally
         getController().setModel(getModel()); // tell controller
     }
@@ -171,7 +171,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
     private void _fillLayout() {
         fillHeader();
-        fillExecSumm();
+        fillExecutiveSummary();
         fillSimulationLocation();
         fillSimulationConfiguration();
         fillEntityParams();
@@ -182,16 +182,17 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
     public void unFillLayout() {
         unFillHeader();
-        unFillExecSumm();
+        unFillExecutiveSummary();
         unFillSimulationLocation();
         unFillSimulationConfiguration();
         unFillEntityParams();
         unFillBehaviors();
-        unFillStatsPan();
-        unFillConRecPan();
+        unFillStatisticsPanel();
+        unFillConclusionsRecommendationsPanel();
     }
 
-    private void fillHeader() {
+    private void fillHeader()
+    {
         titleTF.setText(analystReportModel.getReportName());
         analystNameTF.setText(analystReportModel.getAuthor());
         String date = analystReportModel.getDateOfReport();
@@ -203,7 +204,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         documentLabelTF.setSelectedItem(analystReportModel.getAccess());
     }
 
-    private void unFillHeader() {
+    private void unFillHeader() 
+    {
         analystReportModel.setReportName(titleTF.getText());
         analystReportModel.setAuthor(analystNameTF.getText());
         analystReportModel.setDateOfReport(dateTF.getText());
@@ -272,13 +274,13 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return p;
     }
 
-    private void fillExecSumm() {
+    private void fillExecutiveSummary() {
         wantExecutiveSummary.setSelected(analystReportModel.isExecutiveSummaryComments());
         execSummTA.setText(analystReportModel.getExecutiveSummary());
         execSummTA.setEnabled(wantExecutiveSummary.isSelected());
     }
 
-    private void unFillExecSumm() {
+    private void unFillExecutiveSummary() {
         analystReportModel.setExecutiveSummaryComments(wantExecutiveSummary.isSelected());
         analystReportModel.setExecutiveSummary(execSummTA.getText());
     }
@@ -348,7 +350,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return p;
     }
 
-    private void fillSimulationLocation() {
+    private void fillSimulationLocation()
+    {
         wantLocationDescriptions.setSelected(analystReportModel.isPrintSimulationLocationComments());
         locationCommentsTA.setText(analystReportModel.getSimulationLocationComments());
         locationCommentsTA.setEnabled(wantLocationDescriptions.isSelected());
@@ -806,7 +809,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         statisticsSummaryScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
     }
 
-    private void unFillStatsPan() {
+    private void unFillStatisticsPanel() {
         analystReportModel.setPrintStatisticsComments(wantStatisticsDescriptionAnalysis.isSelected());
         analystReportModel.setStatisticsDescription(statisticsComments.getText());
         analystReportModel.setStatisticsConclusions(statisticsConclusions.getText());
@@ -847,7 +850,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         conRecRecsTA.setEnabled(bool);
     }
 
-    private void unFillConRecPan() {
+    private void unFillConclusionsRecommendationsPanel() {
         analystReportModel.setPrintRecommendationsConclusions(wantConclusionsRecommendations.isSelected());
         analystReportModel.setConclusions(conRecConclusionsTA.getText());
         analystReportModel.setRecommendations(conRecRecsTA.getText());
@@ -865,17 +868,16 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
         fileMenu.add(buildMenuItem(analystReportController,
+                "generateHtmlReport",
+                "Display analyst report HTML",
+                KeyEvent.VK_D,
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
+
+        fileMenu.add(buildMenuItem(analystReportController,
                 "openAnalystReportXML",
                 "Open another analyst report XML",
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-
-        JMenuItem viewXmlMI = new JMenuItem("View analyst report XML");
-        viewXmlMI.setMnemonic(KeyEvent.VK_V);
-        viewXmlMI.setToolTipText("Currently not implemented");
-        viewXmlMI.setEnabled(true);
-        viewXmlMI.add(buildMenuItem(analystReportController, "viewXML", "XML View of Saved Analyst Report", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
-        fileMenu.add(viewXmlMI);
         
         fileMenu.add(buildMenuItem(analystReportController,
                 "saveAnalystReportXML",
@@ -883,11 +885,10 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
 
-        fileMenu.add(buildMenuItem(analystReportController,
-                "generateHtmlReport",
-                "Display analyst report HTML",
-                KeyEvent.VK_D,
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
+        fileMenu.add(buildMenuItem(analystReportController, 
+                "viewXML", 
+                "XML View of Saved Analyst Report", 
+                KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
 
         myMenuBar.add(fileMenu);
     }
