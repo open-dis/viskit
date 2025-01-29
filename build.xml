@@ -784,6 +784,7 @@ their descpritions.
         <delete verbose="true">
             <fileset dir="MyViskitProjects/DefaultProject/AnalystReports">
                 <include name="**/*.png"/>
+                <include name="**/*.html"/>
                 <include name="**/*.xml"/>
             </fileset>
         </delete>
