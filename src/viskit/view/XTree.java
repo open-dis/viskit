@@ -26,34 +26,36 @@ import viskit.doe.FileHandler;
  * @since 27 Aug 2004
  * @version $Id$
  */
-public class XTree extends JTree {
+public class XTree extends JTree { // TODO rename XMLTreeComponent
     
     static final Logger LOG = LogUtils.getLogger(XTree.class);
 
     DefaultTreeModel mod;
 
-    static XTreePanel getTreeInPanel(File xmlF) throws Exception {
-        return new XTreePanel(xmlF);
+    static XTreePanel getTreeInPanel(File xmlFile) throws Exception {
+        return new XTreePanel(xmlFile);
     }
 
-    public XTree(File xmlF) throws Exception {
+    public XTree(File xmlFile) throws Exception 
+    {
         super();
-        setFile(xmlF);
+        setFile(xmlFile);
     }
-    XMLOutputter xmlOut;
-    Document doc = null;
+    XMLOutputter xmlOutputter;
+    Document document = null;
 
-    public final void setFile(File xmlF) {
-        Format form;
+    public final void setFile(File xmlFile) {
+        Format format;
         try {
-            doc = FileHandler.unmarshallJdom(xmlF);
-            xmlOut = new XMLOutputter();
-            form = Format.getPrettyFormat();
-            xmlOut.setFormat(form);
-        } catch (JDOMException | IOException e) {
-            doc = null;
-            xmlOut = null;
-            LOG.error("Error parsing or finding file {}", xmlF.getAbsolutePath());
+            document = FileHandler.unmarshallJdom(xmlFile);
+            xmlOutputter = new XMLOutputter();
+            format = Format.getPrettyFormat();
+            xmlOutputter.setFormat(format);
+        }
+        catch (JDOMException | IOException e) {
+            document = null;
+            xmlOutputter = null;
+            LOG.error("Error parsing or finding file {}", xmlFile.getAbsolutePath());
             return;
         }
 
@@ -61,7 +63,7 @@ public class XTree extends JTree {
         // this.removeAll();
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-        root.setUserObject(new nElement(0, doc.getRootElement()));
+        root.setUserObject(new nElement(0, document.getRootElement()));
         mod = new DefaultTreeModel(root);
         //addChildren(root);
         addRoot(root);
@@ -81,8 +83,8 @@ public class XTree extends JTree {
     }
 
     public String getXML() {
-        if (xmlOut != null) {
-            return xmlOut.outputString(doc);
+        if (xmlOutputter != null) {
+            return xmlOutputter.outputString(document);
         }
         return "";
     }
@@ -216,7 +218,7 @@ public class XTree extends JTree {
                     setToolTipText(tt);
                 }
                 if (idx == 0) {
-                    setToolTipText(((XTree) tree).doc.toString());
+                    setToolTipText(((XTree) tree).document.toString());
                 }
                 setIcon(icons[idx % icons.length]);
             } else {
@@ -292,7 +294,7 @@ public class XTree extends JTree {
             }
             
             if (p != null)
-                System.out.println(p.xtree.getXML());
+                System.out.println(p.xmlTree.getXML());
             
             c.add(p, BorderLayout.CENTER);
             f.setSize(500, 400);
@@ -317,51 +319,54 @@ public class XTree extends JTree {
 
 class XTreePanel extends JPanel {
 
-    public XTree xtree;
-    public JTextArea srcXML;
+    public XTree xmlTree;
+    public JTextArea sourceXmlTextArea;
 
-    XTreePanel(File xmlF) throws Exception {
+    XTreePanel(File xmlFile) throws Exception 
+    {
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         try {
-            xtree = new XTree(xmlF);
-        } catch (Exception e) {
-            xtree = null;
+            xmlTree = new XTree(xmlFile);
+        } 
+        catch (Exception e) {
+            xmlTree = null;
             throw (e);
         }
 
-        srcXML = new JTextArea("raw XML here");
-        srcXML.setWrapStyleWord(true);
-        srcXML.setLineWrap(true);
-        srcXML.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        Font oldF = srcXML.getFont();
-        srcXML.setFont(new Font("Monospaced", oldF.getStyle(), oldF.getSize()));
-        srcXML.setText(getElementText((DefaultMutableTreeNode) xtree.mod.getRoot()));
-        srcXML.setCaretPosition(0);
+        sourceXmlTextArea = new JTextArea("raw XML here");
+        sourceXmlTextArea.setWrapStyleWord(true);
+        sourceXmlTextArea.setEditable(false);
+        sourceXmlTextArea.setLineWrap(true);
+        sourceXmlTextArea.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        Font oldF = sourceXmlTextArea.getFont();
+        sourceXmlTextArea.setFont(new Font("Monospaced", oldF.getStyle(), oldF.getSize()));
+        sourceXmlTextArea.setText(getElementText((DefaultMutableTreeNode) xmlTree.mod.getRoot()));
+        sourceXmlTextArea.setCaretPosition(0);
 
-        JScrollPane treeJsp = new JScrollPane(xtree);
-        JScrollPane taJsp = new JScrollPane(srcXML);
-        taJsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // because we wrap
+        JScrollPane xmlTreeScrollPane = new JScrollPane(xmlTree);
+        JScrollPane xmlTextScrollPane = new JScrollPane(sourceXmlTextArea);
+        xmlTextScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER); // because we wrap
 
-        JSplitPane jspt = new JSplitPane(JSplitPane.VERTICAL_SPLIT, treeJsp, taJsp);
-        jspt.setOneTouchExpandable(false);
-        jspt.setResizeWeight(0.75);
+        JSplitPane xmlViewSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, xmlTreeScrollPane, xmlTextScrollPane);
+        xmlViewSplitPane.setOneTouchExpandable(false);
+        xmlViewSplitPane.setResizeWeight(0.75);
 
-        Dimension d1 = xtree.getPreferredSize();
-        Dimension d2 = srcXML.getPreferredSize();
-        jspt.setPreferredSize(new Dimension(d1.width, d1.height + d2.height));
-        add(jspt);
+        Dimension d1 = xmlTree.getPreferredSize();
+        Dimension d2 = sourceXmlTextArea.getPreferredSize();
+        xmlViewSplitPane.setPreferredSize(new Dimension(d1.width, d1.height + d2.height));
+        add(xmlViewSplitPane);
         add(Box.createVerticalGlue());
 
-        xtree.getSelectionModel().addTreeSelectionListener((TreeSelectionEvent e) -> {
-            DefaultMutableTreeNode dmt = (DefaultMutableTreeNode) xtree.getLastSelectedPathComponent();
+        xmlTree.getSelectionModel().addTreeSelectionListener((TreeSelectionEvent e) -> {
+            DefaultMutableTreeNode dmt = (DefaultMutableTreeNode) xmlTree.getLastSelectedPathComponent();
             if (dmt == null) {
                 return;
             }
-            srcXML.setText(getElementText(dmt));
-            srcXML.revalidate();
-            srcXML.setCaretPosition(0);
+            sourceXmlTextArea.setText(getElementText(dmt));
+            sourceXmlTextArea.revalidate();
+            sourceXmlTextArea.setCaretPosition(0);
         });
     }
 
@@ -369,7 +374,7 @@ class XTreePanel extends JPanel {
         Object o = dmt.getUserObject();
         if (o instanceof XTree.nElement) {
             Element elm = ((XTree.nElement) o).elem;
-            return xtree.xmlOut.outputString(elm);
+            return xmlTree.xmlOutputter.outputString(elm);
         } else {
             return "";
         }
