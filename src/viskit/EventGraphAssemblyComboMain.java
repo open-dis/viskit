@@ -166,7 +166,7 @@ public class EventGraphAssemblyComboMain {
             help.aboutViskit();
         });
 
-        final MainFrame mf = (MainFrame) ViskitGlobals.instance().getMainAppWindow();
+        final MainFrame mf = (MainFrame) ViskitGlobals.instance().getMainFrameWindow();
 
         // CMD Q for macOS
         Desktop.getDesktop().setQuitHandler((QuitEvent e, QuitResponse response) -> {

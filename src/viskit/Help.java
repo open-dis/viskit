@@ -61,14 +61,14 @@ public class Help {
     public static final String VERSION_STRING = VERSION.getVersionString();
     public static final String CR = "<br>";
     public static final String ABOUT_EVENTGRAPH_STRING =
-            "Viskit Event Graph and Assembly Editor" + CR + "   version " + VERSION_STRING + CR
-            + "last modified: " + VERSION.getLastModified() + CR + CR;
+            "Viskit Event Graph and Assembly Editor" + CR + "   version " + VERSION_STRING +
+            ", last modified: " + VERSION.getLastModified() + CR + CR;
     public static final String ABOUT_ASSEMBLY_STRING =
             "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR
             + "last modified: " + VERSION.getLastModified() + CR + CR;
-    public static final String SIMKIT_URL = "https://github.com/ahbuss/Simkit/";
-    public static final String VISKIT_URL = "https://gitlab.nps.edu/Savage/viskit";
-    public static final String ISSUES_URL = "https://gitlab.nps.edu/Savage/viskit/issues";
+    public static final String SIMKIT_URL   = "https://github.com/ahbuss/Simkit";
+    public static final String VISKIT_URL   = "https://gitlab.nps.edu/Savage/viskit";
+    public static final String ISSUES_URL   = "https://gitlab.nps.edu/Savage/viskit/issues";
     public static final String BUGZILLA_URL = "https://github.com/terry-norbraten/viskit/issues";
     public static final String DEVELOPERS =
             "Copyright &copy; 2004-2025 under the Lesser GNU Public License (LGPL)" + CR + CR
@@ -148,7 +148,7 @@ public class Help {
     public void aboutViskit() {
         JOptionPane.showMessageDialog(parent,
                 aboutViskitEditorPane,
-                "About Viskit...",
+                "About Viskit",
                 JOptionPane.OK_OPTION,
                 icon
         );

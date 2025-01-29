@@ -56,14 +56,16 @@ import viskit.mvc.MvcController;
  * @since Aug 2008
  * @version $Id$
  */
-public class ViskitProjectButtonPanel extends javax.swing.JPanel {
-
+public class ViskitProjectButtonPanel extends javax.swing.JPanel
+{
     private static JDialog dialog;
 
-    public static void showDialog() {
-        ViskitProjectButtonPanel panel = new ViskitProjectButtonPanel();
+    public static void showDialog()
+    {
+        ViskitProjectButtonPanel viskitProjectButtonPanel = new ViskitProjectButtonPanel();
         dialog = new JDialog((Dialog) null, true);  // modal
-        dialog.setContentPane(panel);
+        dialog.setTitle("Viskit Project Initialization");
+        dialog.setContentPane(viskitProjectButtonPanel);
         dialog.pack();
 
         // We don't want a JVM exit when the user closes this dialog and merely
@@ -112,14 +114,14 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
             }
         });
 
-        existingButton.setText("Open existing project");
+        existingButton.setText("Open existing Viskit project");
         existingButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 existingButtonActionPerformed(evt);
             }
         });
 
-        createButton.setText("Create new project");
+        createButton.setText("Create new Viskit project");
         createButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createButtonActionPerformed(evt);
@@ -139,22 +141,22 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(existingButton)
-                    .addComponent(createButton)
-                    .addComponent(exitButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(createButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(existingButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(exitButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(existingButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(createButton)
                 .addGap(18, 18, 18)
                 .addComponent(exitButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -168,17 +170,20 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel {
      */
 private void existingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtonActionPerformed
     File file;
-    if (!firstTime) {
-        MvcController vac = ViskitGlobals.instance().getAssemblyController();
-        if (vac != null) {
+    if (!firstTime) 
+    {
+        MvcController mvcController = ViskitGlobals.instance().getAssemblyController();
+        if (mvcController != null) {
 
-            AssemblyView vaw = (AssemblyView) vac.getView();
+            AssemblyView assemblyView = (AssemblyView) mvcController.getView();
 
-            if (vaw != null)
-                vaw.openProject();
+            if (assemblyView != null)
+                assemblyView.openProject();
         }
-    } else {
-        file = ViskitProject.openProjectDir(this, ViskitProject.VISKIT_PROJECTS_DIR);
+    } 
+    else 
+    {
+        file = ViskitProject.openProjectDirectory(this, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
         ViskitStatics.setViskitProjectFile(file);
         firstTime = !firstTime;
 
@@ -186,7 +191,6 @@ private void existingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
         // controller hasn't been created yet to store that info when Viskit
         // first starts up
     }
-
     defaultButtActionPerformed(null);
 
 }//GEN-LAST:event_existingButtonActionPerformed
@@ -198,7 +202,7 @@ private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_defaultButtActionPerformed
 
 private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-    File projF;
+    File newProjectFile;
 
     // What we wish to do here is force the user to create a new project space
     // before letting them move on, or, open and existing project, or the only
@@ -208,16 +212,16 @@ private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         if (ViskitProjectGenerationDialog3.cancelled)
             return;
         
-        String projPath = ViskitProjectGenerationDialog3.projectPath;
-        projF = new File(projPath);
-        if (projF.exists() && (projF.isFile() || projF.list().length > 0))
-            JOptionPane.showMessageDialog(this, "Chosen project name exists.");
+        String newProjectPath = ViskitProjectGenerationDialog3.projectPath;
+        newProjectFile = new File(newProjectPath);
+        if (newProjectFile.exists() && (newProjectFile.isFile() || newProjectFile.list().length > 0))
+            JOptionPane.showMessageDialog(this, "Chosen project name already exists, please create a new project name.");
         else
             break; // out of do
         
     } while (true);
 
-    ViskitStatics.setViskitProjectFile(projF);
+    ViskitStatics.setViskitProjectFile(newProjectFile);
 
     // NOTE: We have no way of setting the first opened project here as the
     // controller hasn't been created yet to store that info when Viskit first

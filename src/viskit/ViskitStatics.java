@@ -107,9 +107,15 @@ public class ViskitStatics {
      * @param newProjectFile the base directory of a Viskit project
      */
     @SuppressWarnings("unchecked")
-    public static void setViskitProjectFile(File newProjectFile) {
-        ViskitProject.VISKIT_PROJECTS_DIR = newProjectFile.getParent().replaceAll("\\\\", "/");
-        ViskitConfiguration.instance().setVal(ViskitConfiguration.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIR);
+    public static void setViskitProjectFile(File newProjectFile) 
+    {
+        if (newProjectFile == null)
+        {
+            LOG.error("*** ViskitStatics setViskitProjectFile() received a null file, ignored...");
+            return;
+        }
+        ViskitProject.VISKIT_PROJECTS_DIRECTORY = newProjectFile.getParent().replaceAll("\\\\", "/"); // de-windows
+        ViskitConfiguration.instance().setVal(ViskitConfiguration.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
         ViskitProject.DEFAULT_PROJECT_NAME = newProjectFile.getName();
         ViskitConfiguration.instance().setVal(ViskitConfiguration.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
     }

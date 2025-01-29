@@ -1000,7 +1000,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
 
     @Override
     public void genericReport(int type, String title, String msg) {
-        JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainAppWindow(), msg, title, type);
+        JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainFrameWindow(), msg, title, type);
     }
 
     @Override
@@ -1016,7 +1016,7 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         if (ViskitGlobals.instance().getCurrentViskitProject() != null)
             return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir());
         else
-            return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIR));
+            return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY));
     }
 
     @Override
@@ -1060,11 +1060,11 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         if (!aController.handleProjectClosing())
             return;
 
-        File file = ViskitProject.openProjectDir(this.getContent(), ViskitProject.VISKIT_PROJECTS_DIR);
+        File file = ViskitProject.openProjectDirectory(this.getContent(), ViskitProject.VISKIT_PROJECTS_DIRECTORY);
         if (file != null)
-            aController.openProject(file); // calls EGVF showProjectName
+            aController.openProject(file); // calls EGVF setTitleApplicationProjectName
 
-        showProjectName();
+        setTitleApplicationProjectName();
     }
 
     private File getUniqueName(String suggName) {

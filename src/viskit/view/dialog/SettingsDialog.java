@@ -534,7 +534,7 @@ public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences
         @Override
         public void actionPerformed(ActionEvent e) {
             if (addChooser == null) {
-                addChooser = new JFileChooser(ViskitProject.VISKIT_PROJECTS_DIR);
+                addChooser = new JFileChooser(ViskitProject.VISKIT_PROJECTS_DIRECTORY);
                 addChooser.setMultiSelectionEnabled(false);
                 addChooser.setAcceptAllFileFilterUsed(false);
                 addChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);

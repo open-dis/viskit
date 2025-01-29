@@ -92,7 +92,8 @@ public class ViskitProject {
 
     static final Logger LOG = LogUtils.getLogger(ViskitProject.class);
 
-    public static String VISKIT_PROJECTS_DIR = DEFAULT_VISKIT_PROJECTS_DIR;
+    /** This static variable will get updated at launch if user's home directory doesn't exist */
+    public static String VISKIT_PROJECTS_DIRECTORY = DEFAULT_VISKIT_PROJECTS_DIR;
 
     /** This static variable will be set by the user upon first Viskit startup
      * to determine a project location space on the user's machine. A default
@@ -119,7 +120,8 @@ public class ViskitProject {
     private boolean projectOpen = false;
     private Document projectDocument;
 
-    public ViskitProject(File projectRoot) {
+    public ViskitProject(File projectRoot)
+    {
         if (projectRoot.exists() && !projectRoot.isDirectory()) {
             LOG.warn("Project root must be directory, not: {}",projectRoot);
             return;
@@ -377,11 +379,12 @@ public class ViskitProject {
         deleteDirectoryContents(projectRoot);
     }
 
-    public void closeProject() {
-        ViskitConfiguration vConfig = ViskitConfiguration.instance();
-        vConfig.getViskitGuiConfig().setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, "");
-        vConfig.cleanup();
-        vConfig.removeProjectXMLConfig(vConfig.getProjectXMLConfig());
+    public void closeProject() 
+    {
+        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
+        viskitConfiguration.getViskitGuiConfig().setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, "");
+        viskitConfiguration.cleanup();
+        viskitConfiguration.removeProjectXMLConfig(viskitConfiguration.getProjectXMLConfig());
         setProjectOpen(false);
     }
 
@@ -634,42 +637,48 @@ public class ViskitProject {
     /** Utility method to aid in Viskit specific project directory selection
      *
      * @param parent the component parent for JOptionPane orientation
-     * @param startingDirPath a path to start looking from in the chooser
+     * @param defaultDirectoryPath a path to start looking from in the chooser
      * @return a path to a valid project directory
      */
-    public static File openProjectDir(JComponent parent, String startingDirPath) {
-        File projectDir = null;
-        initializeProjectChooser(startingDirPath);
+    public static File openProjectDirectory(JComponent parent, String defaultDirectoryPath)
+    {
+        String initialDirectoryPath = defaultDirectoryPath;
+        File projectDirectory = new File (initialDirectoryPath);
+        
+        // if no user preference directory exists, fall back to MyViskitProjects/DefaultProject
+        if (!projectDirectory.exists())
+        {
+            // likely user has not created their own projects yet, fall back to Viskit's embedded MyViskitProjects
+            initialDirectoryPath = "./MyViskitProjects/"; // allow user to choose DefaultProject or whatever else is there
+        }
+        initializeProjectChooser(initialDirectoryPath);
 
-        projectChooser.setDialogTitle("Open an Existing Viskit Project");
-        boolean isProjectDir;
+        projectChooser.setDialogTitle("Open existing Viskit Project");
+        boolean isProjectDirectory;
 
         do {
-            int ret = projectChooser.showOpenDialog(parent);
-
-            // User may have exited the chooser
-            if (ret == JFileChooser.CANCEL_OPTION) {
+            int returnValue = projectChooser.showOpenDialog(parent);
+            // User may have exited the chooser, if so then no file was chosen
+            if (returnValue == JFileChooser.CANCEL_OPTION) {
                 return null;
             }
-
-            projectDir = projectChooser.getSelectedFile();
-            isProjectDir = ((ViskitProjectFileView)projectChooser.getFileView()).isViskitProject(projectDir);
+            projectDirectory = projectChooser.getSelectedFile();
+            isProjectDirectory = ((ViskitProjectFileView)projectChooser.getFileView()).isViskitProject(projectDirectory);
 
             // Give user a chance to select an iconized project directory
-            if (!isProjectDir) {
+            if (!isProjectDirectory) {
                 Object[] options = {"Select project", "Cancel"};
-                int retrn = JOptionPane.showOptionDialog(parent, "Your selection is not a valid Viskit project.", "Please try another selection",
+                returnValue = JOptionPane.showOptionDialog(parent, "Your selection is not a valid Viskit project.", "Please try another selection",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
-                if (retrn != 0) {
+                if (returnValue != 0) {
                     // 0th choice (Select project)
                     return null; // cancelled
                 } // cancelled
             }
+        } while (!isProjectDirectory); // continue until user has found a valid directory or else cancels the directory chooser
 
-        } while (!isProjectDir);
-
-        return projectDir;
+        return projectDirectory;
     }
 
     /**
@@ -698,17 +707,17 @@ public class ViskitProject {
         /**
          * Report if given directory holds a Viskit Project
          *
-         * @param fDir the project directory to test
+         * @param fileDirectory the project directory to test
          * @return true when a viskitProject.xml file is found
          */
-        public boolean isViskitProject(File fDir) {
+        public boolean isViskitProject(File fileDirectory) {
 
-            if ((fDir == null) || !fDir.exists() || !fDir.isDirectory()) {
+            if ((fileDirectory == null) || !fileDirectory.exists() || !fileDirectory.isDirectory()) {
                 return false;
             }
 
             // http://www.avajava.com/tutorials/lessons/how-do-i-use-a-filenamefilter-to-display-a-subset-of-files-in-a-directory.html
-            File[] files = fDir.listFiles((File dir, String name) -> {
+            File[] files = fileDirectory.listFiles((File dir, String name) -> {
                 // configuration/ contains the template viskitProject.xml file
                 // so, don't show this directory as a potential Viskit project
                 if (dir.getName().equals(VISKIT_CONFIG_DIR)) {

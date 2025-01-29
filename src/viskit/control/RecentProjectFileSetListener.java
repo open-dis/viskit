@@ -134,7 +134,7 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
                 acontroller.doProjectCleanup();
                 acontroller.openProject(fullPath);
 
-                ((MvcAbstractJFrameView) ((MvcController) acontroller).getView()).showProjectName();
+                ((MvcAbstractJFrameView) ((MvcController) acontroller).getView()).setTitleApplicationProjectName();
             }
         }
     }

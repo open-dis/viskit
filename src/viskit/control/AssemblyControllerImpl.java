@@ -134,7 +134,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if (!initialAssemblyFile.contains(projectPath.getPath())) {
                 doProjectCleanup();
                 projectPath = new File(initialAssemblyFile).getParentFile().getParentFile().getParentFile();
-                openProject(projectPath); // calls EventGraphViewFrame showProjectName
+                openProject(projectPath); // calls EventGraphViewFrame setTitleApplicationProjectName
 
                 // Add new project EventGraphs for LEGO tree inclusion of our SimEntities
                 SettingsDialog.RebuildLEGOTreePanelTask t = new SettingsDialog.RebuildLEGOTreePanelTask();
@@ -142,7 +142,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
             compileAssembly(initialAssemblyFile);
         } else {
-            openProject(projectPath); // calls EventGraphViewFrame showProjectName
+            openProject(projectPath); // calls EventGraphViewFrame setTitleApplicationProjectName
             List<String> files = getOpenAssemblyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", files.size());
             File file;
@@ -154,7 +154,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
         }
 
-        ((AssemblyViewFrame) getView()).showProjectName();
+        ((AssemblyViewFrame) getView()).setTitleApplicationProjectName();
         recordProjectFiles();
     }
 
@@ -638,29 +638,34 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @return indication of continue or cancel
      */
     public boolean handleProjectClosing() {
-        boolean retVal = true;
-        if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {
+        boolean projectClosed = true;
+        if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+        {
             String msg = "Are you sure you want to close your current Viskit Project?";
             String title = "Close Current Project";
 
-            int ret = ((AssemblyView) getView()).genericAskYN(title, msg);
-            if (ret == JOptionPane.YES_OPTION) {
+            int returnValue = ((AssemblyView) getView()).genericAskYN(title, msg);
+            if (returnValue == JOptionPane.YES_OPTION)
+            {
                 doProjectCleanup();
-            } else {
-                retVal = false;
+            } 
+            else {
+                projectClosed = false;
             }
         }
-        return retVal;
+        return projectClosed;
     }
 
     @Override
-    public void doProjectCleanup() {
+    public void doProjectCleanup()
+    {
         closeAll();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
         ViskitConfiguration.instance().clearViskitConfig();
         clearRecentAssemblyFileList();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
         ViskitGlobals.instance().getCurrentViskitProject().closeProject();
+        ViskitGlobals.instance().getMainFrameWindow().updateApplicationTitle();
     }
 
     @Override
@@ -670,7 +675,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjectSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
-        ViskitGlobals.instance().getEventGraphEditor().showProjectName();
+        ViskitGlobals.instance().getEventGraphEditor().setTitleApplicationProjectName();
         runner.resetAssemblySimulationRunPanel();
     }
 

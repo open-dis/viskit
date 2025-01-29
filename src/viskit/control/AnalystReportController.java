@@ -102,7 +102,7 @@ public class AnalystReportController extends MvcAbstractController {
             frame = (AnalystReportFrame) getView();
         }
 
-        frame.showProjectName();
+        frame.setTitleApplicationProjectName();
         buildAnalystReport(targetFile);
     }
 

@@ -542,7 +542,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     @Override
     public String addParameterDialog() {
 
-        if (ParameterDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), null)) {      // blocks here
+        if (ParameterDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewSimParameter(ParameterDialog.newName,
                     ParameterDialog.newType,
                     "new value here",
@@ -554,7 +554,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
     @Override
     public String addStateVariableDialog() {
-        if (StateVariableDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), null)) {      // blocks here
+        if (StateVariableDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewStateVariable(StateVariableDialog.newName,
                     StateVariableDialog.newType,
                     "new value here",
@@ -738,8 +738,8 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         myMenuBar.add(fileMenu);
         myMenuBar.add(editMenu);
 
-        Help help = new Help(ViskitGlobals.instance().getMainAppWindow());
-        help.mainFrameLocated(ViskitGlobals.instance().getMainAppWindow().getBounds());
+        Help help = new Help(ViskitGlobals.instance().getMainFrameWindow());
+        help.mainFrameLocated(ViskitGlobals.instance().getMainFrameWindow().getBounds());
         ViskitGlobals.instance().setHelp(help); // single instance for all viskit frames
 
         JMenu helpMenu = new JMenu("Help");
@@ -1135,7 +1135,7 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
         if (ViskitGlobals.instance().getCurrentViskitProject() != null) {
             return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir());
         } else {
-            return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIR));
+            return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY));
         }
     }
 
@@ -1238,13 +1238,13 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
     @Override
     public boolean doEditNode(EventNode node) {
         selectMode.doClick();     // always go back into select mode
-        return EventInspectorDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), node); // blocks
+        return EventInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), node); // blocks
     }
 
     @Override
     public boolean doEditEdge(Edge edge) {
         selectMode.doClick();     // always go back into select mode
-        return EdgeInspectorDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), edge); // blocks
+        return EdgeInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), edge); // blocks
     }
 
     @Override
@@ -1254,12 +1254,12 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
     @Override
     public boolean doEditParameter(ViskitParameter param) {
-        return ParameterDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), param);    // blocks
+        return ParameterDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), param);    // blocks
     }
 
     @Override
     public boolean doEditStateVariable(ViskitStateVariable var) {
-        return StateVariableDialog.showDialog(ViskitGlobals.instance().getMainAppWindow(), var);
+        return StateVariableDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), var);
     }
 
     @Override

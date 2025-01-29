@@ -17,61 +17,75 @@ import viskit.util.TitleListener;
 /**
  * From an article at www.jaydeetechnology.co.uk
  */
-public abstract class MvcAbstractJFrameView extends JFrame implements MvcView, MvcModelListener {
+public abstract class MvcAbstractJFrameView extends JFrame implements MvcView, MvcModelListener 
+{    
 
-    protected TitleListener titlList;
-    protected int titlKey;
-    private MvcModel model;
-    private MvcController controller;
+    protected TitleListener titlelListener;
+    protected int titleKey;
+    private MvcModel mvcModel;
+    private MvcController mvcController;
 
-    public MvcAbstractJFrameView(String title) {
+    public MvcAbstractJFrameView(String title) 
+    {
         super(title);
     }
 
-    public void registerWithModel() {
-        ((MvcAbstractModel) model).addModelListener(this);
+    public void registerWithModel() 
+    {
+        ((MvcAbstractModel) mvcModel).addModelListener(this);
     }
 
     /** Sets the frame title listener and key for this frame
      *
-     * @param lis the title listener to set
-     * @param key the key for this frame's title
+     * @param newTitleListener the title listener to set
+     * @param keyValue the key for this frame's title
      */
-    public void setTitleListener(TitleListener lis, int key) {
-        titlList = lis;
-        titlKey = key;
+    public void setTitleListener(TitleListener newTitleListener, int keyValue) 
+    {
+        titlelListener = newTitleListener;
+        titleKey = keyValue;
 
-        showProjectName();
+        setTitleApplicationProjectName();
     }
 
+//    public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation"; // using Simkit
     /**
      * Shows the project name in the frame title bar
      */
-    public void showProjectName() {
-        String ttl = " Project: " + ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
-        if (this.titlList != null) {
-            titlList.setTitle(ttl, titlKey);
+    public void setTitleApplicationProjectName()
+    {
+        String newTitle = new String();
+//        newTitle = VISKIT_APPLICATION_TITLE;
+        if      ( ViskitConfiguration.PROJECT_TITLE_NAME.toLowerCase().contains("project"))
+             newTitle +=         ": " +    ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
+        else if (!ViskitConfiguration.PROJECT_TITLE_NAME.isBlank())
+             newTitle += " Project: " + ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
+        // otherwise value is unchanged;
+        
+        if (this.titlelListener != null) 
+        {
+            titlelListener.setTitle(newTitle, titleKey);
         }
     }
 
     @Override
     public MvcController getController() {
-        return controller;
+        return mvcController;
     }
 
     @Override
     public MvcModel getModel() {
-        return model;
+        return mvcModel;
     }
 
     @Override
     public void setController(MvcController controller) {
-        this.controller = controller;
+        this.mvcController = controller;
     }
 
     @Override
     public void setModel(MvcModel model) {
-        this.model = model;
+        this.mvcModel = model;
         registerWithModel();
     }
 

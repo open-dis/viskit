@@ -27,7 +27,7 @@ public class ClassPanel extends JPanel {
 
     public ClassPanel(LegoTree ltree, String title, String plusTT, String minusTT) {
         this.tree = ltree;
-        jfc = new JFileChooser(ViskitProject.VISKIT_PROJECTS_DIR);
+        jfc = new JFileChooser(ViskitProject.VISKIT_PROJECTS_DIRECTORY);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JLabel lab = new JLabel(title); //"Event Graphs");

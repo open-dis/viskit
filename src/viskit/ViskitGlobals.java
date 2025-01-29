@@ -80,6 +80,7 @@ import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcController;
 import edu.nps.util.SystemExitHandler;
 import viskit.control.InternalAssemblySimulationRunner;
+import viskit.view.MainFrame;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -100,7 +101,7 @@ public class ViskitGlobals {
     private final DefaultComboBoxModel<String> defaultComboBoxModel;
     private JPopupMenu popupMenu;
     private final myTypeListener myTypeListener;
-    private JFrame mainApplicationWindow;
+    private MainFrame mainFrameWindow;
 
     private ViskitProject currentViskitProject;
 
@@ -518,7 +519,7 @@ public class ViskitGlobals {
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) {
             ViskitProjectButtonPanel.showDialog(); // hopefully, void this
         } else {
-            ViskitProject.VISKIT_PROJECTS_DIR = projectHome;
+            ViskitProject.VISKIT_PROJECTS_DIRECTORY = projectHome;
         }
     }
 
@@ -804,7 +805,7 @@ public class ViskitGlobals {
         if ((projectName != null) && (!projectName.isEmpty())) {
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }
-        projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIR);
+        projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY);
 
         if (currentViskitProject == null)
             currentViskitProject = new ViskitProject(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
@@ -965,12 +966,14 @@ public class ViskitGlobals {
         }
     }
 
-    public JFrame getMainAppWindow() {
-        return mainApplicationWindow;
+    public MainFrame getMainFrameWindow() 
+    {
+        return mainFrameWindow;
     }
 
-    public void setMainAppWindow(JFrame mainAppWindow) {
-        this.mainApplicationWindow = mainAppWindow;
+    public void setMainFrameWindow(MainFrame mainFrameWindow)
+    {
+        this.mainFrameWindow = mainFrameWindow;
     }
 
     public Help getHelp() {
