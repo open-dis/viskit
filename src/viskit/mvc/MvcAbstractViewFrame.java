@@ -17,7 +17,7 @@ import viskit.util.TitleListener;
 /**
  * From an article at www.jaydeetechnology.co.uk
  */
-public abstract class MvcAbstractJFrameView extends JFrame implements MvcView, MvcModelListener 
+public abstract class MvcAbstractViewFrame extends JFrame implements MvcView, MvcModelListener 
 {    
 
     protected TitleListener titlelListener;
@@ -25,7 +25,7 @@ public abstract class MvcAbstractJFrameView extends JFrame implements MvcView, M
     private MvcModel mvcModel;
     private MvcController mvcController;
 
-    public MvcAbstractJFrameView(String title) 
+    public MvcAbstractViewFrame(String title) 
     {
         super(title);
     }

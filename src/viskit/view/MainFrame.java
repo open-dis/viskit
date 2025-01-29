@@ -56,7 +56,7 @@ import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
 import viskit.doe.JobLauncherTab2;
 import viskit.model.Model;
-import viskit.mvc.MvcAbstractJFrameView;
+import viskit.mvc.MvcAbstractViewFrame;
 import viskit.util.OpenAssembly;
 import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcModel;
@@ -76,9 +76,9 @@ public class MainFrame extends JFrame
 {
     public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation"; // using Simkit
     
-    MvcAbstractJFrameView eventGraphFrame;
-    MvcAbstractJFrameView assemblyFrame;
-    MvcAbstractJFrameView reportPanel;
+    MvcAbstractViewFrame eventGraphFrame;
+    MvcAbstractViewFrame assemblyFrame;
+    MvcAbstractViewFrame reportPanel;
     InternalAssemblySimulationRunner internalAssemblySimulationRunner;
     JobLauncherTab2 runGridComponent;
 
@@ -249,7 +249,7 @@ public class MainFrame extends JFrame
             assemblyPaneIndex = topTabbedAssemblyPane.indexOfComponent(reportPanel.getContentPane());
             topTabbedAssemblyPane.setTitleAt(assemblyPaneIndex, "Analyst Report");
             topTabbedAssemblyPane.setToolTipTextAt(assemblyPaneIndex, "Supports analyst assessment and report generation");
-            menuBar = ((AnalystReportFrame) reportPanel).getMenus();
+            menuBar = ((AnalystReportViewFrame) reportPanel).getMenus();
             menus.add(menuBar);
             doCommonHelp(menuBar);
             jamSettingsHandler(menuBar);

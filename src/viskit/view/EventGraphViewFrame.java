@@ -68,7 +68,7 @@ import viskit.images.SchedArcIcon;
 import viskit.jgraph.ViskitGraphComponentWrapper;
 import viskit.jgraph.ViskitGraphModel;
 import viskit.model.*;
-import viskit.mvc.MvcAbstractJFrameView;
+import viskit.mvc.MvcAbstractViewFrame;
 import viskit.mvc.MvcModelEvent;
 import viskit.util.EventGraphFileFilter;
 import viskit.view.dialog.ParameterDialog;
@@ -106,7 +106,7 @@ import viskit.mvc.MvcRecentFileListener;
   @since 12:52:59 PM
   @version $Id$
  */
-public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventGraphView
+public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGraphView
 {
     public static String DESCRIPTION_HINT = "Good descriptions reveal model meaning and author intent";
 

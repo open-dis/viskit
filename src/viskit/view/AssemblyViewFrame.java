@@ -77,7 +77,7 @@ import viskit.images.SimEventListenerIcon;
 import viskit.jgraph.ViskitGraphAssemblyComponentWrapper;
 import viskit.jgraph.ViskitGraphAssemblyModel;
 import viskit.model.*;
-import viskit.mvc.MvcAbstractJFrameView;
+import viskit.mvc.MvcAbstractViewFrame;
 import viskit.mvc.MvcModelEvent;
 import viskit.util.AssemblyFileFilter;
 import viskit.view.dialog.EventGraphNodeInspectorDialog;
@@ -132,7 +132,7 @@ import viskit.mvc.MvcRecentFileListener;
  *   to be used to configure an assembly file for sim running
  * </pre>
  */
-public class AssemblyViewFrame extends MvcAbstractJFrameView implements AssemblyView, DragStartListener
+public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyView, DragStartListener
 {
     static final Logger LOG = LogUtils.getLogger(AssemblyViewFrame.class);
     

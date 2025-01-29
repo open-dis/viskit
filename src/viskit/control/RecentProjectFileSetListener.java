@@ -46,7 +46,7 @@ import javax.swing.JSeparator;
 
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import viskit.mvc.MvcAbstractJFrameView;
+import viskit.mvc.MvcAbstractViewFrame;
 import viskit.mvc.MvcController;
 import viskit.mvc.MvcRecentFileListener;
 
@@ -134,7 +134,7 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
                 acontroller.doProjectCleanup();
                 acontroller.openProject(fullPath);
 
-                ((MvcAbstractJFrameView) ((MvcController) acontroller).getView()).setTitleApplicationProjectName();
+                ((MvcAbstractViewFrame) ((MvcController) acontroller).getView()).setTitleApplicationProjectName();
             }
         }
     }

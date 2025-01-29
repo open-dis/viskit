@@ -70,8 +70,8 @@ import viskit.model.AnalystReportModel;
 import viskit.model.EventNode;
 import viskit.model.Model;
 import viskit.model.ViskitElement;
-import viskit.mvc.MvcAbstractJFrameView;
-import viskit.view.AnalystReportFrame;
+import viskit.mvc.MvcAbstractViewFrame;
+import viskit.view.AnalystReportViewFrame;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.AssemblySimulationRunPanel;
@@ -138,7 +138,7 @@ public class ViskitGlobals {
     }
 
     /* routines to manage the singleton-aspect of the views. */
-    MvcAbstractJFrameView assemblyViewFrame;
+    MvcAbstractViewFrame assemblyViewFrame;
     MvcController assemblyController;
 
     /**
@@ -153,7 +153,7 @@ public class ViskitGlobals {
      *
      * @return the component AssemblyViewFrame
      */
-    public MvcAbstractJFrameView buildAssemblyViewFrame() {
+    public MvcAbstractViewFrame buildAssemblyViewFrame() {
         assemblyController = new AssemblyControllerImpl();
         assemblyViewFrame = new AssemblyViewFrame(assemblyController);
         assemblyController.setView(assemblyViewFrame);
@@ -196,7 +196,7 @@ public class ViskitGlobals {
 
     /* EventGraphViewFrame / EventGraphControllerImpl */
 
-    MvcAbstractJFrameView eventGraphViewFrame;
+    MvcAbstractViewFrame eventGraphViewFrame;
     MvcController eContl;
 
     public EventGraphViewFrame getEventGraphEditor() {
@@ -213,7 +213,7 @@ public class ViskitGlobals {
      *
      * @return an instance of the EventGraphViewFrame
      */
-    public MvcAbstractJFrameView buildEventGraphViewFrame() {
+    public MvcAbstractViewFrame buildEventGraphViewFrame() {
         eContl = new EventGraphControllerImpl();
         eventGraphViewFrame = new EventGraphViewFrame(eContl);
         eContl.setView(eventGraphViewFrame);
@@ -268,24 +268,24 @@ public class ViskitGlobals {
     /* AnalystReport model / view / controller */
 
     /* routines to manage the singleton-aspect of the view */
-    MvcAbstractJFrameView aRf;
+    MvcAbstractViewFrame aRf;
     MvcController aRcont;
 
     /**
      * Get a reference to the analyst report view.
      * @return a reference to the analyst report view or null if yet unbuilt.
      */
-    public AnalystReportFrame getAnalystReportEditor() {
-        return (AnalystReportFrame) aRf;
+    public AnalystReportViewFrame getAnalystReportEditor() {
+        return (AnalystReportViewFrame) aRf;
     }
 
     /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
      *
-     * @return the component AnalystReportFrame
+     * @return the component AnalystReportViewFrame
      */
-    public MvcAbstractJFrameView buildAnalystReportFrame() {
+    public MvcAbstractViewFrame buildAnalystReportFrame() {
         aRcont = new AnalystReportController();
-        aRf = new AnalystReportFrame(aRcont);
+        aRf = new AnalystReportViewFrame(aRcont);
         aRcont.setView(aRf);
         return aRf;
     }

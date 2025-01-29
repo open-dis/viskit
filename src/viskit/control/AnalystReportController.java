@@ -56,7 +56,7 @@ import viskit.mvc.MvcAbstractController;
 import viskit.model.AnalystReportModel;
 import viskit.model.Model;
 import viskit.util.XsltUtility;
-import viskit.view.AnalystReportFrame;
+import viskit.view.AnalystReportViewFrame;
 import viskit.view.AssemblyViewFrame;
 
 /** A controller for the analyst report panel.  All functions are to be
@@ -69,7 +69,7 @@ public class AnalystReportController extends MvcAbstractController {
 
     static final Logger LOG = LogUtils.getLogger(AnalystReportController.class);
 
-    private AnalystReportFrame analystReportFrame;
+    private AnalystReportViewFrame analystReportFrame;
     private File analystReportFile;
     private File currentAssembyFile;
     private AnalystReportModel analystReportModel;
@@ -103,7 +103,7 @@ public class AnalystReportController extends MvcAbstractController {
         }
 
         if (analystReportFrame == null) {
-            analystReportFrame = (AnalystReportFrame) getView();
+            analystReportFrame = (AnalystReportViewFrame) getView();
         }
 
         analystReportFrame.setTitleApplicationProjectName();

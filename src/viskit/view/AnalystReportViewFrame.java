@@ -66,7 +66,7 @@ import org.apache.logging.log4j.Logger;
 
 import viskit.util.OpenAssembly;
 import viskit.control.AnalystReportController;
-import viskit.mvc.MvcAbstractJFrameView;
+import viskit.mvc.MvcAbstractViewFrame;
 import viskit.mvc.MvcModelEvent;
 import viskit.model.AnalystReportModel;
 import viskit.mvc.MvcController;
@@ -80,9 +80,9 @@ import viskit.mvc.MvcController;
  * @since 2:47:03 PM
  * @version $Id$
  */
-public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAssembly.AssembyChangeListener {
+public class AnalystReportViewFrame extends MvcAbstractViewFrame implements OpenAssembly.AssembyChangeListener {
 
-    static final Logger LOG = LogUtils.getLogger(AnalystReportFrame.class);
+    static final Logger LOG = LogUtils.getLogger(AnalystReportViewFrame.class);
     private final static String FRAME_DEFAULT_TITLE = "Viskit Analyst Report Editor";
     private AnalystReportModel analystReportModel;
 
@@ -94,7 +94,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
     private JMenuBar myMenuBar;
     private JFileChooser locationImageFileChooser;
 
-    public AnalystReportFrame(MvcController controller) {
+    public AnalystReportViewFrame(MvcController controller) {
         super(FRAME_DEFAULT_TITLE);
         initMVC(controller);
         setLayout();
@@ -925,7 +925,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int resp = locationImageFileChooser.showOpenDialog(AnalystReportFrame.this);
+            int resp = locationImageFileChooser.showOpenDialog(AnalystReportViewFrame.this);
             if (resp == JFileChooser.APPROVE_OPTION) {
                 tf.setText(locationImageFileChooser.getSelectedFile().getAbsolutePath());
             }
