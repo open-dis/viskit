@@ -648,32 +648,34 @@ public class EventGraphViewFrame extends MvcAbstractJFrameView implements EventG
 
         fileMenu.add(buildMenuItem(controller, "newProject", "New Viskit Project", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
-        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/E-Mail Viskit Project", KeyEvent.VK_Z,
+        
+        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
+        fileMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
+        // The recently opened project file listener will be set with the
+        // openRecentProjMenu in the MainFrame after the AssemblyView is instantiated
+
+        fileMenu.add(buildMenuItem(controller, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
+        fileMenu.addSeparator();
+        
         fileMenu.add(buildMenuItem(controller, "newEventGraph", "New Event Graph", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
-        fileMenu.addSeparator();
 
         fileMenu.add(buildMenuItem(controller, "open", "Open Event Graph", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         fileMenu.add(openRecentEventGraphMenu = buildMenu("Open Recent Event Graph"));
         openRecentEventGraphMenu.setEnabled(false); // inactive until needed, reset by listener
-        fileMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
-        fileMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
-
-        // The recently opened project file listener will be set with the
-        // openRecentProjMenu in the MainFrame after the AssemblyView is instantiated
 
         fileMenu.add(buildMenuItem(controller, "close", "Close Event Graph", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
         fileMenu.add(buildMenuItem(controller, "closeAll", "Close All Event Graphs", null, null));
         fileMenu.add(buildMenuItem(controller, "save", "Save Event Graph", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        fileMenu.add(buildMenuItem(controller, "saveAs", "Save as...", KeyEvent.VK_A, null));
+        fileMenu.add(buildMenuItem(controller, "saveAs", "Save Event Graph as...", KeyEvent.VK_A, null));
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(controller, "showXML", "View Saved Event Graph XML", KeyEvent.VK_X, null));
+        fileMenu.add(buildMenuItem(controller, "showXML", "View XML Saved Event Graph", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
         fileMenu.add(buildMenuItem(controller, "generateJavaSource", "Generate Event Graph Java Source", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         fileMenu.add(buildMenuItem(controller, "captureWindow", "Save Event Graph Screen Image", KeyEvent.VK_I,

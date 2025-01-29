@@ -855,7 +855,7 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
 
     private void buildMenus() {
 
-        AnalystReportController controller = (AnalystReportController) getController();
+        AnalystReportController analystReportController = (AnalystReportController) getController();
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
@@ -864,8 +864,8 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
-        fileMenu.add(buildMenuItem(controller,
-                "openAnalystReport",
+        fileMenu.add(buildMenuItem(analystReportController,
+                "openAnalystReportXML",
                 "Open another analyst report XML",
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
@@ -876,13 +876,13 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
         view.setEnabled(false); // TODO:  implement listener and view functionality
 
         fileMenu.add(view);
-        fileMenu.add(buildMenuItem(controller,
-                "saveAnalystReport",
+        fileMenu.add(buildMenuItem(analystReportController,
+                "saveAnalystReportXML",
                 "Save analyst report XML",
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
 
-        fileMenu.add(buildMenuItem(controller,
+        fileMenu.add(buildMenuItem(analystReportController,
                 "generateHtmlReport",
                 "Display analyst report HTML",
                 KeyEvent.VK_D,
