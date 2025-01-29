@@ -88,7 +88,7 @@ public interface EventGraphController {
     void zipAndMailProject();
 
     /** Show the XML form of an event graph */
-    void showXML();
+    void viewXML();
 
     /** A component, e.g., vMod, wants to say something.
      *

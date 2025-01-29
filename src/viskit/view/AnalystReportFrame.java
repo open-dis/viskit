@@ -870,12 +870,13 @@ public class AnalystReportFrame extends MvcAbstractJFrameView implements OpenAss
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
 
-        JMenuItem view = new JMenuItem("View analyst report XML");
-        view.setMnemonic(KeyEvent.VK_V);
-        view.setToolTipText("Currently not implemented");
-        view.setEnabled(false); // TODO:  implement listener and view functionality
-
-        fileMenu.add(view);
+        JMenuItem viewXmlMI = new JMenuItem("View analyst report XML");
+        viewXmlMI.setMnemonic(KeyEvent.VK_V);
+        viewXmlMI.setToolTipText("Currently not implemented");
+        viewXmlMI.setEnabled(true);
+        viewXmlMI.add(buildMenuItem(analystReportController, "viewXML", "XML View of Saved Analyst Report", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
+        fileMenu.add(viewXmlMI);
+        
         fileMenu.add(buildMenuItem(analystReportController,
                 "saveAnalystReportXML",
                 "Save analyst report XML",

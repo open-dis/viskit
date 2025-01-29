@@ -26,9 +26,9 @@ import viskit.doe.FileHandler;
  * @since 27 Aug 2004
  * @version $Id$
  */
-public class XTree extends JTree { // TODO rename XMLTreeComponent
-    
-    static final Logger LOG = LogUtils.getLogger(XTree.class);
+public class XMLTreeComponent extends JTree 
+{   
+    static final Logger LOG = LogUtils.getLogger(XMLTreeComponent.class);
 
     DefaultTreeModel mod;
 
@@ -36,7 +36,7 @@ public class XTree extends JTree { // TODO rename XMLTreeComponent
         return new XTreePanel(xmlFile);
     }
 
-    public XTree(File xmlFile) throws Exception 
+    public XMLTreeComponent(File xmlFile) throws Exception 
     {
         super();
         setFile(xmlFile);
@@ -218,7 +218,7 @@ public class XTree extends JTree { // TODO rename XMLTreeComponent
                     setToolTipText(tt);
                 }
                 if (idx == 0) {
-                    setToolTipText(((XTree) tree).document.toString());
+                    setToolTipText(((XMLTreeComponent) tree).document.toString());
                 }
                 setIcon(icons[idx % icons.length]);
             } else {
@@ -284,11 +284,11 @@ public class XTree extends JTree { // TODO rename XMLTreeComponent
             Container c = f.getContentPane();
             c.setLayout(new BorderLayout());
             
-            //XTree xt = new XTree(fil);
+            //XTree xt = new XMLTreeComponent(fil);
             //c.add(new JScrollPane(xt), BorderLayout.CENTER);
             XTreePanel p = null;
             try {
-                p = XTree.getTreeInPanel(fil);
+                p = XMLTreeComponent.getTreeInPanel(fil);
             } catch (Exception e) {
                 e.printStackTrace(System.err);
             }
@@ -319,7 +319,7 @@ public class XTree extends JTree { // TODO rename XMLTreeComponent
 
 class XTreePanel extends JPanel {
 
-    public XTree xmlTree;
+    public XMLTreeComponent xmlTree;
     public JTextArea sourceXmlTextArea;
 
     XTreePanel(File xmlFile) throws Exception 
@@ -328,7 +328,7 @@ class XTreePanel extends JPanel {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         try {
-            xmlTree = new XTree(xmlFile);
+            xmlTree = new XMLTreeComponent(xmlFile);
         } 
         catch (Exception e) {
             xmlTree = null;
@@ -372,8 +372,8 @@ class XTreePanel extends JPanel {
 
     final String getElementText(DefaultMutableTreeNode dmt) {
         Object o = dmt.getUserObject();
-        if (o instanceof XTree.nElement) {
-            Element elm = ((XTree.nElement) o).elem;
+        if (o instanceof XMLTreeComponent.nElement) {
+            Element elm = ((XMLTreeComponent.nElement) o).elem;
             return xmlTree.xmlOutputter.outputString(elm);
         } else {
             return "";

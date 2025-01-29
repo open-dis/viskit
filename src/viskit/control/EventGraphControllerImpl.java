@@ -967,11 +967,10 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void showXML() {
+    public void viewXML() {
         if (!checkSave() || ((Model) getModel()).getLastFile() == null) {
             return;
         }
-
         ViskitGlobals.instance().getAssemblyEditor().displayXML(((Model) getModel()).getLastFile());
     }
 

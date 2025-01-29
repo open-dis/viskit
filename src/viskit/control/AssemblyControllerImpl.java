@@ -1351,13 +1351,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /* from menu:*/
 
     @Override
-    public void showXML() {
-        AssemblyModel vmod = (AssemblyModel) getModel();
-        if (!checkSaveForSourceCompile() || vmod.getLastFile() == null) {
+    public void viewXML() {
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (!checkSaveForSourceCompile() || assemblyModel.getLastFile() == null) {
             return;
         }
 
-        ((AssemblyView) getView()).displayXML(vmod.getLastFile());
+        ((AssemblyView) getView()).displayXML(assemblyModel.getLastFile());
     }
 
     private boolean checkSaveForSourceCompile() {

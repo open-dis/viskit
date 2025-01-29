@@ -416,13 +416,13 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
         fileMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_A, null));
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(assemblyController, "showXML", "View XML Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
-        fileMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate Assembly Java Source", KeyEvent.VK_J,
+        fileMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate Java Source of saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         fileMenu.add(buildMenuItem(assemblyController, "captureWindow", "Save Assembly Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
         fileMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly Simulation Run", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK)));
+        fileMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
 
         // TODO: Unknown as to what this does exactly
         fileMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
@@ -1150,45 +1150,47 @@ public class AssemblyViewFrame extends MvcAbstractJFrameView implements Assembly
     }
 
     @Override
-    public void displayXML(File f) {
-        JComponent xt;
+    public void displayXML(File file)
+    {
+        JComponent xmlTreeComponent;
         try {
-            xt = XTree.getTreeInPanel(f);
-        } catch (Exception e) {
+            xmlTreeComponent = XMLTreeComponent.getTreeInPanel(file);
+        } 
+        catch (Exception e) {
             genericReport(JOptionPane.ERROR_MESSAGE, "XML Display Error", e.getMessage());
             return;
         }
         //xt.setVisibleRowCount(25);
-        xt.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        xmlTreeComponent.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
-        final JFrame jf = new JFrame(f.getName());
+        final JFrame xmlDisplayFrame = new JFrame(file.getName());
 
-        JPanel content = new JPanel();
-        jf.setContentPane(content);
+        JPanel contentPanel = new JPanel();
+        xmlDisplayFrame.setContentPane(contentPanel);
 
-        content.setLayout(new BorderLayout());
-        content.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        content.add(xt, BorderLayout.CENTER);
+        contentPanel.setLayout(new BorderLayout());
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        contentPanel.add(xmlTreeComponent, BorderLayout.CENTER);
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 4));
         JButton closeButton = new JButton("Close");
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(closeButton);
-        content.add(buttonPanel, BorderLayout.SOUTH);
+        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         //jf.pack();
-        jf.setSize(475, 500);
-        jf.setLocationRelativeTo(this);
+        xmlDisplayFrame.setSize(475, 500);
+        xmlDisplayFrame.setLocationRelativeTo(this);
 
         Runnable r = () -> {
-            jf.setVisible(true);
+            xmlDisplayFrame.setVisible(true);
         };
         SwingUtilities.invokeLater(r);
 
         closeButton.addActionListener((ActionEvent e) -> {
             Runnable r1 = () -> {
-                jf.dispose();
+                xmlDisplayFrame.dispose();
             };
             SwingUtilities.invokeLater(r1);
         });

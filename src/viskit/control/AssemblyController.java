@@ -63,7 +63,7 @@ public interface AssemblyController {
      */
     void zipAndMailProject();
 
-    void showXML();
+    void viewXML();
 
     /** 
      * A component, e.g., vAMod, wants to say something.

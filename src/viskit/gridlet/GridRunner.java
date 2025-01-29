@@ -1014,7 +1014,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
      *
      * Each range is divided into bins of equal probability. Each bin is
      * numbered from 0 to number of independent variables - 1.
-     * A numIndptVars x numIndptVars index matrix is created in the form of of a
+     * A numIndptVars x numIndptVars index matrix is created in the form of a
      * Random Latin Square. A Random Latin Square is one whose first row and
      * column contain a random permutation of {sequence 0...runs-1} and each sub
      * matrix is created by selecting values that are not in the row or column
