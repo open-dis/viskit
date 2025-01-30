@@ -295,7 +295,7 @@ public class ViskitStatics {
                 }
             }
         } catch (NoClassDefFoundError e) {
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(
+            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(
                     JOptionPane.ERROR_MESSAGE,
                     "Missng: " + e.getMessage(),
                     "Please make sure that the library for: " + s

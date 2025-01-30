@@ -201,7 +201,7 @@ public class SourceWindow extends JFrame {
                 }
                 SourceWindow.this.dispose();
             } catch (IOException ex) {
-                ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
+                ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                         "File I/O Error",
                         "\n" + f.getName() + "\n" + ex.getMessage()
                 );

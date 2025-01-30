@@ -1076,7 +1076,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         // TODO consider inserting loaded assembly filename into message above as a user confirmation
         
         String assemblyName = assemblyFile.getName().substring(0, assemblyFile.getName().indexOf(".xml"));
-        int numberOfReplications = ViskitGlobals.instance().getAssemblySimulationRunPanel().getNumberOfReplications();
+        int numberOfReplications = ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications();
         String announcement =
                 "<html><body>" +
                 "<p align='center'>" + numberOfReplications + " total replication";
@@ -1087,7 +1087,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                 "<p align='center'>Analyst Report " + assemblyName + "</p><br />" +
                 "<p align='center'> is loaded and ready for further editing</p><br /></body></html>";
                 
-        ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+        ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Analyst Report Ready", announcement);
     }
 

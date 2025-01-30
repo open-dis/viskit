@@ -192,8 +192,8 @@ public class AnalystReportController extends MvcAbstractController {
 
     public void generateHtmlReport() 
     {
-        if (!ViskitGlobals.instance().getAssemblySimulationRunPanel().analystReportCB.isSelected()) {
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+        if (!ViskitGlobals.instance().getSimulationRunPanel().analystReportCB.isSelected()) {
+            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Enable Analyst Reports not selected",
                     "<html><body><p align='center'>"
                     + "The checkbox for <code>Enable Analyst Reports </code>is not"
@@ -307,14 +307,14 @@ public class AnalystReportController extends MvcAbstractController {
             Desktop.getDesktop().browse(new URI(file.getPath().replaceAll("\\\\", "/")));
         } 
         catch (URISyntaxException ex) {
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
+            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
                     "<html><center>URISyntaxException displaying HTML:<br>" + ex.getMessage()
             );
             System.err.println(ex.getMessage());
         }
         catch (IOException ex) {
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE,
+            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
                     "<html><center>IOException displaying HTML:<br>" + ex.getMessage()
             );
@@ -326,7 +326,7 @@ public class AnalystReportController extends MvcAbstractController {
     public void viewXML() 
     {
         // bravely ignoring error checking here...
-        ViskitGlobals.instance().getAssemblyEditor().displayXML(analystReportFile);
+        ViskitGlobals.instance().getAssemblyViewFrame().displayXML(analystReportFile);
     }
 
 } // end class file AnalystReportController.java

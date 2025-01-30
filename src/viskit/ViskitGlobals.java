@@ -145,7 +145,7 @@ public class ViskitGlobals {
      * Get a reference to the assembly editor view.
      * @return a reference to the assembly editor view or null if yet unbuilt.
      */
-    public AssemblyViewFrame getAssemblyEditor() {
+    public AssemblyViewFrame getAssemblyViewFrame() {
         return (AssemblyViewFrame) assemblyViewFrame;
     }
 
@@ -199,7 +199,7 @@ public class ViskitGlobals {
     MvcAbstractViewFrame eventGraphViewFrame;
     MvcController eContl;
 
-    public EventGraphViewFrame getEventGraphEditor() {
+    public EventGraphViewFrame getEventGraphViewFrame() {
         return (EventGraphViewFrame) eventGraphViewFrame;
     }
 
@@ -767,12 +767,12 @@ public class ViskitGlobals {
     JComboBox pending;
     Object lastSelected = "void";
 
-    public AssemblySimulationRunPanel getAssemblySimulationRunPanel()
+    public AssemblySimulationRunPanel getSimulationRunPanel()
     {
         return assemblySimulationRunPanel;
     }
 
-    public void setAssemblySimulationRunPanel(AssemblySimulationRunPanel assemblySimulationRunPanel) 
+    public void setSimulationRunPanel(AssemblySimulationRunPanel assemblySimulationRunPanel) 
     {
         this.assemblySimulationRunPanel = assemblySimulationRunPanel;
     }

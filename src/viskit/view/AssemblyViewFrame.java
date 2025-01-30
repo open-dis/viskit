@@ -1225,8 +1225,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     /**
      * @param newTitle the title to set
      */
+    @Override
     public void setTitle(String newTitle) {
         this.title = newTitle;
+    }
+    public int getNumberAssembliesLoaded()
+    {
+        return tabbedPane.getTabCount();
     }
 
 } // end class file AssemblyViewFrame.java

@@ -471,7 +471,7 @@ public abstract class ViskitModelInstantiator {
                         pClazz = ViskitStatics.classForName(pType);
 
                         if (pClazz == null) {
-                            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, 
+                            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE, 
                                     "Basic Java Class Name Found",
                                     "<html><body><p align='center'>" +
                                     "Please check Event Graph <b>" + type + "</b> parameter(s) for compliance using" +

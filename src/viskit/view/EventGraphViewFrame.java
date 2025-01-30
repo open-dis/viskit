@@ -210,6 +210,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         getContent().add(tabbedPane, BorderLayout.CENTER);
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
+    public int getNumberEventGraphsLoaded()
+    {
+        return tabbedPane.getTabCount();
+    }
 
     public ViskitGraphComponentWrapper getCurrentVgraphComponentWrapper() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
@@ -1161,7 +1165,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
      * the Actions library.
      */
     public void openProject() {
-        ViskitGlobals.instance().getAssemblyEditor().openProject();
+        ViskitGlobals.instance().getAssemblyViewFrame().openProject();
     }
 
     /**
@@ -1229,12 +1233,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
      * @param file to candidate Event Graph file
      */
     private void deleteCanceledSave(File file) {
-        ViskitGlobals.instance().getAssemblyEditor().deleteCanceledSave(file);
+        ViskitGlobals.instance().getAssemblyViewFrame().deleteCanceledSave(file);
     }
 
     @Override
     public File openRecentFilesAsk(Collection<String> lis) {
-        return ViskitGlobals.instance().getAssemblyEditor().openRecentFilesAsk(lis);
+        return ViskitGlobals.instance().getAssemblyViewFrame().openRecentFilesAsk(lis);
     }
 
     @Override
@@ -1266,17 +1270,17 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
     @Override
     public int genericAsk(String title, String msg) {
-        return ViskitGlobals.instance().getAssemblyEditor().genericAsk(title, msg);
+        return ViskitGlobals.instance().getAssemblyViewFrame().genericAsk(title, msg);
     }
 
     @Override
     public int genericAskYN(String title, String msg) {
-        return ViskitGlobals.instance().getAssemblyEditor().genericAskYN(title, msg);
+        return ViskitGlobals.instance().getAssemblyViewFrame().genericAskYN(title, msg);
     }
 
     @Override
     public void genericReport(int type, String title, String msg) {
-        ViskitGlobals.instance().getAssemblyEditor().genericReport(type, title, msg);
+        ViskitGlobals.instance().getAssemblyViewFrame().genericReport(type, title, msg);
     }
 
     @Override

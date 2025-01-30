@@ -613,7 +613,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             // We don't need to recurse since we know this is a file, but make sure
             // it's re-compiled and re-validated. model.isDirty will be set from
             // this call.
-            ViskitGlobals.instance().getAssemblyEditor().addEventGraphsToLegoTree(f, false);
+            ViskitGlobals.instance().getAssemblyViewFrame().addEventGraphsToLegoTree(f, false);
         }
 
         // Don't watch an XML file whose source couldn't be compiled correctly
@@ -962,7 +962,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (source != null && source.length() > 0) {
             String className = mod.getMetadata().packageName + "." +
                     mod.getMetadata().name;
-            ViskitGlobals.instance().getAssemblyEditor().showAndSaveSource(className, source, localLastFile.getName());
+            ViskitGlobals.instance().getAssemblyViewFrame().showAndSaveSource(className, source, localLastFile.getName());
         }
     }
 
@@ -971,7 +971,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (!checkSave() || ((Model) getModel()).getLastFile() == null) {
             return;
         }
-        ViskitGlobals.instance().getAssemblyEditor().displayXML(((Model) getModel()).getLastFile());
+        ViskitGlobals.instance().getAssemblyViewFrame().displayXML(((Model) getModel()).getLastFile());
     }
 
     @Override

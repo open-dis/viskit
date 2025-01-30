@@ -485,7 +485,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (assemblyModel == null) {return;}
         GraphMetadata graphMetadata = assemblyModel.getMetadata();
         boolean modified =
-                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), graphMetadata);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyViewFrame(), graphMetadata);
         if (modified) {
             ((AssemblyModel) getModel()).changeMetaData(graphMetadata);
 
@@ -675,7 +675,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjectSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
-        ViskitGlobals.instance().getEventGraphEditor().setTitleApplicationProjectName();
+        ViskitGlobals.instance().getEventGraphViewFrame().setTitleApplicationProjectName();
         runner.resetAssemblySimulationRunPanel();
     }
 
@@ -706,7 +706,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
 
         boolean modified =
-                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditor(), gmd);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyViewFrame(), gmd);
         if (modified) {
             ((AssemblyModel) getModel()).changeMetaData(gmd);
 
@@ -1702,7 +1702,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     else if (!name.isBlank())
                          consoleName += " for Assembly " + name;
                     ((AssemblyViewFrame) getView()).setTitle(name);
-                    ViskitGlobals.instance().getAssemblySimulationRunPanel().setTitle(consoleName);
+                    ViskitGlobals.instance().getSimulationRunPanel().setTitle(consoleName);
                     // Initializes a fresh class loader
                     runner.exec(execStrings);
 

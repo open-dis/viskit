@@ -231,7 +231,7 @@ abstract public class MetadataDialog extends JDialog {
             modified = true;
             if (modified) {
                 if (nameTf.getText().trim().isEmpty()) {
-                    ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "Error", "Must have a non-zero length name");
+                    ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE, "Error", "Must have a non-zero length name");
                     nameTf.requestFocus();
                     return;
                 }

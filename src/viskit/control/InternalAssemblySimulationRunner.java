@@ -132,7 +132,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         lastLoaderNoReset = ViskitGlobals.instance().getWorkClassLoader();
 
         // Provide access to Enable Analyst Report checkbox
-        ViskitGlobals.instance().setAssemblySimulationRunPanel(assemblySimulationRunPanel);
+        ViskitGlobals.instance().setSimulationRunPanel(assemblySimulationRunPanel);
     }
 
     public JMenuBar getMenus() {
@@ -168,7 +168,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         } 
         catch (Throwable throwable) 
         {
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(
+            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(
                     JOptionPane.ERROR_MESSAGE,
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage()
@@ -502,7 +502,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
             if (saveChooser == null) {
                 saveChooser = new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
             }
-            File fil = ViskitGlobals.instance().getEventGraphEditor().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
+            File fil = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(fil);
 
             int retv = saveChooser.showSaveDialog(null);
@@ -522,7 +522,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
             try (Writer bw = new BufferedWriter(new FileWriter(fil))) {
                 bw.write(assemblySimulationRunPanel.outputStreamTA.getText());
             } catch (IOException e1) {
-                ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
+                ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
             }
         }
     }
@@ -548,7 +548,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         } 
         else 
         {
-            ViskitGlobals.instance().getAssemblyEditor().genericReport(JOptionPane.INFORMATION_MESSAGE,
+            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Analyst Report Panel not visible",
                     "<html><body><p align='center'>" +
                     "The Analyst Report tab has not been set to be visible.<br>" +

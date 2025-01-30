@@ -276,7 +276,7 @@ public class MainFrame extends JFrame
         internalAssemblySimulationRunner = new InternalAssemblySimulationRunner(analystReportPanelVisible);
         ViskitGlobals.instance().setInternalAssemblySimulationRunner(internalAssemblySimulationRunner);
         
-        simulationRunTabbedPane.add(ViskitGlobals.instance().getAssemblySimulationRunPanel(), TAB1_LOCALRUN_INDEX);
+        simulationRunTabbedPane.add(ViskitGlobals.instance().getSimulationRunPanel(), TAB1_LOCALRUN_INDEX);
         simulationRunTabbedPane.setTitleAt(TAB1_LOCALRUN_INDEX, "Local Run");
         simulationRunTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_INDEX, "Run replications on local host");
         menuBar = internalAssemblySimulationRunner.getMenus();
@@ -370,7 +370,7 @@ public class MainFrame extends JFrame
         @Override
         public void stateChanged(ChangeEvent e) {
 
-            Model[] mods = ViskitGlobals.instance().getEventGraphEditor().getOpenModels();
+            Model[] mods = ViskitGlobals.instance().getEventGraphViewFrame().getOpenModels();
             Model dirtyMod = null;
 
             // Make sure we save modified Event Graphs if we wander off to the Assembly tab
@@ -530,7 +530,7 @@ public class MainFrame extends JFrame
 
                 if (tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX] != -1) {
                     eventGraphController.removeEventGraphFileListener(assemblyController.getOpenEventGraphListener());
-                    eventGraphController.removeRecentEventGraphFileListener(ViskitGlobals.instance().getEventGraphEditor().getRecentEventGraphFileListener());
+                    eventGraphController.removeRecentEventGraphFileListener(ViskitGlobals.instance().getEventGraphViewFrame().getRecentEventGraphFileListener());
 
                     // TODO: Need doe listener removal (tdn) 9/13/24
 
@@ -539,8 +539,8 @@ public class MainFrame extends JFrame
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] != -1) {
                     assemblyController.removeAssemblyFileListener(assemblyController.getAssemblyChangeListener());
                     assemblyController.removeAssemblyFileListener((OpenAssembly.AssembyChangeListener) reportPanel);
-                    assemblyController.removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentAssemblyFileListener());
-                    assemblyController.removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyEditor().getRecentProjectFileSetListener());
+                    assemblyController.removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentAssemblyFileListener());
+                    assemblyController.removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentProjectFileSetListener());
 
                     // TODO: Need grid and doe listener removal (tdn) 9/13/24
 
@@ -608,7 +608,7 @@ public class MainFrame extends JFrame
         @Override
         public void resetAssemblySimulationRunPanel()
         {
-            AssemblySimulationRunPanel runnerPanel = ViskitGlobals.instance().getAssemblySimulationRunPanel();
+            AssemblySimulationRunPanel runnerPanel = ViskitGlobals.instance().getSimulationRunPanel();
             runnerPanel.outputStreamTA.setText(null);
             runnerPanel.outputStreamTA.setText(
                     "Assembly output stream:" + runnerPanel.lineEnd +
