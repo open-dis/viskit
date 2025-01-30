@@ -59,7 +59,7 @@ import viskit.view.dialog.SettingsDialog;
  * @since Sep 22, 2005 : 3:23:52 PM
  * @version $Id$
  */
-public class EventGraphAssemblyComboMain {
+public class ViskitApplication {
 
     /**
      * Viskit entry point from the command line, or introspection
@@ -74,7 +74,7 @@ public class EventGraphAssemblyComboMain {
             });
 
         } catch (Exception e) {
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).error(e);
+            LogUtils.getLogger(ViskitApplication.class).error(e);
 
             if (e instanceof InvocationTargetException) {
 
@@ -98,7 +98,7 @@ public class EventGraphAssemblyComboMain {
 
                 ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
             } catch (MalformedURLException | URISyntaxException ex) {
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).fatal(ex);
+                LogUtils.getLogger(ViskitApplication.class).fatal(ex);
             }
         }
     }
@@ -116,9 +116,9 @@ public class EventGraphAssemblyComboMain {
                 file.delete();
             }
             if (dotViskit.delete())
-                LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("{} was found and deleted from your system.", dotViskit.getName());
+                LogUtils.getLogger(ViskitApplication.class).info("{} was found and deleted from your system.", dotViskit.getName());
 
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).info("Please restart Viskit");
+            LogUtils.getLogger(ViskitApplication.class).info("Please restart Viskit");
         }
     }
 
@@ -130,7 +130,7 @@ public class EventGraphAssemblyComboMain {
             initialAssemblyFile = args[0];
 
         if (viskit.ViskitStatics.debug) {
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).debug("***Inside EventGraphAssembly main {}: ", args.length);
+            LogUtils.getLogger(ViskitApplication.class).debug("***Inside EventGraphAssembly main {}: ", args.length);
         }
         setLandFandFonts();
 
@@ -156,7 +156,7 @@ public class EventGraphAssemblyComboMain {
                 UIManager.setLookAndFeel(s);
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            LogUtils.getLogger(EventGraphAssemblyComboMain.class).error("Error setting {} Look and Feel", s);
+            LogUtils.getLogger(ViskitApplication.class).error("Error setting {} Look and Feel", s);
         }
     }
 
@@ -174,8 +174,8 @@ public class EventGraphAssemblyComboMain {
             response.performQuit();
         });
 
-        ImageIcon aboutIcon = new ImageIcon(EventGraphAssemblyComboMain.class.getResource("/viskit/images/ViskitLogo.gif"));
+        ImageIcon aboutIcon = new ImageIcon(ViskitApplication.class.getResource("/viskit/images/ViskitLogo.gif"));
         Taskbar.getTaskbar().setIconImage(aboutIcon.getImage());
     }
 
-} // end class file EventGraphAssemblyComboMain.java
+} // end class file ViskitApplication.java
