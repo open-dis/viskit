@@ -410,7 +410,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         viskitMenuBar.add(fileMenu);
 
-        eventGraphMenu.setText("Event Graph   ");
+        eventGraphMenu.setText("Event Graph");
         eventGraphMenu.setActionCommand("Event Graph Editor");
 
         newEventGraphMI.setMnemonic(KeyEvent.VK_N);
@@ -509,7 +509,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         viskitMenuBar.add(eventGraphMenu);
 
-        assemblyMenu.setText("Assembly             ");
+        assemblyMenu.setText("Assembly           ");
 
         newAssemblyMI.setMnemonic(KeyEvent.VK_N);
         newAssemblyMI.setText("New Assembly");
@@ -593,7 +593,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         viskitMenuBar.add(assemblyMenu);
 
-        assemblySimulationRunMenu.setText("Assembly Simulation         ");
+        assemblySimulationRunMenu.setText("Simulation Run   ");
 
         showSimulationRunPanelMI.setMnemonic(KeyEvent.VK_S);
         showSimulationRunPanelMI.setText("Show Simulation Console");
