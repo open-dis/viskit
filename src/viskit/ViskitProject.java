@@ -100,6 +100,7 @@ public class ViskitProject {
      * location will be in the user's profile, or home directory.
      */
     public static String DEFAULT_PROJECT_NAME = "DefaultProject";
+    public static String NEW_PROJECT_NAME     = "MyNewProject";
 
     private File projectRoot;
     private File projectFile;
