@@ -636,8 +636,11 @@ public class InternalSimulationRunner implements PropertyChangeListener
         getSimulationRunMenu().add(saveMI);
         getSimulationRunMenu().add(viewMI);
 
+        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        {
         getSimulationRunMenu().addSeparator();
         getSimulationRunMenu().add(new JMenuItem("Viskit Settings"));
+        }
         myMenuBar.add(getSimulationRunMenu());
 
         // No edit functionality needed for SimulationRun panel

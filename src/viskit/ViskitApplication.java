@@ -59,21 +59,22 @@ import viskit.view.dialog.SettingsDialog;
  * @since Sep 22, 2005 : 3:23:52 PM
  * @version $Id$
  */
-public class ViskitApplication {
-
+public class ViskitApplication
+{
     /**
      * Viskit entry point from the command line, or introspection
      * @param args command line arguments if any
      */
-    public static void main(final String[] args) {
-
+    public static void main(final String[] args)
+    {
         // Launch all GUI stuff on, or within the EDT
         try {
             SwingUtilities.invokeLater(() -> {
                 createGUI(args);
             });
 
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             LogUtils.getLogger(ViskitApplication.class).error(e);
 
             if (e instanceof InvocationTargetException) {
@@ -135,8 +136,8 @@ public class ViskitApplication {
         setLandFandFonts();
 
         // Leave tooltips on the screen until mouse movement causes removal
-        ToolTipManager ttm = ToolTipManager.sharedInstance();
-        ttm.setDismissDelay(Integer.MAX_VALUE); // never remove automatically
+        ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+        toolTipManager.setDismissDelay(Integer.MAX_VALUE); // never remove automatically
 
         JFrame mainFrame = new MainFrame(initialAssemblyFile);
         if (isMac) {
@@ -183,7 +184,7 @@ public class ViskitApplication {
             help.aboutViskit();
         });
 
-        final MainFrame mainFrame = (MainFrame) ViskitGlobals.instance().getMainFrameWindow();
+        final MainFrame mainFrame = (MainFrame) ViskitGlobals.instance().getMainFrame();
 
         // CMD Q for macOS
         Desktop.getDesktop().setQuitHandler((QuitEvent e, QuitResponse response) -> {

@@ -666,7 +666,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         clearRecentAssemblyFileList();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
         ViskitGlobals.instance().getCurrentViskitProject().closeProject();
-        ViskitGlobals.instance().getMainFrameWindow().updateApplicationTitle();
+        ViskitGlobals.instance().getMainFrame().updateApplicationTitle();
     }
 
     @Override
@@ -1704,7 +1704,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                          consoleName += " for Assembly " + assemblyName;
                     ((AssemblyViewFrame) getView()).setTitle(assemblyName);
                     ViskitGlobals.instance().getSimulationRunPanel().setTitle(consoleName);
-                    ViskitGlobals.instance().getMainFrameWindow().getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX,  assemblyName);
+                    ViskitGlobals.instance().getMainFrame().getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX,  assemblyName);
                     // Initializes a fresh class loader
                     runner.exec(execStrings);
 

@@ -547,7 +547,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     @Override
     public String addParameterDialog() {
 
-        if (ParameterDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), null)) {      // blocks here
+        if (ParameterDialog.showDialog(ViskitGlobals.instance().getMainFrame(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewSimParameter(ParameterDialog.newName,
                     ParameterDialog.newType,
                     "new value here",
@@ -559,7 +559,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
     @Override
     public String addStateVariableDialog() {
-        if (StateVariableDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), null)) {      // blocks here
+        if (StateVariableDialog.showDialog(ViskitGlobals.instance().getMainFrame(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewStateVariable(StateVariableDialog.newName,
                     StateVariableDialog.newType,
                     "new value here",
@@ -649,50 +649,60 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
         // Set up file menu
 //      JMenu fileMenu = new JMenu("File");
-        eventGraphMenu = new JMenu("Event Graph Editor");
-        getEventGraphMenu().setMnemonic(KeyEvent.VK_F);
+        eventGraphMenu = new JMenu("Event Graph"); // Editor
+        eventGraphMenu.setMnemonic(KeyEvent.VK_E);
 
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "newProject", "New Viskit Project", KeyEvent.VK_V,
+        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        {
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "newProject", "New Viskit Project", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
         
-        getEventGraphMenu().add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
+        eventGraphMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
-        getEventGraphMenu().add(openRecentProjectMenu = buildMenu("Open Recent Project"));
+        eventGraphMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
         // The recently opened project file listener will be set with the
         // openRecentProjMenu in the MainFrame after the AssemblyView is instantiated
 
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
-        getEventGraphMenu().addSeparator();
+        eventGraphMenu.addSeparator();
+        }
         
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "newEventGraph", "New Event Graph", KeyEvent.VK_N,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "newEventGraph", "New Event Graph", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
 
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "open", "Open Event Graph", KeyEvent.VK_O,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "open", "Open Event Graph", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
-        getEventGraphMenu().add(openRecentEventGraphMenu = buildMenu("Open Recent Event Graph"));
+        eventGraphMenu.add(openRecentEventGraphMenu = buildMenu("Open Recent Event Graph"));
         openRecentEventGraphMenu.setEnabled(false); // inactive until needed, reset by listener
 
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "close", "Close Event Graph", null,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "close", "Close Event Graph", null,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "closeAll", "Close All Event Graphs", null, null));
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "save", "Save Event Graph", KeyEvent.VK_S,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "closeAll", "Close All Event Graphs", null, null));
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "save", "Save Event Graph", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "saveAs", "Save Event Graph as...", KeyEvent.VK_A, null));
-        getEventGraphMenu().addSeparator();
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "saveAs", "Save Event Graph as...", KeyEvent.VK_A, null));
+        eventGraphMenu.addSeparator();
 
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "generateJavaSource", "Generate Java Source of saved Event Graph", KeyEvent.VK_J, // TODO confirm "saved"
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Generate Java Source of saved Event Graph", KeyEvent.VK_J, // TODO confirm "saved"
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "captureWindow", "Save Event Graph Screen Image", KeyEvent.VK_I,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "captureWindow", "Save Event Graph Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "viewXML", "XML View of Saved Event Graph", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
-        getEventGraphMenu().addSeparator();
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "viewXML", "XML View of Saved Event Graph", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
 
-        getEventGraphMenu().add(buildMenuItem(eventGraphController, "settings", "Viskit Settings", null, null));
-        getEventGraphMenu().addSeparator();
+        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        {
+        eventGraphMenu.addSeparator();
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "settings", "Viskit Settings", null, null));
+        
+        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        {
+        eventGraphMenu.addSeparator();
 
-        getEventGraphMenu().add(quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit", KeyEvent.VK_Q,
+        eventGraphMenu.add(quitMenuItem = buildMenuItem(eventGraphController, "quit", "Exit", KeyEvent.VK_Q,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
+        }
+        }
 
         // Set up edit menu
         JMenu editMenu = new JMenu("Edit");
@@ -743,11 +753,11 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
         // Create a new menu bar and add the menus we created above to it
         myMenuBar = new JMenuBar();
-        myMenuBar.add(getEventGraphMenu());
+        myMenuBar.add(eventGraphMenu);
         myMenuBar.add(editMenu);
 
-        Help help = new Help(ViskitGlobals.instance().getMainFrameWindow());
-        help.mainFrameLocated(ViskitGlobals.instance().getMainFrameWindow().getBounds());
+        Help help = new Help(ViskitGlobals.instance().getMainFrame());
+        help.mainFrameLocated(ViskitGlobals.instance().getMainFrame().getBounds());
         ViskitGlobals.instance().setHelp(help); // single instance for all viskit frames
 
         JMenu helpMenu = new JMenu("Help");
@@ -762,7 +772,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
         myMenuBar.add(helpMenu);
     }
-
+    
     // Use the actions package
     private JMenuItem buildMenuItem(Object source, String method, String name, Integer mnemonic, KeyStroke accelerator)
     {
@@ -1246,13 +1256,13 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     @Override
     public boolean doEditNode(EventNode node) {
         selectMode.doClick();     // always go back into select mode
-        return EventInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), node); // blocks
+        return EventInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrame(), node); // blocks
     }
 
     @Override
     public boolean doEditEdge(Edge edge) {
         selectMode.doClick();     // always go back into select mode
-        return EdgeInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), edge); // blocks
+        return EdgeInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrame(), edge); // blocks
     }
 
     @Override
@@ -1262,12 +1272,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
     @Override
     public boolean doEditParameter(ViskitParameter param) {
-        return ParameterDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), param);    // blocks
+        return ParameterDialog.showDialog(ViskitGlobals.instance().getMainFrame(), param);    // blocks
     }
 
     @Override
     public boolean doEditStateVariable(ViskitStateVariable var) {
-        return StateVariableDialog.showDialog(ViskitGlobals.instance().getMainFrameWindow(), var);
+        return StateVariableDialog.showDialog(ViskitGlobals.instance().getMainFrame(), var);
     }
 
     @Override
@@ -1345,7 +1355,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     /**
      * @return the eventGraphMenu
      */
-    public JMenu getEventGraphMenu() {
+    public JMenu getEventGraphMenu()
+    {
         return eventGraphMenu;
     }
 

@@ -77,7 +77,7 @@ public class MainFrame extends JFrame
     public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation"; // using Simkit
 
     /** modalMenus: true means choice from traditional modalMenuBarList, false means new combinedMenuBar */
-    private boolean modalMenus = true; 
+    private boolean modalMenus = false; 
     JMenuBar mainFrameMenuBar;
     JMenuBar combinedMenuBar = new JMenuBar();
     java.util.List<JMenuBar> modalMenuBarList = new ArrayList<>();
@@ -115,9 +115,9 @@ public class MainFrame extends JFrame
     public MainFrame(String initialAssemblyFile) 
     {
         super(ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME);
+        ViskitGlobals.instance().setMainFrame(MainFrame.this);
         
         this.initialAssemblyFile = initialAssemblyFile;
-        ViskitGlobals.instance().setMainFrameWindow(MainFrame.this);
 
         initializeMainFrame();
 
@@ -176,7 +176,11 @@ public class MainFrame extends JFrame
             // TODO no longer needed?
             // eventGraphFrame.setTitleListener(myTitleListener, assemblyPaneIndex);
             setJMenuBar(mainFrameMenuBar);
+            
+        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        {
             jamQuitHandler(((EventGraphViewFrame) eventGraphFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
+        }
             tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX] = assemblyPaneIndex;
         } 
         else {
@@ -201,7 +205,10 @@ public class MainFrame extends JFrame
             // TODO is this needed?
             // assemblyFrame.setTitleListener(myTitleListener, assemblyPaneIndex);
             setJMenuBar(mainFrameMenuBar);
+        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        {
             jamQuitHandler(((AssemblyViewFrame) assemblyFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
+        }
             tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] = assemblyPaneIndex;
         } 
         else 
@@ -262,7 +269,10 @@ public class MainFrame extends JFrame
             }
             // TODO is this needed?
             // reportPanel.setTitleListener(myTitleListener, assemblyPaneIndex);
+        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        {
             jamQuitHandler(null, myQuitAction, mainFrameMenuBar);
+        }
             tabIndices[TAB0_ANALYST_REPORT_INDEX] = assemblyPaneIndex;
             AnalystReportController analystReportController = (AnalystReportController) reportPanel.getController();
             analystReportController.setMainTabbedPane(topTabbedPane, assemblyPaneIndex);
@@ -409,10 +419,12 @@ public class MainFrame extends JFrame
             selectedMenuBar.add(helpMenu);
             
             // TODO rename menu methods consistently
+            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getProjectMenu());
             combinedMenuBar.add(ViskitGlobals.instance().getEventGraphViewFrame().getEventGraphMenu());
-            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getFileMenu());
+            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getAssemblyMenu());
             combinedMenuBar.add(ViskitGlobals.instance().getInternalSimulationRunner().getMenus());
             combinedMenuBar.add(ViskitGlobals.instance().getAnalystReportEditor().getMenus());
+            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getHelpMenu());
             
             if  (hasModalMenus())
                  setJMenuBar(selectedMenuBar);

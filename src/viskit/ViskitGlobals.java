@@ -101,7 +101,7 @@ public class ViskitGlobals {
     private final DefaultComboBoxModel<String> defaultComboBoxModel;
     private JPopupMenu popupMenu;
     private final MyTypeListener myTypeListener;
-    private MainFrame mainFrameWindow;
+    private MainFrame mainFrame;
 
     private ViskitProject currentViskitProject;
 
@@ -970,14 +970,14 @@ public class ViskitGlobals {
         }
     }
 
-    public MainFrame getMainFrameWindow() 
+    public MainFrame getMainFrame() 
     {
-        return mainFrameWindow;
+        return mainFrame;
     }
 
-    public void setMainFrameWindow(MainFrame mainFrameWindow)
+    public void setMainFrame(MainFrame mainFrame)
     {
-        this.mainFrameWindow = mainFrameWindow;
+        this.mainFrame = mainFrame;
     }
 
     public Help getHelp() {
