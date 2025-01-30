@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -56,7 +56,8 @@ import viskit.util.Version;
  * @version $Id$
  * @author  ahbuss
  */
-public class Help {
+public class Help
+{
     public static final Version VERSION = new Version("version.txt");
     public static final String VERSION_STRING = VERSION.getVersionString();
     public static final String CR = "<br>";
