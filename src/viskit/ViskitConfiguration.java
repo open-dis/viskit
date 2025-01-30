@@ -98,7 +98,7 @@ public class ViskitConfiguration {
     private XMLConfiguration projectXMLConfiguration = null;
 
     static {
-        LOG.info("Welcome to the Visual Discrete Event Simulation (DES) toolkit (Viskit)");
+        LOG.info("Welcome to Visual Simkit (Viskit) Discrete Event Simulation (DES) toolkit");
         LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
     }
 
