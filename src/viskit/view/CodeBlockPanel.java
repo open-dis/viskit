@@ -68,9 +68,9 @@ public class CodeBlockPanel extends JPanel {
         setOpaque(false);
 
         if (multilined) {
-            jtc = new myJTextArea();
+            jtc = new MyJTextArea();
         } else {
-            jtc = new myJTextField("");
+            jtc = new MyJTextField("");
         }
         jtc.setOpaque(true);
         jtc.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -103,7 +103,7 @@ public class CodeBlockPanel extends JPanel {
         editButton.setMaximumSize(dd);
         add(editButton);
 
-        editButton.addActionListener(new buttonListener());
+        editButton.addActionListener(new ButtonListener());
     }
 
     /**
@@ -136,7 +136,7 @@ public class CodeBlockPanel extends JPanel {
         jtc.setText(s);
     }
 
-    class buttonListener implements ActionListener {
+    class ButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -157,12 +157,12 @@ public class CodeBlockPanel extends JPanel {
         }
     }
 
-    class myJTextArea extends JTextArea implements DocumentListener {
+    class MyJTextArea extends JTextArea implements DocumentListener {
 
-        public myJTextArea() {
+        public MyJTextArea() {
             super();
             setPreferredSize(new Dimension(50, 50));
-            getDocument().addDocumentListener(myJTextArea.this);
+            getDocument().addDocumentListener(MyJTextArea.this);
         }
 
         @Override
@@ -188,11 +188,11 @@ public class CodeBlockPanel extends JPanel {
         }
     }
 
-    class myJTextField extends JTextField implements DocumentListener {
+    class MyJTextField extends JTextField implements DocumentListener {
 
-        public myJTextField(String s) {
+        public MyJTextField(String s) {
             super(s);
-            getDocument().addDocumentListener(myJTextField.this);
+            getDocument().addDocumentListener(MyJTextField.this);
         }
 
         @Override

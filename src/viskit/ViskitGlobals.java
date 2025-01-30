@@ -100,7 +100,7 @@ public class ViskitGlobals {
     private Interpreter interpreter;
     private final DefaultComboBoxModel<String> defaultComboBoxModel;
     private JPopupMenu popupMenu;
-    private final myTypeListener myTypeListener;
+    private final MyTypeListener myTypeListener;
     private MainFrame mainFrameWindow;
 
     private ViskitProject currentViskitProject;
@@ -131,7 +131,7 @@ public class ViskitGlobals {
 
     private ViskitGlobals() {
         defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
-        myTypeListener = new myTypeListener();
+        myTypeListener = new MyTypeListener();
         buildTypePopup();
         inititalizeProjectHome();
         createWorkingDirectory();
@@ -1015,7 +1015,7 @@ public class ViskitGlobals {
         }
     }
 
-    class myTypeListener implements ActionListener, ItemListener {
+    class MyTypeListener implements ActionListener, ItemListener {
 
         @Override
         public void itemStateChanged(ItemEvent e) {

@@ -175,7 +175,7 @@ public class AssemblySimulationRunPanel extends JPanel
         // TODO:  can a user use this to advance to a certain time in the sim?
         vcrStartTimeTF = new JTextField(10);
         vcrStartTimeTF.setEditable(false);
-        ViskitStatics.clampSize(vcrStartTimeTF, vcrStartTimeTF, vcrStartTimeTF);
+        ViskitStatics.clampComponentSize(vcrStartTimeTF);
         JPanel vcrSimTimePanel = new JPanel();
         vcrSimTimePanel.setLayout(new BoxLayout(vcrSimTimePanel, BoxLayout.X_AXIS));
         vcrSimTimePanel.add(vcrStartTimeLabel);
@@ -183,12 +183,12 @@ public class AssemblySimulationRunPanel extends JPanel
         vcrSimTimePanel.add(Box.createHorizontalStrut(10));
         upperLeftFlowPanel.add(vcrSimTimePanel);
 
-        JLabel vcrStopTimeLabel = new JLabel("Sim stop time:  ");
+        JLabel vcrStopTimeLabel = new JLabel("Sim stop time: ");
         vcrStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
         vcrStopTimeLabel.setBorder(new EmptyBorder(0,2,0,10));
         vcrStopTimeTF = new JTextField(10);
-        ViskitStatics.clampSize(vcrStopTimeTF, vcrStopTimeTF, vcrStopTimeTF);
+        ViskitStatics.clampComponentSize(vcrStopTimeTF, vcrStartTimeTF, vcrStartTimeTF);
         vcrSimTimePanel = new JPanel();
         vcrSimTimePanel.setLayout(new BoxLayout(vcrSimTimePanel, BoxLayout.X_AXIS));
         vcrSimTimePanel.add(vcrStopTimeLabel);
@@ -196,7 +196,7 @@ public class AssemblySimulationRunPanel extends JPanel
         vcrSimTimePanel.add(Box.createHorizontalStrut(10));
         upperLeftFlowPanel.add(vcrSimTimePanel);
 
-        JLabel numberReplicationsLabel = new JLabel("# replications:  ");
+        JLabel numberReplicationsLabel = new JLabel("# replications: ");
         numberReplicationsLabel.setToolTipText("How many replications (simulation executions) to run");
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
         numberReplicationsLabel.setBorder(new EmptyBorder(0,2,0,10));
@@ -212,13 +212,38 @@ public class AssemblySimulationRunPanel extends JPanel
                 numberReplicationsTF.setText(Integer.toString(DEFAULT_NUMBER_OF_REPLICATIONS));
             }
         });
-        ViskitStatics.clampSize(numberReplicationsTF, numberReplicationsTF, numberReplicationsTF);
+        ViskitStatics.clampComponentSize(numberReplicationsTF, vcrStartTimeTF, vcrStartTimeTF);
+        
+        String[] exampleReplicationCounts =
+        {
+               "1", // 0
+               "2", // 1
+              "10", // 2
+              "30", // 3
+             "100", // 4
+            "1000", // 5
+        };
+        JComboBox numberReplicationsComboBox = new JComboBox<>(exampleReplicationCounts);
+        numberReplicationsComboBox.setSelectedIndex(3); // 30, law of large numbers (LLN)
+        numberReplicationsComboBox.setEditable(true);
+        numberReplicationsComboBox.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JComboBox cb = (JComboBox) e.getSource();
+                String count = (String) cb.getSelectedItem();
+                numberReplicationsTF.setText(count);
+                // TODO any further updates?
+            }
+        });
+        ViskitStatics.clampComponentSize(numberReplicationsComboBox, vcrStartTimeTF, vcrStartTimeTF);
         
         vcrSimTimePanel = new JPanel();
 //      vcrSimTimePanel.add(Box.createHorizontalStrut(10));
         vcrSimTimePanel.setLayout(new BoxLayout(vcrSimTimePanel, BoxLayout.X_AXIS));
         vcrSimTimePanel.add(numberReplicationsLabel);
-        vcrSimTimePanel.add(numberReplicationsTF);
+//      vcrSimTimePanel.add(numberReplicationsTF);
+        vcrSimTimePanel.add(numberReplicationsComboBox);
         upperLeftFlowPanel.add(vcrSimTimePanel);
 
         vcrVerboseCB = new JCheckBox("Verbose output", false);
@@ -232,7 +257,7 @@ public class AssemblySimulationRunPanel extends JPanel
         VerboseReplicationNumberTFListener replicationListener = new VerboseReplicationNumberTFListener();
         verboseReplicationNumberTF.addActionListener(replicationListener);
         verboseReplicationNumberTF.addCaretListener(replicationListener);
-        ViskitStatics.clampSize(verboseReplicationNumberTF);
+        ViskitStatics.clampComponentSize(verboseReplicationNumberTF);
         verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_DEFAULT_HINT);
         verboseReplicationNumberTF.setToolTipText("Which replication run (1..n) will be verbose?");
         upperLeftFlowPanel.add(verboseReplicationNumberTF);

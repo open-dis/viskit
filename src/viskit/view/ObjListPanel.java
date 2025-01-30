@@ -132,7 +132,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                 b.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createEtchedBorder(),
                         BorderFactory.createEmptyBorder(0, 3, 0, 3)));
-                ViskitStatics.clampSize(b, entryTF[i], b);
+                ViskitStatics.clampComponentSize(b, entryTF[i], b);
 
                 tinyP.add(b);
                 if (showLabels) {
