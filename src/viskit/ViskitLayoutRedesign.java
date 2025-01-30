@@ -200,7 +200,9 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         assemblySimulationRunTabbedPane.addTab("(Assembly 3 Simulation Run)", assembly3_SimulationRunPanel);
 
-        viskitTabbedPane.addTab("Assembly Simulation Run", assemblySimulationRunTabbedPane);
+        viskitTabbedPane.addTab("Simulation Run", assemblySimulationRunTabbedPane);
+
+        analystReportTabbedPane.setBackground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout _1_HeaderPanelLayout = new javax.swing.GroupLayout(_1_HeaderPanel);
         _1_HeaderPanel.setLayout(_1_HeaderPanelLayout);

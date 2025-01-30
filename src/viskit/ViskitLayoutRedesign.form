@@ -635,8 +635,8 @@
         <Container class="javax.swing.JTabbedPane" name="assemblySimulationRunTabbedPane">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Assembly Simulation Run">
-                <Property name="tabTitle" type="java.lang.String" value="Assembly Simulation Run"/>
+              <JTabbedPaneConstraints tabName="Simulation Run">
+                <Property name="tabTitle" type="java.lang.String" value="Simulation Run"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -742,6 +742,11 @@
           </Layout>
           <SubComponents>
             <Container class="javax.swing.JTabbedPane" name="analystReportTabbedPane">
+              <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
+                </Property>
+              </Properties>
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
               <SubComponents>
