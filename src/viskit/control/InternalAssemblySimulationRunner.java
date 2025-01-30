@@ -63,7 +63,6 @@ import viskit.assembly.BasicAssembly;
 import viskit.assembly.JTextAreaOutputStream;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
-import viskit.util.OpenAssembly;
 
 /** Controller for the Assembly Run panel
  *
@@ -582,25 +581,25 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         switch (newEvent) {
             case START:
                 assemblySimulationRunPanel.vcrPlayButton.setEnabled(false);
-                assemblySimulationRunPanel.vcrStepButton.setEnabled(true);
+                assemblySimulationRunPanel.vcrStepButton.setEnabled(false); // TODO
                 assemblySimulationRunPanel.vcrStopButton.setEnabled(true);
                 assemblySimulationRunPanel.vcrRewindButton.setEnabled(false);
                 break;
             case STEP:
                 assemblySimulationRunPanel.vcrPlayButton.setEnabled(true);
-                assemblySimulationRunPanel.vcrStepButton.setEnabled(true);
+                assemblySimulationRunPanel.vcrStepButton.setEnabled(false); // TODO
                 assemblySimulationRunPanel.vcrStopButton.setEnabled(true);
                 assemblySimulationRunPanel.vcrRewindButton.setEnabled(true);
                 break;
             case STOP:
                 assemblySimulationRunPanel.vcrPlayButton.setEnabled(true);
-                assemblySimulationRunPanel.vcrStepButton.setEnabled(true);
+                assemblySimulationRunPanel.vcrStepButton.setEnabled(false); // TODO
                 assemblySimulationRunPanel.vcrStopButton.setEnabled(false);
                 assemblySimulationRunPanel.vcrRewindButton.setEnabled(false);
                 break;
             case REWIND:
                 assemblySimulationRunPanel.vcrPlayButton.setEnabled(true);
-                assemblySimulationRunPanel.vcrStepButton.setEnabled(true); 
+                assemblySimulationRunPanel.vcrStepButton.setEnabled(false); // TODO 
                 assemblySimulationRunPanel.vcrStopButton.setEnabled(false);
                 assemblySimulationRunPanel.vcrRewindButton.setEnabled(false);
                 break;
