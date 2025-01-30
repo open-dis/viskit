@@ -169,6 +169,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private AssemblyController assemblyController;
     private JMenu projectMenu;
     private JMenu assemblyMenu;
+    private JMenu editMenu;
     private JMenu helpMenu;
 
     private int untitledCount = 0;
@@ -254,6 +255,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
      * @return the recentProjectFileSetListener
      */
     public RecentProjectFileSetListener getRecentProjectFileSetListener() {
+        if (recentProjectFileSetListener == null)
+            recentProjectFileSetListener = new RecentProjectFileSetListener();
         return recentProjectFileSetListener;
     }
 
@@ -402,16 +405,16 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
-        } // end hasModalMenus
-
-        // The AssemblyViewFrame will get this listener for its menu item of the same name
-        recentProjectFileSetListener = new RecentProjectFileSetListener();
-        getRecentProjectFileSetListener().addMenuItem(openRecentProjectMenu);
-        assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         
         assemblyMenu.add(buildMenuItem(assemblyController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.addSeparator();
+        } // end hasModalMenus
+
+        // The AssemblyViewFrame will get this listener for its menu item of the same name
+        recentProjectFileSetListener = new RecentProjectFileSetListener();
+        recentProjectFileSetListener.addMenuItem(openRecentProjectMenu);
+        assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         
         assemblyMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
@@ -462,13 +465,14 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         ActionIntrospector.getAction(assemblyController, "paste").setEnabled(false);
 
         // Set up edit menu
-        JMenu editMenu = new JMenu("Edit");
-        JMenu whichMenu;
-        if  (ViskitGlobals.instance().getMainFrame().hasModalMenus())
-             whichMenu = editMenu;
-        else whichMenu = assemblyMenu;
-
+        editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
+        
+//        JMenu whichMenu;
+//        if  (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+//             whichMenu = editMenu;
+//        else whichMenu = assemblyMenu;
+
         editMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
         editMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_Y,
@@ -493,7 +497,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         editMenu.add(buildMenuItem(assemblyController, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
-
+        
         // Create a new menu bar and add the menus we created above to it
         myMenuBar = new JMenuBar();
         myMenuBar.add(assemblyMenu);
@@ -1310,6 +1314,11 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
      */
     public JMenu getAssemblyMenu()
     {
+        if  (!ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        {
+            // add to combined menu
+            assemblyMenu.add(editMenu); // TODO fix
+        }
         return assemblyMenu;
     }
 

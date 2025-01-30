@@ -58,7 +58,7 @@ import viskit.mvc.MvcRecentFileListener;
  */
 public class RecentProjectFileSetListener implements MvcRecentFileListener {
 
-    private final List<JMenu> openRecentProjectMenus;
+    private List<JMenu> openRecentProjectMenus;
 
     public RecentProjectFileSetListener() {
         openRecentProjectMenus = new ArrayList<>();
@@ -71,24 +71,30 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
     @Override
     public void listChanged()
     {
-        AssemblyController acontroller = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
-        Set<String> lis = acontroller.getRecentProjectFileSet();
+        AssemblyController assemblyController = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+        Set<String> recentProjectFileSet = assemblyController.getRecentProjectFileSet();
+        if (openRecentProjectMenus == null)
+            openRecentProjectMenus = new ArrayList<>();
 
-        for (JMenu m : openRecentProjectMenus) {
-            m.removeAll();
+        for (JMenu menu : openRecentProjectMenus)
+        {
+            if  (menu != null)
+                 menu.removeAll();
+            else menu = new JMenu(); // TODO why did this happen?
         }
 
         String nameOnly;
         Action act;
         JMenuItem mi;
         File f;
-        for (String fullPath : lis) {
+        for (String fullPath : recentProjectFileSet) {
             f = new File(fullPath);
             if (!f.exists()) {
                 continue;
             }
 
-            for (JMenu m : openRecentProjectMenus) {
+            for (JMenu m : openRecentProjectMenus)
+            {
                 nameOnly = f.getName();
                 act = new ParameterizedProjAction(nameOnly);
                 act.putValue(ViskitStatics.FULL_PATH, fullPath);
@@ -97,7 +103,7 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
                 m.add(mi);
             }
         }
-        if (!lis.isEmpty()) {
+        if (!recentProjectFileSet.isEmpty()) {
 
             for (JMenu m : openRecentProjectMenus) 
             {
