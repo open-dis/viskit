@@ -44,7 +44,7 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         nameTF.getDocument().addDocumentListener(lis);
         locationTF.getDocument().addDocumentListener(lis);
 
-        nameTF.setText(ViskitProject.DEFAULT_PROJECT_NAME);
+        nameTF.setText(ViskitProject.NEW_PROJECT_NAME);
         locationTF.setText(ViskitProject.DEFAULT_VISKIT_PROJECTS_DIR);
     }
 
@@ -93,25 +93,25 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jLabel1 = new javax.swing.JLabel();
+        projectNameLabel = new javax.swing.JLabel();
         nameTF = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
+        projectLocationLabel = new javax.swing.JLabel();
         locationTF = new javax.swing.JTextField();
-        browseButt = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
+        browseButton = new javax.swing.JButton();
+        projectPathLabel = new javax.swing.JLabel();
         pathTF = new javax.swing.JTextField();
-        cancelButt = new javax.swing.JButton();
-        createButt = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
+        cancelButton = new javax.swing.JButton();
+        createButton = new javax.swing.JButton();
+        spacerLabel = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setLayout(new java.awt.GridBagLayout());
 
-        jLabel1.setText("Project Name:");
+        projectNameLabel.setText("Project Name:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
-        add(jLabel1, gridBagConstraints);
+        add(projectNameLabel, gridBagConstraints);
 
         nameTF.setColumns(30);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -121,13 +121,13 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 0);
         add(nameTF, gridBagConstraints);
 
-        jLabel2.setText("Project Location:");
+        projectLocationLabel.setText("Project Location:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 5);
-        add(jLabel2, gridBagConstraints);
+        add(projectLocationLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -136,10 +136,10 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(locationTF, gridBagConstraints);
 
-        browseButt.setText("Browse...");
-        browseButt.addActionListener(new java.awt.event.ActionListener() {
+        browseButton.setText("Browse...");
+        browseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                browseButtActionPerformed(evt);
+                browseButtonActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -147,15 +147,15 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
-        add(browseButt, gridBagConstraints);
+        add(browseButton, gridBagConstraints);
 
-        jLabel3.setText("Project Path:");
+        projectPathLabel.setText("Project Path:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 5);
-        add(jLabel3, gridBagConstraints);
+        add(projectPathLabel, gridBagConstraints);
 
         pathTF.setEditable(false);
         pathTF.setBackground(new java.awt.Color(204, 204, 204));
@@ -170,11 +170,11 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         add(pathTF, gridBagConstraints);
 
-        cancelButt.setText("Cancel");
-        cancelButt.setPreferredSize(new java.awt.Dimension(65, 22));
-        cancelButt.addActionListener(new java.awt.event.ActionListener() {
+        cancelButton.setText("Cancel");
+        cancelButton.setPreferredSize(new java.awt.Dimension(65, 22));
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelButtActionPerformed(evt);
+                cancelButtonActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -182,12 +182,12 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 5);
-        add(cancelButt, gridBagConstraints);
+        add(cancelButton, gridBagConstraints);
 
-        createButt.setText("Create");
-        createButt.addActionListener(new java.awt.event.ActionListener() {
+        createButton.setText("Create");
+        createButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                createButtActionPerformed(evt);
+                createButtonActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -195,43 +195,43 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 0);
-        add(createButt, gridBagConstraints);
+        add(createButton, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.weighty = 1.0;
-        add(jLabel4, gridBagConstraints);
+        add(spacerLabel, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-private void cancelButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtActionPerformed
+private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
     cancelled = true;
     dialog.dispose();
-}//GEN-LAST:event_cancelButtActionPerformed
+}//GEN-LAST:event_cancelButtonActionPerformed
 
-private void createButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtActionPerformed
+private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
     cancelled = false;
     projectPath = pathTF.getText().trim().replaceAll("\\\\", "/");
     dialog.dispose();
-}//GEN-LAST:event_createButtActionPerformed
+}//GEN-LAST:event_createButtonActionPerformed
 
-private void browseButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtActionPerformed
+private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
 
     File file = ViskitProject.newProjectPath(this, System.getProperty("user.home"));
 
     if (file != null)
         locationTF.setText(file.getAbsolutePath().replaceAll("\\\\", "/"));
-}//GEN-LAST:event_browseButtActionPerformed
+}//GEN-LAST:event_browseButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton browseButt;
-    private javax.swing.JButton cancelButt;
-    private javax.swing.JButton createButt;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JButton browseButton;
+    private javax.swing.JButton cancelButton;
+    private javax.swing.JButton createButton;
     private javax.swing.JTextField locationTF;
     private javax.swing.JTextField nameTF;
     private javax.swing.JTextField pathTF;
+    private javax.swing.JLabel projectLocationLabel;
+    private javax.swing.JLabel projectNameLabel;
+    private javax.swing.JLabel projectPathLabel;
+    private javax.swing.JLabel spacerLabel;
     // End of variables declaration//GEN-END:variables
 }
