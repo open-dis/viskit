@@ -116,7 +116,7 @@ public class AssemblySimulationRunPanel extends JPanel
 //        add(titlePanel);
         
         JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        JSplitPane leftSideVerticalSplit;
+        JSplitPane leftSideHorizontalSplit;
 
         outputStreamTA = new JTextArea("Assembly output stream:" + lineEnd +
                 "----------------------" + lineEnd);
@@ -145,10 +145,12 @@ public class AssemblySimulationRunPanel extends JPanel
         int w = Integer.parseInt(ViskitConfiguration.instance().getVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
         int h = Integer.parseInt(ViskitConfiguration.instance().getVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
-        leftSideVerticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
-        leftSideVerticalSplit.setDividerLocation((h/2) - 60); // TODO check with Ben, else -1
+        leftSideHorizontalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
+        
+        // reduce magnitude of offset value smaller to provide more room upper-left vcrPanel 
+        leftSideHorizontalSplit.setDividerLocation((h/2) - 50);
 
-        leftRightSplit.setLeftComponent(leftSideVerticalSplit);
+        leftRightSplit.setLeftComponent(leftSideHorizontalSplit);
         leftRightSplit.setRightComponent(scrollPane);
         leftRightSplit.setDividerLocation((w/2) - (w/4) + 10);
 
@@ -364,7 +366,7 @@ public class AssemblySimulationRunPanel extends JPanel
         upperLeftFlowPanel.add(Box.createVerticalBox()); // TODO which?
         upperLeftFlowPanel.add(Box.createVerticalStrut(10));
         upperLeftFlowPanel.add(nowRunningLabel);
-//        upperLeftFlowPanel.add(Box.createHorizontalStrut(10));
+        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
 
         runButtonsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         upperLeftFlowPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
