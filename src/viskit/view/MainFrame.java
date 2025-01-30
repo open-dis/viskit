@@ -92,20 +92,20 @@ public class MainFrame extends JFrame
     private DoeMain doeMain;
 
     /** The initial assembly to load. */
-    private final String initialAssemblyFile;
-    private final int TAB0_EVENTGRAPH_EDITOR_INDEX = 0;
-    private final int TAB0_ASSEMBLY_EDITOR_INDEX = 1;
-    private final int TAB0_SIMULATION_RUN_SUBTABS_INDEX = 2;
-    private final int TAB0_ANALYST_REPORT_INDEX = 3;
-    private final int[] tabIndices = {
+    private       final String initialAssemblyFile;
+    public static final int TAB0_EVENTGRAPH_EDITOR_INDEX = 0;
+    public static final int TAB0_ASSEMBLY_EDITOR_INDEX = 1;
+    public static final int TAB0_SIMULATION_RUN_SUBTABS_INDEX = 2;
+    public static final int TAB0_ANALYST_REPORT_INDEX = 3;
+    public static final int[] tabIndices = {
         TAB0_EVENTGRAPH_EDITOR_INDEX,
         TAB0_ASSEMBLY_EDITOR_INDEX,
         TAB0_SIMULATION_RUN_SUBTABS_INDEX,
         TAB0_ANALYST_REPORT_INDEX,
     };
-    private final int TAB1_LOCALRUN_INDEX = 0;
-    private final int TAB1_DESIGN_OF_EXPERIMENTS_INDEX = 1;
-    private final int TAB1_CLUSTERUN_INDEX = 2;
+    public static final int TAB1_LOCALRUN_INDEX = 0;
+    public static final int TAB1_DESIGN_OF_EXPERIMENTS_INDEX = 1;
+    public static final int TAB1_CLUSTERUN_INDEX = 2;
 
     private AssemblyController     assemblyController;
     private EventGraphController eventGraphController;
@@ -223,17 +223,17 @@ public class MainFrame extends JFrame
 
         // Assembly Simulation Run
         simulationRunTabbedPane = new JTabbedPane();
-        simulationRunTabbedPane.addChangeListener(tabChangeListener);
+        getSimulationRunTabbedPane().addChangeListener(tabChangeListener);
         JPanel runTabbedPanePanel = new JPanel(new BorderLayout());
         runTabbedPanePanel.setBackground(new Color(206, 206, 255)); // light blue
-        runTabbedPanePanel.add(simulationRunTabbedPane, BorderLayout.CENTER);
+        runTabbedPanePanel.add(getSimulationRunTabbedPane(), BorderLayout.CENTER);
 
         // Always selected as visible
         if (SettingsDialog.isAssemblySimulationRunVisible()) {
             topTabbedPane.add(runTabbedPanePanel);
             assemblyPaneIndex = topTabbedPane.indexOfComponent(runTabbedPanePanel);
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Assembly Simulation Run");
-            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "First initialize Assembly Simulation Run from Assembly tab");
+            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "First initialize Assembly for Simulation Run from Assembly tab");
             menus.add(null); // placeholder
             tabIndices[TAB0_SIMULATION_RUN_SUBTABS_INDEX] = assemblyPaneIndex;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
@@ -276,9 +276,9 @@ public class MainFrame extends JFrame
         internalAssemblySimulationRunner = new InternalAssemblySimulationRunner(analystReportPanelVisible);
         ViskitGlobals.instance().setInternalAssemblySimulationRunner(internalAssemblySimulationRunner);
         
-        simulationRunTabbedPane.add(ViskitGlobals.instance().getSimulationRunPanel(), TAB1_LOCALRUN_INDEX);
-        simulationRunTabbedPane.setTitleAt(TAB1_LOCALRUN_INDEX, "Local Run");
-        simulationRunTabbedPane.setToolTipTextAt(TAB1_LOCALRUN_INDEX, "Run replications on local host");
+        getSimulationRunTabbedPane().add(ViskitGlobals.instance().getSimulationRunPanel(), TAB1_LOCALRUN_INDEX);
+        getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, "Local Run");
+        getSimulationRunTabbedPane().setToolTipTextAt(TAB1_LOCALRUN_INDEX, "Run replications on local host");
         menuBar = internalAssemblySimulationRunner.getMenus();
         menus.add(menuBar);
         doCommonHelp(menuBar);
@@ -300,9 +300,9 @@ public class MainFrame extends JFrame
         if (isDOEVisible) {
             doeMain = DoeMain.main2();
             doeFrame = doeMain.getMainFrame();
-            simulationRunTabbedPane.add(doeFrame.getContent(), TAB1_DESIGN_OF_EXPERIMENTS_INDEX);
-            simulationRunTabbedPane.setTitleAt(TAB1_DESIGN_OF_EXPERIMENTS_INDEX, "Design of Experiments");
-            simulationRunTabbedPane.setIconAt(TAB1_DESIGN_OF_EXPERIMENTS_INDEX, new ImageIcon(getClass().getClassLoader().getResource("viskit/images/grid.png")));
+            getSimulationRunTabbedPane().add(doeFrame.getContent(), TAB1_DESIGN_OF_EXPERIMENTS_INDEX);
+            getSimulationRunTabbedPane().setTitleAt(TAB1_DESIGN_OF_EXPERIMENTS_INDEX, "Design of Experiments");
+            getSimulationRunTabbedPane().setIconAt(TAB1_DESIGN_OF_EXPERIMENTS_INDEX, new ImageIcon(getClass().getClassLoader().getResource("viskit/images/grid.png")));
             menuBar = doeMain.getMenus();
             if (menuBar == null) {
                 menuBar = new JMenuBar();
@@ -322,9 +322,9 @@ public class MainFrame extends JFrame
             runGridComponent = new JobLauncherTab2(doeMain.getController(), null, null, this);
             if (doeFrame != null)
                 doeFrame.getController().setJobLauncher(runGridComponent);
-            simulationRunTabbedPane.add(runGridComponent.getContent(), TAB1_CLUSTERUN_INDEX);
-            simulationRunTabbedPane.setTitleAt(TAB1_CLUSTERUN_INDEX, "LaunchClusterJob");
-            simulationRunTabbedPane.setIconAt(TAB1_CLUSTERUN_INDEX, new ImageIcon(getClass().getClassLoader().getResource("viskit/images/grid.png")));
+            getSimulationRunTabbedPane().add(runGridComponent.getContent(), TAB1_CLUSTERUN_INDEX);
+            getSimulationRunTabbedPane().setTitleAt(TAB1_CLUSTERUN_INDEX, "LaunchClusterJob");
+            getSimulationRunTabbedPane().setIconAt(TAB1_CLUSTERUN_INDEX, new ImageIcon(getClass().getClassLoader().getResource("viskit/images/grid.png")));
             menuBar = new JMenuBar();
             menuBar.add(new JMenu("File"));
             jamQuitHandler(null, myQuitAction, menuBar);
@@ -395,12 +395,12 @@ public class MainFrame extends JFrame
             // back and change something, then handle that here
             if (i == tabIndices[TAB0_SIMULATION_RUN_SUBTABS_INDEX]) 
             {
-                i = topTabbedPane.getTabCount() + simulationRunTabbedPane.getSelectedIndex();
+                i = topTabbedPane.getTabCount() + getSimulationRunTabbedPane().getSelectedIndex();
                 topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATION_RUN_SUBTABS_INDEX], "Run simulation defined by assembly");
             }
             else
             {
-                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATION_RUN_SUBTABS_INDEX], "First initialize Assembly Simulation Run from Assembly tab");
+                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATION_RUN_SUBTABS_INDEX], "First initialize Assembly for Simulation Run from Assembly tab");
             }
 
             getJMenuBar().remove(helpMenu);
@@ -598,7 +598,7 @@ public class MainFrame extends JFrame
 
                 // toggles a tab change listener
                 topTabbedPane.setSelectedIndex(tabIndices[TAB0_SIMULATION_RUN_SUBTABS_INDEX]);
-                simulationRunTabbedPane.setSelectedIndex(TAB1_LOCALRUN_INDEX);
+                getSimulationRunTabbedPane().setSelectedIndex(TAB1_LOCALRUN_INDEX);
 
                 // initializes a fresh class loader
                 internalAssemblySimulationRunner.preInitRun(execStrings);
@@ -637,8 +637,8 @@ public class MainFrame extends JFrame
             titles[key] = title;
             int assemblyTabIndex = topTabbedPane.getSelectedIndex();
             if (assemblyTabIndex == tabIndices[TAB0_SIMULATION_RUN_SUBTABS_INDEX]) {
-                assemblyTabIndex = topTabbedPane.getTabCount() + simulationRunTabbedPane.getSelectedIndex();
-                simulationRunTabbedPane.setTitleAt(TAB1_LOCALRUN_INDEX, title.substring(title.indexOf(":") + 1));
+                assemblyTabIndex = topTabbedPane.getTabCount() + getSimulationRunTabbedPane().getSelectedIndex();
+                getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, title.substring(title.indexOf(":") + 1));
             }
             // TODO shift top-most title control to be separate
 //            if (assemblyTabIndex == key) {
@@ -659,5 +659,12 @@ public class MainFrame extends JFrame
              newTitle += " Project: " + ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
         // otherwise value is unchanged;
         setTitle(newTitle);
+    }
+
+    /**
+     * @return the simulationRunTabbedPane
+     */
+    public JTabbedPane getSimulationRunTabbedPane() {
+        return simulationRunTabbedPane;
     }
 }

@@ -68,8 +68,9 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
-import viskit.view.SimulationRunPanel;
 import viskit.assembly.SimulationRunPlugInterface;
+import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
+import viskit.view.SimulationRunPanel;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -1695,14 +1696,15 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     // Ensure any changes to the Assembly Properties dialog get saved
                     save();
         
-                    String        name = ViskitGlobals.instance().getActiveAssemblyModel().getMetadata().name;
-                    String consoleName = InternalAssemblySimulationRunner.ASSEMBLY_SIMULATION_RUN_PANEL_TITLE;
-                    if (!name.isBlank() && name.toLowerCase().contains("assembly"))
-                         consoleName += " for " + name;
-                    else if (!name.isBlank())
-                         consoleName += " for Assembly " + name;
-                    ((AssemblyViewFrame) getView()).setTitle(name);
+                    String assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetadata().name;
+                    String  consoleName = InternalAssemblySimulationRunner.ASSEMBLY_SIMULATION_RUN_PANEL_TITLE;
+                    if (!assemblyName.isBlank() && assemblyName.toLowerCase().contains("assembly"))
+                         consoleName += " for " + assemblyName;
+                    else if (!assemblyName.isBlank())
+                         consoleName += " for Assembly " + assemblyName;
+                    ((AssemblyViewFrame) getView()).setTitle(assemblyName);
                     ViskitGlobals.instance().getSimulationRunPanel().setTitle(consoleName);
+                    ViskitGlobals.instance().getMainFrameWindow().getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX,  assemblyName);
                     // Initializes a fresh class loader
                     runner.exec(execStrings);
 

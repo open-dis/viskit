@@ -416,11 +416,11 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         fileMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_A, null));
         fileMenu.addSeparator();
 
-        fileMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate Java Source of saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
+        fileMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate Java Source of Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         fileMenu.add(buildMenuItem(assemblyController, "captureWindow", "Save Assembly Screen Image", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        fileMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly Simulation Run", KeyEvent.VK_I,
+        fileMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly for Simulation Run", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK)));
         fileMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
 
@@ -599,8 +599,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
 
-        JLabel initializeAssemblyRunLabel = new JLabel ("  Initialize Assembly Simulation Run: ");
-        initializeAssemblyRunLabel.setToolTipText("First initialize Assembly Simulation Run from Assembly tab");
+        JLabel initializeAssemblyRunLabel = new JLabel ("  Initialize Assembly for Simulation Run: ");
+        initializeAssemblyRunLabel.setToolTipText("First initialize Assembly for Simulation Run from Assembly tab");
         getToolBar().add(initializeAssemblyRunLabel);
         getToolBar().add(initializeAssemblySimulationRunButton);
 

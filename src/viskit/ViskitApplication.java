@@ -145,10 +145,10 @@ public class ViskitApplication {
         mainFrame.setVisible(true);
         
         MainFrame.runLater(1000L, () -> {
-            // give file loading a chance to finish
+            // give file loading a chance to finish...
             // TODO check if author has entered profile information, offer to help
 
-            if (// TODO also check here if project is loaded?
+            if ((ViskitGlobals.instance().hasCurrentViskitProject()) &&
                 (ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded() == 0) &&
                 (ViskitGlobals.instance().getAssemblyViewFrame().getNumberAssembliesLoaded()    == 0))
             {

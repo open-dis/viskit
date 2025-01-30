@@ -106,7 +106,7 @@ public class ViskitGlobals {
     private ViskitProject currentViskitProject;
 
     /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
-    private SimulationRunPanel assemblySimulationRunPanel;
+    private SimulationRunPanel simulationRunPanel;
     
     private InternalAssemblySimulationRunner internalAssemblySimulationRunner;
 
@@ -769,16 +769,20 @@ public class ViskitGlobals {
 
     public SimulationRunPanel getSimulationRunPanel()
     {
-        return assemblySimulationRunPanel;
+        return simulationRunPanel;
     }
 
     public void setSimulationRunPanel(SimulationRunPanel assemblySimulationRunPanel) 
     {
-        this.assemblySimulationRunPanel = assemblySimulationRunPanel;
+        this.simulationRunPanel = assemblySimulationRunPanel;
     }
 
     public ViskitProject getCurrentViskitProject() {
         return currentViskitProject;
+    }
+
+    public boolean hasCurrentViskitProject() {
+        return (currentViskitProject != null);
     }
 
     /**
