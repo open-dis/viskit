@@ -172,15 +172,16 @@ public class ViskitStatics {
     }
 
     /**
-     * Clamp the size of c to the preferred height of h and the preferred width of w
-     * @param c the component to size clamp
-     * @param h component height
-     * @param w component width
+     * Clamp the size of component c to the preferred height of component h and the preferred width of component w
+     * @param targetComponent the component to size clamp
+     * @param heightComponent use height of this component
+     * @param widthComponent  use width  of this component
      */
-    public static void clampSize(JComponent c, JComponent h, JComponent w) {
-        Dimension d = new Dimension(h.getPreferredSize().width, w.getPreferredSize().height);
-        c.setMaximumSize(d);
-        c.setMinimumSize(d);
+    public static void clampComponentSize(JComponent targetComponent, JComponent heightComponent, JComponent widthComponent) {
+        Dimension dimension = new Dimension(widthComponent.getPreferredSize().width, 
+                                          heightComponent.getPreferredSize().height);
+        targetComponent.setMaximumSize(dimension);
+        targetComponent.setMinimumSize(dimension);
     }
 
     public static void clampMaxSize(JComponent c) {
@@ -188,8 +189,8 @@ public class ViskitStatics {
         c.setMaximumSize(d);
     }
 
-    public static void clampSize(JComponent c) {
-        clampSize(c, c, c);
+    public static void clampComponentSize(JComponent component) {
+        ViskitStatics.clampComponentSize(component, component, component);
     }
 
     /**
