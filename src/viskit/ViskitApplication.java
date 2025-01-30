@@ -143,6 +143,20 @@ public class ViskitApplication {
             setupMacUI();
         }
         mainFrame.setVisible(true);
+        
+        // TODO check if author has entered profile information, offer to help
+        
+        if (// TODO also check here if project is loaded?
+            (ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded() == 0) &&
+            (ViskitGlobals.instance().getAssemblyViewFrame().getNumberAssembliesLoaded()    == 0))
+        {
+            // provide initial guidance to new user who is facing an empty editor
+            String guidance = "<html><body><p align='center'>Welcome to Viskit!</p><br />" +
+                                          "<p align='center'>To get started, create or open</p><br />" +
+                                          "<p align='center'>an Event Graph or an Assembly</p><br />";
+            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                "Add Event Graph or Assembly", guidance);
+        }
     }
 
     private static void setLandFandFonts() {
