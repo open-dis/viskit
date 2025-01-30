@@ -752,7 +752,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
             nowRunningsString.append(" of ");
             nowRunningsString.append(Integer.parseInt(assemblySimulationRunPanel.numberReplicationsTF.getText()));
             nowRunningsString.append("</b>\n");
-            nowRunningsString.append("</font></p></body></html>\n");
+            nowRunningsString.append("</font></p><br></body></html>\n");
             assemblySimulationRunPanel.nowRunningLabel.setText(nowRunningsString.toString());
 
             // reset display string in preparation for the next replication output
