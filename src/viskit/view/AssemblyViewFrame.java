@@ -1005,13 +1005,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public void genericReport(int type, String title, String msg) {
+    public void genericReport(int type, String title, String message) {
         if (type == JOptionPane.ERROR_MESSAGE)
         {
-            LOG.error(msg);
-            System.err.println("***" + msg);
+            LOG.error(message);
+            System.err.println("***" + message);
         }
-        JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainFrameWindow(), msg, title, type);
+        JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainFrameWindow(), message, title, type);
     }
 
     @Override
