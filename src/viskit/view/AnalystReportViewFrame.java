@@ -85,6 +85,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     static final Logger LOG = LogUtils.getLogger(AnalystReportViewFrame.class);
     private final static String FRAME_DEFAULT_TITLE = "Viskit Analyst Report Editor";
     private AnalystReportModel analystReportModel;
+    private JMenu analystReportMenu;
 
     /**
      * TODO: rewire this functionality?
@@ -862,35 +863,36 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
-        // Setup the File Menu
-        myMenuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("File");
-        fileMenu.setMnemonic(KeyEvent.VK_F);
+        // Setup the Analyst Report Menu
+        myMenuBar = new JMenuBar(); // TODO omit completely when refactoring complete
+//      JMenu fileMenu = new JMenu("File");
+        analystReportMenu = new JMenu("Analyst Report");
+        getAnalystReportMenu().setMnemonic(KeyEvent.VK_F);
 
-        fileMenu.add(buildMenuItem(analystReportController,
+        getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "generateHtmlReport",
                 "Display analyst report HTML",
                 KeyEvent.VK_D,
                 KeyStroke.getKeyStroke(KeyEvent.VK_D, accelMod)));
 
-        fileMenu.add(buildMenuItem(analystReportController,
+        getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "openAnalystReportXML",
                 "Open another analyst report XML",
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         
-        fileMenu.add(buildMenuItem(analystReportController,
+        getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "saveAnalystReportXML",
                 "Save analyst report XML",
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
 
-        fileMenu.add(buildMenuItem(analystReportController, 
+        getAnalystReportMenu().add(buildMenuItem(analystReportController, 
                 "viewXML", 
                 "XML View of Saved Analyst Report", 
                 KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
 
-        myMenuBar.add(fileMenu);
+        myMenuBar.add(getAnalystReportMenu());
     }
 
     // Use the actions package
@@ -931,6 +933,13 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
                 tf.setText(locationImageFileChooser.getSelectedFile().getAbsolutePath());
             }
         }
+    }
+
+    /**
+     * @return the analystReportMenu
+     */
+    public JMenu getAnalystReportMenu() {
+        return analystReportMenu;
     }
 }
 
