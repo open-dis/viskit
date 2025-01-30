@@ -76,7 +76,8 @@ public class MainFrame extends JFrame
 {
     public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation"; // using Simkit
 
-    boolean modalMenus = true;
+    /** modalMenus: true means choice from traditional modalMenuBarList, false means new combinedMenuBar */
+    private boolean modalMenus = true; 
     JMenuBar mainFrameMenuBar;
     JMenuBar combinedMenuBar = new JMenuBar();
     java.util.List<JMenuBar> modalMenuBarList = new ArrayList<>();
@@ -407,7 +408,13 @@ public class MainFrame extends JFrame
             JMenuBar selectedMenuBar = modalMenuBarList.get(i);
             selectedMenuBar.add(helpMenu);
             
-            if  (modalMenus)
+            // TODO rename menu methods consistently
+            combinedMenuBar.add(ViskitGlobals.instance().getEventGraphViewFrame().getEventGraphMenu());
+            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getFileMenu());
+            combinedMenuBar.add(ViskitGlobals.instance().getInternalSimulationRunner().getMenus());
+            combinedMenuBar.add(ViskitGlobals.instance().getAnalystReportEditor().getMenus());
+            
+            if  (hasModalMenus())
                  setJMenuBar(selectedMenuBar);
             else setJMenuBar(combinedMenuBar);
             
@@ -670,5 +677,21 @@ public class MainFrame extends JFrame
      */
     public JTabbedPane getSimulationRunTabbedPane() {
         return simulationRunTabbedPane;
+    }
+
+    /**
+     * Interface setting modalMenus: true means choice from traditional modalMenuBarList, false means new combinedMenuBar
+     * @return the modalMenus
+     */
+    public boolean hasModalMenus() {
+        return modalMenus;
+    }
+
+    /**
+     * Interface setting modalMenus: true means choice from traditional modalMenuBarList, false means new combinedMenuBar
+     * @param modalMenus the modalMenus to set
+     */
+    public void setModalMenus(boolean modalMenus) {
+        this.modalMenus = modalMenus;
     }
 }

@@ -1554,8 +1554,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param xmlFile the EventGraph to package up
      * @return a package and file pair
      */
-    public PkgAndFile createTemporaryEventGraphClass(File xmlFile) {
-        PkgAndFile paf = null;
+    public PackageAndFile createTemporaryEventGraphClass(File xmlFile) {
+        PackageAndFile paf = null;
         try {
             SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
             x2j.unmarshal();
@@ -1591,7 +1591,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param source the raw source to write to file
      * @return a package and file pair
      */
-    private PkgAndFile compileJavaClassAndSetPackage(String source) {
+    private PackageAndFile compileJavaClassAndSetPackage(String source) {
         String pkg = null;
         if (source != null && !source.isEmpty()) {
             Pattern p = Pattern.compile("package.*;");
@@ -1606,7 +1606,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
             File f = compileJavaClassFromString(source);
             if (f != null)
-                return new PkgAndFile(pkg, f);
+                return new PackageAndFile(pkg, f);
         }
         return null;
     }
@@ -1633,11 +1633,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         String src = produceJavaAssemblyClass(); // asks to save
 
-        PkgAndFile paf = compileJavaClassAndSetPackage(src);
+        PackageAndFile paf = compileJavaClassAndSetPackage(src);
         if (paf != null) {
-            File f = paf.f;
+            File f = paf.file;
             String clNam = f.getName().substring(0, f.getName().indexOf('.'));
-            clNam = paf.pkg + "." + clNam;
+            clNam = paf.packageName + "." + clNam;
 
             execStrings = buildExecStrings(clNam);
         } 
@@ -1697,7 +1697,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     save();
         
                     String assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetadata().name;
-                    String  consoleName = InternalAssemblySimulationRunner.ASSEMBLY_SIMULATION_RUN_PANEL_TITLE;
+                    String  consoleName = InternalSimulationRunner.ASSEMBLY_SIMULATION_RUN_PANEL_TITLE;
                     if (!assemblyName.isBlank() && assemblyName.toLowerCase().contains("assembly"))
                          consoleName += " for " + assemblyName;
                     else if (!assemblyName.isBlank())

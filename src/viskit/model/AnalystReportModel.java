@@ -157,7 +157,7 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     /** This constructor for opening a temp report for further
      * annotations, or as required from the analyst/user.  Can be called from
-     * the InternalAssemblyRunner after a report is ready for display
+     * the InternalSimulationRunner after a report is ready for display
      *
      * @param fullReport an existing report to open
      */

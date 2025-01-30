@@ -75,9 +75,9 @@ import viskit.model.AssemblyModelImpl;
  * @since 3:43:51 PM
  * @version $Id$
  */
-public class InternalAssemblySimulationRunner implements PropertyChangeListener {
+public class InternalSimulationRunner implements PropertyChangeListener {
 
-    static final Logger LOG = LogUtils.getLogger(InternalAssemblySimulationRunner.class);
+    static final Logger LOG = LogUtils.getLogger(InternalSimulationRunner.class);
 
     /** The name of the basicAssembly to run */
     private String assemblyClassName;
@@ -109,7 +109,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
      * The internal logic for the Assembly Runner panel
      * @param analystReportPanelVisible if true, the analyst report panel will be visible
      */
-    public InternalAssemblySimulationRunner(boolean analystReportPanelVisible) 
+    public InternalSimulationRunner(boolean analystReportPanelVisible) 
     {
         saveListener = new SaveListener();
 
@@ -770,4 +770,4 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         return simulationRunMenu;
     }
 
-}  // end class file InternalAssemblySimulationRunner.java
+}  // end class file InternalSimulationRunner.java

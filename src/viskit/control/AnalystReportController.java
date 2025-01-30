@@ -77,7 +77,7 @@ public class AnalystReportController extends MvcAbstractController {
     /** Creates a new instance of AnalystReportController */
     public AnalystReportController() {}
 
-    /** Called from the InternalAssemblyRunner when the temp Analyst report is
+    /** Called from the InternalSimulationRunner when the temp Analyst report is
      * filled out and ready to copy from a temp to a permanent directory
      *
      * @param path the path to the temp Analyst Report that will be copied

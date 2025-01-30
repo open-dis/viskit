@@ -94,7 +94,7 @@ public class FileBasedClassManager {
     Class<?> fclass = null;
     JAXBContext jaxbContext = null;
     Unmarshaller unmarshaller = null;
-    PkgAndFile paf = null;
+    PackageAndFile paf = null;
     File fXml = null;
     SimEntity simEntity = null;
 
@@ -191,7 +191,7 @@ public class FileBasedClassManager {
             fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
 
             fileBasedAssemblyNode =  (fXml == null) ?
-                new FileBasedAssemblyNode(paf.f, fclass.getName(), f, paf.pkg) :
+                new FileBasedAssemblyNode(paf.file, fclass.getName(), f, paf.packageName) :
                 new FileBasedAssemblyNode(f, fclass.getName(), fXml, simEntity.getPackage());
 
             List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
