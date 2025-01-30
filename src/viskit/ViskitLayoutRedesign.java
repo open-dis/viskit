@@ -355,7 +355,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         viskitTabbedPane.addTab("Cloud Simulation Run", cloudSimulationRunTabbedPane);
 
-        fileMenu.setText("File  ");
+        fileMenu.setText("Project");
 
         newViskitProjectMI.setMnemonic(KeyEvent.VK_N);
         newViskitProjectMI.setText("New Viskit Project");
