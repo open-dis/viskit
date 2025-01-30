@@ -75,6 +75,8 @@ import viskit.assembly.AssemblySimulationRunPlug;
 public class MainFrame extends JFrame
 {
     public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation"; // using Simkit
+
+    java.util.List<JMenuBar> menus = new ArrayList<>();
     
     MvcAbstractViewFrame eventGraphFrame;
     MvcAbstractViewFrame assemblyFrame;
@@ -139,8 +141,6 @@ public class MainFrame extends JFrame
         return myQuitAction;
     }
 
-    java.util.List<JMenuBar> menus = new ArrayList<>();
-
     private void initializeMainFrame() 
     {
         updateApplicationTitle();
@@ -175,7 +175,8 @@ public class MainFrame extends JFrame
             setJMenuBar(menuBar);
             jamQuitHandler(((EventGraphViewFrame) eventGraphFrame).getQuitMenuItem(), myQuitAction, menuBar);
             tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX] = assemblyPaneIndex;
-        } else {
+        } 
+        else {
             tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX] = -1;
         }
 
@@ -413,17 +414,18 @@ public class MainFrame extends JFrame
 
     /**
      * Stick the first Help menu we see into all the following ones.
-     * @param mb
+     * @param menuBar
      */
-    private void doCommonHelp(JMenuBar mb) {
-        JMenu men;
-        for (int i = 0; i < mb.getMenuCount(); i++) {
-            men = mb.getMenu(i);
-            if (men.getText().equalsIgnoreCase("Help")) {
+    private void doCommonHelp(JMenuBar menuBar) 
+    {
+        JMenu menu;
+        for (int i = 0; i < menuBar.getMenuCount(); i++) {
+            menu = menuBar.getMenu(i);
+            if (menu.getText().equalsIgnoreCase("Help")) {
                 if (helpMenu == null) {
-                    helpMenu = men;
+                    helpMenu = menu;
                 } else {
-                    mb.remove(i);
+                    menuBar.remove(i);
                 }
                 return;
             }
