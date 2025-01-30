@@ -75,7 +75,7 @@ import viskit.view.AnalystReportViewFrame;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.AssemblySimulationRunPanel;
-import viskit.view.ViskitProjectButtonPanel;
+import viskit.view.ViskitStartupProjectInitializationPanel;
 import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcController;
 import edu.nps.util.SystemExitHandler;
@@ -517,7 +517,7 @@ public class ViskitGlobals {
         String projectHome = vConfig.getVal(ViskitConfiguration.PROJECT_PATH_KEY);
         LOG.debug(projectHome);
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) {
-            ViskitProjectButtonPanel.showDialog(); // hopefully, void this
+            ViskitStartupProjectInitializationPanel.showDialog(); // hopefully, void this
         } else {
             ViskitProject.VISKIT_PROJECTS_DIRECTORY = projectHome;
         }

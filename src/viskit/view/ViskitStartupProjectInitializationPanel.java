@@ -56,13 +56,13 @@ import viskit.mvc.MvcController;
  * @since Aug 2008
  * @version $Id$
  */
-public class ViskitProjectButtonPanel extends javax.swing.JPanel
+public class ViskitStartupProjectInitializationPanel extends javax.swing.JPanel
 {
     private static JDialog dialog;
 
     public static void showDialog()
     {
-        ViskitProjectButtonPanel viskitProjectButtonPanel = new ViskitProjectButtonPanel();
+        ViskitStartupProjectInitializationPanel viskitProjectButtonPanel = new ViskitStartupProjectInitializationPanel();
         dialog = new JDialog((Dialog) null, true);  // modal
         dialog.setTitle("Viskit Project Initialization");
         dialog.setContentPane(viskitProjectButtonPanel);
@@ -83,14 +83,14 @@ public class ViskitProjectButtonPanel extends javax.swing.JPanel
                 };
                 SwingUtilities.invokeAndWait(r);
             } catch (InterruptedException | InvocationTargetException ex) {
-                LogUtils.getLogger(ViskitProjectButtonPanel.class).error(ex);
+                LogUtils.getLogger(ViskitStartupProjectInitializationPanel.class).error(ex);
             }
         else
             dialog.setVisible(true);
     }
 
     /** Creates new form ViskitProjectButtonPanel */
-    public ViskitProjectButtonPanel() {
+    public ViskitStartupProjectInitializationPanel() {
         initComponents();
     }
 
