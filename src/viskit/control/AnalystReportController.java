@@ -92,10 +92,10 @@ public class AnalystReportController extends MvcAbstractController {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
         String output = formatter.format(new Date()); // today
 
-        String usr = System.getProperty("user.name");
-        String outputFile = (usr + "AnalystReport_" + output + ".xml");
+        String userName = System.getProperty("user.name");
+        String outputFilename = (userName + "AnalystReport_" + output + ".xml");
 
-        File targetFile = new File(analystReportDirectory, outputFile);
+        File targetFile = new File(analystReportDirectory, outputFilename);
         try {
             Files.copy(srcFil.toPath(), targetFile.toPath());
         } catch (IOException ioe) {

@@ -68,8 +68,8 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
-import viskit.assembly.AssemblySimulationRunPlug;
-import viskit.view.AssemblySimulationRunPanel;
+import viskit.view.SimulationRunPanel;
+import viskit.assembly.SimulationRunPlugInterface;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -91,7 +91,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private String initialAssemblyFile;
 
     /** The handler to run an assembly */
-    private AssemblySimulationRunPlug runner;
+    private SimulationRunPlugInterface runner;
 
     /** Creates a new instance of AssemblyController */
     public AssemblyControllerImpl() {
@@ -676,7 +676,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjectSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
         ViskitGlobals.instance().getEventGraphViewFrame().setTitleApplicationProjectName();
-        runner.resetAssemblySimulationRunPanel();
+        runner.resetSimulationRunPanel();
     }
 
     @Override
@@ -1690,7 +1690,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 else
                 {
                     // Ensure a cleared Simulation panel upon every Assembly compile
-                    runner.resetAssemblySimulationRunPanel();
+                    runner.resetSimulationRunPanel();
 
                     // Ensure any changes to the Assembly Properties dialog get saved
                     save();
@@ -1854,11 +1854,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
     }
 
-    /** Override the default AssemblySimulationRunPlug
+    /** Override the default SimulationRunPlugInterface
      *
-     * @param plug the AssemblySimulationRunPlug to set
+     * @param plug the SimulationRunPlugInterface to set
      */
-    public void setAssemblyRunner(AssemblySimulationRunPlug plug) {
+    public void setAssemblyRunner(SimulationRunPlugInterface plug) {
         runner = plug;
     }
 

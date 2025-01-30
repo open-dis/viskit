@@ -76,7 +76,7 @@ import viskit.ViskitConfiguration;
 import viskit.model.AssemblyNode;
 
 import viskit.reports.ReportStatisticsConfiguration;
-import viskit.view.AssemblySimulationRunPanel;
+import viskit.view.SimulationRunPanel;
 
 /**
  * Base class for creating Simkit scenarios.
@@ -144,7 +144,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         replicationStatisticsPropertyChangeListenerArray = new PropertyChangeListener[0];
         designPointSimpleStatisticsTally = new SampleStatistics[0];
         propertyChangeListenerArray = new PropertyChangeListener[0];
-        setNumberReplications(AssemblySimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
+        setNumberReplications(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
         hookupsCalled = false;
 
         // Creates a report statistics config object and names it based on the name

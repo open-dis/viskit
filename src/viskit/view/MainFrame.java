@@ -61,7 +61,7 @@ import viskit.util.OpenAssembly;
 import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcModel;
 import edu.nps.util.SystemExitHandler;
-import viskit.assembly.AssemblySimulationRunPlug;
+import viskit.assembly.SimulationRunPlugInterface;
 
 /**
  * MOVES Institute
@@ -290,7 +290,7 @@ public class MainFrame extends JFrame
 // TODO unhide, unify?
         AssemblyControllerImpl assemblyControllerImpl = ((AssemblyControllerImpl) assemblyFrame.getController());
         assemblyControllerImpl.setInitialAssemblyFile(initialAssemblyFile);
-        assemblyControllerImpl.setAssemblyRunner(new ThisAssemblyRunnerPlug());
+        assemblyControllerImpl.setAssemblyRunner(new SimulationRunPlug());
         
         /* DIFF between OA3302 branch and trunk */
 
@@ -349,7 +349,7 @@ public class MainFrame extends JFrame
         });
     }
 
-    private void runLater(final long ms, final Runnable runr) {
+    public static void runLater(final long ms, final Runnable runnable) {
 
         java.util.Timer timer = new java.util.Timer("DelayedRunner", true);
 
@@ -357,7 +357,7 @@ public class MainFrame extends JFrame
 
             @Override
             public void run() {
-                SwingUtilities.invokeLater(runr);
+                SwingUtilities.invokeLater(runnable);
             }
         };
 
@@ -588,7 +588,7 @@ public class MainFrame extends JFrame
     /** Prepares the Assembly with a fresh class loader free of static artifacts for
      * a completely independent run
      */
-    class ThisAssemblyRunnerPlug implements AssemblySimulationRunPlug {
+    class SimulationRunPlug implements SimulationRunPlugInterface {
 
         @Override
         public void exec(String[] execStrings) {
@@ -606,24 +606,24 @@ public class MainFrame extends JFrame
         }
 
         @Override
-        public void resetAssemblySimulationRunPanel()
+        public void resetSimulationRunPanel()
         {
-            AssemblySimulationRunPanel runnerPanel = ViskitGlobals.instance().getSimulationRunPanel();
-            runnerPanel.outputStreamTA.setText(null);
-            runnerPanel.outputStreamTA.setText(
-                    "Assembly output stream:" + runnerPanel.lineEnd +
-                    "-----------------------" + runnerPanel.lineEnd);
-            runnerPanel.vcrStartTimeTF.setText("");
-            runnerPanel.vcrStopTimeTF.setText("");
-            runnerPanel.numberReplicationsTF.setText(Integer.toString(AssemblySimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS)); // initialized in XML and panel
-            runnerPanel.vcrVerboseCB.setSelected(false);
-            runnerPanel.printReplicationReportsCB.setSelected(false);
-            runnerPanel.printSummaryReportsCB.setSelected(false);
+            SimulationRunPanel simulationRunPanel = ViskitGlobals.instance().getSimulationRunPanel();
+            simulationRunPanel.outputStreamTA.setText(null);
+            simulationRunPanel.outputStreamTA.setText(
+                    "Assembly output stream:" + simulationRunPanel.lineEnd +
+                    "-----------------------" + simulationRunPanel.lineEnd);
+            simulationRunPanel.vcrStartTimeTF.setText("");
+            simulationRunPanel.vcrStopTimeTF.setText("");
+            simulationRunPanel.numberReplicationsTF.setText(Integer.toString(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS)); // initialized in XML and panel
+            simulationRunPanel.vcrVerboseCB.setSelected(false);
+            simulationRunPanel.printReplicationReportsCB.setSelected(false);
+            simulationRunPanel.printSummaryReportsCB.setSelected(false);
 
             internalAssemblySimulationRunner.vcrButtonPressDisplayUpdate(InternalAssemblySimulationRunner.Event.OFF); // initialize
             internalAssemblySimulationRunner.doTitle(null);
             
-            runnerPanel.nowRunningLabel.setText("");
+            simulationRunPanel.nowRunningLabel.setText("");
         }
     }
 

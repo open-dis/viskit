@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.control;
 
-import viskit.view.AssemblySimulationRunPanel;
+import viskit.view.SimulationRunPanel;
 
 import edu.nps.util.LogUtils;
 import edu.nps.util.TempFileManager;
@@ -81,7 +81,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
 
     /** The name of the basicAssembly to run */
     String assemblyClassName;
-    AssemblySimulationRunPanel assemblySimulationRunPanel;
+    SimulationRunPanel assemblySimulationRunPanel;
     ActionListener saveListener;
     JMenuBar myMenuBar;
     Thread simulationRunnerThread;
@@ -116,7 +116,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons. Currently, only start and stop work
 
-        assemblySimulationRunPanel = new AssemblySimulationRunPanel(ASSEMBLY_SIMULATION_RUN_PANEL_TITLE, false, analystReportPanelVisible);
+        assemblySimulationRunPanel = new SimulationRunPanel(ASSEMBLY_SIMULATION_RUN_PANEL_TITLE, false, analystReportPanelVisible);
         doMenus();
         assemblySimulationRunPanel.vcrStopButton.addActionListener(assemblySimulationRunStopListener = new StopListener());
         assemblySimulationRunPanel.vcrPlayButton.addActionListener(new StartResumeListener());

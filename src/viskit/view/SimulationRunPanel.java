@@ -56,7 +56,7 @@ import viskit.ViskitStatics;
  * @since Jul 17, 2006
  * @since 3:17:07 PM
  */
-public class AssemblySimulationRunPanel extends JPanel
+public class SimulationRunPanel extends JPanel
 {
     public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 30; // also defined twice in viskit.xsd schema
     
@@ -97,7 +97,7 @@ public class AssemblySimulationRunPanel extends JPanel
      * Currently, only start and stop work
      * @param analystReportPanelVisible if true, will enable the analyst report check box
      */
-    public AssemblySimulationRunPanel(String newTitle, boolean showExtraButtons, boolean analystReportPanelVisible)
+    public SimulationRunPanel(String newTitle, boolean showExtraButtons, boolean analystReportPanelVisible)
     {
         this.analystReportPanelVisible = analystReportPanelVisible; // TODO why?
         setLayout(new BorderLayout());

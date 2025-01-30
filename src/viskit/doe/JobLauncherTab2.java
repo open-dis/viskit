@@ -63,7 +63,7 @@ import org.jdom.Text;
 import viskit.*;
 import viskit.util.TitleListener;
 import viskit.util.OpenAssembly;
-import viskit.view.AssemblySimulationRunPanel;
+import viskit.view.SimulationRunPanel;
 import viskit.view.dialog.SettingsDialog;
 import viskit.xsd.bindings.assembly.Experiment;
 import viskit.xsd.bindings.assembly.SampleStatistics;
@@ -468,8 +468,8 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
             exp.setTotalSamples("1");
             numberCubesTF.setText("1");
-            exp.setReplicationsPerDesignPoint(Integer.toString(AssemblySimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS));
-            numberReplicationsTF.setText(        Integer.toString(AssemblySimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS));
+            exp.setReplicationsPerDesignPoint(Integer.toString(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS));
+            numberReplicationsTF.setText(Integer.toString(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS));
             exp.setTimeout("5000");
             replicationsTimeOut.setText("5000");
             int numDesignPts = jaxbRoot.getDesignParameters().size();
