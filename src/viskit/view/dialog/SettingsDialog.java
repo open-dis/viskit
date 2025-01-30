@@ -277,7 +277,7 @@ public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences
         innerPanel.add(eventGraphCB);
         assemblyCB = new JCheckBox("Assembly Editor");
         innerPanel.add(assemblyCB);
-        simulationRunCB = new JCheckBox("Assembly Simulation Run");
+        simulationRunCB = new JCheckBox("Simulation Run");
         innerPanel.add(simulationRunCB);
         analystReportCB = new JCheckBox("Analyst Report");
         innerPanel.add(analystReportCB);

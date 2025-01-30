@@ -76,9 +76,10 @@ public class MainFrame extends JFrame
 {
     public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation"; // using Simkit
 
-    JMenuBar newMenuBar = new JMenuBar();
-    
-    java.util.List<JMenuBar> menus = new ArrayList<>();
+    boolean modalMenus = true;
+    JMenuBar mainFrameMenuBar;
+    JMenuBar combinedMenuBar = new JMenuBar();
+    java.util.List<JMenuBar> modalMenuBarList = new ArrayList<>();
     
     MvcAbstractViewFrame eventGraphFrame;
     MvcAbstractViewFrame assemblyFrame;
@@ -149,7 +150,6 @@ public class MainFrame extends JFrame
         
 //        ViskitGlobals.instance().setAssemblyQuitHandler(null);
 //        ViskitGlobals.instance().setEventGraphQuitHandler(null); <- TODO: investigate why these are here
-        JMenuBar menuBar;
         int assemblyPaneIndex;
 
         ChangeListener tabChangeListener = new myTabChangeListener();
@@ -168,14 +168,14 @@ public class MainFrame extends JFrame
             assemblyPaneIndex = topTabbedPane.indexOfComponent(((EventGraphViewFrame) eventGraphFrame).getContent());
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Event Graph Editor");
             topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Visual editor for simulation entity definitions");
-            menuBar = ((EventGraphViewFrame) eventGraphFrame).getMenus();
-            menus.add(menuBar);
-            doCommonHelp(menuBar);
-            jamSettingsHandler(menuBar);
+            mainFrameMenuBar = ((EventGraphViewFrame) eventGraphFrame).getMenus();
+            modalMenuBarList.add(mainFrameMenuBar);
+            doCommonHelp(mainFrameMenuBar);
+            jamSettingsHandler(mainFrameMenuBar);
             // TODO no longer needed?
             // eventGraphFrame.setTitleListener(myTitleListener, assemblyPaneIndex);
-            setJMenuBar(menuBar);
-            jamQuitHandler(((EventGraphViewFrame) eventGraphFrame).getQuitMenuItem(), myQuitAction, menuBar);
+            setJMenuBar(mainFrameMenuBar);
+            jamQuitHandler(((EventGraphViewFrame) eventGraphFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
             tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX] = assemblyPaneIndex;
         } 
         else {
@@ -193,14 +193,14 @@ public class MainFrame extends JFrame
             assemblyPaneIndex = topTabbedPane.indexOfComponent(((AssemblyViewFrame) assemblyFrame).getContent());
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Assembly Editor");
             topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Visual editor for simulation defined by assembly");
-            menuBar = ((AssemblyViewFrame) assemblyFrame).getMenus();
-            menus.add(menuBar);
-            doCommonHelp(menuBar);
-            jamSettingsHandler(menuBar);
+            mainFrameMenuBar = ((AssemblyViewFrame) assemblyFrame).getMenus();
+            modalMenuBarList.add(mainFrameMenuBar);
+            doCommonHelp(mainFrameMenuBar);
+            jamSettingsHandler(mainFrameMenuBar);
             // TODO is this needed?
             // assemblyFrame.setTitleListener(myTitleListener, assemblyPaneIndex);
-            setJMenuBar(menuBar);
-            jamQuitHandler(((AssemblyViewFrame) assemblyFrame).getQuitMenuItem(), myQuitAction, menuBar);
+            setJMenuBar(mainFrameMenuBar);
+            jamQuitHandler(((AssemblyViewFrame) assemblyFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
             tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] = assemblyPaneIndex;
         } 
         else 
@@ -232,9 +232,9 @@ public class MainFrame extends JFrame
         if (SettingsDialog.isAssemblySimulationRunVisible()) {
             topTabbedPane.add(runTabbedPanePanel);
             assemblyPaneIndex = topTabbedPane.indexOfComponent(runTabbedPanePanel);
-            topTabbedPane.setTitleAt(assemblyPaneIndex, "Assembly Simulation Run");
+            topTabbedPane.setTitleAt(assemblyPaneIndex, "Simulation Run");
             topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "First initialize Assembly for Simulation Run from Assembly tab");
-            menus.add(null); // placeholder
+            modalMenuBarList.add(null); // placeholder
             tabIndices[TAB0_SIMULATION_RUN_SUBTABS_INDEX] = assemblyPaneIndex;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
         } 
@@ -252,16 +252,16 @@ public class MainFrame extends JFrame
             assemblyPaneIndex = topTabbedPane.indexOfComponent(reportPanel.getContentPane());
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Analyst Report");
             topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Supports analyst assessment and report generation");
-            menuBar = ((AnalystReportViewFrame) reportPanel).getMenus();
-            menus.add(menuBar);
-            doCommonHelp(menuBar);
-            jamSettingsHandler(menuBar);
+            mainFrameMenuBar = ((AnalystReportViewFrame) reportPanel).getMenus();
+            modalMenuBarList.add(mainFrameMenuBar);
+            doCommonHelp(mainFrameMenuBar);
+            jamSettingsHandler(mainFrameMenuBar);
             if (getJMenuBar() == null) {
-                setJMenuBar(menuBar);
+                setJMenuBar(mainFrameMenuBar);
             }
             // TODO is this needed?
             // reportPanel.setTitleListener(myTitleListener, assemblyPaneIndex);
-            jamQuitHandler(null, myQuitAction, menuBar);
+            jamQuitHandler(null, myQuitAction, mainFrameMenuBar);
             tabIndices[TAB0_ANALYST_REPORT_INDEX] = assemblyPaneIndex;
             AnalystReportController analystReportController = (AnalystReportController) reportPanel.getController();
             analystReportController.setMainTabbedPane(topTabbedPane, assemblyPaneIndex);
@@ -277,15 +277,15 @@ public class MainFrame extends JFrame
         ViskitGlobals.instance().setInternalAssemblySimulationRunner(internalAssemblySimulationRunner);
         
         getSimulationRunTabbedPane().add(ViskitGlobals.instance().getSimulationRunPanel(), TAB1_LOCALRUN_INDEX);
-        getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, "Local Run");
+        getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, "Local Simulation Run");
         getSimulationRunTabbedPane().setToolTipTextAt(TAB1_LOCALRUN_INDEX, "Run replications on local host");
-        menuBar = internalAssemblySimulationRunner.getMenus();
-        menus.add(menuBar);
-        doCommonHelp(menuBar);
-        jamSettingsHandler(menuBar);
+        mainFrameMenuBar = internalAssemblySimulationRunner.getMenus();
+        modalMenuBarList.add(mainFrameMenuBar);
+        doCommonHelp(mainFrameMenuBar);
+        jamSettingsHandler(mainFrameMenuBar);
         // TODO is this needed?
         // internalAssemblySimulationRunner.setTitleListener(myTitleListener, topTabbedAssemblyPane.getTabCount() + TAB1_LOCALRUN_INDEX);
-        jamQuitHandler(internalAssemblySimulationRunner.getQuitMenuItem(), myQuitAction, menuBar);
+        jamQuitHandler(internalAssemblySimulationRunner.getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
         
 // TODO unhide, unify?
         AssemblyControllerImpl assemblyControllerImpl = ((AssemblyControllerImpl) assemblyFrame.getController());
@@ -303,16 +303,16 @@ public class MainFrame extends JFrame
             getSimulationRunTabbedPane().add(doeFrame.getContent(), TAB1_DESIGN_OF_EXPERIMENTS_INDEX);
             getSimulationRunTabbedPane().setTitleAt(TAB1_DESIGN_OF_EXPERIMENTS_INDEX, "Design of Experiments");
             getSimulationRunTabbedPane().setIconAt(TAB1_DESIGN_OF_EXPERIMENTS_INDEX, new ImageIcon(getClass().getClassLoader().getResource("viskit/images/grid.png")));
-            menuBar = doeMain.getMenus();
-            if (menuBar == null) {
-                menuBar = new JMenuBar();
-                menuBar.add(new JMenu("File"));
+            mainFrameMenuBar = doeMain.getMenus();
+            if (mainFrameMenuBar == null) {
+                mainFrameMenuBar = new JMenuBar();
+                mainFrameMenuBar.add(new JMenu("File"));
             }
-            menus.add(menuBar);
-            doCommonHelp(menuBar);
+            modalMenuBarList.add(mainFrameMenuBar);
+            doCommonHelp(mainFrameMenuBar);
             // TODO is this needed?
             // doeFrame.setTitleListener(myTitleListener, topTabbedAssemblyPane.getTabCount() + TAB1_DESIGN_OF_EXPERIMENTS_INDEX);
-            jamQuitHandler(doeMain.getQuitMenuItem(), myQuitAction, menuBar);
+            jamQuitHandler(doeMain.getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
             assemblyControllerImpl.addAssemblyFileListener(doeFrame.getController().getOpenAssemblyListener());
             eventGraphController.addEventGraphFileListener(doeFrame.getController().getOpenEventGraphListener());
         }
@@ -325,11 +325,11 @@ public class MainFrame extends JFrame
             getSimulationRunTabbedPane().add(runGridComponent.getContent(), TAB1_CLUSTERUN_INDEX);
             getSimulationRunTabbedPane().setTitleAt(TAB1_CLUSTERUN_INDEX, "LaunchClusterJob");
             getSimulationRunTabbedPane().setIconAt(TAB1_CLUSTERUN_INDEX, new ImageIcon(getClass().getClassLoader().getResource("viskit/images/grid.png")));
-            menuBar = new JMenuBar();
-            menuBar.add(new JMenu("File"));
-            jamQuitHandler(null, myQuitAction, menuBar);
-            menus.add(menuBar);
-            doCommonHelp(menuBar);
+            mainFrameMenuBar = new JMenuBar();
+            mainFrameMenuBar.add(new JMenu("File"));
+            jamQuitHandler(null, myQuitAction, mainFrameMenuBar);
+            modalMenuBarList.add(mainFrameMenuBar);
+            doCommonHelp(mainFrameMenuBar);
             // TODO is this needed?
             // runGridComponent.setTitleListener(myTitleListener, topTabbedAssemblyPane.getTabCount() + TAB1_CLUSTERUN_INDEX);
             assemblyControllerImpl.addAssemblyFileListener(runGridComponent);
@@ -404,9 +404,13 @@ public class MainFrame extends JFrame
             }
 
             getJMenuBar().remove(helpMenu);
-            JMenuBar newMB = menus.get(i);
-            newMB.add(helpMenu);
-            setJMenuBar(newMB);
+            JMenuBar selectedMenuBar = modalMenuBarList.get(i);
+            selectedMenuBar.add(helpMenu);
+            
+            if  (modalMenus)
+                 setJMenuBar(selectedMenuBar);
+            else setJMenuBar(combinedMenuBar);
+            
             // TODO is this needed?
             // myTitleListener.setTitle(titles[i], i);
         }

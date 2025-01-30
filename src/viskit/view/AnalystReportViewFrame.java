@@ -857,8 +857,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         analystReportModel.setRecommendations(conRecRecsTA.getText());
     }
 
-    private void buildMenus() {
-
+    private void buildMenus()
+    {
         AnalystReportController analystReportController = (AnalystReportController) getController();
 
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();

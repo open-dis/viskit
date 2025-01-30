@@ -80,12 +80,13 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
     static final Logger LOG = LogUtils.getLogger(InternalAssemblySimulationRunner.class);
 
     /** The name of the basicAssembly to run */
-    String assemblyClassName;
-    SimulationRunPanel assemblySimulationRunPanel;
-    ActionListener saveListener;
-    JMenuBar myMenuBar;
-    Thread simulationRunnerThread;
-    BasicAssembly basicAssembly;
+    private String assemblyClassName;
+    private SimulationRunPanel assemblySimulationRunPanel;
+    private ActionListener saveListener;
+    private JMenuBar myMenuBar;
+    private JMenu simulationRunMenu;
+    private Thread simulationRunnerThread;
+    private BasicAssembly basicAssembly;
 
     /** external runner saves a file */
     private String analystReportTempFile = null;
@@ -117,7 +118,7 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         // false will enable all VCR buttons. Currently, only start and stop work
 
         assemblySimulationRunPanel = new SimulationRunPanel(ASSEMBLY_SIMULATION_RUN_PANEL_TITLE, false, analystReportPanelVisible);
-        doMenus();
+        buildMenus();
         assemblySimulationRunPanel.vcrStopButton.addActionListener(assemblySimulationRunStopListener = new StopListener());
         assemblySimulationRunPanel.vcrPlayButton.addActionListener(new StartResumeListener());
         assemblySimulationRunPanel.vcrRewindButton.addActionListener(new RewindListener());
@@ -615,33 +616,35 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
         }
     }
 
-    private void doMenus() {
+    private void buildMenus()
+    {
         myMenuBar = new JMenuBar();
-        JMenu file = new JMenu("File");
-        JMenuItem save = new JMenuItem("Save output streams");
-        JMenu edit = new JMenu("Edit");
-        JMenuItem copy = new JMenuItem("Copy");
-        JMenuItem selAll = new JMenuItem("Select all");
-        JMenuItem clrAll = new JMenuItem("Clear all");
-        JMenuItem view = new JMenuItem("View output in text editor");
+//      JMenu fileMenu = new JMenu("File");
+        simulationRunMenu = new JMenu("Simulation Run");
+        JMenuItem saveMI = new JMenuItem("Save output streams");
+        JMenuItem copyMI = new JMenuItem("Copy");
+        JMenuItem selectAllMI = new JMenuItem("Select all");
+        JMenuItem clearAllMI = new JMenuItem("Clear all");
+        JMenuItem viewMI = new JMenuItem("View output in text editor");
 
-        save.addActionListener(saveListener);
-        copy.addActionListener(new CopyListener());
-        selAll.addActionListener(new SelectAllListener());
-        clrAll.addActionListener(new ClearListener());
-        view.addActionListener(new ViewListener());
+        saveMI.addActionListener(saveListener);
+        copyMI.addActionListener(new CopyListener());
+        selectAllMI.addActionListener(new SelectAllListener());
+        clearAllMI.addActionListener(new ClearListener());
+        viewMI.addActionListener(new ViewListener());
 
-        file.add(save);
-        file.add(view);
+        getSimulationRunMenu().add(saveMI);
+        getSimulationRunMenu().add(viewMI);
 
-        file.addSeparator();
-        file.add(new JMenuItem("Viskit Settings"));
+        getSimulationRunMenu().addSeparator();
+        getSimulationRunMenu().add(new JMenuItem("Viskit Settings"));
+        myMenuBar.add(getSimulationRunMenu());
 
-        edit.add(copy);
-        edit.add(selAll);
-        edit.add(clrAll);
-        myMenuBar.add(file);
-        myMenuBar.add(edit);
+//        JMenu editMenu = new JMenu("Edit");
+//        editMenu.add(copyMI);
+//        editMenu.add(selectAllMI);
+//        editMenu.add(clearAllMI);
+//        myMenuBar.add(editMenu);
     }
 
     class CopyListener implements ActionListener {
@@ -758,6 +761,13 @@ public class InternalAssemblySimulationRunner implements PropertyChangeListener 
             // reset display string in preparation for the next replication output
             nowRunningsString.delete(beginLength, nowRunningsString.length());
         }
+    }
+
+    /**
+     * @return the simulationRunMenu
+     */
+    public JMenu getSimulationRunMenu() {
+        return simulationRunMenu;
     }
 
 }  // end class file InternalAssemblySimulationRunner.java
