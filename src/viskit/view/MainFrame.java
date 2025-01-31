@@ -419,9 +419,13 @@ public class MainFrame extends JFrame
                 topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATION_RUN_SUBTABS_INDEX], "First initialize Assembly for Simulation Run from Assembly tab");
             }
 
-            getJMenuBar().remove(helpMenu);
-            JMenuBar selectedMenuBar = modalMenuBarList.get(i);
-            selectedMenuBar.add(helpMenu);
+            JMenuBar selectedMenuBar = new JMenuBar();
+            if (helpMenu != null)
+            {
+                getJMenuBar().remove(helpMenu);
+//                selectedMenuBar = modalMenuBarList.get(i);
+                selectedMenuBar.add(helpMenu);
+            }
             
             // TODO rename menu methods consistently
             combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getProjectMenu());

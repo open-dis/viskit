@@ -481,7 +481,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void editGraphMetaData() {
+    public void editGraphMetadata() {
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null) {return;}
         GraphMetadata graphMetadata = assemblyModel.getMetadata();

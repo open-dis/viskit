@@ -45,6 +45,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.text.DateFormat;
@@ -873,24 +874,24 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
                 "generateHtmlReport",
                 "HTML analyst report display",
                 KeyEvent.VK_H,
-                KeyStroke.getKeyStroke(KeyEvent.VK_H, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "openAnalystReportXML",
                 "Open another analyst report XML",
                 KeyEvent.VK_O,
-                KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "saveAnalystReportXML",
                 "Save analyst report XML",
                 KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController, 
                 "viewXML", 
-                "XML View of Saved Analyst Report", 
-                KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
+                "XML View of Saved Analyst Report",
+                KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         myMenuBar.add(getAnalystReportMenu());
     }

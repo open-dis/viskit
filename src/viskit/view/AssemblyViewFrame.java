@@ -177,8 +177,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     public AssemblyViewFrame(MvcController controller) {
         super(FRAME_DEFAULT_TITLE);
-        initMVC(controller);   // set up mvc linkages
-        initUI();   // build widgets
+        initializeMVC(controller);   // set up mvc linkages
+        initializeUserInterface(); // build widgets
     }
 
     public JComponent getContent() {
@@ -195,16 +195,17 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     /**
      * Initialize the MVC connections
-     * @param ctrl the controller for this view
+     * @param mvcController the controller for this view
      */
-    private void initMVC(MvcController ctrl) {
-        setController(ctrl);
+    private void initializeMVC(MvcController mvcController)
+    {
+        setController(mvcController);
     }
 
     /**
      * Initialize the user interface
      */
-    private void initUI()
+    private void initializeUserInterface()
     {
         buildEditMenu(); // must be first
         buildMenus();
@@ -433,8 +434,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
-        editMenu.add(buildMenuItem(assemblyController, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
+        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties...", KeyEvent.VK_E,
+                KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
         }
     }
 
@@ -490,14 +491,14 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         {
         assemblyMenu.addSeparator();
         assemblyMenu.add(editMenu);
-        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_P,
+        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.addSeparator();
         }
 
-        assemblyMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate Java Source of Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
+        assemblyMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Java Source Generation for Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "captureWindow", "Save Assembly Screen Image", KeyEvent.VK_I,
+        assemblyMenu.add(buildMenuItem(assemblyController, "captureWindow", "Image Save Assembly Diagram", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly for Simulation Run", KeyEvent.VK_R,
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK)));
@@ -534,11 +535,11 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         projectMenu = new JMenu("Project");
         projectMenu.setMnemonic(KeyEvent.VK_P);
 
-        projectMenu.add(buildMenuItem(assemblyController, "newProject", "New Viskit Project", KeyEvent.VK_V,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
+        projectMenu.add(buildMenuItem(assemblyController, "newProject", "New Viskit Project", KeyEvent.VK_N,
+                null));
         
-        projectMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
+        projectMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_O,
+                null));
         projectMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
 
         // The AssemblyViewFrame will get this listener for its menu item of the same name
@@ -547,7 +548,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         
         projectMenu.add(buildMenuItem(assemblyController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
         projectMenu.addSeparator();
 
         projectMenu.add(buildMenuItem(assemblyController, "settings", "Viskit Settings", null, null));

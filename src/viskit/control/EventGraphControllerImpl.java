@@ -1043,7 +1043,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void editGraphMetaData() {
+    public void editGraphMetadata() {
         Model mod = (Model) getModel();
         if (mod == null) {return;}
         GraphMetadata gmd = mod.getMetadata();
