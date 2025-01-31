@@ -154,7 +154,7 @@ public class MainFrame extends JFrame
         int assemblyPaneIndex;
 
         ChangeListener tabChangeListener = new myTabChangeListener();
-        myQuitAction = new ExitAction("Exit");
+        myQuitAction = new QuitAction("Quit");
 
         topTabbedPane = new JTabbedPane();
 
@@ -294,9 +294,14 @@ public class MainFrame extends JFrame
         modalMenuBarList.add(mainFrameMenuBar);
         doCommonHelp(mainFrameMenuBar);
         jamSettingsHandler(mainFrameMenuBar);
+        
         // TODO is this needed?
         // internalSimulationRunner.setTitleListener(myTitleListener, topTabbedAssemblyPane.getTabCount() + TAB1_LOCALRUN_INDEX);
+        
+        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        {
         jamQuitHandler(internalSimulationRunner.getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
+        }
         
 // TODO unhide, unify?
         AssemblyControllerImpl assemblyControllerImpl = ((AssemblyControllerImpl) assemblyFrame.getController());
@@ -503,9 +508,9 @@ public class MainFrame extends JFrame
         mi.setAction(qa);
     }
 
-    class ExitAction extends AbstractAction {
+    class QuitAction extends AbstractAction {
 
-        public ExitAction(String s) {
+        public QuitAction(String s) {
             super(s);
         }
 
@@ -581,7 +586,7 @@ public class MainFrame extends JFrame
                 // Q: What is setting this true when it's false?
                 // A: The Viskit Setting Dialog, third tab
                 if (viskit.ViskitStatics.debug) {
-                    LogUtils.getLogger(ExitAction.class).info("in actionPerformed");
+                    LogUtils.getLogger(QuitAction.class).info("in actionPerformed");
                 }
 
                 // Remember the size of this main frame set by the user
