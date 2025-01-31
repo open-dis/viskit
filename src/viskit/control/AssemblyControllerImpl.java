@@ -68,9 +68,9 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
-import viskit.assembly.SimulationRunPlugInterface;
 import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
 import viskit.view.SimulationRunPanel;
+import viskit.assembly.SimulationRunInterface;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -92,7 +92,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private String initialAssemblyFile;
 
     /** The handler to run an assembly */
-    private SimulationRunPlugInterface runner;
+    private SimulationRunInterface runner;
 
     /** Creates a new instance of AssemblyController */
     public AssemblyControllerImpl() {
@@ -1716,7 +1716,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     save();
         
                     String assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetadata().name;
-                    String  consoleName = InternalSimulationRunner.ASSEMBLY_SIMULATION_RUN_PANEL_TITLE;
+                    String  consoleName = TextAreaOutputStream.ASSEMBLY_SIMULATION_RUN_PANEL_TITLE;
                     if (!assemblyName.isBlank() && assemblyName.toLowerCase().contains("assembly"))
                          consoleName += " for " + assemblyName;
                     else if (!assemblyName.isBlank())
@@ -1875,11 +1875,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
     }
 
-    /** Override the default SimulationRunPlugInterface
+    /** Override the default SimulationRunInterface
      *
-     * @param plug the SimulationRunPlugInterface to set
+     * @param plug the SimulationRunInterface to set
      */
-    public void setAssemblyRunner(SimulationRunPlugInterface plug) {
+    public void setAssemblyRunner(SimulationRunInterface plug) {
         runner = plug;
     }
 

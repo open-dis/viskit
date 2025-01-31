@@ -60,7 +60,6 @@ import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.assembly.BasicAssembly;
-import viskit.assembly.JTextAreaOutputStream;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
 
@@ -75,9 +74,9 @@ import viskit.model.AssemblyModelImpl;
  * @since 3:43:51 PM
  * @version $Id$
  */
-public class InternalSimulationRunner implements PropertyChangeListener 
+public class TextAreaOutputStream implements PropertyChangeListener 
 {
-    static final Logger LOG = LogUtils.getLogger(InternalSimulationRunner.class);
+    static final Logger LOG = LogUtils.getLogger(TextAreaOutputStream.class);
 
     /** The name of the basicAssembly to run */
     private String assemblyClassName;
@@ -109,7 +108,7 @@ public class InternalSimulationRunner implements PropertyChangeListener
      * The internal logic for the Assembly Runner panel
      * @param analystReportPanelVisible if true, the analyst report panel will be visible
      */
-    public InternalSimulationRunner(boolean analystReportPanelVisible) 
+    public TextAreaOutputStream(boolean analystReportPanelVisible) 
     {
         saveListener = new SaveListener();
 
@@ -216,7 +215,7 @@ public class InternalSimulationRunner implements PropertyChangeListener
         setStopTimeMethod.invoke(assemblyInstance, stopTime);
         simulationRunPanel.vcrStopTimeTF.setText("" + getStopTimeMethod.invoke(assemblyInstance));
     }
-    JTextAreaOutputStream textAreaOutputStream;
+    viskit.assembly.TextAreaOutputStream textAreaOutputStream;
     Runnable assemblyRunnable;
 
     protected void initializeAssemblySimulationRun() {
@@ -279,7 +278,7 @@ public class InternalSimulationRunner implements PropertyChangeListener
             }
             // *** End RNG seed state reset ***
 
-            textAreaOutputStream = new JTextAreaOutputStream(simulationRunPanel.outputStreamTA, 16*1024);
+            textAreaOutputStream = new viskit.assembly.TextAreaOutputStream(simulationRunPanel.outputStreamTA, 16*1024);
 
             setOutputStreamMethod.invoke(assemblyInstance, textAreaOutputStream);
             setNumberReplicationsMethod.invoke(assemblyInstance, Integer.valueOf(simulationRunPanel.numberReplicationsTF.getText().trim()));
@@ -774,4 +773,4 @@ public class InternalSimulationRunner implements PropertyChangeListener
         return simulationRunMenu;
     }
 
-}  // end class file InternalSimulationRunner.java
+}  // end class file TextAreaOutputStream.java

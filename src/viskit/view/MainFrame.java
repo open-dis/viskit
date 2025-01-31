@@ -50,7 +50,7 @@ import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.AssemblyController;
 import viskit.control.EventGraphController;
-import viskit.control.InternalSimulationRunner;
+import viskit.control.TextAreaOutputStream;
 import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.DoeMain;
 import viskit.doe.DoeMainFrame;
@@ -61,7 +61,7 @@ import viskit.util.OpenAssembly;
 import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcModel;
 import edu.nps.util.SystemExitHandler;
-import viskit.assembly.SimulationRunPlugInterface;
+import viskit.assembly.SimulationRunInterface;
 
 /**
  * MOVES Institute
@@ -85,7 +85,7 @@ public class MainFrame extends JFrame
     MvcAbstractViewFrame eventGraphFrame;
     MvcAbstractViewFrame assemblyFrame;
     MvcAbstractViewFrame reportPanel;
-    InternalSimulationRunner internalSimulationRunner;
+    TextAreaOutputStream internalSimulationRunner;
     JobLauncherTab2 runGridComponent;
 
     private Action myQuitAction;
@@ -284,7 +284,7 @@ public class MainFrame extends JFrame
         }
 
         // Assembly Simulation Run
-        internalSimulationRunner = new InternalSimulationRunner(analystReportPanelVisible);
+        internalSimulationRunner = new TextAreaOutputStream(analystReportPanelVisible);
         ViskitGlobals.instance().setInternalSimulationRunner(internalSimulationRunner);
         
         getSimulationRunTabbedPane().add(ViskitGlobals.instance().getSimulationRunPanel(), TAB1_LOCALRUN_INDEX);
@@ -620,7 +620,7 @@ public class MainFrame extends JFrame
     /** Prepares the Assembly with a fresh class loader free of static artifacts for
      * a completely independent run
      */
-    class SimulationRunPlug implements SimulationRunPlugInterface {
+    class SimulationRunPlug implements SimulationRunInterface {
 
         @Override
         public void exec(String[] execStrings) {
@@ -652,7 +652,7 @@ public class MainFrame extends JFrame
             simulationRunPanel.printReplicationReportsCB.setSelected(false);
             simulationRunPanel.printSummaryReportsCB.setSelected(false);
 
-            internalSimulationRunner.vcrButtonPressDisplayUpdate(InternalSimulationRunner.Event.OFF); // initialize
+            internalSimulationRunner.vcrButtonPressDisplayUpdate(TextAreaOutputStream.Event.OFF); // initialize
             internalSimulationRunner.doTitle(null);
             
             simulationRunPanel.nowRunningLabel.setText("");

@@ -3,9 +3,9 @@ package viskit.assembly;
 /**
  * Internal access for the Assembly Runner
  * 
- * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.assembly.SimulationRunPlugInterface">Terry Norbraten, NPS MOVES</a>
+ * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.assembly.SimulationRunInterface">Terry Norbraten, NPS MOVES</a>
  */
-public interface SimulationRunPlugInterface {
+public interface SimulationRunInterface {
 
     /**
      * Provide execution arguments for running an assembly
@@ -16,4 +16,4 @@ public interface SimulationRunPlugInterface {
     /** Resets the runner upon project change */
     void resetSimulationRunPanel();
 
-} // end class file SimulationRunPlugInterface.java
+} // end class file SimulationRunInterface.java

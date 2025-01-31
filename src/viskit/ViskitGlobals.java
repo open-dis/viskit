@@ -79,7 +79,7 @@ import viskit.view.ViskitStartupProjectInitializationPanel;
 import viskit.view.dialog.SettingsDialog;
 import viskit.mvc.MvcController;
 import edu.nps.util.SystemExitHandler;
-import viskit.control.InternalSimulationRunner;
+import viskit.control.TextAreaOutputStream;
 import viskit.view.MainFrame;
 
 /**
@@ -108,7 +108,7 @@ public class ViskitGlobals {
     /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
     private SimulationRunPanel simulationRunPanel;
     
-    private InternalSimulationRunner internalSimulationRunner;
+    private TextAreaOutputStream internalSimulationRunner;
 
     /** Flag to denote called systemExit only once */
     private boolean systemExitCalled = false;
@@ -1097,14 +1097,14 @@ public class ViskitGlobals {
     /**
      * @return the internalSimulationRunner
      */
-    public InternalSimulationRunner getInternalSimulationRunner() {
+    public TextAreaOutputStream getInternalSimulationRunner() {
         return internalSimulationRunner;
     }
 
     /**
      * @param internalSimulationRunner the internalSimulationRunner to set
      */
-    public void setInternalSimulationRunner(InternalSimulationRunner internalSimulationRunner) {
+    public void setInternalSimulationRunner(TextAreaOutputStream internalSimulationRunner) {
         this.internalSimulationRunner = internalSimulationRunner;
     }
 

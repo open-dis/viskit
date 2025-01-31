@@ -45,31 +45,31 @@ import javax.swing.Timer;
 import org.apache.logging.log4j.Logger;
 
 /**
- * JTextAreaOutputStream.java
- * Created on Aug 18, 2008
- *
- * A class to stream text to a jTextArea
- *
- * MOVES Institute
- * Naval Postgraduate School, Monterey, CA, USA
- * www.nps.edu
+ * TextAreaOutputStream.java
+ Created on Aug 18, 2008
+
+ A class to stream text to a jTextArea
+
+ MOVES Institute
+ Naval Postgraduate School, Monterey, CA, USA
+ www.nps.edu
  *
  * @author mike
  * @version $Id$
  */
-public class JTextAreaOutputStream extends ByteArrayOutputStream implements ActionListener
+public class TextAreaOutputStream extends ByteArrayOutputStream implements ActionListener
 {
   public static final int OUTPUTLIMIT = 1024 * 1024 * 8; // 8Mb
   public static final int BACKOFFSIZE = 1024 * 16;       // 16Kb, must be less than OUTPUTLIMIT
   
-  private static final Logger LOG = LogUtils.getLogger(JTextAreaOutputStream.class);
+  private static final Logger LOG = LogUtils.getLogger(TextAreaOutputStream.class);
   
   private final JTextArea jTextArea;
   private final Timer swingTimer;
   private final int delay = 125; //250;   // Performance adjuster for slow machines
   private final String warningMsg = "Output limit exceeded / previous text deleted.\n" +
                                     "----------------------------------------------\n";
-  public JTextAreaOutputStream(JTextArea textArea, int buffSize)
+  public TextAreaOutputStream(JTextArea textArea, int buffSize)
   {
     super(buffSize);
     jTextArea = textArea;
