@@ -448,9 +448,48 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
         // Set up file menu
-//      JMenu projectMenu = new JMenu("File");
         assemblyMenu = new JMenu("Assembly"); // Editor
         assemblyMenu.setMnemonic(KeyEvent.VK_A);
+
+        // Set up edit submenu
+        JMenu editSubMenu = new JMenu("Edit Assembly");
+        if (!ViskitGlobals.instance().getMainFrame().hasModalMenus()) // combined menu integration
+        {
+        ActionIntrospector.getAction(assemblyController, "undo").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "redo").setEnabled(false);
+        
+        // These start off being disabled, until something is selected
+        ActionIntrospector.getAction(assemblyController, "cut").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "remove").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "copy").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, "paste").setEnabled(false);
+
+        editSubMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
+        editSubMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_Y,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.ALT_DOWN_MASK)));
+        editSubMenu.addSeparator();
+
+        // the next four are disabled until something is selected
+        editSubMenu.add(buildMenuItem(assemblyController, "cut", "Cut", KeyEvent.VK_X,
+                KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK)));
+        editSubMenu.getItem(editSubMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
+        editSubMenu.add(buildMenuItem(assemblyController, "copy", "Copy", KeyEvent.VK_C,
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
+        editSubMenu.add(buildMenuItem(assemblyController, "paste", "Paste Events", KeyEvent.VK_V,
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
+        editSubMenu.add(buildMenuItem(assemblyController, "remove", "Delete", KeyEvent.VK_DELETE,
+                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK)));
+        editSubMenu.addSeparator();
+
+        editSubMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_G, null));
+        editSubMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
+        
+        assemblyMenu.add(editSubMenu);
+        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties...", KeyEvent.VK_E,
+                KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
+        assemblyMenu.addSeparator();
+        }
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
@@ -461,8 +500,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
         
-        assemblyMenu.add(buildMenuItem(assemblyController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
+        assemblyMenu.add(buildMenuItem(assemblyController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z, null));
         assemblyMenu.addSeparator();
         } // end hasModalMenus
         
@@ -486,15 +524,6 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.add(buildMenuItem(assemblyController, "save", "Save Assembly", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_A, null));
-
-        if (!ViskitGlobals.instance().getMainFrame().hasModalMenus()) // combined menu integration
-        {
-        assemblyMenu.addSeparator();
-        assemblyMenu.add(editMenu);
-        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties...", KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
-        assemblyMenu.addSeparator();
-        }
 
         assemblyMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Java Source Generation for Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK)));
@@ -548,14 +577,14 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         
         projectMenu.add(buildMenuItem(assemblyController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
+                null));
         projectMenu.addSeparator();
 
         projectMenu.add(buildMenuItem(assemblyController, "settings", "Viskit Settings", null, null));
         projectMenu.addSeparator();
 
         projectMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Quit", KeyEvent.VK_Q,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
+                null));
     }
     
     public void buildHelpMenu()
