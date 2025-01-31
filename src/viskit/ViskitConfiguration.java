@@ -96,9 +96,11 @@ public class ViskitConfiguration {
     private final Map<String, String> sessionHM;
     private CombinedConfiguration combinedConfiguration;
     private XMLConfiguration projectXMLConfiguration = null;
+    
+    public static final String VISKIT_WELCOME_MESSAGE = "Welcome to Visual Simkit (Viskit) Discrete Event Simulation (DES) Authoring Tool";
 
     static {
-        LOG.info("Welcome to Visual Simkit (Viskit) Discrete Event Simulation (DES) toolkit");
+        LOG.info(VISKIT_WELCOME_MESSAGE);
         LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
     }
 

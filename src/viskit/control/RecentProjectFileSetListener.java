@@ -78,9 +78,9 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
 
         for (JMenu menu : openRecentProjectMenus)
         {
-            if  (menu != null)
-                 menu.removeAll();
-            else menu = new JMenu(); // TODO why did this happen?
+            if  (menu == null)
+                 menu = new JMenu(); // TODO why did this happen?
+            menu.removeAll();
         }
 
         String nameOnly;
@@ -93,26 +93,30 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
                 continue;
             }
 
-            for (JMenu m : openRecentProjectMenus)
+            for (JMenu menu : openRecentProjectMenus)
             {
+                if  (menu == null)
+                     menu = new JMenu(); // TODO why did this happen?
                 nameOnly = f.getName();
                 act = new ParameterizedProjAction(nameOnly);
                 act.putValue(ViskitStatics.FULL_PATH, fullPath);
                 mi = new JMenuItem(act);
                 mi.setToolTipText(fullPath);
-                m.add(mi);
+                menu.add(mi);
             }
         }
         if (!recentProjectFileSet.isEmpty()) {
 
-            for (JMenu m : openRecentProjectMenus) 
+            for (JMenu menu : openRecentProjectMenus) 
             {
-                m.add(new JSeparator());
+                if  (menu == null)
+                     menu = new JMenu(); // TODO why did this happen?
+                menu.add(new JSeparator());
                 act = new ParameterizedProjAction("clear history");
                 act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
                 mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
-                m.add(mi);
+                menu.add(mi);
             }
         }
     }
