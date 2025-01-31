@@ -741,10 +741,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void quit() {
+    public void quit() 
+    {
         if (preQuit()) {
             postQuit();
         }
+        System.exit(0);
     }
 
     @Override
