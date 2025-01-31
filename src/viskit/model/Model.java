@@ -19,7 +19,7 @@ public interface Model {
     /**
      * Separate initialization from object construction.
      */
-    void init();
+    void initialize();
 
     /**
      * Messaged by controller when a new Model should be created, or an existing

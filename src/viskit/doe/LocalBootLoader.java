@@ -110,7 +110,7 @@ public class LocalBootLoader extends URLClassLoader {
     }
 
     /** Create a context with viskit's libs along with the generated
-     * eventgraphs, takes two stages the returned LocalBootLoader can be used as
+     * event graphs, takes two stages the returned LocalBootLoader can be used as
      * an isolated context, i.e., where static methods and variables from one
      * class don't interfere with one another or between LocalBootLoaders, here
      * by setting threads' contextClassLoaders to their own LocalBootLoaders.
@@ -118,18 +118,20 @@ public class LocalBootLoader extends URLClassLoader {
      * @param allowAssembly
      * @return an isolated Context Class Loader instance
      */
-    public LocalBootLoader init(boolean allowAssembly) {
+    public LocalBootLoader initialize(boolean allowAssembly)
+    {
         this.allowAssembly = allowAssembly;
-        return init();
+        return LocalBootLoader.this.initialize();
     }
 
     /** @return a custom ClassLoader */
-    public LocalBootLoader init() {
+    public LocalBootLoader initialize() 
+    {
         File jar = null, tempUrl;
         String[] tempClasspath;
 
         // Capture the current runtime classpath
-        initStage1();
+        initializeStage1();
 
         stage1.allowAssembly = this.allowAssembly;
 
@@ -163,11 +165,11 @@ public class LocalBootLoader extends URLClassLoader {
         // Now add our project's working directory, i.e. build/classes
         try {
 
-            stage1.addURL(getWorkDir().toURI().toURL());
+            stage1.addURL(getWorkDirectory().toURI().toURL());
             tempClasspath = new String[getClassPath().length + 1];
             System.arraycopy(getClassPath(), 0, tempClasspath, 0, classPath.length);
             try {
-                tempClasspath[tempClasspath.length - 1] = getWorkDir().getCanonicalPath();
+                tempClasspath[tempClasspath.length - 1] = getWorkDirectory().getCanonicalPath();
                 classPath = tempClasspath;
             } catch (IOException ex) {
                 LOG.error(ex);
@@ -245,7 +247,7 @@ public class LocalBootLoader extends URLClassLoader {
     }
 
     /** @return the working class directory for this project */
-    public File getWorkDir() {
+    public File getWorkDirectory() {
         return workDir;
     }
 
@@ -255,7 +257,7 @@ public class LocalBootLoader extends URLClassLoader {
     }
 
     /** @param enable if true allows Assembly inclusion in temp jars */
-    public void setAllowAssemby(boolean enable) {
+    public void setAllowAssembly(boolean enable) {
         this.allowAssembly = enable;
     }
 
@@ -265,7 +267,7 @@ public class LocalBootLoader extends URLClassLoader {
     }
 
     /** Creates new instances of the stage1 LocalBootLoader */
-    private void initStage1() {
+    private void initializeStage1() {
 
         String classPathProp = System.getProperty("java.class.path");
         classPathProp = classPathProp.replaceAll("\\\\", "/");
@@ -299,7 +301,7 @@ public class LocalBootLoader extends URLClassLoader {
 
         ClassLoader parentClassLoader = getParent();
 
-        stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDir());
+        stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
         boolean loop = !allowAssembly;
 
         // if each LocalBootLoader individually has to read from
@@ -316,7 +318,7 @@ public class LocalBootLoader extends URLClassLoader {
                 }
                 //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
-                stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDir());
+                stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
             } catch (ClassNotFoundException e) {
                 loop = false;
             }
@@ -341,15 +343,15 @@ public class LocalBootLoader extends URLClassLoader {
         try {
 
             // Don't jar up an empty build/classes directory
-            if (getWorkDir().listFiles().length == 0) {return null;}
+            if (getWorkDirectory().listFiles().length == 0) {return null;}
 
             // this potentially "dirties" this instance of stage1
             // meaning it could have Assembly classes in it
-            stage1.addURL(getWorkDir().toURI().toURL());
+            stage1.addURL(getWorkDirectory().toURI().toURL());
 
             // make a clean version of the file in jar form
             // to be added to a newer stage1 (rebooted) instance.
-            newJar = makeJarFileFromDir(getWorkDir());
+            newJar = makeJarFileFromDirectory(getWorkDirectory());
 
         } catch (MalformedURLException ex) {
             LOG.error(ex);
@@ -358,7 +360,7 @@ public class LocalBootLoader extends URLClassLoader {
         return newJar;
     }
 
-    private File makeJarFileFromDir(File dir2jar) {
+    private File makeJarFileFromDirectory(File dir2jar) {
         File jarOut = dir2jar;
         JarOutputStream jos = null;
         try {
@@ -366,7 +368,7 @@ public class LocalBootLoader extends URLClassLoader {
             OutputStream fos = new FileOutputStream(jarOut);
             jos = new JarOutputStream(fos);
             if (dir2jar.isDirectory())
-                makeJarFileFromDir(dir2jar, dir2jar, jos);
+                makeJarFileFromDirectory(dir2jar, dir2jar, jos);
 
             jos.flush();
         } catch (java.util.zip.ZipException ze) {
@@ -384,7 +386,7 @@ public class LocalBootLoader extends URLClassLoader {
         return jarOut;
     }
 
-    private void makeJarFileFromDir(File baseDir, File newDir, JarOutputStream jos) {
+    private void makeJarFileFromDirectory(File baseDir, File newDir, JarOutputStream jos) {
         File[] dirList = newDir.listFiles();
         InputStream fis = null;
         JarEntry je;
@@ -397,7 +399,7 @@ public class LocalBootLoader extends URLClassLoader {
 
             // Recurse until we get to .class files
             if (file.isDirectory()) {
-                makeJarFileFromDir(baseDir, file, jos);
+                makeJarFileFromDirectory(baseDir, file, jos);
             } else {
 
                 entryName = file.getParentFile().getName() + "/" + file.getName();

@@ -82,7 +82,7 @@ public class LocalTaskQueue extends ArrayList<Object> {
                 File workDir = (File) getWorkDir.invoke(parent);
                 // really doesn't matter which ClassLoader gets passed to LBL, that's the whole point, it "boots" up from the bottom
                 LocalBootLoader loader = new LocalBootLoader(extUrls, (ClassLoader) parent, workDir);
-                loader = loader.init();
+                loader = loader.initialize();
                 Thread.currentThread().setContextClassLoader(loader); // this line is not kidding around!
                 Object task;
                 Class<?> gridletz;

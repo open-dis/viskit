@@ -841,7 +841,7 @@ public class ViskitGlobals {
                     getWorkDirectory());
 
             // Allow Assembly files in the ClassLoader
-            workLoader = loader.init(true);
+            workLoader = loader.initialize(true);
 
             Thread.currentThread().setContextClassLoader(workLoader);
         }
@@ -876,7 +876,7 @@ public class ViskitGlobals {
                 getWorkDirectory());
 
             // Allow Assembly files in the ClassLoader
-            freshLoader = loader.init(true);
+            freshLoader = loader.initialize(true);
 
             // Set a fresh ClassLoader for this thread to be free of any static
             // state set from the Viskit working ClassLoader

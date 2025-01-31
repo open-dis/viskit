@@ -37,34 +37,36 @@ import viskit.mvc.MvcController;
 public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel {
 
     private static JAXBContext jaxbContext;
-    private ObjectFactory oFactory;
+    private ObjectFactory objectFactory;
     private SimkitAssembly jaxbRoot;
     private File currentFile;
     private String title = new String();
     private boolean modelDirty = false;
-    private GraphMetadata metaData;
+    private GraphMetadata graphMetadata;
 
     /** We require specific order on this Map's contents */
     private final Map<String, AssemblyNode> nodeCache;
-    private final String schemaLoc = XMLValidationTool.ASSEMBLY_SCHEMA;
+    private final String schemaLocation = XMLValidationTool.ASSEMBLY_SCHEMA;
     private Point2D.Double pointLess;
-    private final AssemblyControllerImpl controller;
+    private final AssemblyControllerImpl assemblyController;
 
     public AssemblyModelImpl(MvcController cont) {
         pointLess = new Point2D.Double(30, 60);
-        controller = (AssemblyControllerImpl) cont;
-        metaData = new GraphMetadata(this);
+        assemblyController = (AssemblyControllerImpl) cont;
+        graphMetadata = new GraphMetadata(this);
         nodeCache = new LinkedHashMap<>();
     }
 
-    public void init() {
+    public void initialize() 
+    {
         try {
             if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
                 jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-            oFactory = new ObjectFactory();
-            jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
-        } catch (JAXBException e) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            objectFactory = new ObjectFactory();
+            jaxbRoot = objectFactory.createSimkitAssembly(); // to start with empty graph
+        } 
+        catch (JAXBException e) {
+            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML Error",
                     "Exception on JAXBContext instantiation" +
                     "\n" + e.getMessage()
@@ -89,24 +91,25 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     @Override
     public GraphMetadata getMetadata() {
-        return metaData;
+        return graphMetadata;
     }
 
     @Override
     public void changeMetaData(GraphMetadata gmd) {
-        metaData = gmd;
+        graphMetadata = gmd;
         setDirty(true);
     }
 
     @Override
-    public boolean newModel(File f) 
+    public boolean newModel(File newModelFile) // Assembly
     {
         getNodeCache().clear();
         pointLess = new Point2D.Double(30, 60);
         this.notifyChanged(new ModelEvent(this, ModelEvent.NEWASSEMBLYMODEL, "New empty assembly model"));
 
-        if (f == null) {
-            jaxbRoot = oFactory.createSimkitAssembly(); // to start with empty graph
+        if (newModelFile == null)
+        {
+            jaxbRoot = objectFactory.createSimkitAssembly(); // to start with empty graph
         } 
         else 
         {
@@ -115,13 +118,14 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
                 // Check for inadvertant opening of an Event Graph, tough to do, yet possible (bugfix 1248)
                 try {
-                    jaxbRoot = (SimkitAssembly) u.unmarshal(f);
-                } catch (ClassCastException cce) {
+                    jaxbRoot = (SimkitAssembly) u.unmarshal(newModelFile);
+                } 
+                catch (ClassCastException cce) {
                     // If we get here, they've tried to load an event graph.
-                    controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                    assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                             "This is an Event Graph",
                             "Use the Event Graph Editor to" +
-                            "\n" + "work with this file: " + f.getName()
+                            "\n" + "work with this file: " + newModelFile.getName()
                             );
                     return false;
                 }
@@ -149,10 +153,10 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             } 
             catch (JAXBException e) 
             {
-                controller.messageUser(JOptionPane.ERROR_MESSAGE,
+                assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                         "XML I/O Error",
                         "Exception on JAXB unmarshalling of" +
-                            "\n" + f.getName() +
+                            "\n" + newModelFile.getName() +
                             "\n" + e.getMessage() +
                             "\nin AssemblyModel.newModel(File)"
                             );
@@ -160,10 +164,14 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 return false;
             }
         }
-        currentFile = f;
-        title = currentFile.getName();
-        if (title.contains(".xml"))
-            title = title.substring(0,title.indexOf(".xml"));
+        currentFile = newModelFile;
+        if (currentFile != null)
+        {
+             title = currentFile.getName();
+             if (title.contains(".xml"))
+                 title = title.substring(0,title.indexOf(".xml"));
+        }
+        else title = "UnsavedAssemblyFile";
         
         setDirty(false);
         return true;
@@ -183,7 +191,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         try {
             tmpF = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
         } catch (IOException e) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "I/O Error",
                     "Exception creating temporary file, AssemblyModel.saveModel():" +
                     "\n" + e.getMessage()
@@ -195,24 +203,24 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             fw = new FileWriter(tmpF);
             Marshaller m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLoc);
+            m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbRoot.setName(nIe(metaData.name));
-            jaxbRoot.setVersion(nIe(metaData.version));
-            jaxbRoot.setPackage(nIe(metaData.packageName));
+            jaxbRoot.setName(nIe(graphMetadata.name));
+            jaxbRoot.setVersion(nIe(graphMetadata.version));
+            jaxbRoot.setPackage(nIe(graphMetadata.packageName));
 
             if (jaxbRoot.getSchedule() == null) {
-                jaxbRoot.setSchedule(oFactory.createSchedule());
+                jaxbRoot.setSchedule(objectFactory.createSchedule());
             }
-            if (!metaData.stopTime.equals("")) {
-                jaxbRoot.getSchedule().setStopTime(metaData.stopTime);
+            if (!graphMetadata.stopTime.equals("")) {
+                jaxbRoot.getSchedule().setStopTime(graphMetadata.stopTime);
             } else {
                 jaxbRoot.getSchedule().setStopTime("100.0");
             }
 
             // Schedule needs this value to properly sync with Enable Analyst Reports
             jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(ViskitGlobals.instance().getSimulationRunPanel().analystReportCB.isSelected()));
-            jaxbRoot.getSchedule().setVerbose("" + metaData.verbose);
+            jaxbRoot.getSchedule().setVerbose("" + graphMetadata.verbose);
 
             m.marshal(jaxbRoot, fw);
 
@@ -222,7 +230,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             modelDirty = false;
             currentFile = f;
         } catch (JAXBException e) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML I/O Error",
                     "Exception on JAXB marshalling" +
                     "\n" + f +
@@ -230,7 +238,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                     "\n(check for blank data fields)"
                     );
         } catch (IOException ex) {
-            controller.messageUser(JOptionPane.ERROR_MESSAGE,
+            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "File I/O Error",
                     "Exception on writing " + f.getName() +
                     "\n" + ex.getMessage());
@@ -287,7 +295,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         Set<String> hs = new HashSet<>(10);
         for (AssemblyNode n : getNodeCache().values()) {
             if (!hs.add(n.getName())) {
-                controller.messageUser(JOptionPane.INFORMATION_MESSAGE,
+                assemblyController.messageUser(JOptionPane.INFORMATION_MESSAGE,
                         "XML file contains duplicate event name", n.getName() +
                         "\nUnique name substituted.");
                 return false;
@@ -319,7 +327,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             node.setPosition(p);
         }
 
-        SimEntity jaxbEventGraph = oFactory.createSimEntity();
+        SimEntity jaxbEventGraph = objectFactory.createSimEntity();
 
         jaxbEventGraph.setName(nIe(widgetName));
         jaxbEventGraph.setType(className);
@@ -341,7 +349,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     @Override
     public void redoEventGraph(EventGraphNode node) {
-        SimEntity jaxbEventGraph = oFactory.createSimEntity();
+        SimEntity jaxbEventGraph = objectFactory.createSimEntity();
 
         jaxbEventGraph.setName(node.getName());
         node.opaqueModelObject = jaxbEventGraph;
@@ -363,7 +371,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         modelDirty = true;
 
-        if (!controller.isUndo())
+        if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(evNode, ModelEvent.EVENTGRAPHDELETED, "Event Graph deleted"));
         else
             notifyChanged(new ModelEvent(evNode, ModelEvent.UNDO_EVENT_GRAPH, "Event Graph undone"));
@@ -382,7 +390,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         else
             pcNode.setPosition(p);
 
-        PropertyChangeListener pcl = oFactory.createPropertyChangeListener();
+        PropertyChangeListener pcl = objectFactory.createPropertyChangeListener();
 
         pcl.setName(nIe(widgetName));
         pcl.setType(className);
@@ -407,7 +415,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     @Override
     public void redoPropChangeListener(PropertyChangeListenerNode node) {
 
-        PropertyChangeListener jaxbPCL = oFactory.createPropertyChangeListener();
+        PropertyChangeListener jaxbPCL = objectFactory.createPropertyChangeListener();
 
         jaxbPCL.setName(node.getName());
         jaxbPCL.setType(node.getType());
@@ -428,7 +436,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         modelDirty = true;
 
-        if (!controller.isUndo())
+        if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(pclNode, ModelEvent.PCLDELETED, "Property Change Listener deleted"));
         else
             notifyChanged(new ModelEvent(pclNode, ModelEvent.UNDO_PCL, "Property Change Listener undone"));
@@ -444,7 +452,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         src.getConnections().add(ae);
         target.getConnections().add(ae);
 
-        Adapter jaxbAdapter = oFactory.createAdapter();
+        Adapter jaxbAdapter = objectFactory.createAdapter();
 
         ae.opaqueModelObject = jaxbAdapter;
         jaxbAdapter.setTo(target.getName());
@@ -467,7 +475,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         src = (AssemblyNode) ae.getFrom();
         target = (AssemblyNode) ae.getTo();
 
-        Adapter jaxbAdapter = oFactory.createAdapter();
+        Adapter jaxbAdapter = objectFactory.createAdapter();
         ae.opaqueModelObject = jaxbAdapter;
         jaxbAdapter.setTo(target.getName());
         jaxbAdapter.setFrom(src.getName());
@@ -489,7 +497,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         src.getConnections().add(pce);
         target.getConnections().add(pce);
 
-        PropertyChangeListenerConnection pclc = oFactory.createPropertyChangeListenerConnection();
+        PropertyChangeListenerConnection pclc = objectFactory.createPropertyChangeListenerConnection();
 
         pce.opaqueModelObject = pclc;
 
@@ -510,7 +518,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         src = (AssemblyNode) pce.getFrom();
         target = (AssemblyNode) pce.getTo();
 
-        PropertyChangeListenerConnection pclc = oFactory.createPropertyChangeListenerConnection();
+        PropertyChangeListenerConnection pclc = objectFactory.createPropertyChangeListenerConnection();
         pce.opaqueModelObject = pclc;
         pclc.setListener(target.getName());
         pclc.setSource(src.getName());
@@ -530,7 +538,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         src.getConnections().add(sele);
         target.getConnections().add(sele);
 
-        SimEventListenerConnection selc = oFactory.createSimEventListenerConnection();
+        SimEventListenerConnection selc = objectFactory.createSimEventListenerConnection();
 
         sele.opaqueModelObject = selc;
 
@@ -550,7 +558,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         src = (AssemblyNode) sele.getFrom();
         target = (AssemblyNode) sele.getTo();
 
-        SimEventListenerConnection selc = oFactory.createSimEventListenerConnection();
+        SimEventListenerConnection selc = objectFactory.createSimEventListenerConnection();
         sele.opaqueModelObject = selc;
         selc.setListener(target.getName());
         selc.setSource(src.getName());
@@ -569,7 +577,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         modelDirty = true;
 
-        if (!controller.isUndo())
+        if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(pce, ModelEvent.PCLEDGEDELETED, "PCL edge deleted"));
         else
             notifyChanged(new ModelEvent(pce, ModelEvent.UNDO_PCL_EDGE, "PCL edge undone"));
@@ -583,7 +591,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         modelDirty = true;
 
-        if (!controller.isUndo())
+        if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(sele, ModelEvent.SIMEVLISTEDGEDELETED, "SimEvList edge deleted"));
         else
             notifyChanged(new ModelEvent(sele, ModelEvent.UNDO_SIM_EVENT_LISTENER_EDGE, "SimEvList edge undone"));
@@ -596,7 +604,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         modelDirty = true;
 
-        if (!controller.isUndo())
+        if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTEREDGEDELETED, "Adapter edge deleted"));
         else
             notifyChanged(new ModelEvent(ae, ModelEvent.UNDO_ADAPTER_EDGE, "Adapter edge undone"));
@@ -674,7 +682,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         double x = pclNode.getPosition().getX();
         double y = pclNode.getPosition().getY();
-        Coordinate coor = oFactory.createCoordinate();
+        Coordinate coor = objectFactory.createCoordinate();
         coor.setX("" + x);
         coor.setY("" + y);
         pclNode.getPosition().setLocation(x, y);
@@ -718,7 +726,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         double x = evNode.getPosition().getX();
         double y = evNode.getPosition().getY();
-        Coordinate coor = oFactory.createCoordinate();
+        Coordinate coor = objectFactory.createCoordinate();
         coor.setX("" + x);
         coor.setY("" + y);
         evNode.getPosition().setLocation(x, y);
@@ -786,7 +794,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 return;
             }
         }
-        Output op = oFactory.createOutput();
+        Output op = objectFactory.createOutput();
         op.setEntity(se.getName());
         outTL.add(op);
     }
@@ -798,7 +806,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 return;
             }
         }
-        Verbose op = oFactory.createVerbose();
+        Verbose op = objectFactory.createVerbose();
         op.setEntity(se.getName());
         vTL.add(op);
     }
@@ -912,7 +920,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private TerminalParameter buildParamFromFreeF(ViskitModelInstantiator.FreeF viff) {
-        TerminalParameter tp = oFactory.createTerminalParameter();
+        TerminalParameter tp = objectFactory.createTerminalParameter();
 
         tp.setType(viff.getType());
         tp.setValue(viff.getValue());
@@ -921,7 +929,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private MultiParameter buildParamFromConstr(ViskitModelInstantiator.Constr vicon) {
-        MultiParameter mp = oFactory.createMultiParameter();
+        MultiParameter mp = objectFactory.createMultiParameter();
 
         mp.setType(vicon.getType());
         for (Object vi : vicon.getArgs()) {
@@ -931,7 +939,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private FactoryParameter buildParamFromFactory(ViskitModelInstantiator.Factory vifact) {
-        FactoryParameter fp = oFactory.createFactoryParameter();
+        FactoryParameter fp = objectFactory.createFactoryParameter();
 
         fp.setType(vifact.getType());
         fp.setFactory(vifact.getFactoryClass());
@@ -943,7 +951,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private MultiParameter buildParamFromArray(ViskitModelInstantiator.Array viarr) {
-        MultiParameter mp = oFactory.createMultiParameter();
+        MultiParameter mp = objectFactory.createMultiParameter();
 
         mp.setType(viarr.getType());
         for (Object vi : viarr.getInstantiators()) {

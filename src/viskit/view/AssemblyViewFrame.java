@@ -150,7 +150,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     JMenu openRecentAssemblyMenu, openRecentProjectMenu;
 
-    private final static String FRAME_DEFAULT_TITLE = " Viskit Assembly Editor";
+    private final static String FRAME_DEFAULT_TITLE = "Assembly Editor";
 
     private final String FULLPATH = ViskitStatics.FULL_PATH;
     private final String CLEARPATHFLAG = ViskitStatics.CLEAR_PATH_FLAG;
@@ -165,7 +165,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
     private RecentProjectFileSetListener recentProjectFileSetListener;
-    private RecentAssemblyFileListener recentAssemblyFileListener;
+    private RecentAssemblyFileListener   recentAssemblyFileListener; // TODO public?
     private AssemblyController assemblyController;
     private JMenu projectMenu;
     private JMenu assemblyMenu;

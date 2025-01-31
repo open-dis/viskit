@@ -72,7 +72,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
-    public void init() 
+    public void initialize() 
     {
         try {
             if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)

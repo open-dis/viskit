@@ -34,8 +34,9 @@ public class GraphMetadata {
         author = System.getProperty("user.name");
         packageName = "test";
         
-        if (caller instanceof AssemblyModelImpl) {
-            name = "AssemblyName";
+        if (caller instanceof AssemblyModelImpl) 
+        {
+            name = "NewAssembly";
             viskit.xsd.bindings.assembly.ObjectFactory of =
                     new viskit.xsd.bindings.assembly.ObjectFactory();
             SimkitAssembly tmp = of.createSimkitAssembly();

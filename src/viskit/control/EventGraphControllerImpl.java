@@ -126,7 +126,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
 
         ModelImpl mod = new ModelImpl(this);
-        mod.init();
+        mod.initialize();
         mod.newModel(null);
 
         // No model set in controller yet...it gets set
@@ -222,7 +222,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     void _doOpenEventGraph(File file) {
         EventGraphView viskitView = (EventGraphView) getView();
         ModelImpl modelImplementation = new ModelImpl(this);
-        modelImplementation.init();
+        modelImplementation.initialize();
         viskitView.addTab(modelImplementation);
 
         Model[] openAlready = viskitView.getOpenModels();

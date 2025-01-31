@@ -227,10 +227,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         AssemblyView assemblyView = (AssemblyView) getView();
         AssemblyModelImpl assemblyModelImpl = new AssemblyModelImpl(this);
-        assemblyModelImpl.init();
+        assemblyModelImpl.initialize();
         assemblyView.addTab(assemblyModelImpl);
 
-        // these may init to null on startup, check
+        // these may initialize to null on startup, check
         // before doing any openAlready lookups
         AssemblyModel[] assemblyModelOpenAlreadyArray = null;
         if (assemblyView != null)
@@ -504,7 +504,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private static Field adapterNodeCountField;
     private static Field propertyChangeListenerNodeCountField;
 
-    static { // do at class init time
+    static { // do at class initialize time
         try {
             eventGraphCountField = AssemblyControllerImpl.class.getDeclaredField("eventGraphNodeCount");
            adapterNodeCountField = AssemblyControllerImpl.class.getDeclaredField("adapterNodeCount");
@@ -681,43 +681,49 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void newAssembly() {
-
-        // Don't allow a new event graph to be created if a current project is
-        // not open
-        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
-
-        GraphMetadata oldGmd = null;
-        AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
-        if (viskitAssemblyModel != null) {
-            oldGmd = viskitAssemblyModel.getMetadata();
+    public void newAssembly()
+    {
+        // Don't allow a new Assembly to be created if a current project is not open
+        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
+        {
+            LOG.error("newAssembly() unable to create new assembly if project is not open");
+            return;
         }
 
-        AssemblyModelImpl mod = new AssemblyModelImpl(this);
-        mod.init();
-        mod.newModel(null);
+        GraphMetadata oldGraphMetadata = null;
+        AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
+        if (viskitAssemblyModel != null) {
+            oldGraphMetadata = viskitAssemblyModel.getMetadata();
+        }
+
+        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
+        assemblyModel.initialize();
+        assemblyModel.newModel(null); // should create new assembly file
 
         // No vAMod set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
-        ((AssemblyView) getView()).addTab(mod);
+        ((AssemblyView) getView()).addTab(assemblyModel);
 
-        GraphMetadata gmd = new GraphMetadata(mod);   // build a new one, specific to Assembly
-        if (oldGmd != null) {
-            gmd.packageName = oldGmd.packageName;
+        GraphMetadata graphMetadata = new GraphMetadata(assemblyModel);   // build a new one, specific to Assembly
+        if (oldGraphMetadata != null) {
+            graphMetadata.packageName = oldGraphMetadata.packageName;
         }
 
         boolean modified =
-                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyViewFrame(), gmd);
-        if (modified) {
-            ((AssemblyModel) getModel()).changeMetaData(gmd);
+                AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyViewFrame(), graphMetadata);
+        if (modified) 
+        {
+            ((AssemblyModel) getModel()).changeMetaData(graphMetadata);
 
             // update title bar
-            ((AssemblyView) getView()).setSelectedAssemblyName(gmd.name);
+            ((AssemblyView) getView()).setSelectedAssemblyName(graphMetadata.name);
 
             // TODO: Implement this
 //            ((AssemblyView)  getView()).setSelectedEventGraphDescription(gmd.description);
-        } else {
-            ((AssemblyView) getView()).deleteTab(mod);
+        } 
+        else 
+        {
+            ((AssemblyView) getView()).deleteTab(assemblyModel);
         }
     }
 
