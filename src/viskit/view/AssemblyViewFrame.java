@@ -410,21 +410,21 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 //        else whichMenu = assemblyMenu;
 
         editMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
         editMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_Y,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.ALT_DOWN_MASK)));
         editMenu.addSeparator();
 
         // the next four are disabled until something is selected
         editMenu.add(buildMenuItem(assemblyController, "cut", "Cut", KeyEvent.VK_X,
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK)));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
         editMenu.add(buildMenuItem(assemblyController, "copy", "Copy", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
         editMenu.add(buildMenuItem(assemblyController, "paste", "Paste Events", KeyEvent.VK_V,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
         editMenu.add(buildMenuItem(assemblyController, "remove", "Delete", KeyEvent.VK_DELETE,
-                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK)));
         editMenu.addSeparator();
 
         editMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_G, null));
@@ -434,7 +434,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
         editMenu.add(buildMenuItem(assemblyController, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
         }
     }
 
@@ -465,27 +465,25 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.addSeparator();
         } // end hasModalMenus
         
-        
-
         // The AssemblyViewFrame will get this listener for its menu item of the same name
         recentProjectFileSetListener = new RecentProjectFileSetListener();
         recentProjectFileSetListener.addMenuItem(openRecentProjectMenu);
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         
         assemblyMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly", KeyEvent.VK_N,
-                KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK)));
 
         assemblyMenu.add(buildMenuItem(assemblyController, "open", "Open Assembly", KeyEvent.VK_O,
-                KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
         openRecentAssemblyMenu.setEnabled(false); // inactive until needed, reset by listener
 
         // Bug fix: 1195
         assemblyMenu.add(buildMenuItem(assemblyController, "close", "Close Assembly", null,
-                KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "closeAll", "Close All Assemblies", null, null));
         assemblyMenu.add(buildMenuItem(assemblyController, "save", "Save Assembly", KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_A, null));
 
         if (!ViskitGlobals.instance().getMainFrame().hasModalMenus()) // combined menu integration
@@ -493,17 +491,17 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.addSeparator();
         assemblyMenu.add(editMenu);
         assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetaData", "Edit Properties...", KeyEvent.VK_P,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.addSeparator();
         }
 
         assemblyMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Generate Java Source of Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
-                KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "captureWindow", "Save Assembly Screen Image", KeyEvent.VK_I,
-                KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly for Simulation Run", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
+        assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly for Simulation Run", KeyEvent.VK_R,
+                KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK)));
+        assemblyMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK)));
 
         // TODO: Unknown as to what this does exactly
         assemblyMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
@@ -515,7 +513,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.add(buildMenuItem(assemblyController, "settings", "Viskit Settings", null, null));
         assemblyMenu.addSeparator();
 
-        assemblyMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Exit", KeyEvent.VK_Q,
+        assemblyMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Quit", KeyEvent.VK_Q,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
         } // end hasModalMenus
         
@@ -555,7 +553,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         projectMenu.add(buildMenuItem(assemblyController, "settings", "Viskit Settings", null, null));
         projectMenu.addSeparator();
 
-        projectMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Exit", KeyEvent.VK_Q,
+        projectMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Quit", KeyEvent.VK_Q,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
     }
     
