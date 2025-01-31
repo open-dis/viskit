@@ -904,8 +904,16 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      *
      * @return true = continue, false = don't (i.e., we canceled)
      */
-    private boolean askToSaveAndContinue() {
-        int yn = (((AssemblyView) getView()).genericAsk("Question", "Save modified assembly?"));
+    private boolean askToSaveAndContinue()
+    {
+        String message = "Save modified ";
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if ((assemblyModel != null) && (assemblyModel.getMetadata() != null))
+             message += assemblyModel.getMetadata().name + ".xml"; 
+        if (!message.toLowerCase().contains("assembly"))
+             message += " assembly";
+        message += "?";
+        int yn = (((AssemblyView) getView()).genericAsk("Save assembly?", message));
 
         switch (yn) {
             case JOptionPane.YES_OPTION:
@@ -1385,10 +1393,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void generateJavaSource() {
         String source = produceJavaAssemblyClass();
-        AssemblyModel vmod = (AssemblyModel) getModel();
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (source != null && !source.isEmpty()) {
-            String className = vmod.getMetadata().packageName + "." + vmod.getMetadata().name;
-            ((AssemblyView) getView()).showAndSaveSource(className, source, vmod.getLastFile().getName());
+            String className = assemblyModel.getMetadata().packageName + "." + assemblyModel.getMetadata().name;
+            ((AssemblyView) getView()).showAndSaveSource(className, source, assemblyModel.getLastFile().getName());
         }
     }
 
