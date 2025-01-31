@@ -149,7 +149,7 @@ public class ViskitApplication
             // give file loading a chance to finish...
             // TODO check if author has entered profile information, offer to help
 
-            if ((ViskitGlobals.instance().hasCurrentViskitProject()) &&
+            if ((ViskitGlobals.instance().hasViskitProject()) &&
                 (ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded() == 0) &&
                 (ViskitGlobals.instance().getAssemblyViewFrame().getNumberAssembliesLoaded()    == 0))
             {

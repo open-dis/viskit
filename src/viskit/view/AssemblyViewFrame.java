@@ -905,7 +905,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
         ViskitGlobals vGlobals = ViskitGlobals.instance();
-        ViskitProject vkp = vGlobals.getCurrentViskitProject();
+        ViskitProject vkp = vGlobals.getViskitProject();
 
         // A fresh (reset) LocalBootLoader will be instantiated
         // here when compiling EGs for the first time, or when the
@@ -1119,8 +1119,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private JFileChooser buildOpenSaveChooser() {
 
         // Try to open in the current project directory for Assemblies
-        if (ViskitGlobals.instance().getCurrentViskitProject() != null)
-            return new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir());
+        if (ViskitGlobals.instance().getViskitProject() != null)
+            return new JFileChooser(ViskitGlobals.instance().getViskitProject().getAssembliesDir());
         else
             return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY));
     }
@@ -1160,17 +1160,22 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public void openProject() {
-        AssemblyControllerImpl aController = ((AssemblyControllerImpl) getController());
+    public void openProject()
+    {
+        assemblyController = ((AssemblyControllerImpl) getController()); // TODO unscramble impl's
 
-        if (!aController.handleProjectClosing())
+        if (!((AssemblyControllerImpl)assemblyController).handleProjectClosing())
             return;
 
         File file = ViskitProject.openProjectDirectory(this.getContent(), ViskitProject.VISKIT_PROJECTS_DIRECTORY);
         if (file != null)
-            aController.openProject(file); // calls EGVF setTitleApplicationProjectName
-
-        setTitleApplicationProjectName();
+        {
+            assemblyController.openProject(file); // calls EGVF setTitleApplicationProjectName
+            String projectName = new String();
+            if (file.exists())
+                projectName = file.getName(); // TODO handle using actual data
+            ViskitGlobals.instance().getMainFrame().setTitle(projectName);
+        }
     }
 
     private File getUniqueName(String suggName) {
@@ -1198,7 +1203,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             jfc = buildOpenSaveChooser();
 
         jfc.setDialogTitle("Save Assembly File");
-        File fil = new File(ViskitGlobals.instance().getCurrentViskitProject().getAssembliesDir(), suggName);
+        File fil = new File(ViskitGlobals.instance().getViskitProject().getAssembliesDir(), suggName);
         if (!fil.getParentFile().isDirectory())
             fil.getParentFile().mkdirs();
         if (showUniqueName)
@@ -1227,7 +1232,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     public void deleteCanceledSave(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir()))
+                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getViskitProject().getEventGraphsDir()))
                     deleteCanceledSave(file.getParentFile());
             }
         }

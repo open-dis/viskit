@@ -87,7 +87,7 @@ public class AnalystReportController extends MvcAbstractController {
         LOG.debug("Path of temp Analyst Report: " + path);
         File srcFil = new File(path);
 
-        File analystReportDirectory = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
+        File analystReportDirectory = ViskitGlobals.instance().getViskitProject().getAnalystReportsDirectory();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
         String output = formatter.format(new Date()); // today
@@ -140,7 +140,7 @@ public class AnalystReportController extends MvcAbstractController {
                     break;
             }
         }
-        File analystReportDirectory = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
+        File analystReportDirectory = ViskitGlobals.instance().getViskitProject().getAnalystReportsDirectory();
         JFileChooser openAnalystReportChooser = new JFileChooser(analystReportDirectory);
         openAnalystReportChooser.setDialogTitle("Open Analyst Report XML");
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst Report data files (.xml)", "xml");
@@ -212,7 +212,7 @@ public class AnalystReportController extends MvcAbstractController {
         outputHtmlFilePath = outputHtmlFilePath.substring(0, outputHtmlFilePath.lastIndexOf(".")) + ".html";
         
         // all unnecessary, user does not need to frequently change paths, this code is problematic anywar
-//        File analystReportDirectory = ViskitGlobals.instance().getCurrentViskitProject().getAnalystReportsDirectory();
+//        File analystReportDirectory = ViskitGlobals.instance().getViskitProject().getAnalystReportsDirectory();
 //        JFileChooser generateHtmlReportChooser = new JFileChooser(analystReportDirectory);
 //        generateHtmlReportChooser.setDialogTitle("Save as XML, then convert to HTML");
 //        FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst report data (.xml)", "xml");

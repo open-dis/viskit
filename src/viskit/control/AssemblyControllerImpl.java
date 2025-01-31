@@ -124,7 +124,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public void begin() {
-        File projectPath = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
+        File projectPath = ViskitGlobals.instance().getViskitProject().getProjectRoot();
 
         // The initialAssemblyFile is set if we have stated a file "arg" upon startup
         // from the command line
@@ -553,13 +553,15 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void newProject() {
-        if (handleProjectClosing()) {
+    public void newProject() 
+    {
+        if (handleProjectClosing()) 
+        {
             ViskitGlobals.instance().inititalizeProjectHome();
             ViskitGlobals.instance().createWorkingDirectory();
 
             // For a brand new empty project open a default Event Graph
-            File[] eventGraphFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            File[] eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDir().listFiles();
             if (eventGraphFiles.length == 0) {
                 ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
             }
@@ -578,7 +580,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             @Override
             public Void doInBackground() {
 
-                projectDirectory = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                projectDirectory = ViskitGlobals.instance().getViskitProject().getProjectRoot();
                 projectZipFile = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
                 logFile = new File(projectDirectory, "debug.log");
 
@@ -640,10 +642,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      */
     public boolean handleProjectClosing() {
         boolean projectClosed = true;
-        if (ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen())
+        if (ViskitGlobals.instance().getViskitProject().isProjectOpen())
         {
             String msg = "Are you sure you want to close your current Viskit Project?";
-            String title = "Close Current Project";
+            String title = "Close Current Project?";
 
             int returnValue = ((AssemblyView) getView()).genericAskYN(title, msg);
             if (returnValue == JOptionPane.YES_OPTION)
@@ -654,6 +656,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 projectClosed = false;
             }
         }
+        
         return projectClosed;
     }
 
@@ -665,7 +668,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitConfiguration.instance().clearViskitConfig();
         clearRecentAssemblyFileList();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
-        ViskitGlobals.instance().getCurrentViskitProject().closeProject();
+        ViskitGlobals.instance().getViskitProject().closeProject();
         ViskitGlobals.instance().getMainFrame().updateApplicationTitle();
     }
 
@@ -675,7 +678,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().createWorkingDirectory();
 
         // Add our currently opened project to the recently opened projects list
-        adjustRecentProjectSet(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
+        adjustRecentProjectSet(ViskitGlobals.instance().getViskitProject().getProjectRoot());
         ViskitGlobals.instance().getEventGraphViewFrame().setTitleApplicationProjectName();
         runner.resetSimulationRunPanel();
     }
@@ -684,7 +687,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public void newAssembly()
     {
         // Don't allow a new Assembly to be created if a current project is not open
-        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) 
+        if (!ViskitGlobals.instance().getViskitProject().isProjectOpen()) 
         {
             LOG.error("newAssembly() unable to create new assembly if project is not open");
             return;
@@ -746,7 +749,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (preQuit()) {
             postQuit();
         }
-        System.exit(0);
+        ViskitGlobals.instance().getMainFrame().quit();
     }
 
     @Override
@@ -1520,7 +1523,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         try {
 
             // Should always have a live ViskitProject
-            ViskitProject viskitProject = ViskitGlobals.instance().getCurrentViskitProject();
+            ViskitProject viskitProject = ViskitGlobals.instance().getViskitProject();
 
             // Create, or find the project's java source and package
             File srcPkg = new File(viskitProject.getSrcDir(), packagePath);

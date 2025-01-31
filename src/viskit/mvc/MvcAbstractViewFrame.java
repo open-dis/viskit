@@ -48,14 +48,12 @@ public abstract class MvcAbstractViewFrame extends JFrame implements MvcView, Mv
         setTitleApplicationProjectName();
     }
 
-//    public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation"; // using Simkit
     /**
      * Shows the project name in the frame title bar
      */
     public void setTitleApplicationProjectName()
     {
         String newTitle = new String();
-//        newTitle = VISKIT_APPLICATION_TITLE;
         if      ( ViskitConfiguration.PROJECT_TITLE_NAME.toLowerCase().contains("project"))
              newTitle +=         ": " +    ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
         else if (!ViskitConfiguration.PROJECT_TITLE_NAME.isBlank())

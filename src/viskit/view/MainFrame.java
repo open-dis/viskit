@@ -74,7 +74,7 @@ import viskit.assembly.SimulationRunPlugInterface;
  */
 public class MainFrame extends JFrame
 {
-    public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation"; // using Simkit
+    public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation (DES) Tool"; // using Simkit
 
     /** modalMenus: true means choice from traditional modalMenuBarList, false means new combinedMenuBar */
     private boolean modalMenus = false; 
@@ -147,7 +147,7 @@ public class MainFrame extends JFrame
 
     private void initializeMainFrame() 
     {
-        updateApplicationTitle();
+        updateApplicationTitle(); // project must be loaded before including project title
         
 //        ViskitGlobals.instance().setAssemblyQuitHandler(null);
 //        ViskitGlobals.instance().setEventGraphQuitHandler(null); <- TODO: investigate why these are here
@@ -680,14 +680,23 @@ public class MainFrame extends JFrame
     }
     
     /**
-     * Application title, include project name in the frame title bar
+     * Application title, no name provided
      */
     public void updateApplicationTitle()
     {
+        updateApplicationTitle("");
+    }
+    
+    /**
+     * Application title, include project name in the frame title bar
+     * @param newProjectName name of current viskit project, if any
+     */
+    public void updateApplicationTitle(String newProjectName)
+    {
         String newTitle = VISKIT_APPLICATION_TITLE;
-        if      ( ViskitConfiguration.PROJECT_TITLE_NAME.toLowerCase().contains("project"))
+        if      ( newProjectName.toLowerCase().contains("project"))
              newTitle +=         ": " +    ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
-        else if (!ViskitConfiguration.PROJECT_TITLE_NAME.isBlank())
+        else if (!newProjectName.isBlank())
              newTitle += " Project: " + ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
         // otherwise value is unchanged;
         setTitle(newTitle);
@@ -714,5 +723,11 @@ public class MainFrame extends JFrame
      */
     public void setModalMenus(boolean modalMenus) {
         this.modalMenus = modalMenus;
+    }
+    
+    /** All done, any additional final cleanups can be performed here if needed. */
+    public void quit()
+    {
+        System.exit(0);
     }
 }

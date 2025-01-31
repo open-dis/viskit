@@ -501,7 +501,7 @@ public class InternalSimulationRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e) {
             if (saveChooser == null) {
-                saveChooser = new JFileChooser(ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot());
+                saveChooser = new JFileChooser(ViskitGlobals.instance().getViskitProject().getProjectRoot());
             }
             File fil = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(fil);

@@ -655,7 +655,7 @@ public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences
             // Allow relative paths
             if (path.contains("..")) {
                 itr = Path.of(file.toURI()).iterator();
-                file = ViskitGlobals.instance().getCurrentViskitProject().getProjectRoot();
+                file = ViskitGlobals.instance().getViskitProject().getProjectRoot();
                 while (itr.hasNext() && path.contains("..")) {
                     file = file.getParentFile();
                     path = path.replaceFirst("../", "");

@@ -90,7 +90,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         } else {
 
             // For a brand new empty project open a default Event Graph
-            File[] eventGraphFiles = ViskitGlobals.instance().getCurrentViskitProject().getEventGraphsDir().listFiles();
+            File[] eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDir().listFiles();
             if (eventGraphFiles.length == 0) {
                 newEventGraph();
             }
@@ -117,7 +117,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
         // Don't allow a new event graph to be created if a current project is
         // not open
-        if (!ViskitGlobals.instance().getCurrentViskitProject().isProjectOpen()) {return;}
+        if (!ViskitGlobals.instance().getViskitProject().isProjectOpen()) {return;}
 
         GraphMetadata oldGmd = null;
         Model viskitModel = (Model) getModel();

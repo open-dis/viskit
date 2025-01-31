@@ -39,7 +39,7 @@ public class HistogramChart {
      * @return the path url of the created object
      */
     public String createChart(String title, String label, double[] data) {
-        ViskitProject vkp = ViskitGlobals.instance().getCurrentViskitProject();
+        ViskitProject vkp = ViskitGlobals.instance().getViskitProject();
         File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "Histogram.png");
         IntervalXYDataset dataset = createDataset(label, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);

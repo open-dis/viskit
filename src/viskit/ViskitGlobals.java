@@ -103,7 +103,7 @@ public class ViskitGlobals {
     private final MyTypeListener myTypeListener;
     private MainFrame mainFrame;
 
-    private ViskitProject currentViskitProject;
+    private ViskitProject ViskitProject;
 
     /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
     private SimulationRunPanel simulationRunPanel;
@@ -777,12 +777,16 @@ public class ViskitGlobals {
         this.simulationRunPanel = simulationRunPanel;
     }
 
-    public ViskitProject getCurrentViskitProject() {
-        return currentViskitProject;
+    /**
+     * @return current ViskitProject */
+    public ViskitProject getViskitProject() {
+        return ViskitProject;
     }
 
-    public boolean hasCurrentViskitProject() {
-        return (currentViskitProject != null);
+    /**
+     * @return whether a ViskitProject is currently loaded */
+    public boolean hasViskitProject() {
+        return (ViskitProject != null);
     }
 
     /**
@@ -811,18 +815,18 @@ public class ViskitGlobals {
         }
         projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY);
 
-        if (currentViskitProject == null)
-            currentViskitProject = new ViskitProject(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
+        if (ViskitProject == null)
+            ViskitProject = new ViskitProject(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
         else
-            currentViskitProject.setProjectRoot(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
+            ViskitProject.setProjectRoot(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
 
-        if (currentViskitProject.initProject()) {
-            SettingsDialog.saveExtraClasspathEntries(currentViskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
+        if (ViskitProject.initProject()) {
+            SettingsDialog.saveExtraClasspathEntries(ViskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
         } else {
             LOG.warn("Unable to create project directory, returning");
             return;
         }
-        workingDirectory = currentViskitProject.getClassesDirectory();
+        workingDirectory = ViskitProject.getClassesDirectory();
     }
 
     private ClassLoader workLoader, freshLoader;

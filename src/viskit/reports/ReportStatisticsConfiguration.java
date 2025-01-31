@@ -227,7 +227,7 @@ public class ReportStatisticsConfiguration {
         dateFormat = formatter.format(today);
 
         // Create a unique file name for each DTG/Location Pair
-        ViskitProject vkp = ViskitGlobals.instance().getCurrentViskitProject();
+        ViskitProject vkp = ViskitGlobals.instance().getViskitProject();
         File anRptStatDir = vkp.getAnalystReportStatisticsDir();
 
         String outputFile = (author + assemblyName + "_" + dateFormat + ".xml");
