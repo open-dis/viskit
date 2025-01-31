@@ -405,7 +405,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         fileMenu.add(zipMailViskitProjectMI);
 
         exitMI.setMnemonic(KeyEvent.VK_X);
-        exitMI.setText("Exit");
+        exitMI.setText("Quit");
         fileMenu.add(exitMI);
 
         viskitMenuBar.add(fileMenu);
