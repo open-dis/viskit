@@ -868,7 +868,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         myMenuBar = new JMenuBar(); // TODO omit completely when refactoring complete
 //      JMenu fileMenu = new JMenu("File");
         analystReportMenu = new JMenu("Analyst Report");
-        getAnalystReportMenu().setMnemonic(KeyEvent.VK_F);
+        getAnalystReportMenu().setMnemonic(KeyEvent.VK_R);
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "generateHtmlReport",

@@ -661,14 +661,14 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         editMenu.addSeparator();
 
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(eventGraphController, "cut", "Cut", KeyEvent.VK_X,
+        editMenu.add(buildMenuItem(eventGraphController, "cut", "Cut", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
         editMenu.add(buildMenuItem(eventGraphController, "copy", "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
-        editMenu.add(buildMenuItem(eventGraphController, "paste", "Paste Events", KeyEvent.VK_V,
+        editMenu.add(buildMenuItem(eventGraphController, "paste", "Paste Events", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
-        editMenu.add(buildMenuItem(eventGraphController, "remove", "Delete", KeyEvent.VK_DELETE,
+        editMenu.add(buildMenuItem(eventGraphController, "remove", "Delete", KeyEvent.VK_D,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod)));
 
         // These start off being disabled, until something is selected
@@ -678,14 +678,14 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         ActionIntrospector.getAction(eventGraphController, "remove").setEnabled(false);
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(eventGraphController, "newNode", "Add Event Node", KeyEvent.VK_N,
+        editMenu.add(buildMenuItem(eventGraphController, "newNode", "Add Event Node", KeyEvent.VK_A,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
         editMenu.add(buildMenuItem(eventGraphController, "newSimParameter", "Add Simulation Parameter...", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add State Variable...", KeyEvent.VK_V,
+        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add State Variable...", KeyEvent.VK_A,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", null, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", null, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", KeyEvent.VK_A, null));
 
         // Thess start off being disabled, until something is selected
         ActionIntrospector.getAction(eventGraphController, "newSelfRefSchedulingEdge").setEnabled(false);
@@ -741,14 +741,14 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         ActionIntrospector.getAction(eventGraphController, "remove").setEnabled(false);
         editEventGraphSubMenu.addSeparator();
 
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newNode", "Add Event Node", KeyEvent.VK_N,
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newNode", "Add Event Node", KeyEvent.VK_A,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSimParameter", "Add Simulation Parameter...", KeyEvent.VK_S,
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSimParameter", "Add Simulation Parameter...", KeyEvent.VK_A,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add State Variable...", KeyEvent.VK_V,
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add State Variable...", KeyEvent.VK_A,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", null, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", null, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", KeyEvent.VK_A, null));
 
         // Thess start off being disabled, until something is selected
         ActionIntrospector.getAction(eventGraphController, "newSelfRefSchedulingEdge").setEnabled(false);
@@ -782,14 +782,15 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphMenu.add(buildMenuItem(eventGraphController, "open", "Open Event Graph", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, accelMod)));
         eventGraphMenu.add(openRecentEventGraphMenu = buildMenu("Open Recent Event Graph"));
+        openRecentEventGraphMenu.setMnemonic('O');
         openRecentEventGraphMenu.setEnabled(false); // inactive until needed, reset by listener
 
-        eventGraphMenu.add(buildMenuItem(eventGraphController, "close", "Close Event Graph", null,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "close", "Close Event Graph", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
-        eventGraphMenu.add(buildMenuItem(eventGraphController, "closeAll", "Close All Event Graphs", null, null));
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "closeAll", "Close All Event Graphs", KeyEvent.VK_C, null));
         eventGraphMenu.add(buildMenuItem(eventGraphController, "save", "Save Event Graph", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        eventGraphMenu.add(buildMenuItem(eventGraphController, "saveAs", "Save Event Graph as...", KeyEvent.VK_A, null));
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "saveAs", "Save Event Graph as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, accelMod)));
         eventGraphMenu.addSeparator();
 
         eventGraphMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Java Source Generation for saved Event Graph", KeyEvent.VK_J,

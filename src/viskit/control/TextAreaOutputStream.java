@@ -502,16 +502,17 @@ public class TextAreaOutputStream implements PropertyChangeListener
             if (saveChooser == null) {
                 saveChooser = new JFileChooser(ViskitGlobals.instance().getViskitProject().getProjectRoot());
             }
-            File fil = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName("AssemblyOutput.txt", saveChooser.getCurrentDirectory());
-            saveChooser.setSelectedFile(fil);
+            File consoleFile = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName("SimulationRunOutput.txt", saveChooser.getCurrentDirectory());
+            saveChooser.setSelectedFile(consoleFile);
+            saveChooser.setDialogTitle("Save Console Output");
 
             int retv = saveChooser.showSaveDialog(null);
             if (retv != JFileChooser.APPROVE_OPTION) {
                 return;
             }
 
-            fil = saveChooser.getSelectedFile();
-            if (fil.exists()) {
+            consoleFile = saveChooser.getSelectedFile();
+            if (consoleFile.exists()) {
                 int r = JOptionPane.showConfirmDialog(null, "File exists.  Overwrite?", "Confirm",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (r != JOptionPane.YES_OPTION) {
@@ -519,7 +520,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
                 }
             }
 
-            try (Writer bw = new BufferedWriter(new FileWriter(fil))) {
+            try (Writer bw = new BufferedWriter(new FileWriter(consoleFile))) {
                 bw.write(simulationRunPanel.outputStreamTA.getText());
             } catch (IOException e1) {
                 ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
@@ -620,20 +621,35 @@ public class TextAreaOutputStream implements PropertyChangeListener
         myMenuBar = new JMenuBar();
 //      JMenu fileMenu = new JMenu("File");
         simulationRunMenu = new JMenu("Simulation Run");
-        JMenuItem saveMI = new JMenuItem("Save output streams");
-        JMenuItem copyMI = new JMenuItem("Copy");
-        JMenuItem selectAllMI = new JMenuItem("Select all");
-        JMenuItem clearAllMI = new JMenuItem("Clear all");
-        JMenuItem viewMI = new JMenuItem("View output in text editor");
+        simulationRunMenu.setToolTipText("Simulation Run performs multiple replications of a compiled Assembly model");
+        simulationRunMenu.setMnemonic('S');
+        JMenuItem copyMI = new JMenuItem("Copy selected console text");
+        copyMI.setMnemonic('C');
+        copyMI.setToolTipText("Copy simulation run console output");
+        JMenuItem saveMI = new JMenuItem("Save console output to file");
+        saveMI.setMnemonic('S');
+        saveMI.setToolTipText("Save simulation run console output to a file");
+        JMenuItem selectAllMI = new JMenuItem("Select all console text");
+        selectAllMI.setMnemonic('S');
+        selectAllMI.setToolTipText("Select all text in the console log");
+        JMenuItem clearAllMI = new JMenuItem("Clear all console text");
+        clearAllMI.setMnemonic('C');
+        clearAllMI.setToolTipText("Clear the console text area");
+        JMenuItem viewMI = new JMenuItem("View console output in text editor");
+        viewMI.setMnemonic('V');
+        viewMI.setToolTipText("Directly launch console output to text editor");
 
-        saveMI.addActionListener(saveListener);
         copyMI.addActionListener(new CopyListener());
+        saveMI.addActionListener(saveListener);
         selectAllMI.addActionListener(new SelectAllListener());
         clearAllMI.addActionListener(new ClearListener());
         viewMI.addActionListener(new ViewListener());
 
-        getSimulationRunMenu().add(saveMI);
-        getSimulationRunMenu().add(viewMI);
+        simulationRunMenu.add(saveMI);
+        simulationRunMenu.add(copyMI);
+        simulationRunMenu.add(selectAllMI);
+        simulationRunMenu.add(clearAllMI);
+        simulationRunMenu.add(viewMI);
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {

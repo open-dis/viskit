@@ -121,7 +121,7 @@ public class SimulationRunPanel extends JPanel
         outputStreamTA = new JTextArea("Assembly output stream:" + lineEnd +
                 "----------------------" + lineEnd);
         outputStreamTA.setEditable(true); // to allow for additional manual input prior to saving out
-        outputStreamTA.setToolTipText("This text space is editable to support copying and analysis");
+        outputStreamTA.setToolTipText("Console output is editable to support copying and analysis");
         outputStreamTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         outputStreamTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
         // don't force an initial scroller outputStreamTA.setRows(100);
@@ -170,6 +170,7 @@ public class SimulationRunPanel extends JPanel
 
         JLabel vcrStartTimeLabel = new JLabel("Sim start time: ");
         vcrStartTimeLabel.setToolTipText("Initial simulation start time");
+//      ViskitStatics.clampComponentSize(vcrStartTimeLabel); // TODO unexpected reduction
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
         vcrStartTimeLabel.setBorder(new EmptyBorder(0,2,0,10));
         // TODO:  is this start time or current time of sim?
@@ -187,6 +188,7 @@ public class SimulationRunPanel extends JPanel
 
         JLabel vcrStopTimeLabel = new JLabel("Sim stop time: ");
         vcrStopTimeLabel.setToolTipText("Stop current replication once simulation stop time reached");
+        ViskitStatics.clampComponentSize(vcrStopTimeLabel, vcrStartTimeLabel, vcrStartTimeLabel);
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
         vcrStopTimeLabel.setBorder(new EmptyBorder(0,2,0,10));
         vcrStopTimeTF = new JTextField(10);
@@ -270,21 +272,20 @@ public class SimulationRunPanel extends JPanel
             upperLeftFlowPanel.add(closeButton);
         }
 
-        printReplicationReportsCB = new JCheckBox("Print replication report(s)");
-        printReplicationReportsCB.setToolTipText("Print Output Report for Replication(s) to console");
+        printReplicationReportsCB = new JCheckBox("Log replication reports");
+        printReplicationReportsCB.setToolTipText("Print Output Report for Replications to console");
         upperLeftFlowPanel.add(printReplicationReportsCB);
-        printSummaryReportsCB = new JCheckBox("Print summary report");
-        printSummaryReportsCB.setToolTipText("Print out the Summary Output Report to console");
+        printSummaryReportsCB = new JCheckBox("Log summary report");
+        printSummaryReportsCB.setToolTipText("Log the Summary Output Report for Replication(s) to console");
         upperLeftFlowPanel.add(printSummaryReportsCB);
 
-        /* DIFF between OA3302 branch and trunk */
-        saveReplicationDataCB = new JCheckBox("Save replication data to XML");
-        saveReplicationDataCB.setToolTipText("Use in conjuction with Enable Analyst Reports to save replication data to XML");
+        saveReplicationDataCB = new JCheckBox("Save replication data to XML file");
+        saveReplicationDataCB.setToolTipText("Save replication data to XML file, for use as Analyst Report");
         saveReplicationDataCB.setSelected(analystReportPanelVisible);
         saveReplicationDataCB.setEnabled(analystReportPanelVisible);
         upperLeftFlowPanel.add(saveReplicationDataCB);
         analystReportCB = new JCheckBox("Enable Analyst Reports");
-        analystReportCB.setToolTipText("When enabled, replication data saved to XML will be used to generate HTML reports");
+        analystReportCB.setToolTipText("Replication data saved to XML is used to generate HTML reports");
         analystReportCB.setSelected(analystReportPanelVisible);
         analystReportCB.setEnabled(analystReportPanelVisible);
         upperLeftFlowPanel.add(analystReportCB);
