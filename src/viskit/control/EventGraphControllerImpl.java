@@ -98,8 +98,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void settings() {
-        // placeholder for multi-tabbed combo app.
+    public void settings() 
+    {
+        ViskitGlobals.instance().getAssemblyController().settings();
     }
 
     @Override

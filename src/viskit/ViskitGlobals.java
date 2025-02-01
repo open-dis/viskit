@@ -138,8 +138,8 @@ public class ViskitGlobals {
     }
 
     /* routines to manage the singleton-aspect of the views. */
-    MvcAbstractViewFrame assemblyViewFrame;
-    MvcController assemblyController;
+    AssemblyViewFrame assemblyViewFrame;
+    AssemblyControllerImpl assemblyController;
 
     /**
      * Get a reference to the assembly editor view.
@@ -169,7 +169,7 @@ public class ViskitGlobals {
         return (AssemblyModel) assemblyController.getModel();
     }
 
-    public MvcController getAssemblyController() {
+    public AssemblyControllerImpl getAssemblyController() {
         return assemblyController;
     }
 

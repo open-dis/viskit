@@ -69,7 +69,6 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
 import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
-import viskit.view.SimulationRunPanel;
 import viskit.assembly.SimulationRunInterface;
 
 /**
@@ -205,8 +204,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void settings() {
-        // placeholder for combo gui
+    public void settings()
+    {
+        boolean modified; // TODO can we do anything with this notification?
+        modified = SettingsDialog.showDialog(ViskitGlobals.instance().getMainFrame());
     }
 
     @Override

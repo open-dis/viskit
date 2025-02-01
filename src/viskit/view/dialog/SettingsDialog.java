@@ -99,10 +99,17 @@ public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences
     private JRadioButton otherLafRB;
     private JTextField otherTF;
 
-    public static boolean showDialog(JFrame mother) {
+    /** 
+     * Display preferences panel
+     * @param parentFrame so that window can popup
+     * @return whether modified
+     */
+    public static boolean showDialog(JFrame parentFrame) 
+    {
         if (settingsDialog == null) {
-            settingsDialog = new SettingsDialog(mother);
-        } else {
+            settingsDialog = new SettingsDialog(parentFrame);
+        } 
+        else {
             settingsDialog.setParams();
         }
         settingsDialog.setVisible(true);
@@ -110,9 +117,9 @@ public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences
         return modified;
     }
 
-    private SettingsDialog(JFrame mother)
+    private SettingsDialog(JFrame parentFrame)
     {
-        super(mother, "Viskit Settings", true);
+        super(parentFrame, "Viskit Settings", true);
 
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.addWindowListener(new myCloseListener());

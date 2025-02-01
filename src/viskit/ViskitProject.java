@@ -308,34 +308,36 @@ public class ViskitProject {
     }
 
     /** @return an array of a project's extra classpaths */
-    public String[] getProjectAdditionalClasspaths() {
-
+    public String[] getProjectAdditionalClasspaths() 
+    {
         // Prevent duplicate entries
-        Set<String> cp = new HashSet<>();
+        Set<String> classpathSet = new HashSet<>();
 
         // Find and list JARs and ZIPs, from the project's lib directory, in the extra classpath widget
         try {
-            String file;
-            for (File f : getLibDir().listFiles()) {
-                if ((f.getName().toLowerCase().contains(".jar")) || (f.getName().toLowerCase().contains(".zip"))) {
-                    file = f.getCanonicalPath().replaceAll("\\\\", "/");
-                    LOG.debug(file);
-                    cp.add(file);
+            String additionalJarZipFilePath;
+            for (File additionalFile : getLibDir().listFiles()) {
+                if  ((additionalFile.getName().toLowerCase().contains(".jar")) || 
+                     (additionalFile.getName().toLowerCase().contains(".zip"))) 
+                {
+                    additionalJarZipFilePath = additionalFile.getCanonicalPath().replaceAll("\\\\", "/");
+                    LOG.debug(additionalJarZipFilePath);
+                    classpathSet.add(additionalJarZipFilePath);
                 }
             }
             LOG.debug(getEventGraphsDir().getCanonicalPath());
 
             // Now list any paths inside/outside of the project space, i.e. ${other path}/build/classes
             String[] classPaths = SettingsDialog.getExtraClassPath();
-            cp.addAll(Arrays.asList(classPaths));
-            LOG.debug("Project cp: {}", cp);
+            classpathSet.addAll(Arrays.asList(classPaths));
+            LOG.debug("Project cp: {}", classpathSet);
 
         } catch (IOException ex) {
             LOG.error(ex);
         } catch (NullPointerException npe) {
             return null;
         }
-        return cp.toArray(String[]::new);
+        return classpathSet.toArray(String[]::new);
     }
 
     public void clean() {
