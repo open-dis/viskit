@@ -156,7 +156,7 @@ public class ViskitApplication
                 // provide initial guidance to new user who is facing an empty editor
                 String guidance = "<html><body><p align='center'>Welcome to Viskit!</p><br />" +
                                               "<p align='center'>To get started, create or open an</p><br />" +
-                                              "<p align='center'><i>Event Graph</i> or <i>Assembly</i></p><br />";
+                                              "<p align='center'><i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />";
                 ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Add Event Graph or Assembly", guidance);
             }
