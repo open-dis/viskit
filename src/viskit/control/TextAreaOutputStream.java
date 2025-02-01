@@ -654,7 +654,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
         getSimulationRunMenu().addSeparator();
-        getSimulationRunMenu().add(new JMenuItem("Viskit Settings"));
+        getSimulationRunMenu().add(new JMenuItem("Viskit Preferences"));
         }
         myMenuBar.add(getSimulationRunMenu());
 

@@ -82,7 +82,8 @@ public interface EventGraphController {
      */
     void newProject();
 
-    /** Creates a zip of the current project directory and initiates an email
+    /** 
+     * Creates a zip of the current project directory and initiates an email
      * client form to open for mailing to the viskit mailing list
      */
     void zipAndMailProject();
@@ -90,37 +91,35 @@ public interface EventGraphController {
     /** Show the XML form of an event graph */
     void viewXML();
 
-    /** A component, e.g., vMod, wants to say something.
-     *
-     * @param typ the type of message, i.e. ERROR, WARN, INFO, QUESTION, etc.
+    /** 
+     *A component wants to say something.
+     * @param messageType the type of message, i.e. JOptionPane.ERROR, JOptionPane.WARN, JOptionPane.INFO, JOptionPane.QUESTION, etc.
      * @param title the title of the message in the dialog frame
-     * @param msg the message to transmit
+     * @param message the message to transmit
      */
-    void messageUser(int typ, String title, String msg);    // typ is one of JOptionPane types
+    void messageUser(int messageType, String title, String message);    // typ is one of JOptionPane types
 
-    /** Requests to the controller to perform editing operations on existing entities
-     *
-     * @param node the node to edit
+    /** 
+     * Requests to the controller to perform editing operations on existing entities
+     * @param eventNode the node to edit
      */
-    void nodeEdit(EventNode node);
+    void nodeEdit(EventNode eventNode);
 
     /**
      * Edit a scheduling edge
-     *
-     * @param ed the edge to edit
+     * @param schedulingEdge the edge to edit
      */
-    void schedulingArcEdit(Edge ed);
+    void schedulingArcEdit(Edge schedulingEdge);
 
     /**
      * Edit a canceling edge
-     *
-     * @param ed the edge to edit
+     * @param cancellingArcEdge the edge to edit
      */
-    void cancellingArcEdit(Edge ed);
+    void cancellingArcEdit(Edge cancellingArcEdge);
 
-    void simParameterEdit(ViskitParameter param);
+    void simParameterEdit(ViskitParameter simParameter);
 
-    void stateVariableEdit(ViskitStateVariable var);
+    void stateVariableEdit(ViskitStateVariable stateVariable);
 
     void codeBlockEdit(String s);
 
@@ -131,9 +130,9 @@ public interface EventGraphController {
 
     /**
      * Opens one of the recently opened Event Graphs
-     * @param path to the recent Event Graph
+     * @param recentEventGraphPath to the recent Event Graph
      */
-    void openRecentEventGraph(File path);
+    void openRecentEventGraph(File recentEventGraphPath);
 
     /** Closes an open Event Graph */
     void close();
@@ -184,7 +183,7 @@ public interface EventGraphController {
 
     void selectNodeOrEdge(Vector<Object> v);
 
-    void settings();
+    void showViskitUserPreferences();
 
     boolean preClose();
 
@@ -194,9 +193,9 @@ public interface EventGraphController {
 
     void postQuit();
 
-    void deleteSimParameter(ViskitParameter p);
+    void deleteSimParameter(ViskitParameter simParameter);
 
-    void deleteStateVariable(ViskitStateVariable var);
+    void deleteStateVariable(ViskitStateVariable stateVariable);
 
     void eventList();
 
@@ -210,13 +209,13 @@ public interface EventGraphController {
      */
     void captureWindow();
 
-    void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
+    void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener eventGraphFileListener);
 
-    void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis);
+    void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener eventGraphFileListener);
 
-    void addRecentEventGraphFileListener(MvcRecentFileListener lis);
+    void addRecentEventGraphFileListener(MvcRecentFileListener recentEventGraphFileListener);
 
-    void removeRecentEventGraphFileListener(MvcRecentFileListener lis);
+    void removeRecentEventGraphFileListener(MvcRecentFileListener recentEventGraphFileListener);
 
     Set<String> getRecentEventGraphFileSet();
 

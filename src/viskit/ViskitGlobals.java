@@ -76,7 +76,7 @@ import viskit.view.AssemblyViewFrame;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.SimulationRunPanel;
 import viskit.view.ViskitStartupProjectInitializationPanel;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.ViskitUserPreferences;
 import viskit.mvc.MvcController;
 import edu.nps.util.SystemExitHandler;
 import viskit.control.TextAreaOutputStream;
@@ -310,7 +310,7 @@ public class ViskitGlobals {
             interpreter.setStrictJava(true);       // no loose typing
         }
 
-        String[] workCP = SettingsDialog.getExtraClassPath();
+        String[] workCP = ViskitUserPreferences.getExtraClassPath();
         if (workCP != null && workCP.length > 0) {
             for (String path : workCP) {
                 try {
@@ -821,7 +821,7 @@ public class ViskitGlobals {
             ViskitProject.setProjectRoot(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
 
         if (ViskitProject.initProject()) {
-            SettingsDialog.saveExtraClasspathEntries(ViskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
+            ViskitUserPreferences.saveExtraClasspathEntries(ViskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
         } else {
             LOG.warn("Unable to create project directory, returning");
             return;
@@ -839,7 +839,7 @@ public class ViskitGlobals {
      */
     public ClassLoader getWorkClassLoader() {
         if (workLoader == null) {
-            URL[] urls = SettingsDialog.getExtraClassPathArraytoURLArray();
+            URL[] urls = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
             LocalBootLoader loader = new LocalBootLoader(urls,
                     Thread.currentThread().getContextClassLoader(),
                     getWorkDirectory());
@@ -865,7 +865,7 @@ public class ViskitGlobals {
         if (freshLoader == null) {
 
             // Forcing exposure of extra classpaths here.  Bugfix 1237
-            URL[] urlArray = SettingsDialog.getExtraClassPathArraytoURLArray();
+            URL[] urlArray = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
 
             /* Not sure if this breaks the "fresh" classloader for assembly
                running, but in post JDK8 land, the Java Platform Module System

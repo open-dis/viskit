@@ -98,9 +98,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void settings() 
+    public void showViskitUserPreferences() 
     {
-        ViskitGlobals.instance().getAssemblyController().settings();
+        ViskitGlobals.instance().getAssemblyController().showViskitUserPreferences();
     }
 
     @Override

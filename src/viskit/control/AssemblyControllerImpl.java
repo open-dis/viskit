@@ -62,7 +62,7 @@ import viskit.util.XMLValidationTool;
 import viskit.view.dialog.AssemblyMetadataDialog;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.AssemblyView;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.ViskitUserPreferences;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -137,7 +137,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 openProject(projectPath); // calls EventGraphViewFrame setTitleApplicationProjectName
 
                 // Add new project EventGraphs for LEGO tree inclusion of our SimEntities
-                SettingsDialog.RebuildLEGOTreePanelTask t = new SettingsDialog.RebuildLEGOTreePanelTask();
+                ViskitUserPreferences.RebuildLEGOTreePanelTask t = new ViskitUserPreferences.RebuildLEGOTreePanelTask();
                 t.execute();
             }
             compileAssembly(initialAssemblyFile);
@@ -204,10 +204,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void settings()
+    public void showViskitUserPreferences()
     {
         boolean modified; // TODO can we do anything with this notification?
-        modified = SettingsDialog.showDialog(ViskitGlobals.instance().getMainFrame());
+        modified = ViskitUserPreferences.showDialog(ViskitGlobals.instance().getMainFrame());
     }
 
     @Override
@@ -641,24 +641,36 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      *
      * @return indication of continue or cancel
      */
-    public boolean handleProjectClosing() {
-        boolean projectClosed = true;
+    public boolean handleProjectClosing() 
+    {
+        boolean projectClosed;
+        String title, message;
         if (ViskitGlobals.instance().getViskitProject().isProjectOpen())
         {
-            String msg = "Are you sure you want to close your current Viskit Project?";
-            String title = "Close Current Project?";
+            title = "Close Current Project?";
+            message = "Are you sure you want to close the current Viskit Project?";
+            // TODO show project name
 
-            int returnValue = ((AssemblyView) getView()).genericAskYN(title, msg);
+            int returnValue = ((AssemblyView) getView()).genericAskYN(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
             {
                 doProjectCleanup();
+                projectClosed = true;
+                return projectClosed;
             } 
             else {
                 projectClosed = false;
+                return projectClosed;
             }
         }
-        
-        return projectClosed;
+        else // hopefully not reachable if other logic works OK
+        {
+            title = "Project already closed";
+            message = "Unable to close project since none is open";
+            ((AssemblyView) getView()).genericReport(JOptionPane.ERROR_MESSAGE, title, message);
+                projectClosed = true;
+                return projectClosed;
+        }
     }
 
     @Override

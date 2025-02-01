@@ -133,7 +133,7 @@ public class ViskitApplication
         if (viskit.ViskitStatics.debug) {
             LogUtils.getLogger(ViskitApplication.class).debug("***Inside EventGraphAssembly main {}: ", args.length);
         }
-        setLandFandFonts();
+        setLookAndFeel();
 
         // Leave tooltips on the screen until mouse movement causes removal
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
@@ -163,18 +163,18 @@ public class ViskitApplication
         });
     }
 
-    private static void setLandFandFonts() {
-        String s = ViskitUserPreferences.getLookAndFeel();
+    private static void setLookAndFeel() {
+        String userPreferencesLookAndFeel = ViskitUserPreferences.getLookAndFeel();
         try {
-            if (s == null || s.isEmpty() || s.equalsIgnoreCase("default")) {
+            if (userPreferencesLookAndFeel == null || userPreferencesLookAndFeel.isEmpty() || userPreferencesLookAndFeel.equalsIgnoreCase("default")) {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            } else if (s.equalsIgnoreCase("platform")) {
+            } else if (userPreferencesLookAndFeel.equalsIgnoreCase("platform")) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } else {
-                UIManager.setLookAndFeel(s);
+                UIManager.setLookAndFeel(userPreferencesLookAndFeel);
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            LogUtils.getLogger(ViskitApplication.class).error("Error setting {} Look and Feel", s);
+            LogUtils.getLogger(ViskitApplication.class).error("Error setting {} Look and Feel", userPreferencesLookAndFeel);
         }
     }
 

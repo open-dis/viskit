@@ -76,11 +76,11 @@ import viskit.control.AssemblyControllerImpl;
  * @since 11:24:06 AM
  * @version $Id$
  */
-public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences, watch out: tricky due to method reflection
+public class ViskitUserPreferences extends JDialog
 {
-    static final Logger LOG = LogUtils.getLogger(SettingsDialog.class);
+    static final Logger LOG = LogUtils.getLogger(ViskitUserPreferences.class);
 
-    private static SettingsDialog settingsDialog;
+    private static ViskitUserPreferences settingsDialog;
     private static boolean modified = false;
     private final JButton cancelButton;
     private final JButton okButton;
@@ -107,7 +107,7 @@ public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences
     public static boolean showDialog(JFrame parentFrame) 
     {
         if (settingsDialog == null) {
-            settingsDialog = new SettingsDialog(parentFrame);
+            settingsDialog = new ViskitUserPreferences(parentFrame);
         } 
         else {
             settingsDialog.setParams();
@@ -117,9 +117,9 @@ public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences
         return modified;
     }
 
-    private SettingsDialog(JFrame parentFrame)
+    private ViskitUserPreferences(JFrame parentFrame)
     {
-        super(parentFrame, "Viskit Settings", true);
+        super(parentFrame, "Viskit Preferences", true);
 
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -523,7 +523,7 @@ public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(SettingsDialog.this, "Apply changes?",
+                int ret = JOptionPane.showConfirmDialog(ViskitUserPreferences.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
                     okButton.doClick();
@@ -572,7 +572,7 @@ public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences
                 });
             }
 
-            int retv = addChooser.showOpenDialog(SettingsDialog.this);
+            int retv = addChooser.showOpenDialog(ViskitUserPreferences.this);
             if (retv == JFileChooser.APPROVE_OPTION) {
                 File selFile = addChooser.getSelectedFile();
                 String absPath = selFile.getAbsolutePath();

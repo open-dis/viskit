@@ -190,7 +190,7 @@ public interface AssemblyController {
      */
     void postClose();
 
-    void settings();
+    void showViskitUserPreferences();
 
     /**
      * Perform Assembly Editor shutdown duties

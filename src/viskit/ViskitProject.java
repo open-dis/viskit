@@ -55,7 +55,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import viskit.doe.FileHandler;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.ViskitUserPreferences;
 
 /** The base class for management of all Viskit Projects
  * @version $Id: ViskitProject.java 1916 2008-07-04 09:13:41Z tdnorbra $
@@ -328,7 +328,7 @@ public class ViskitProject {
             LOG.debug(getEventGraphsDir().getCanonicalPath());
 
             // Now list any paths inside/outside of the project space, i.e. ${other path}/build/classes
-            String[] classPaths = SettingsDialog.getExtraClassPath();
+            String[] classPaths = ViskitUserPreferences.getExtraClassPath();
             classpathSet.addAll(Arrays.asList(classPaths));
             LOG.debug("Project cp: {}", classpathSet);
 

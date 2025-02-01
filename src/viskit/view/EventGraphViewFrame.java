@@ -75,7 +75,7 @@ import viskit.view.dialog.ParameterDialog;
 import viskit.view.dialog.EdgeInspectorDialog;
 import viskit.view.dialog.StateVariableDialog;
 import viskit.view.dialog.EventInspectorDialog;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.ViskitUserPreferences;
 import viskit.mvc.MvcController;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
@@ -121,7 +121,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     public final static int SELF_REF_CANCEL_MODE = 5;
 
     private static final String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
-    private static final String LOOK_AND_FEEL = SettingsDialog.getLookAndFeel();;
+    private static final String LOOK_AND_FEEL = ViskitUserPreferences.getLookAndFeel();;
 
     /** Toolbar for dropping icons, connecting, etc. */
     private JToolBar toolBar;    // Mode buttons on the toolbar
@@ -802,7 +802,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
         eventGraphMenu.addSeparator();
-        eventGraphMenu.add(buildMenuItem(eventGraphController, "settings", "Viskit Settings", null, null));
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "showViskitUserPreferences", "Viskit Preferences", null, null));
         
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {

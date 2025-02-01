@@ -84,7 +84,7 @@ import viskit.util.AssemblyFileFilter;
 import viskit.view.dialog.EventGraphNodeInspectorDialog;
 import viskit.view.dialog.RecentFilesDialog;
 import viskit.view.dialog.SimEventListenerConnectionInspectorDialog;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.ViskitUserPreferences;
 import viskit.view.dialog.PclNodeInspectorDialog;
 import viskit.view.dialog.AdapterConnectionInspectorDialog;
 import viskit.view.dialog.PclEdgeInspectorDialog;
@@ -256,7 +256,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     /**
      * @return the recentProjectFileSetListener
      */
-    public RecentProjectFileSetListener getRecentProjectFileSetListener() {
+    public RecentProjectFileSetListener getRecentProjectFileSetListener()
+    {
         if (recentProjectFileSetListener == null)
             recentProjectFileSetListener = new RecentProjectFileSetListener();
         return recentProjectFileSetListener;
@@ -494,10 +495,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
-        assemblyMenu.add(buildMenuItem(assemblyController, "newProject", "New Viskit Project", KeyEvent.VK_V,
+        assemblyMenu.add(buildMenuItem(assemblyController, "newProject", "New Viskit Project", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
         
-        assemblyMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
+        assemblyMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
         
@@ -542,7 +543,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
         assemblyMenu.addSeparator();
-        assemblyMenu.add(buildMenuItem(assemblyController, "settings", "Viskit Settings", null, null));
+        assemblyMenu.add(buildMenuItem(assemblyController, "showViskitUserPreferences", "Viskit Preferences", null, null));
         assemblyMenu.addSeparator();
 
         assemblyMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Quit", KeyEvent.VK_Q,
@@ -581,8 +582,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         projectMenu.add(buildMenuItem(assemblyController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
                 null));
 
-        projectMenu.add(buildMenuItem(assemblyController, "settings", "Viskit Settings", null, null));
         projectMenu.addSeparator();
+        projectMenu.add(buildMenuItem(assemblyController, "showViskitUserPreferences", "Viskit Preferences", null, null));
 
         projectMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Quit", KeyEvent.VK_Q,
                 null));
@@ -921,7 +922,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         // Parse any extra/additional classpath for any required dependencies
         File file;
         try {
-            URL[] extraCP = SettingsDialog.getExtraClassPathArraytoURLArray();
+            URL[] extraCP = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
             for (URL path : extraCP) { // tbd same for pcls
                 if (path == null)
                     continue; // can happen if extraClassPaths.path[@value] is null or erroneous
@@ -1113,30 +1114,31 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public int genericAsk(String title, String msg) {
-        return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_CANCEL_OPTION);
+    public int genericAsk(String title, String message) {
+        return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_CANCEL_OPTION);
     }
 
     @Override
-    public int genericAskYN(String title, String msg) {
-        return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_OPTION);
+    public int genericAskYN(String title, String message) {
+        return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION);
     }
 
     @Override
-    public int genericAsk2Buttons(String title, String msg, String butt1, String butt2) {
-        return JOptionPane.showOptionDialog(this, msg, title, JOptionPane.DEFAULT_OPTION,
+    public int genericAsk2Buttons(String title, String message, String butt1, String butt2) {
+        return JOptionPane.showOptionDialog(this, message, title, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null,
                 new String[]{butt1, butt2}, butt1);
     }
 
     @Override
-    public void genericReport(int type, String title, String message) {
-        if (type == JOptionPane.ERROR_MESSAGE)
+    public void genericReport(int messageType, String title, String message)
+    {
+        if (messageType == JOptionPane.ERROR_MESSAGE)
         {
             LOG.error(message);
             System.err.println("***" + message);
         }
-        JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainFrame(), message, title, type);
+        JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainFrame(), message, title, messageType);
     }
 
     @Override
@@ -1194,7 +1196,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     {
         assemblyController = ((AssemblyControllerImpl) getController()); // TODO unscramble impl's
 
-        if (!((AssemblyControllerImpl)assemblyController).handleProjectClosing())
+        if (!assemblyController.handleProjectClosing())
             return;
 
         File file = ViskitProject.openProjectDirectory(this.getContent(), ViskitProject.VISKIT_PROJECTS_DIRECTORY);
