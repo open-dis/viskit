@@ -49,7 +49,7 @@ import java.net.URL;
 import javax.swing.*;
 
 import viskit.view.MainFrame;
-import viskit.view.dialog.SettingsDialog;
+import viskit.view.dialog.ViskitUserPreferences;
 
 /**
  * MOVES Institute
@@ -155,8 +155,8 @@ public class ViskitApplication
             {
                 // provide initial guidance to new user who is facing an empty editor
                 String guidance = "<html><body><p align='center'>Welcome to Viskit!</p><br />" +
-                                              "<p align='center'>To get started, create or open</p><br />" +
-                                              "<p align='center'>an <i>Event Graph</i> or an <i>Assembly</i></p><br />";
+                                              "<p align='center'>To get started, create or open an</p><br />" +
+                                              "<p align='center'><i>Event Graph</i> or <i>Assembly</i></p><br />";
                 ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Add Event Graph or Assembly", guidance);
             }
@@ -164,7 +164,7 @@ public class ViskitApplication
     }
 
     private static void setLandFandFonts() {
-        String s = SettingsDialog.getLookAndFeel();
+        String s = ViskitUserPreferences.getLookAndFeel();
         try {
             if (s == null || s.isEmpty() || s.equalsIgnoreCase("default")) {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
