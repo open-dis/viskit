@@ -65,6 +65,7 @@ import viskit.ViskitConfiguration;
 import viskit.ViskitProject;
 import viskit.ViskitStatics;
 import viskit.control.AssemblyController;
+import viskit.control.AssemblyControllerImpl;
 
 /**
  * <p>MOVES Institute
@@ -389,8 +390,8 @@ public class SettingsDialog extends JDialog // TODO rename ViskitUserPreferences
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            AssemblyController aCtrlr = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
-            aCtrlr.clearRecentAssemblyFileList();
+            AssemblyControllerImpl assemblyController = (AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController();
+            assemblyController.clearRecentAssemblyFileList();
         }
     }
 

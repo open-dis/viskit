@@ -216,7 +216,7 @@ public class MainFrame extends JFrame
             tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] = -1;
         }
 
-        assemblyController = (AssemblyController) assemblyFrame.getController();
+        assemblyController = (AssemblyControllerImpl) assemblyFrame.getController();
         assemblyController.setMainTabbedPane(topTabbedPane, TAB0_ASSEMBLY_EDITOR_INDEX);
         eventGraphController = (EventGraphController) eventGraphFrame.getController();
 
@@ -541,7 +541,7 @@ public class MainFrame extends JFrame
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] != -1) {
                     topTabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX]);
-                    if (!((AssemblyController) assemblyFrame.getController()).preQuit()) {
+                    if (!((AssemblyControllerImpl) assemblyFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
@@ -576,7 +576,7 @@ public class MainFrame extends JFrame
 
                     // TODO: Need grid and doe listener removal (tdn) 9/13/24
 
-                    ((AssemblyController) assemblyFrame.getController()).postQuit();
+                    ((AssemblyControllerImpl) assemblyFrame.getController()).postQuit();
                 }
 
                 /* DIFF between OA3302 branch and trunk */

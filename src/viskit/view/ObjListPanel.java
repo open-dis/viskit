@@ -30,7 +30,7 @@ import viskit.model.ViskitModelInstantiator;
 import viskit.view.dialog.ArrayInspector;
 import viskit.view.dialog.ObjectInspector;
 import viskit.ViskitStatics;
-import viskit.control.AssemblyController;
+import viskit.control.AssemblyControllerImpl;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -244,7 +244,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
             } catch (ClassNotFoundException e1) {
                 String msg = "An object type specified in this element (probably " + inst.getType() + ") was not found.\n" +
                         "Add the XML or class file defining the element to the proper list at left.";
-                ((AssemblyController)ViskitGlobals.instance().getAssemblyViewFrame().getController()).messageUser(
+                ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyViewFrame().getController()).messageUser(
                         JOptionPane.ERROR_MESSAGE,
                         e1.getMessage(),
                         msg);

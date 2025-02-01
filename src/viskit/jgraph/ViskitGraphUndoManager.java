@@ -59,10 +59,10 @@ import viskit.mvc.MvcController;
 public class ViskitGraphUndoManager extends GraphUndoManager implements GraphSelectionListener {
 
     private final Vector<Object> selected;
-    private final MvcController controller;
+    private final MvcController mvcController;
 
     public ViskitGraphUndoManager(MvcController controller) {
-        this.controller = controller;
+        this.mvcController = controller;
         selected = new Vector<>();
     }
 
@@ -72,10 +72,10 @@ public class ViskitGraphUndoManager extends GraphUndoManager implements GraphSel
         // Remember the update the menus.  Edit is handled by the super()
         super.undoableEditHappened(e);
 
-        if (controller instanceof EventGraphControllerImpl)
-            ((EventGraphControllerImpl) controller).updateUndoRedoStatus();
+        if (mvcController instanceof EventGraphControllerImpl)
+            ((EventGraphControllerImpl) mvcController).updateUndoRedoStatus();
         else
-            ((AssemblyControllerImpl) controller).updateUndoRedoStatus();
+            ((AssemblyControllerImpl) mvcController).updateUndoRedoStatus();
     }
 
     @Override
@@ -96,10 +96,10 @@ public class ViskitGraphUndoManager extends GraphUndoManager implements GraphSel
             }
         }
 
-        if (controller instanceof EventGraphControllerImpl)
-            ((EventGraphController) controller).selectNodeOrEdge(selected);
+        if (mvcController instanceof EventGraphControllerImpl)
+            ((EventGraphController) mvcController).selectNodeOrEdge(selected);
         else
-            ((AssemblyController) controller).selectNodeOrEdge(selected);
+            ((AssemblyControllerImpl) mvcController).selectNodeOrEdge(selected);
     }
 
 } // end class ViskitGraphUndoManager

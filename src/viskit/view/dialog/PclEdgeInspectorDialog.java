@@ -19,7 +19,7 @@ import java.util.Vector;
 import javax.swing.text.JTextComponent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import viskit.control.AssemblyController;
+import viskit.control.AssemblyControllerImpl;
 import viskit.model.EventGraphNode;
 import viskit.model.PropertyChangeEdge;
 import viskit.model.PropertyChangeListenerNode;
@@ -247,10 +247,10 @@ public class PclEdgeInspectorDialog extends JDialog {
                 }
 
                 Class<?> stopClass = ViskitStatics.classForName("simkit.BasicSimEntity");
-                BeanInfo binf = Introspector.getBeanInfo(c, stopClass);
-                PropertyDescriptor[] pds = binf.getPropertyDescriptors();
-                if (pds == null || pds.length <= 0) {
-                    ((AssemblyController)ViskitGlobals.instance().getAssemblyController()).messageUser(
+                BeanInfo beanInfo = Introspector.getBeanInfo(c, stopClass);
+                PropertyDescriptor[] propertyDescriptorArray = beanInfo.getPropertyDescriptors();
+                if (propertyDescriptorArray == null || propertyDescriptorArray.length <= 0) {
+                    ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).messageUser(
                             JOptionPane.INFORMATION_MESSAGE,
                             "No properties found in " + classname,
                             "Enter name manually.");
@@ -258,7 +258,7 @@ public class PclEdgeInspectorDialog extends JDialog {
                 }
                 Vector<String> nams = new Vector<>();
                 Vector<String> typs = new Vector<>();
-                for (PropertyDescriptor pd : pds) {
+                for (PropertyDescriptor pd : propertyDescriptorArray) {
                     if (pd.getWriteMethod() != null) {
                         // want getters but no setter
                         continue;

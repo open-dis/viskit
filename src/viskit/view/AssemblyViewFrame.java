@@ -166,7 +166,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private JMenuItem quitMenuItem;
     private RecentProjectFileSetListener recentProjectFileSetListener;
     private RecentAssemblyFileListener   recentAssemblyFileListener; // TODO public?
-    private AssemblyController assemblyController;
+    private AssemblyControllerImpl assemblyController;
     private JMenu projectMenu;
     private JMenu assemblyMenu;
     private JMenu editMenu;
@@ -300,7 +300,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             String nameOnly;
             Action currentAction;
             JMenuItem mi;
-            assemblyController = (AssemblyController) getController(); // TODO repetitive
+            assemblyController = (AssemblyControllerImpl) getController(); // TODO repetitive
             Set<String> files = assemblyController.getRecentAssemblyFileSet();
             openRecentAssemblyMenu.removeAll(); // clear prior to rebuilding menu
             openRecentAssemblyMenu.setEnabled(false); // disable unless file is found
@@ -334,7 +334,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             // TODO note that some items might remain loaded after "clear menu" and so wondering if that is ambiguous
             
             // prior implementation is different pattern and so not continued
-//            AssemblyController assemblyCcontroller = (AssemblyController) getController();
+//            AssemblyController assemblyCcontroller = (AssemblyControllerImpl) getController();
 //            Set<String> files = assemblyCcontroller.getRecentAssemblyFileSet();
 //            openRecentAssemblyMenu.removeAll();
 //            files.stream().filter(fullPath -> new File(fullPath).exists()).map(fullPath -> {
@@ -367,7 +367,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         @Override
         public void actionPerformed(ActionEvent ev)
         {
-            assemblyController = (AssemblyController) getController(); // TODO repetitive
+            assemblyController = (AssemblyControllerImpl) getController(); // TODO repetitive
 
             File fullPath;
             Object obj = getValue(ViskitStatics.FULL_PATH);
@@ -390,7 +390,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     {
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
         
-        assemblyController = (AssemblyController) getController(); // TODO repetitive
+        assemblyController = (AssemblyControllerImpl) getController(); // TODO repetitive
 
         ActionIntrospector.getAction(assemblyController, "undo").setEnabled(false);
         ActionIntrospector.getAction(assemblyController, "redo").setEnabled(false);
@@ -441,7 +441,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     private void buildMenus()
     {
-        assemblyController = (AssemblyController) getController(); // TODO repetitive
+        assemblyController = (AssemblyControllerImpl) getController(); // TODO repetitive
         recentAssemblyFileListener = new RecentAssemblyFileListener();
         assemblyController.addRecentAssemblyFileSetListener(getRecentAssemblyFileListener());
 
@@ -560,7 +560,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     private void buildProjectMenu()
     {
-        assemblyController = (AssemblyController) getController(); // TODO repetitive
+        assemblyController = (AssemblyControllerImpl) getController(); // TODO repetitive
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(); // TODO repetitive
         
         projectMenu = new JMenu("Project");
@@ -1004,20 +1004,20 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                     if (xn != null) {
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
-                                ((AssemblyController) getController()).newFileBasedEventGraphNode(xn, p);
+                                ((AssemblyControllerImpl) getController()).newFileBasedEventGraphNode(xn, p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newFileBasedPropertyChangeListenerNode(xn, p);
+                                ((AssemblyControllerImpl) getController()).newFileBasedPropertyChangeListenerNode(xn, p);
                                 break;
                         }
                     } else {
                         // Else class-based node
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
-                                ((AssemblyController) getController()).newEventGraphNode(sa[1], p);
+                                ((AssemblyControllerImpl) getController()).newEventGraphNode(sa[1], p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyController) getController()).newPropertyChangeListenerNode(sa[1], p);
+                                ((AssemblyControllerImpl) getController()).newPropertyChangeListenerNode(sa[1], p);
                                 break;
                         }
                     }

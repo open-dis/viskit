@@ -21,6 +21,7 @@ import org.jgraph.graph.*;
 import viskit.view.AssemblyViewFrame;
 import viskit.model.ModelEvent;
 import viskit.control.AssemblyController;
+import viskit.control.AssemblyControllerImpl;
 import viskit.model.*;
 
 /**
@@ -412,7 +413,7 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         DefaultGraphCell src = (DefaultGraphCell) getModel().getParent(source);
         DefaultGraphCell tar = (DefaultGraphCell) getModel().getParent(target);
         Object[] oa = new Object[]{src, tar};
-        AssemblyController controller = (AssemblyController) parent.getController();
+        AssemblyController controller = (AssemblyControllerImpl) parent.getController();
 
         switch (parent.getCurrentMode()) {
             case AssemblyViewFrame.ADAPTER_MODE:

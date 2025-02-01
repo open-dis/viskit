@@ -5,6 +5,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import org.jgraph.plaf.basic.BasicGraphUI;
 import viskit.ViskitGlobals;
 import viskit.control.AssemblyController;
+import viskit.control.AssemblyControllerImpl;
 import viskit.model.*;
 
 /**
@@ -43,9 +44,9 @@ public class ViskitGraphAssemblyUI extends BasicGraphUI {
         return false; // any returned boolean does nothing in JGraph v.5.14.0
     }
 
-    private void createEditDialog(Object cell) {
-
-        AssemblyController cntl = (AssemblyController) ViskitGlobals.instance().getAssemblyController();
+    private void createEditDialog(Object cell) 
+    {
+        AssemblyController cntl = (AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController();
         Object obj = ((DefaultMutableTreeNode) cell).getUserObject();
         if (cell instanceof ViskitAssemblyEdgeCell) {
             if (obj instanceof AdapterEdge) {
