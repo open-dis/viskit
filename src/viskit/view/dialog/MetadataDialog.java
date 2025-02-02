@@ -34,13 +34,13 @@ abstract public class MetadataDialog extends JDialog {
     JCheckBox verboseCb;
     JTextArea descriptionTextArea;
 
-    public MetadataDialog(JFrame f, GraphMetadata gmd) {
-        this(f, gmd, "Event Graph Properties");
+    public MetadataDialog(JFrame frame, GraphMetadata graphMetadata) {
+        this(frame, graphMetadata, "Event Graph Properties");
     }
 
-    public MetadataDialog(JFrame f, GraphMetadata gmd, String title) {
-        super(f, title, true);
-        this.param = gmd;
+    public MetadataDialog(JFrame frame, GraphMetadata graphMetadata, String title) {
+        super(frame, title, true);
+        this.param = graphMetadata;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -158,15 +158,15 @@ abstract public class MetadataDialog extends JDialog {
         cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
 
-        setParams(f, gmd);
+        setParams(frame, graphMetadata);
     }
 
-    public final void setParams(Component c, GraphMetadata gmd) {
-        param = gmd;
+    public final void setParams(Component c, GraphMetadata graphMetadata) {
+        param = graphMetadata;
 
         fillWidgets();
 
-        modified = (gmd == null);
+        modified = (graphMetadata == null);
         pack();
         setLocationRelativeTo(c);
     }

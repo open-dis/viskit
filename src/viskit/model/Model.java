@@ -125,9 +125,9 @@ public interface Model {
 
     /** Modifies the properties of this Event Graph model
      *
-     * @param gmd the meta data that contains changes to record
+     * @param graphMetadata the meta data that contains changes to record
      */
-    void changeMetadata(GraphMetadata gmd);
+    void changeMetadata(GraphMetadata graphMetadata);
 
     /**
      * Notify of a change to an Event Node

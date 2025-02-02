@@ -1204,5 +1204,21 @@ getProjectWorkingDirectory());
     public void setAnalystReportViewFrame(AnalystReportViewFrame analystReportViewFrame) {
         this.analystReportViewFrame = analystReportViewFrame;
     }
+    public void selectEventGraphTab()
+    {
+        mainFrame.selectEventGraphTab();
+    }
+    public void selectAssemblyTab()
+    {
+        mainFrame.selectAssemblyTab();
+    }
+    public void selectSimulationRunTab()
+    {
+        mainFrame.selectSimulationRunTab();
+    }
+    public void selectAnalystReportTab()
+    {
+        mainFrame.selectAnalystReportTab();
+    }
 
 } // end class file ViskitGlobals.java

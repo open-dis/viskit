@@ -18,14 +18,14 @@ public class AssemblyMetadataDialog extends MetadataDialog {
 
     private static MetadataDialog dialog;
     
-    public static boolean showDialog(JFrame f, GraphMetadata gmd) {
-        gmd.description = "NOTE: The description field for this Assembly is not" +
+    public static boolean showDialog(JFrame f, GraphMetadata graphMetadata) {
+        graphMetadata.description = "NOTE: The description field for this Assembly is not" +
                 " currently implemented.  Any text typed in this area will not" +
                 " be saved to XML";
         if (dialog == null) {
-            dialog = new AssemblyMetadataDialog(f, gmd);
+            dialog = new AssemblyMetadataDialog(f, graphMetadata);
         } else {
-            dialog.setParams(f, gmd);
+            dialog.setParams(f, graphMetadata);
         }
 
         dialog.setVisible(true);
@@ -33,7 +33,7 @@ public class AssemblyMetadataDialog extends MetadataDialog {
         return modified;
     }
 
-    AssemblyMetadataDialog(JFrame f, GraphMetadata gmd) {
-        super(f, gmd, "Assembly Properties");
+    AssemblyMetadataDialog(JFrame f, GraphMetadata graphMetadata) {
+        super(f, graphMetadata, "Assembly Properties");
     }
 }

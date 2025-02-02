@@ -288,11 +288,11 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             if (mod.getLastFile() != null)
                 ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
 
-            GraphMetadata gmd = mod.getMetadata();
-            if (gmd != null)
-                setSelectedAssemblyName(gmd.name);
+            GraphMetadata graphMetadata = mod.getMetadata();
+            if (graphMetadata != null)
+                setSelectedAssemblyName(graphMetadata.name);
             else if (viskit.ViskitStatics.debug)
-                System.err.println("error: AssemblyViewFrame gmd null..");
+                System.err.println("error: AssemblyViewFrame graphMetadata null..");
         }
     }
 

@@ -50,7 +50,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     private Point2D.Double pointLess;
     private final AssemblyControllerImpl assemblyController;
 
-    public AssemblyModelImpl(AssemblyControllerImpl newAssemblyController) {
+    public AssemblyModelImpl(AssemblyControllerImpl newAssemblyController)
+    {
         pointLess = new Point2D.Double(30, 60);
         assemblyController = newAssemblyController;
         graphMetadata = new GraphMetadata(this);
@@ -95,8 +96,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void changeMetaData(GraphMetadata gmd) {
-        graphMetadata = gmd;
+    public void changeMetaData(GraphMetadata newGraphMetadata) {
+        this.graphMetadata = newGraphMetadata;
         setDirty(true);
     }
 

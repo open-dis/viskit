@@ -279,10 +279,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
 //            adjustMenus((Model) getModel()); // enable/disable menu items based on new Event Graph
 
-            GraphMetadata gmd = ((Model) getModel()).getMetadata();
-            if (gmd != null) {
-                setSelectedEventGraphName(gmd.name);
-                setSelectedEventGraphDescription(gmd.description);
+            GraphMetadata graphMetadata = ((Model) getModel()).getMetadata();
+            if (graphMetadata != null) {
+                setSelectedEventGraphName(graphMetadata.name);
+                setSelectedEventGraphDescription(graphMetadata.description);
                 
             } else if (viskit.ViskitStatics.debug) {
                 System.err.println("error: EventGraphViewFrame metadata null...");

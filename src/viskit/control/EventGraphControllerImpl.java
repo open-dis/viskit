@@ -114,7 +114,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void newEventGraph() {
+    public void newEventGraph()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
 
         // Don't allow a new event graph to be created if a current project is
         // not open
@@ -136,18 +138,18 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
         // If we have models already opened, then use their package names for
         // this new Event Graph
-        GraphMetadata gmd = mod.getMetadata();
+        GraphMetadata graphMetadata = mod.getMetadata();
         if (oldGmd != null) {
-            gmd.packageName = oldGmd.packageName;
+            graphMetadata.packageName = oldGmd.packageName;
         }
 
         boolean modified =
-                EventGraphMetadataDialog.showDialog((JFrame) getView(), gmd);
+                EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
         if (modified) {
 
             // update title bar
-            ((EventGraphView) getView()).setSelectedEventGraphName(gmd.name);
-            ((EventGraphView) getView()).setSelectedEventGraphDescription(gmd.description);
+            ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name);
+            ((EventGraphView) getView()).setSelectedEventGraphDescription(graphMetadata.description);
 
             // Bugfix 1398
             String msg =
@@ -170,7 +172,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
      * Dialog operation
      * @return true = continue, false = don't (i.e., we canceled)
      */
-    private boolean askToSaveAndContinue() {
+    private boolean askToSaveAndContinue()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
         int yn = (((EventGraphView) getView()).genericAsk("Question", "Save modified graph?"));
 
         boolean retVal;
@@ -201,7 +205,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void open() {
+    public void open()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
         // Bug fix: 1249
         File[] files = ViskitGlobals.instance().getEventGraphViewFrame().openFilesAsk();
         if (files == null) {
@@ -220,13 +226,14 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     // Package protected for the AssemblyControllerImpl's access to open EventGraphs
-    void _doOpenEventGraph(File file) {
-        EventGraphView viskitView = (EventGraphView) getView();
+    void _doOpenEventGraph(File file)
+    {
+        EventGraphView eventGraphView = (EventGraphView) getView();
         ModelImpl modelImplementation = new ModelImpl(this);
         modelImplementation.initialize();
-        viskitView.addTab(modelImplementation);
+        eventGraphView.addTab(modelImplementation);
 
-        Model[] openAlready = viskitView.getOpenModels();
+        Model[] openAlready = eventGraphView.getOpenModels();
         boolean isOpenAlready = false;
         String path;
         if (openAlready != null) {
@@ -249,17 +256,17 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 modelImplementation.setNumericPriority(false);
             }
 
-            viskitView.setSelectedEventGraphName(modelImplementation.getMetadata().name);
+            eventGraphView.setSelectedEventGraphName(modelImplementation.getMetadata().name);
             if  (modelImplementation.getMetadata().description.isBlank())
-                 viskitView.setSelectedEventGraphDescription(EventGraphViewFrame.DESCRIPTION_HINT);
-            else viskitView.setSelectedEventGraphDescription(modelImplementation.getMetadata().description);
+                 eventGraphView.setSelectedEventGraphDescription(EventGraphViewFrame.DESCRIPTION_HINT);
+            else eventGraphView.setSelectedEventGraphDescription(modelImplementation.getMetadata().description);
             adjustRecentEventGraphFileSet(file);
             markEventGraphFilesAsOpened();
 
             // Check for good compilation. TODO: Possibly grossly unnecessary since all classpaths and initial Event Graph parsing areadly took place in the project space during startup (tdn) 9/14/24
 //            handleCompileAndSave(mod, file); <- possible source of Viskit barfing when opening a large set of Event Graphs
         } else {
-            viskitView.deleteTab(modelImplementation); // Not a good open, tell view
+            eventGraphView.deleteTab(modelImplementation); // Not a good open, tell view
         }
 
         resetRedoUndoStatus();
@@ -291,7 +298,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private DirectoryWatch dirWatch;
     private File watchDir;
 
-    private void initOpenEventGraphWatch() {
+    private void initOpenEventGraphWatch()
+    {
         try { // TBD this may be obsolete
             watchDir = TempFileManager.createTempFile("eventGraphs", "current");   // actually creates
             watchDir = TempFileManager.createTempDir(watchDir);
@@ -472,9 +480,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public boolean preQuit() {
 
         // Check for dirty models before exiting
-        Model[] mods = ((EventGraphView) getView()).getOpenModels();
-        for (Model mod : mods) {
-            setModel((MvcModel) mod);
+        Model[] modelArray = ((EventGraphView) getView()).getOpenModels();
+        for (Model model : modelArray) {
+            setModel((MvcModel) model);
 
             // Check for a canceled exit
             if (!preClose()) {
@@ -493,15 +501,17 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     @Override
     public void closeAll() {
 
-        Model[] mods = ((EventGraphView) getView()).getOpenModels();
-        for (Model mod : mods) {
-            setModel((MvcModel) mod);
+        Model[] models = ((EventGraphView) getView()).getOpenModels();
+        for (Model model : models) {
+            setModel((MvcModel) model);
             close();
         }
     }
 
     @Override
-    public void close() {
+    public void close()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
         if (preClose()) {
             postClose();
         }
@@ -560,7 +570,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void save() {
+    public void save()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
         Model mod = (Model) getModel();
         File localLastFile = mod.getLastFile();
         if (localLastFile == null) {
@@ -571,7 +583,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void saveAs() {
+    public void saveAs()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
         Model mod = (Model) getModel();
         EventGraphView view = (EventGraphView) getView();
         GraphMetadata graphMetadata = mod.getMetadata();
@@ -608,7 +622,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
      * @param m the model of the XML Event Graph
      * @param f the XML file name to save to
      */
-    private void handleCompileAndSave(Model m, File f) {
+    private void handleCompileAndSave(Model m, File f)
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
         if (m.saveModel(f)) {
 
             // We don't need to recurse since we know this is a file, but make sure
@@ -844,7 +860,10 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void undo() {
+    public void undo()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
+        
         if (selectionVector.isEmpty())
             return;
 
@@ -875,7 +894,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
      * Replaces the last selected node or edge from the JGraph model
      */
     @Override
-    public void redo() {
+    public void redo()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
 
         // Recreate the JAXB (XML) bindings since the paste function only does
         // nodes and not edges
@@ -942,7 +963,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void generateJavaSource() {
+    public void generateJavaSource()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
         Model mod = (Model) getModel();
         if (mod == null) {return;}
         File localLastFile = mod.getLastFile();
@@ -968,7 +991,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void viewXML() {
+    public void viewXML()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
         if (!checkSave() || ((Model) getModel()).getLastFile() == null) {
             return;
         }
@@ -1044,18 +1069,23 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void editGraphMetadata() {
-        Model mod = (Model) getModel();
-        if (mod == null) {return;}
-        GraphMetadata gmd = mod.getMetadata();
+    public void editGraphMetadata() 
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
+        Model model = (Model) getModel();
+        if (model == null) 
+        {
+            return; // not expected
+        }
+        GraphMetadata graphMetadata = model.getMetadata();
         boolean modified =
-                EventGraphMetadataDialog.showDialog((JFrame) getView(), gmd);
+                EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
         if (modified) {
-            ((Model) getModel()).changeMetadata(gmd);
+            ((Model) getModel()).changeMetadata(graphMetadata);
 
             // update title bar
-            ((EventGraphView) getView()).setSelectedEventGraphName(gmd.name);
-            ((EventGraphView) getView()).setSelectedEventGraphDescription(gmd.description);
+            ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name);
+            ((EventGraphView) getView()).setSelectedEventGraphDescription(graphMetadata.description);
         }
     }
 
@@ -1093,7 +1123,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private int imgSaveInt = -1;
 
     @Override
-    public void captureWindow() {
+    public void captureWindow()
+    {
+        ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
         String fileName = "ViskitScreenCapture";
 
         // create and save the image

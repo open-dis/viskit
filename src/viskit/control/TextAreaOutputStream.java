@@ -498,7 +498,9 @@ public class TextAreaOutputStream implements PropertyChangeListener
     class SaveListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e)
+        {
+            ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
             if (saveChooser == null) {
                 saveChooser = new JFileChooser(ViskitGlobals.instance().getViskitProject().getProjectRoot());
             }
@@ -528,12 +530,12 @@ public class TextAreaOutputStream implements PropertyChangeListener
         }
     }
 
-    private void signalAnalystReportReady() {
+    private void signalAnalystReportReady()
+    {
         if (analystReportTempFile == null) {
             // No report to print
             return;
         }
-
         AnalystReportController analystReportController = ViskitGlobals.instance().getAnalystReportController();
         if (analystReportController != null) {
             analystReportController.setReportXML(analystReportTempFile);
@@ -669,7 +671,9 @@ public class TextAreaOutputStream implements PropertyChangeListener
     class CopyListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) 
+        {
+            ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
             String s = simulationRunPanel.outputStreamTA.getSelectedText();
             StringSelection ss = new StringSelection(s);
             Clipboard clpbd = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -677,19 +681,23 @@ public class TextAreaOutputStream implements PropertyChangeListener
         }
     }
 
-    class SelectAllListener implements ActionListener {
-
+    class SelectAllListener implements ActionListener
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e)
+        {
+            ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
             simulationRunPanel.outputStreamTA.requestFocus();
             simulationRunPanel.outputStreamTA.selectAll();
         }
     }
 
-    class ClearListener implements ActionListener {
-
+    class ClearListener implements ActionListener
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e)
+        {
+            ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
             simulationRunPanel.outputStreamTA.setText(null);
         }
     }
@@ -699,6 +707,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
+            ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
             File f; // = tmpFile;
             String osName = ViskitStatics.OPERATING_SYSTEM;
             String filePath = "";

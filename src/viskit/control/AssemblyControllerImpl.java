@@ -83,8 +83,8 @@ import viskit.assembly.SimulationRunInterface;
  * @since 9:26:02 AM
  * @version $Id: AssemblyControllerImpl.java 2884 2015-09-02 17:21:52Z tdnorbra $
  */
-public class AssemblyControllerImpl extends MvcAbstractController implements AssemblyController, OpenAssembly.AssembyChangeListener {
-
+public class AssemblyControllerImpl extends MvcAbstractController implements AssemblyController, OpenAssembly.AssembyChangeListener 
+{
     static final Logger LOG = Log4jUtilities.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
@@ -219,7 +219,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void open() {
+    public void open()
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         File[] filesArray = ViskitGlobals.instance().getAssemblyViewFrame().openFilesAsk();
         if (filesArray == null)
             return;
@@ -235,9 +237,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             return;
 
         AssemblyViewFrame assemblyViewFrame = ViskitGlobals.instance().getAssemblyViewFrame();
-        AssemblyModelImpl assemblyModelImpl = new AssemblyModelImpl(this);
-        assemblyModelImpl.initialize();
-        assemblyViewFrame.addTab(assemblyModelImpl);
+        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
+        assemblyModel.initialize();
+        assemblyViewFrame.addTab(assemblyModel);
 
         // these may initialize to null on startup, check
         // before doing any openAlready lookups
@@ -259,21 +261,21 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 }
             }
         }
-        if (assemblyModelImpl.newModel(file) && !isOpenAlready) 
+        if (assemblyModel.newModel(file) && !isOpenAlready) 
         {
-            assemblyViewFrame.setSelectedAssemblyName(assemblyModelImpl.getMetadata().name);
+            assemblyViewFrame.setSelectedAssemblyName(assemblyModel.getMetadata().name);
             // TODO: Implement an Assembly description block set here
 
             adjustRecentAssemblySet(file);
             markAssemblyFilesOpened();
 
             // replaces old fileWatchOpen(file);
-            initOpenAssemblyWatch(file, assemblyModelImpl.getJaxbRoot());
+            initOpenAssemblyWatch(file, assemblyModel.getJaxbRoot());
             openEventGraphs(file);
         } 
         else 
         {
-            assemblyViewFrame.deleteTab(assemblyModelImpl);
+            assemblyViewFrame.deleteTab(assemblyModel);
         }
 
         resetRedoUndoStatus();
@@ -454,17 +456,22 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void save() {
-        AssemblyModel mod = (AssemblyModel) getModel();
-        if (mod.getLastFile() == null) {
+    public void save()
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (assemblyModel.getLastFile() == null) {
             saveAs();
-        } else {
-            mod.saveModel(mod.getLastFile());
+        } 
+        else {
+            assemblyModel.saveModel(assemblyModel.getLastFile());
         }
     }
 
     @Override
-    public void saveAs() {
+    public void saveAs()
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         AssemblyModel model = (AssemblyModel) getModel();
         AssemblyView assemblyView = (AssemblyView) getView();
         GraphMetadata graphMetadata = model.getMetadata();
@@ -492,12 +499,21 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void editGraphMetadata() 
     {
-        AssemblyModel assemblyModel = (AssemblyModel) getModel();
-        if (assemblyModel == null) 
+//        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+//        if (assemblyModel == null) 
+//        {
+//            return;
+//        }
+//        GraphMetadata graphMetadata = assemblyModel.getMetadata();
+        
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        Model model = (Model) getModel();
+        if (model == null) 
         {
-            return;
+            return; // not expected
         }
-        GraphMetadata graphMetadata = assemblyModel.getMetadata();
+        GraphMetadata graphMetadata = model.getMetadata();
+        
         boolean modified =
                 AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyViewFrame(), graphMetadata);
         if (modified) {
@@ -723,6 +739,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             LOG.error("newAssembly() unable to create new assembly if project is not open");
             return;
         }
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
 
         GraphMetadata oldGraphMetadata = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
@@ -753,7 +770,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             ViskitGlobals.instance().getAssemblyViewFrame().setSelectedAssemblyName(graphMetadata.name);
 
             // TODO: Implement this
-//            ((AssemblyView)  getView()).setSelectedEventGraphDescription(gmd.description);
+//            ((AssemblyView)  getView()).setSelectedEventGraphDescription(graphMetadata.description);
         } 
         else 
         {
@@ -809,8 +826,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void closeAll() {
         AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyViewFrame().getOpenModels();
-        for (AssemblyModel vmod : assemblyModelArray) {
-            setModel((MvcModel) vmod);
+        for (AssemblyModel assemblyModel : assemblyModelArray) {
+            setModel((MvcModel) assemblyModel);
             setCloseAll(true);
             close();
         }
@@ -818,7 +835,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void close() {
+    public void close()
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         if (preClose()) {
             postClose();
         }
@@ -942,6 +961,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      */
     private boolean askToSaveAndContinue()
     {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         String message = "Save modified ";
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if ((assemblyModel != null) && (assemblyModel.getMetadata() != null))
@@ -1179,7 +1199,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private boolean doRemove = false;
 
     @Override
-    public void remove() {
+    public void remove()
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         if (!selectionVector.isEmpty()) {
             // first ask:
             String s, msg = "";
@@ -1313,7 +1335,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * Removes the last selected node or edge from the JGraph model
      */
     @Override
-    public void undo() {
+    public void undo()
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         if (selectionVector.isEmpty())
             return;
 
@@ -1348,7 +1372,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * Replaces the last selected node or edge from the JGraph model
      */
     @Override
-    public void redo() {
+    public void redo()
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
 
         // Recreate the JAXB (XML) bindings since the paste function only does
         // nodes and not edges
@@ -1402,7 +1428,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /* from menu:*/
 
     @Override
-    public void viewXML() {
+    public void viewXML()
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (!checkSaveForSourceCompile() || assemblyModel.getLastFile() == null) {
             return;
@@ -1427,7 +1456,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void generateJavaSource() {
+    public void generateJavaSource()
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         String source = produceJavaAssemblyClass();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (source != null && !source.isEmpty()) {
@@ -1810,6 +1841,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void captureWindow() {
 
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         String fileName = "AssemblyScreenCapture";
         if (assemblyModel.getLastFile() != null) {
@@ -1833,8 +1865,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      *
      *@param assemblyImageFile assemblyImage an image file to write the .png
      */
-    public void captureAssemblyImage(File assemblyImageFile) {
-
+    public void captureAssemblyImage(File assemblyImageFile)
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         // Don't display an extra frame while taking snapshots
         final Timer captureAssemblyImageTimer = new Timer(100, new timerCallback(assemblyImageFile, false));
         captureAssemblyImageTimer.setRepeats(false);
@@ -2098,14 +2131,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /**
      * Sets the Analyst report panel
      * @param tabbedPane our Analyst report panel parent
-     * @param idx the index to retrieve the Analyst report panel
+     * @param index the index to retrieve the Analyst report panel
      */
     @Override
-    public void setMainTabbedPane(JComponent tabbedPane, int idx) {
+    public void setMainTabbedPane(JComponent tabbedPane, int index) {
         this.mainTabbedPane = (JTabbedPane) tabbedPane;
-        mainTabbedPaneIndex = idx;
+        mainTabbedPaneIndex = index;
     }
-    public void makeTopPaneAssemblyTabActive()
+    public void makeTopPaneAssemblyTabActive() // TODO no longer needed?
     {
         mainTabbedPane.setSelectedIndex(mainTabbedPaneIndex);
     }

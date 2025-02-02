@@ -128,6 +128,7 @@ public class AnalystReportController extends MvcAbstractController {
 
     public void openAnalystReportXML() 
     {
+        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
         if (analystReportViewFrame.isReportDirty()) {
             int result = JOptionPane.showConfirmDialog(analystReportViewFrame,
                     "Save current simulation data and analyst report annotations?",
@@ -241,11 +242,14 @@ public class AnalystReportController extends MvcAbstractController {
         showHtmlViewer(outputHtmlFilePath);
     }
 
-    private void saveReport() {
+    private void saveReport()
+    {
         saveReport(analystReportFile);
     }
 
-    private void saveReport(File f) {
+    private void saveReport(File f)
+    {
+        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
         try {
             analystReportModel.writeToXMLFile(f);
             analystReportViewFrame.setReportDirty(false);
@@ -254,14 +258,18 @@ public class AnalystReportController extends MvcAbstractController {
         }
     }
 
-    private void openAnalystReport(File selectedFile) {
+    private void openAnalystReport(File selectedFile)
+    {
+        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
+        
         AnalystReportModel analystReportModelLocal = new AnalystReportModel(selectedFile);
         setContent(analystReportModelLocal);
         analystReportFile = selectedFile;
         analystReportViewFrame.setReportDirty(false);
     }
 
-    private void buildAnalystReport(File targetFile) {
+    private void buildAnalystReport(File targetFile)
+    {
         LOG.debug("TargetFile is: {}", targetFile);
         AnalystReportModel analystReportModelLocal;
         try {
@@ -302,8 +310,9 @@ public class AnalystReportController extends MvcAbstractController {
         showHtmlViewer(new File(htmlFilename));
     }
 
-    private void showHtmlViewer(File file) {
-
+    private void showHtmlViewer(File file)
+    {
+        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
         // pop up the system html viewer, or send currently running browser to html page
         try {
             // must convert slashes here when creating URI, not beforehand
@@ -328,6 +337,8 @@ public class AnalystReportController extends MvcAbstractController {
 //    @Override
     public void viewXML() 
     {
+        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
+        
         // bravely ignoring error checking here...
         ViskitGlobals.instance().getAssemblyViewFrame().displayXML(analystReportFile);
     }
