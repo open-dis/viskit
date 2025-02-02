@@ -277,7 +277,7 @@ public class ViskitGlobals {
     /* AnalystReport model / view / controller, now shifted to stronger class typing */
 
     /* routines to manage the singleton-aspect of the view */
-    AnalystReportViewFrame  analystReportViewFrame;
+    private AnalystReportViewFrame  analystReportViewFrame;
     private AnalystReportController analystReportController;
 
     /**
@@ -285,7 +285,23 @@ public class ViskitGlobals {
      * @return a reference to the analyst report view or null if yet unbuilt.
      */
     public AnalystReportViewFrame getAnalystReportViewFrame() {
+        if    (analystReportViewFrame == null)
+        {
+               analystReportViewFrame = new AnalystReportViewFrame();
+        }
         return analystReportViewFrame;
+    }
+
+    /**
+     * Get a reference to the analyst report view.
+     * @return a reference to the analyst report view or null if yet unbuilt.
+     */
+    public AnalystReportController getAnalystReportController() {
+        if    (analystReportController == null)
+        {
+               analystReportController = new AnalystReportController();
+        }
+        return analystReportController;
     }
 
     /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
@@ -295,10 +311,10 @@ public class ViskitGlobals {
     public MvcAbstractViewFrame buildAnalystReportFrame()
     {
         analystReportController = new AnalystReportController();
-        analystReportViewFrame = new AnalystReportViewFrame();
-        analystReportViewFrame.setAnalystReportController(analystReportController);
-        analystReportController.setView(analystReportViewFrame);
-        return analystReportViewFrame;
+        setAnalystReportViewFrame(new AnalystReportViewFrame());
+//        getAnalystReportViewFrame().setAnalystReportController(analystReportController);
+//        analystReportController.setView(getAnalystReportViewFrame());
+        return getAnalystReportViewFrame();
     }
 
     /** @return the analyst report builder (model) */
@@ -306,10 +322,10 @@ public class ViskitGlobals {
         return (AnalystReportModel) analystReportController.getModel();
     }
 
-    /** @return the analyst report controller */
-    public MvcController getAnalystReportController() {
-        return analystReportController;
-    }
+//    /** @return the analyst report controller */
+//    public MvcController getAnalystReportController() {
+//        return analystReportController;
+//    }
 
     /******
      * Beanshell code
@@ -1180,6 +1196,13 @@ getProjectWorkingDirectory());
      */
     public void setAnalystReportController(AnalystReportController analystReportController) {
         this.analystReportController = analystReportController;
+    }
+
+    /**
+     * @param analystReportViewFrame the analystReportViewFrame to set
+     */
+    public void setAnalystReportViewFrame(AnalystReportViewFrame analystReportViewFrame) {
+        this.analystReportViewFrame = analystReportViewFrame;
     }
 
 } // end class file ViskitGlobals.java

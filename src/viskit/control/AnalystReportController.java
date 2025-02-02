@@ -69,7 +69,7 @@ public class AnalystReportController extends MvcAbstractController {
 
     static final Logger LOG = Log4jUtilities.getLogger(AnalystReportController.class);
 
-    private AnalystReportViewFrame analystReportViewFrame;
+    private static AnalystReportViewFrame analystReportViewFrame;
     private File analystReportFile;
     private File currentAssemblyFile;
     private AnalystReportModel analystReportModel;

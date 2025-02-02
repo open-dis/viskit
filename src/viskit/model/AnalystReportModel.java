@@ -673,17 +673,33 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     // TODO: Version 1.1 JDOM does not yet support generics
     @SuppressWarnings("unchecked")
-    public String[][] unMakeEntityTable() {
-        Element elm = simulationConfigurationElement.getChild("EntityTable");
-        List<Element> lis = elm.getChildren("SimEntity");
-
-        String[][] sa = new String[lis.size()][2];
-        int i = 0;
-        for(Element e : lis) {
-            sa[i]  [0] = e.getAttributeValue("name");
-            sa[i++][1] = e.getAttributeValue("fullyQualifiedName");
+    public String[][] unMakeEntityTable() 
+    {
+        String[][] emptyResult = new String[0][0];
+        if (simulationConfigurationElement == null)
+        {
+            LOG.error("AnalystReportModel unMakeEntityTable() simulationConfigurationElement is null");
+            return emptyResult;
         }
-        return sa;
+        if (!simulationConfigurationElement.getChildren().isEmpty())
+        {
+            Element element = simulationConfigurationElement.getChild("EntityTable");
+            if (element == null)
+            {
+                LOG.error("AnalystReportModel unMakeEntityTable() simulationConfigurationElement EntityTable is null");
+                return emptyResult;
+            }
+            List<Element> elementsList = element.getChildren("SimEntity");
+
+            String[][] sa = new String[elementsList.size()][2];
+            int i = 0;
+            for(Element e : elementsList) {
+                sa[i]  [0] = e.getAttributeValue("name");
+                sa[i++][1] = e.getAttributeValue("fullyQualifiedName");
+            }
+            return sa;
+        }
+        else return emptyResult;
     }
 
     /**

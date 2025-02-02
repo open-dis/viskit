@@ -64,6 +64,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import org.apache.logging.log4j.Logger;
+import viskit.ViskitGlobals;
 
 import viskit.util.OpenAssembly;
 import viskit.control.AnalystReportController;
@@ -95,7 +96,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private boolean dirty = false;
     private JMenuBar myMenuBar;
     private JFileChooser locationImageFileChooser;
-    private AnalystReportController analystReportController;
+    private static AnalystReportController analystReportController;
     
     JTextField titleTF = new JTextField();
     JTextField analystNameTF = new JTextField();
@@ -107,7 +108,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     public AnalystReportViewFrame()
     {
         super(FRAME_DEFAULT_TITLE); // necessary
-        analystReportController = new AnalystReportController();
+        analystReportController = ViskitGlobals.instance().getAnalystReportController();
         initMVC((MvcController) analystReportController);
         initializeAnalystReportController(analystReportController); // TODO unscramble this hierarchy
                 
@@ -182,6 +183,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     private void _fillLayout() {
+        try {
         fillHeader();
         fillExecutiveSummary();
         fillSimulationLocation();
@@ -190,6 +192,11 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         fillBehaviors();
         fillStatisticsPanel();
         fillConclusionsRecommendationsPanel();
+        }
+        catch (Exception e)
+        {
+            LOG.error ("problem with _fillLayout()" + e.getMessage());
+        }
     }
 
     public void unFillLayout() {

@@ -534,7 +534,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
             return;
         }
 
-        AnalystReportController analystReportController = (AnalystReportController) ViskitGlobals.instance().getAnalystReportController();
+        AnalystReportController analystReportController = ViskitGlobals.instance().getAnalystReportController();
         if (analystReportController != null) {
             analystReportController.setReportXML(analystReportTempFile);
 
