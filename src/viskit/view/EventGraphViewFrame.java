@@ -712,7 +712,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphMenu = new JMenu("Event Graph"); // Editor
         eventGraphMenu.setMnemonic(KeyEvent.VK_E);
 
-        editEventGraphSubMenu = new JMenu("Edit Event Graph"); // submenu
+        editEventGraphSubMenu = new JMenu("Edit Event Graph..."); // submenu
         editEventGraphSubMenu.setMnemonic(KeyEvent.VK_E);
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "undo", "Undo", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
@@ -784,6 +784,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphMenu.add(openRecentEventGraphMenu = buildMenu("Open Recent Event Graph"));
         openRecentEventGraphMenu.setMnemonic('O');
         openRecentEventGraphMenu.setEnabled(false); // inactive until needed, reset by listener
+        eventGraphMenu.addSeparator();
 
         eventGraphMenu.add(buildMenuItem(eventGraphController, "close", "Close Event Graph", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));

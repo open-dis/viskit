@@ -628,7 +628,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         JMenuItem copyMI = new JMenuItem("Copy selected console text");
         copyMI.setMnemonic('C');
         copyMI.setToolTipText("Copy simulation run console output");
-        JMenuItem saveMI = new JMenuItem("Save console output to file");
+        JMenuItem saveMI = new JMenuItem("Save console text to file");
         saveMI.setMnemonic('S');
         saveMI.setToolTipText("Save simulation run console output to a file");
         JMenuItem selectAllMI = new JMenuItem("Select all console text");
@@ -647,8 +647,8 @@ public class TextAreaOutputStream implements PropertyChangeListener
         clearAllMI.addActionListener(new ClearListener());
         viewMI.addActionListener(new ViewListener());
 
-        simulationRunMenu.add(saveMI);
         simulationRunMenu.add(copyMI);
+        simulationRunMenu.add(saveMI);
         simulationRunMenu.add(selectAllMI);
         simulationRunMenu.add(clearAllMI);
         simulationRunMenu.add(viewMI);

@@ -434,7 +434,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
-        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties...", KeyEvent.VK_E,
+        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
         }
     }
@@ -451,7 +451,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.setMnemonic(KeyEvent.VK_A);
 
         // Set up edit submenu
-        JMenu editSubMenu = new JMenu("Edit Assembly");
+        JMenu editSubMenu = new JMenu("Edit Assembly...");
         editSubMenu.setMnemonic(KeyEvent.VK_E);
         if (!ViskitGlobals.instance().getMainFrame().hasModalMenus()) // combined menu integration
         {
@@ -486,7 +486,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         editSubMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
         
         assemblyMenu.add(editSubMenu);
-        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties...", KeyEvent.VK_E,
+        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.addSeparator();
         }
@@ -518,6 +518,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         openRecentAssemblyMenu.setMnemonic('O');
         openRecentAssemblyMenu.setEnabled(false); // inactive until needed, reset by listener
 
+        assemblyMenu.addSeparator();
         // Bug fix: 1195
         assemblyMenu.add(buildMenuItem(assemblyController, "close", "Close Assembly", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.ALT_DOWN_MASK)));
@@ -526,17 +527,23 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK)));
 
+        assemblyMenu.addSeparator();
         assemblyMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Java Source Generation for Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "captureWindow", "Image Save Assembly Diagram", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK)));
+        assemblyMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK)));
+        
+        assemblyMenu.addSeparator();
+        // TODO add icon?
         assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly for Simulation Run", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK)));
 
+        /*
         // TODO: Unknown as to what this does exactly
         assemblyMenu.add(buildMenuItem(assemblyController, "export2grid", "Export to Cluster Format", KeyEvent.VK_C, null));
         ActionIntrospector.getAction(assemblyController, "export2grid").setEnabled(false);
+        */
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
