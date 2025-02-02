@@ -169,6 +169,7 @@ public class AnalystReportController extends MvcAbstractController {
 
     public void saveAnalystReportXML() 
     {
+        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
         JFileChooser saveAnalystReportXmlChooser = new JFileChooser(analystReportFile.getParent());
         saveAnalystReportXmlChooser.setDialogTitle("Save Analyst Report XML");
         saveAnalystReportXmlChooser.setSelectedFile(analystReportFile);
