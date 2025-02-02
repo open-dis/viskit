@@ -57,24 +57,20 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         cloudSimulationRunTabbedPane = new javax.swing.JTabbedPane();
         cloudSimulationRunPanel = new javax.swing.JPanel();
         viskitMenuBar = new javax.swing.JMenuBar();
-        fileMenu = new javax.swing.JMenu();
+        projectMenu = new javax.swing.JMenu();
         newViskitProjectMI = new javax.swing.JMenuItem();
         openViskitProjectMI = new javax.swing.JMenuItem();
         openRecentViskitProjectMI = new javax.swing.JMenuItem();
         closeViskitProjectMI = new javax.swing.JMenuItem();
-        jSeparator2 = new javax.swing.JPopupMenu.Separator();
-        userPreferencesMI = new javax.swing.JMenuItem();
         zipMailViskitProjectMI = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        viskitUserPreferencesMI = new javax.swing.JMenuItem();
         exitMI = new javax.swing.JMenuItem();
         eventGraphMenu = new javax.swing.JMenu();
-        newEventGraphMI = new javax.swing.JMenuItem();
-        openEventGraphMI = new javax.swing.JMenuItem();
-        openRecentEventGraphMI = new javax.swing.JMenuItem();
-        closeEventGraphMI = new javax.swing.JMenuItem();
-        closeAllEventGraphsMI = new javax.swing.JMenuItem();
-        jSeparator7 = new javax.swing.JPopupMenu.Separator();
-        eventGraphPropertiesMI = new javax.swing.JMenuItem();
-        jSeparator9 = new javax.swing.JPopupMenu.Separator();
+        editEventGraphSubMenu = new javax.swing.JMenu();
+        undoEventEditMenuItem = new javax.swing.JMenuItem();
+        redoEventEditMenuItem = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
         cutEventEditMenuItem = new javax.swing.JMenuItem();
         copyEventEditMenuItem = new javax.swing.JMenuItem();
         pasteEventEditMenuItem = new javax.swing.JMenuItem();
@@ -87,32 +83,53 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         addCancellingEdgeMenuItem = new javax.swing.JMenuItem();
         addSelfReferencingSchedulingEdgeMenuItem = new javax.swing.JMenuItem();
         addSelfReferencingCancellingEdgeMenuItem = new javax.swing.JMenuItem();
-        jSeparator3 = new javax.swing.JPopupMenu.Separator();
-        undoEventEditMenuItem = new javax.swing.JMenuItem();
-        redoEventEditMenuItem = new javax.swing.JMenuItem();
-        assemblyMenu = new javax.swing.JMenu();
-        newAssemblyMI = new javax.swing.JMenuItem();
-        openAssemblyMI = new javax.swing.JMenuItem();
-        openRecentAssemblyMI = new javax.swing.JMenuItem();
-        closeAssemblyMI = new javax.swing.JMenuItem();
-        closeAllAssembliesMI = new javax.swing.JMenuItem();
+        eventGraphPropertiesMI = new javax.swing.JMenuItem();
+        jSeparator9 = new javax.swing.JPopupMenu.Separator();
+        newEventGraphMI = new javax.swing.JMenuItem();
+        openEventGraphMI = new javax.swing.JMenuItem();
+        openRecentEventGraphMI = new javax.swing.JMenuItem();
         jSeparator10 = new javax.swing.JPopupMenu.Separator();
-        assemblyPropertiesMI = new javax.swing.JMenuItem();
-        jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        closeEventGraphMI = new javax.swing.JMenuItem();
+        closeAllEventGraphsMI = new javax.swing.JMenuItem();
+        saveEventGraphMI = new javax.swing.JMenuItem();
+        saveEventGraphAsMI = new javax.swing.JMenuItem();
+        jSeparator7 = new javax.swing.JPopupMenu.Separator();
+        javaSourceEventGraphMI = new javax.swing.JMenuItem();
+        imageSaveDiagramEventGraphMI = new javax.swing.JMenuItem();
+        xmlViewEventGraphMI = new javax.swing.JMenuItem();
+        assemblyMenu = new javax.swing.JMenu();
+        editAssemblySubMenu = new javax.swing.JMenu();
+        undoAssemblyEditMenuItem = new javax.swing.JMenuItem();
+        redoAssemblyEditMenuItem = new javax.swing.JMenuItem();
+        jSeparator11 = new javax.swing.JPopupMenu.Separator();
         cutAssemblyEditMenuItem = new javax.swing.JMenuItem();
         copyAssemblyEditMenuItem = new javax.swing.JMenuItem();
         pasteAssemblyEditMenuItem = new javax.swing.JMenuItem();
         deleteAssemblyEditMenuItem = new javax.swing.JMenuItem();
         jSeparator8 = new javax.swing.JPopupMenu.Separator();
-        addEventGraphMenuItem = new javax.swing.JMenuItem();
-        addPropertyChangeListenerMenuItem = new javax.swing.JMenuItem();
+        addEventGraphMI = new javax.swing.JMenuItem();
+        addPropertyChangeListenerMI = new javax.swing.JMenuItem();
+        assemblyPropertiesMI = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        newAssemblyMI = new javax.swing.JMenuItem();
+        openAssemblyMI = new javax.swing.JMenuItem();
+        openRecentAssemblyMI = new javax.swing.JMenuItem();
+        jSeparator12 = new javax.swing.JPopupMenu.Separator();
+        closeAssemblyMI = new javax.swing.JMenuItem();
+        closeAllAssembliesMI = new javax.swing.JMenuItem();
+        saveAssemblyMI = new javax.swing.JMenuItem();
+        saveAssemblyAsMI = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
-        undoAssemblyEditMenuItem = new javax.swing.JMenuItem();
-        redoAssemblyEditMenuItem = new javax.swing.JMenuItem();
+        javaSourceAssemblyMI = new javax.swing.JMenuItem();
+        imageSaveDiagramAssemblyMI = new javax.swing.JMenuItem();
+        initializeAssemblyForSimulationRunMI = new javax.swing.JMenuItem();
+        xmlViewAssemblyMI = new javax.swing.JMenuItem();
+        exportToClusterFormatMI = new javax.swing.JMenuItem();
         assemblySimulationRunMenu = new javax.swing.JMenu();
-        showSimulationRunPanelMI = new javax.swing.JMenuItem();
-        clearSimulationConsoleMI = new javax.swing.JMenuItem();
+        copySelectedConsoleTextMI = new javax.swing.JMenuItem();
         saveSimulationConsoleMI = new javax.swing.JMenuItem();
+        selectAllTextSimulationConsoleMI = new javax.swing.JMenuItem();
+        clearSimulationConsoleMI = new javax.swing.JMenuItem();
         viewConsoleTextEditorMI = new javax.swing.JMenuItem();
         analystReportMenu = new javax.swing.JMenu();
         displayAnalystReportHtmlMI = new javax.swing.JMenuItem();
@@ -122,11 +139,10 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         designOfExperimentsMenu = new javax.swing.JMenu();
         gridkitCloudMenu = new javax.swing.JMenu();
         viewCloudSimulationControllerMI = new javax.swing.JMenuItem();
-        viewMenu = new javax.swing.JMenu();
-        viewSavedXmlMI = new javax.swing.JMenuItem();
-        generateJavaSourceMI = new javax.swing.JMenuItem();
-        saveScreenImageMI = new javax.swing.JMenuItem();
         helpMenu = new javax.swing.JMenu();
+        contentsMI = new javax.swing.JMenuItem();
+        searchMI = new javax.swing.JMenuItem();
+        jSeparator13 = new javax.swing.JPopupMenu.Separator();
         tutorialMI = new javax.swing.JMenuItem();
         aboutMI = new javax.swing.JMenuItem();
 
@@ -338,7 +354,9 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
             .addGap(0, 407, Short.MAX_VALUE)
         );
 
-        viskitTabbedPane.addTab("Design of Experiments", designOfExperimentsPanel);
+        viskitTabbedPane.addTab("(Design of Experiments)", designOfExperimentsPanel);
+
+        cloudSimulationRunTabbedPane.setEnabled(false);
 
         javax.swing.GroupLayout cloudSimulationRunPanelLayout = new javax.swing.GroupLayout(cloudSimulationRunPanel);
         cloudSimulationRunPanel.setLayout(cloudSimulationRunPanelLayout);
@@ -353,47 +371,41 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         cloudSimulationRunTabbedPane.addTab("Cloud Simulation Run", cloudSimulationRunPanel);
 
-        viskitTabbedPane.addTab("Cloud Simulation Run", cloudSimulationRunTabbedPane);
+        viskitTabbedPane.addTab("(Cloud Simulation Run)", cloudSimulationRunTabbedPane);
 
-        fileMenu.setText("Project");
+        projectMenu.setText("Project");
 
         newViskitProjectMI.setMnemonic(KeyEvent.VK_N);
         newViskitProjectMI.setText("New Viskit Project");
-        fileMenu.add(newViskitProjectMI);
+        projectMenu.add(newViskitProjectMI);
 
         openViskitProjectMI.setMnemonic(KeyEvent.VK_O);
-        openViskitProjectMI.setText("Open Viskit Project");
+        openViskitProjectMI.setText("Open Project");
         openViskitProjectMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openViskitProjectMIActionPerformed(evt);
             }
         });
-        fileMenu.add(openViskitProjectMI);
+        projectMenu.add(openViskitProjectMI);
 
         openRecentViskitProjectMI.setMnemonic(KeyEvent.VK_R);
-        openRecentViskitProjectMI.setText("Open Recent Viskit Project");
+        openRecentViskitProjectMI.setText("Open Recent Project");
         openRecentViskitProjectMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openRecentViskitProjectMIActionPerformed(evt);
             }
         });
-        fileMenu.add(openRecentViskitProjectMI);
+        projectMenu.add(openRecentViskitProjectMI);
 
         closeViskitProjectMI.setMnemonic(KeyEvent.VK_O);
-        closeViskitProjectMI.setText("Close Viskit Project");
+        closeViskitProjectMI.setText("Close Project");
         closeViskitProjectMI.setToolTipText("Close current project and all related files");
         closeViskitProjectMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 closeViskitProjectMIActionPerformed(evt);
             }
         });
-        fileMenu.add(closeViskitProjectMI);
-        fileMenu.add(jSeparator2);
-
-        userPreferencesMI.setMnemonic(KeyEvent.VK_U);
-        userPreferencesMI.setText("User Preferences");
-        userPreferencesMI.setToolTipText("User settings for Viskit application");
-        fileMenu.add(userPreferencesMI);
+        projectMenu.add(closeViskitProjectMI);
 
         zipMailViskitProjectMI.setMnemonic(KeyEvent.VK_Z);
         zipMailViskitProjectMI.setText("Zip, Mail Viskit Project");
@@ -402,16 +414,102 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
                 zipMailViskitProjectMIActionPerformed(evt);
             }
         });
-        fileMenu.add(zipMailViskitProjectMI);
+        projectMenu.add(zipMailViskitProjectMI);
+        projectMenu.add(jSeparator2);
+
+        viskitUserPreferencesMI.setMnemonic(KeyEvent.VK_U);
+        viskitUserPreferencesMI.setText("Viskit Preferences");
+        viskitUserPreferencesMI.setToolTipText("User settings for Viskit application");
+        viskitUserPreferencesMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viskitUserPreferencesMIActionPerformed(evt);
+            }
+        });
+        projectMenu.add(viskitUserPreferencesMI);
 
         exitMI.setMnemonic(KeyEvent.VK_X);
         exitMI.setText("Quit");
-        fileMenu.add(exitMI);
+        projectMenu.add(exitMI);
 
-        viskitMenuBar.add(fileMenu);
+        viskitMenuBar.add(projectMenu);
 
         eventGraphMenu.setText("Event Graph");
         eventGraphMenu.setActionCommand("Event Graph Editor");
+
+        editEventGraphSubMenu.setText("Edit Event Graph...");
+
+        undoEventEditMenuItem.setMnemonic(KeyEvent.VK_U);
+        undoEventEditMenuItem.setText("Undo");
+        undoEventEditMenuItem.setToolTipText("Undo last action");
+        editEventGraphSubMenu.add(undoEventEditMenuItem);
+
+        redoEventEditMenuItem.setMnemonic(KeyEvent.VK_R);
+        redoEventEditMenuItem.setText("Redo");
+        redoEventEditMenuItem.setToolTipText("Redo last undo");
+        editEventGraphSubMenu.add(redoEventEditMenuItem);
+        editEventGraphSubMenu.add(jSeparator3);
+
+        cutEventEditMenuItem.setMnemonic(KeyEvent.VK_X);
+        cutEventEditMenuItem.setText("Cut");
+        cutEventEditMenuItem.setToolTipText("Cut selected item");
+        editEventGraphSubMenu.add(cutEventEditMenuItem);
+
+        copyEventEditMenuItem.setMnemonic(KeyEvent.VK_C);
+        copyEventEditMenuItem.setText("Copy");
+        copyEventEditMenuItem.setToolTipText("Copy selected item");
+        editEventGraphSubMenu.add(copyEventEditMenuItem);
+
+        pasteEventEditMenuItem.setMnemonic(KeyEvent.VK_V);
+        pasteEventEditMenuItem.setText("Paste Events");
+        pasteEventEditMenuItem.setToolTipText("Paste selected item");
+        editEventGraphSubMenu.add(pasteEventEditMenuItem);
+
+        deleteEventEditMenuItem.setMnemonic(KeyEvent.VK_V);
+        deleteEventEditMenuItem.setText("Delete");
+        deleteEventEditMenuItem.setToolTipText("Delete selected item");
+        editEventGraphSubMenu.add(deleteEventEditMenuItem);
+        editEventGraphSubMenu.add(jSeparator5);
+
+        addEventNodeMenuItem.setMnemonic(KeyEvent.VK_A);
+        addEventNodeMenuItem.setText("Add Event Node");
+        addEventNodeMenuItem.setToolTipText("");
+        editEventGraphSubMenu.add(addEventNodeMenuItem);
+
+        addSimulationParameterMenuItem.setText("Add Simulation Parameter");
+        addSimulationParameterMenuItem.setToolTipText("");
+        editEventGraphSubMenu.add(addSimulationParameterMenuItem);
+
+        addStateVariableMenuItem.setText("Add State Variable");
+        addStateVariableMenuItem.setToolTipText("");
+        editEventGraphSubMenu.add(addStateVariableMenuItem);
+
+        addSchedulingEdgeMenuItem.setText("Add Scheduling Edge");
+        addSchedulingEdgeMenuItem.setToolTipText("");
+        editEventGraphSubMenu.add(addSchedulingEdgeMenuItem);
+
+        addCancellingEdgeMenuItem.setText("Add Cancelling Edge");
+        addCancellingEdgeMenuItem.setToolTipText("");
+        editEventGraphSubMenu.add(addCancellingEdgeMenuItem);
+
+        addSelfReferencingSchedulingEdgeMenuItem.setText("Add Self-Referencing Scheduling Edge");
+        addSelfReferencingSchedulingEdgeMenuItem.setToolTipText("");
+        editEventGraphSubMenu.add(addSelfReferencingSchedulingEdgeMenuItem);
+
+        addSelfReferencingCancellingEdgeMenuItem.setText("Add Self-Referencing Cancelling Edge");
+        addSelfReferencingCancellingEdgeMenuItem.setToolTipText("");
+        editEventGraphSubMenu.add(addSelfReferencingCancellingEdgeMenuItem);
+
+        eventGraphMenu.add(editEventGraphSubMenu);
+
+        eventGraphPropertiesMI.setText("Edit Event Graph Properties");
+        eventGraphPropertiesMI.setToolTipText("graph metadata editor");
+        eventGraphPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eventGraphPropertiesMIActionPerformed(evt);
+            }
+        });
+        eventGraphMenu.add(eventGraphPropertiesMI);
+        eventGraphMenu.add(jSeparator9);
 
         newEventGraphMI.setMnemonic(KeyEvent.VK_N);
         newEventGraphMI.setText("New Event Graph");
@@ -424,6 +522,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         openRecentEventGraphMI.setMnemonic(KeyEvent.VK_R);
         openRecentEventGraphMI.setText("Open Recent Event Graph");
         eventGraphMenu.add(openRecentEventGraphMI);
+        eventGraphMenu.add(jSeparator10);
 
         closeEventGraphMI.setMnemonic(KeyEvent.VK_C);
         closeEventGraphMI.setText("Close Event Graph");
@@ -434,82 +533,91 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         closeAllEventGraphsMI.setText("Close All Event Graphs");
         closeAllEventGraphsMI.setToolTipText("Close all event graphs");
         eventGraphMenu.add(closeAllEventGraphsMI);
+
+        saveEventGraphMI.setMnemonic(KeyEvent.VK_C);
+        saveEventGraphMI.setText("Save Event Graph");
+        saveEventGraphMI.setToolTipText("Close selected event graph");
+        eventGraphMenu.add(saveEventGraphMI);
+
+        saveEventGraphAsMI.setMnemonic(KeyEvent.VK_C);
+        saveEventGraphAsMI.setText("Save Event Graph As...");
+        saveEventGraphAsMI.setToolTipText("Close selected event graph");
+        eventGraphMenu.add(saveEventGraphAsMI);
         eventGraphMenu.add(jSeparator7);
 
-        eventGraphPropertiesMI.setText("Event Graph Properties");
-        eventGraphPropertiesMI.setToolTipText("graph metadata editor");
-        eventGraphPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                eventGraphPropertiesMIActionPerformed(evt);
-            }
-        });
-        eventGraphMenu.add(eventGraphPropertiesMI);
-        eventGraphMenu.add(jSeparator9);
+        javaSourceEventGraphMI.setText("Java Source Generation");
+        eventGraphMenu.add(javaSourceEventGraphMI);
 
-        cutEventEditMenuItem.setMnemonic(KeyEvent.VK_X);
-        cutEventEditMenuItem.setText("Cut");
-        cutEventEditMenuItem.setToolTipText("Cut selected item");
-        eventGraphMenu.add(cutEventEditMenuItem);
+        imageSaveDiagramEventGraphMI.setText("Image Save Event Graph Diagram");
+        eventGraphMenu.add(imageSaveDiagramEventGraphMI);
 
-        copyEventEditMenuItem.setMnemonic(KeyEvent.VK_C);
-        copyEventEditMenuItem.setText("Copy");
-        copyEventEditMenuItem.setToolTipText("Copy selected item");
-        eventGraphMenu.add(copyEventEditMenuItem);
-
-        pasteEventEditMenuItem.setMnemonic(KeyEvent.VK_V);
-        pasteEventEditMenuItem.setText("Paste");
-        pasteEventEditMenuItem.setToolTipText("Paste selected item");
-        eventGraphMenu.add(pasteEventEditMenuItem);
-
-        deleteEventEditMenuItem.setMnemonic(KeyEvent.VK_V);
-        deleteEventEditMenuItem.setText("Delete");
-        deleteEventEditMenuItem.setToolTipText("Delete selected item");
-        eventGraphMenu.add(deleteEventEditMenuItem);
-        eventGraphMenu.add(jSeparator5);
-
-        addEventNodeMenuItem.setMnemonic(KeyEvent.VK_A);
-        addEventNodeMenuItem.setText("Add Event Node");
-        addEventNodeMenuItem.setToolTipText("");
-        eventGraphMenu.add(addEventNodeMenuItem);
-
-        addSimulationParameterMenuItem.setText("Add Simulation Parameter");
-        addSimulationParameterMenuItem.setToolTipText("");
-        eventGraphMenu.add(addSimulationParameterMenuItem);
-
-        addStateVariableMenuItem.setText("Add State Variable");
-        addStateVariableMenuItem.setToolTipText("");
-        eventGraphMenu.add(addStateVariableMenuItem);
-
-        addSchedulingEdgeMenuItem.setText("Add Scheduling Edge");
-        addSchedulingEdgeMenuItem.setToolTipText("");
-        eventGraphMenu.add(addSchedulingEdgeMenuItem);
-
-        addCancellingEdgeMenuItem.setText("Add Cancelling Edge");
-        addCancellingEdgeMenuItem.setToolTipText("");
-        eventGraphMenu.add(addCancellingEdgeMenuItem);
-
-        addSelfReferencingSchedulingEdgeMenuItem.setText("Add Self-Referencing Scheduling Edge");
-        addSelfReferencingSchedulingEdgeMenuItem.setToolTipText("");
-        eventGraphMenu.add(addSelfReferencingSchedulingEdgeMenuItem);
-
-        addSelfReferencingCancellingEdgeMenuItem.setText("Add Self-Referencing Cancelling Edge");
-        addSelfReferencingCancellingEdgeMenuItem.setToolTipText("");
-        eventGraphMenu.add(addSelfReferencingCancellingEdgeMenuItem);
-        eventGraphMenu.add(jSeparator3);
-
-        undoEventEditMenuItem.setMnemonic(KeyEvent.VK_U);
-        undoEventEditMenuItem.setText("Undo");
-        undoEventEditMenuItem.setToolTipText("Undo last action");
-        eventGraphMenu.add(undoEventEditMenuItem);
-
-        redoEventEditMenuItem.setMnemonic(KeyEvent.VK_R);
-        redoEventEditMenuItem.setText("Redo");
-        redoEventEditMenuItem.setToolTipText("Redo last undo");
-        eventGraphMenu.add(redoEventEditMenuItem);
+        xmlViewEventGraphMI.setText("XML View");
+        eventGraphMenu.add(xmlViewEventGraphMI);
 
         viskitMenuBar.add(eventGraphMenu);
 
         assemblyMenu.setText("Assembly           ");
+
+        editAssemblySubMenu.setText("Edit Assembly...");
+
+        undoAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_U);
+        undoAssemblyEditMenuItem.setText("Undo");
+        undoAssemblyEditMenuItem.setToolTipText("Undo last action");
+        editAssemblySubMenu.add(undoAssemblyEditMenuItem);
+
+        redoAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_R);
+        redoAssemblyEditMenuItem.setText("Redo");
+        redoAssemblyEditMenuItem.setToolTipText("Redo last undo");
+        editAssemblySubMenu.add(redoAssemblyEditMenuItem);
+        editAssemblySubMenu.add(jSeparator11);
+
+        cutAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_X);
+        cutAssemblyEditMenuItem.setText("Cut");
+        cutAssemblyEditMenuItem.setToolTipText("Cut selected item");
+        cutAssemblyEditMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cutAssemblyEditMenuItemActionPerformed(evt);
+            }
+        });
+        editAssemblySubMenu.add(cutAssemblyEditMenuItem);
+
+        copyAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_C);
+        copyAssemblyEditMenuItem.setText("Copy");
+        copyAssemblyEditMenuItem.setToolTipText("Copy selected item");
+        editAssemblySubMenu.add(copyAssemblyEditMenuItem);
+
+        pasteAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_V);
+        pasteAssemblyEditMenuItem.setText("Paste Events");
+        pasteAssemblyEditMenuItem.setToolTipText("Paste selected item");
+        editAssemblySubMenu.add(pasteAssemblyEditMenuItem);
+
+        deleteAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_V);
+        deleteAssemblyEditMenuItem.setText("Delete");
+        deleteAssemblyEditMenuItem.setToolTipText("Delete selected item");
+        editAssemblySubMenu.add(deleteAssemblyEditMenuItem);
+        editAssemblySubMenu.add(jSeparator8);
+
+        addEventGraphMI.setMnemonic(KeyEvent.VK_A);
+        addEventGraphMI.setText("Add Event Graph");
+        addEventGraphMI.setToolTipText("");
+        editAssemblySubMenu.add(addEventGraphMI);
+
+        addPropertyChangeListenerMI.setMnemonic(KeyEvent.VK_A);
+        addPropertyChangeListenerMI.setText("Add Property Change Listener");
+        addPropertyChangeListenerMI.setToolTipText("");
+        editAssemblySubMenu.add(addPropertyChangeListenerMI);
+
+        assemblyMenu.add(editAssemblySubMenu);
+
+        assemblyPropertiesMI.setText("Edit Assembly Properties");
+        assemblyPropertiesMI.setToolTipText("graph metadata editor");
+        assemblyPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                assemblyPropertiesMIActionPerformed(evt);
+            }
+        });
+        assemblyMenu.add(assemblyPropertiesMI);
+        assemblyMenu.add(jSeparator4);
 
         newAssemblyMI.setMnemonic(KeyEvent.VK_N);
         newAssemblyMI.setText("New Assembly");
@@ -522,6 +630,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         openRecentAssemblyMI.setMnemonic(KeyEvent.VK_R);
         openRecentAssemblyMI.setText("Open Recent Assembly");
         assemblyMenu.add(openRecentAssemblyMI);
+        assemblyMenu.add(jSeparator12);
 
         closeAssemblyMI.setMnemonic(KeyEvent.VK_C);
         closeAssemblyMI.setText("Close Assembly");
@@ -532,83 +641,66 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         closeAllAssembliesMI.setText("Close All Assemblies");
         closeAllAssembliesMI.setToolTipText("Close all event graphs");
         assemblyMenu.add(closeAllAssembliesMI);
-        assemblyMenu.add(jSeparator10);
 
-        assemblyPropertiesMI.setText("Assembly Properties");
-        assemblyPropertiesMI.setToolTipText("graph metadata editor");
-        assemblyPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                assemblyPropertiesMIActionPerformed(evt);
-            }
-        });
-        assemblyMenu.add(assemblyPropertiesMI);
-        assemblyMenu.add(jSeparator4);
+        saveAssemblyMI.setMnemonic(KeyEvent.VK_C);
+        saveAssemblyMI.setText("Save Assembly");
+        saveAssemblyMI.setToolTipText("Close selected event graph");
+        assemblyMenu.add(saveAssemblyMI);
 
-        cutAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_X);
-        cutAssemblyEditMenuItem.setText("Cut");
-        cutAssemblyEditMenuItem.setToolTipText("Cut selected item");
-        cutAssemblyEditMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cutAssemblyEditMenuItemActionPerformed(evt);
-            }
-        });
-        assemblyMenu.add(cutAssemblyEditMenuItem);
-
-        copyAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_C);
-        copyAssemblyEditMenuItem.setText("Copy");
-        copyAssemblyEditMenuItem.setToolTipText("Copy selected item");
-        assemblyMenu.add(copyAssemblyEditMenuItem);
-
-        pasteAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_V);
-        pasteAssemblyEditMenuItem.setText("Paste");
-        pasteAssemblyEditMenuItem.setToolTipText("Paste selected item");
-        assemblyMenu.add(pasteAssemblyEditMenuItem);
-
-        deleteAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_V);
-        deleteAssemblyEditMenuItem.setText("Delete");
-        deleteAssemblyEditMenuItem.setToolTipText("Delete selected item");
-        assemblyMenu.add(deleteAssemblyEditMenuItem);
-        assemblyMenu.add(jSeparator8);
-
-        addEventGraphMenuItem.setMnemonic(KeyEvent.VK_A);
-        addEventGraphMenuItem.setText("Add Event Graph");
-        addEventGraphMenuItem.setToolTipText("");
-        assemblyMenu.add(addEventGraphMenuItem);
-
-        addPropertyChangeListenerMenuItem.setMnemonic(KeyEvent.VK_A);
-        addPropertyChangeListenerMenuItem.setText("Add Property Change Listener");
-        addPropertyChangeListenerMenuItem.setToolTipText("");
-        assemblyMenu.add(addPropertyChangeListenerMenuItem);
+        saveAssemblyAsMI.setMnemonic(KeyEvent.VK_C);
+        saveAssemblyAsMI.setText("Save Assembly As...");
+        saveAssemblyAsMI.setToolTipText("Close selected event graph");
+        assemblyMenu.add(saveAssemblyAsMI);
         assemblyMenu.add(jSeparator6);
 
-        undoAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_U);
-        undoAssemblyEditMenuItem.setText("Undo");
-        undoAssemblyEditMenuItem.setToolTipText("Undo last action");
-        assemblyMenu.add(undoAssemblyEditMenuItem);
+        javaSourceAssemblyMI.setText("Java Source Generation");
+        javaSourceAssemblyMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                javaSourceAssemblyMIActionPerformed(evt);
+            }
+        });
+        assemblyMenu.add(javaSourceAssemblyMI);
 
-        redoAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_R);
-        redoAssemblyEditMenuItem.setText("Redo");
-        redoAssemblyEditMenuItem.setToolTipText("Redo last undo");
-        assemblyMenu.add(redoAssemblyEditMenuItem);
+        imageSaveDiagramAssemblyMI.setText("Image Save Assembly Diagram");
+        assemblyMenu.add(imageSaveDiagramAssemblyMI);
+
+        initializeAssemblyForSimulationRunMI.setText("Initialize Assembly for Simulation Run");
+        assemblyMenu.add(initializeAssemblyForSimulationRunMI);
+
+        xmlViewAssemblyMI.setText("XML View");
+        assemblyMenu.add(xmlViewAssemblyMI);
+
+        exportToClusterFormatMI.setText("Export to Cluster Format");
+        exportToClusterFormatMI.setEnabled(false);
+        assemblyMenu.add(exportToClusterFormatMI);
 
         viskitMenuBar.add(assemblyMenu);
 
         assemblySimulationRunMenu.setText("Simulation Run   ");
 
-        showSimulationRunPanelMI.setMnemonic(KeyEvent.VK_S);
-        showSimulationRunPanelMI.setText("Show Simulation Console");
-        assemblySimulationRunMenu.add(showSimulationRunPanelMI);
-
-        clearSimulationConsoleMI.setMnemonic(KeyEvent.VK_S);
-        clearSimulationConsoleMI.setText("Clear Simulation Console");
-        assemblySimulationRunMenu.add(clearSimulationConsoleMI);
+        copySelectedConsoleTextMI.setMnemonic(KeyEvent.VK_S);
+        copySelectedConsoleTextMI.setText("Copy selected console text");
+        assemblySimulationRunMenu.add(copySelectedConsoleTextMI);
 
         saveSimulationConsoleMI.setMnemonic(KeyEvent.VK_S);
-        saveSimulationConsoleMI.setText("Save Simulation Console");
+        saveSimulationConsoleMI.setText("Save console text to File");
         assemblySimulationRunMenu.add(saveSimulationConsoleMI);
 
+        selectAllTextSimulationConsoleMI.setMnemonic(KeyEvent.VK_S);
+        selectAllTextSimulationConsoleMI.setText("Select all console text");
+        assemblySimulationRunMenu.add(selectAllTextSimulationConsoleMI);
+
+        clearSimulationConsoleMI.setMnemonic(KeyEvent.VK_S);
+        clearSimulationConsoleMI.setText("Clear all console text");
+        assemblySimulationRunMenu.add(clearSimulationConsoleMI);
+
         viewConsoleTextEditorMI.setMnemonic(KeyEvent.VK_V);
-        viewConsoleTextEditorMI.setText("View Console in Text Editor");
+        viewConsoleTextEditorMI.setText("View console output in text editor");
+        viewConsoleTextEditorMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewConsoleTextEditorMIActionPerformed(evt);
+            }
+        });
         assemblySimulationRunMenu.add(viewConsoleTextEditorMI);
 
         viskitMenuBar.add(assemblySimulationRunMenu);
@@ -616,12 +708,12 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         analystReportMenu.setText("Analyst Report   ");
 
         displayAnalystReportHtmlMI.setMnemonic(KeyEvent.VK_D);
-        displayAnalystReportHtmlMI.setText("Display Analyst Report HTML");
+        displayAnalystReportHtmlMI.setText("HTML Analyst Report Display");
         displayAnalystReportHtmlMI.setToolTipText("Display Analyst Report in Web browser");
         analystReportMenu.add(displayAnalystReportHtmlMI);
 
         openAnotherAnalystReportMI.setMnemonic(KeyEvent.VK_O);
-        openAnotherAnalystReportMI.setText("Open another Analyst Report");
+        openAnotherAnalystReportMI.setText("Open another Analyst Report XML");
         analystReportMenu.add(openAnotherAnalystReportMI);
 
         saveAnalystReportXml.setMnemonic(KeyEvent.VK_S);
@@ -629,16 +721,18 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         analystReportMenu.add(saveAnalystReportXml);
 
         viewAnalystReportXmlMI.setMnemonic(KeyEvent.VK_V);
-        viewAnalystReportXmlMI.setText("View Analyst Report XML");
+        viewAnalystReportXmlMI.setText("XML View of saved Analyst Report");
         analystReportMenu.add(viewAnalystReportXmlMI);
 
         viskitMenuBar.add(analystReportMenu);
 
         designOfExperimentsMenu.setText("Design of Experiments");
         designOfExperimentsMenu.setToolTipText("DOE");
+        designOfExperimentsMenu.setEnabled(false);
         viskitMenuBar.add(designOfExperimentsMenu);
 
         gridkitCloudMenu.setText("Cloud");
+        gridkitCloudMenu.setEnabled(false);
 
         viewCloudSimulationControllerMI.setText("Cloud Simulation Run");
         viewCloudSimulationControllerMI.addActionListener(new java.awt.event.ActionListener() {
@@ -650,23 +744,14 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         viskitMenuBar.add(gridkitCloudMenu);
 
-        viewMenu.setText("View");
-
-        viewSavedXmlMI.setMnemonic(KeyEvent.VK_V);
-        viewSavedXmlMI.setText("View Saved XML");
-        viewMenu.add(viewSavedXmlMI);
-
-        generateJavaSourceMI.setMnemonic(KeyEvent.VK_G);
-        generateJavaSourceMI.setText("Generate Java Source");
-        viewMenu.add(generateJavaSourceMI);
-
-        saveScreenImageMI.setMnemonic(KeyEvent.VK_I);
-        saveScreenImageMI.setText("Save Screen Image");
-        viewMenu.add(saveScreenImageMI);
-
-        viskitMenuBar.add(viewMenu);
-
         helpMenu.setText("Help");
+
+        contentsMI.setText("Contents");
+        helpMenu.add(contentsMI);
+
+        searchMI.setText("Search");
+        helpMenu.add(searchMI);
+        helpMenu.add(jSeparator13);
 
         tutorialMI.setMnemonic(KeyEvent.VK_T);
         tutorialMI.setText("Tutorial");
@@ -725,6 +810,18 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private void assemblyPropertiesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_assemblyPropertiesMIActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_assemblyPropertiesMIActionPerformed
+
+    private void viskitUserPreferencesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viskitUserPreferencesMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_viskitUserPreferencesMIActionPerformed
+
+    private void javaSourceAssemblyMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_javaSourceAssemblyMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_javaSourceAssemblyMIActionPerformed
+
+    private void viewConsoleTextEditorMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewConsoleTextEditorMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_viewConsoleTextEditorMIActionPerformed
 
     /**
      * @param args the command line arguments
@@ -802,9 +899,9 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JPanel _8_ConclusionsRecommendationsPanel;
     private javax.swing.JMenuItem aboutMI;
     private javax.swing.JMenuItem addCancellingEdgeMenuItem;
-    private javax.swing.JMenuItem addEventGraphMenuItem;
+    private javax.swing.JMenuItem addEventGraphMI;
     private javax.swing.JMenuItem addEventNodeMenuItem;
-    private javax.swing.JMenuItem addPropertyChangeListenerMenuItem;
+    private javax.swing.JMenuItem addPropertyChangeListenerMI;
     private javax.swing.JMenuItem addSchedulingEdgeMenuItem;
     private javax.swing.JMenuItem addSelfReferencingCancellingEdgeMenuItem;
     private javax.swing.JMenuItem addSelfReferencingSchedulingEdgeMenuItem;
@@ -828,8 +925,10 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JMenuItem closeViskitProjectMI;
     private javax.swing.JPanel cloudSimulationRunPanel;
     private javax.swing.JTabbedPane cloudSimulationRunTabbedPane;
+    private javax.swing.JMenuItem contentsMI;
     private javax.swing.JMenuItem copyAssemblyEditMenuItem;
     private javax.swing.JMenuItem copyEventEditMenuItem;
+    private javax.swing.JMenuItem copySelectedConsoleTextMI;
     private javax.swing.JMenuItem cutAssemblyEditMenuItem;
     private javax.swing.JMenuItem cutEventEditMenuItem;
     private javax.swing.JMenuItem deleteAssemblyEditMenuItem;
@@ -837,15 +936,22 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JMenu designOfExperimentsMenu;
     private javax.swing.JPanel designOfExperimentsPanel;
     private javax.swing.JMenuItem displayAnalystReportHtmlMI;
+    private javax.swing.JMenu editAssemblySubMenu;
+    private javax.swing.JMenu editEventGraphSubMenu;
     private javax.swing.JPanel eventGraphEditorPanel;
     private javax.swing.JMenu eventGraphMenu;
     private javax.swing.JMenuItem eventGraphPropertiesMI;
     private javax.swing.JMenuItem exitMI;
-    private javax.swing.JMenu fileMenu;
-    private javax.swing.JMenuItem generateJavaSourceMI;
+    private javax.swing.JMenuItem exportToClusterFormatMI;
     private javax.swing.JMenu gridkitCloudMenu;
     private javax.swing.JMenu helpMenu;
+    private javax.swing.JMenuItem imageSaveDiagramAssemblyMI;
+    private javax.swing.JMenuItem imageSaveDiagramEventGraphMI;
+    private javax.swing.JMenuItem initializeAssemblyForSimulationRunMI;
     private javax.swing.JPopupMenu.Separator jSeparator10;
+    private javax.swing.JPopupMenu.Separator jSeparator11;
+    private javax.swing.JPopupMenu.Separator jSeparator12;
+    private javax.swing.JPopupMenu.Separator jSeparator13;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;
@@ -854,6 +960,8 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JPopupMenu.Separator jSeparator8;
     private javax.swing.JPopupMenu.Separator jSeparator9;
+    private javax.swing.JMenuItem javaSourceAssemblyMI;
+    private javax.swing.JMenuItem javaSourceEventGraphMI;
     private javax.swing.JPanel localSimulationRunPanel;
     private javax.swing.JMenuItem newAssemblyMI;
     private javax.swing.JMenuItem newEventGraphMI;
@@ -867,23 +975,28 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JMenuItem openViskitProjectMI;
     private javax.swing.JMenuItem pasteAssemblyEditMenuItem;
     private javax.swing.JMenuItem pasteEventEditMenuItem;
+    private javax.swing.JMenu projectMenu;
     private javax.swing.JMenuItem redoAssemblyEditMenuItem;
     private javax.swing.JMenuItem redoEventEditMenuItem;
     private javax.swing.JMenuItem saveAnalystReportXml;
-    private javax.swing.JMenuItem saveScreenImageMI;
+    private javax.swing.JMenuItem saveAssemblyAsMI;
+    private javax.swing.JMenuItem saveAssemblyMI;
+    private javax.swing.JMenuItem saveEventGraphAsMI;
+    private javax.swing.JMenuItem saveEventGraphMI;
     private javax.swing.JMenuItem saveSimulationConsoleMI;
-    private javax.swing.JMenuItem showSimulationRunPanelMI;
+    private javax.swing.JMenuItem searchMI;
+    private javax.swing.JMenuItem selectAllTextSimulationConsoleMI;
     private javax.swing.JMenuItem tutorialMI;
     private javax.swing.JMenuItem undoAssemblyEditMenuItem;
     private javax.swing.JMenuItem undoEventEditMenuItem;
-    private javax.swing.JMenuItem userPreferencesMI;
     private javax.swing.JMenuItem viewAnalystReportXmlMI;
     private javax.swing.JMenuItem viewCloudSimulationControllerMI;
     private javax.swing.JMenuItem viewConsoleTextEditorMI;
-    private javax.swing.JMenu viewMenu;
-    private javax.swing.JMenuItem viewSavedXmlMI;
     private javax.swing.JMenuBar viskitMenuBar;
     private javax.swing.JTabbedPane viskitTabbedPane;
+    private javax.swing.JMenuItem viskitUserPreferencesMI;
+    private javax.swing.JMenuItem xmlViewAssemblyMI;
+    private javax.swing.JMenuItem xmlViewEventGraphMI;
     private javax.swing.JMenuItem zipMailViskitProjectMI;
     // End of variables declaration//GEN-END:variables
 }

@@ -4,7 +4,7 @@
   <NonVisualComponents>
     <Menu class="javax.swing.JMenuBar" name="viskitMenuBar">
       <SubComponents>
-        <Menu class="javax.swing.JMenu" name="fileMenu">
+        <Menu class="javax.swing.JMenu" name="projectMenu">
           <Properties>
             <Property name="text" type="java.lang.String" value="Project"/>
           </Properties>
@@ -22,7 +22,7 @@
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_O" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Open Viskit Project"/>
+                <Property name="text" type="java.lang.String" value="Open Project"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openViskitProjectMIActionPerformed"/>
@@ -33,7 +33,7 @@
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_R" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Open Recent Viskit Project"/>
+                <Property name="text" type="java.lang.String" value="Open Recent Project"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openRecentViskitProjectMIActionPerformed"/>
@@ -44,23 +44,12 @@
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_O" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Close Viskit Project"/>
+                <Property name="text" type="java.lang.String" value="Close Project"/>
                 <Property name="toolTipText" type="java.lang.String" value="Close current project and all related files"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="closeViskitProjectMIActionPerformed"/>
               </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="userPreferencesMI">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_U" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="User Preferences"/>
-                <Property name="toolTipText" type="java.lang.String" value="User settings for Viskit application"/>
-              </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="zipMailViskitProjectMI">
               <Properties>
@@ -71,6 +60,20 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="zipMailViskitProjectMIActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="viskitUserPreferencesMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_U" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Viskit Preferences"/>
+                <Property name="toolTipText" type="java.lang.String" value="User settings for Viskit application"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="viskitUserPreferencesMIActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="exitMI">
@@ -89,6 +92,127 @@
             <Property name="actionCommand" type="java.lang.String" value="Event Graph Editor"/>
           </Properties>
           <SubComponents>
+            <Menu class="javax.swing.JMenu" name="editEventGraphSubMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Edit Event Graph..."/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="undoEventEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_U" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Undo"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Undo last action"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="redoEventEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_R" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Redo"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Redo last undo"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator3">
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="cutEventEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_X" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Cut"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Cut selected item"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="copyEventEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_C" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Copy"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Copy selected item"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="pasteEventEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_V" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Paste Events"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Paste selected item"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="deleteEventEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_V" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Delete"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Delete selected item"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator5">
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="addEventNodeMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_A" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Add Event Node"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="addSimulationParameterMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Add Simulation Parameter"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="addStateVariableMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Add State Variable"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="addSchedulingEdgeMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Add Scheduling Edge"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="addCancellingEdgeMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Add Cancelling Edge"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="addSelfReferencingSchedulingEdgeMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Add Self-Referencing Scheduling Edge"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="addSelfReferencingCancellingEdgeMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Add Self-Referencing Cancelling Edge"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
+            <MenuItem class="javax.swing.JMenuItem" name="eventGraphPropertiesMI">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Edit Event Graph Properties"/>
+                <Property name="toolTipText" type="java.lang.String" value="graph metadata editor"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="eventGraphPropertiesMIActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator9">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="newEventGraphMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -113,6 +237,8 @@
                 <Property name="text" type="java.lang.String" value="Open Recent Event Graph"/>
               </Properties>
             </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator10">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="closeEventGraphMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -131,120 +257,39 @@
                 <Property name="toolTipText" type="java.lang.String" value="Close all event graphs"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator7">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="eventGraphPropertiesMI">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Event Graph Properties"/>
-                <Property name="toolTipText" type="java.lang.String" value="graph metadata editor"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="eventGraphPropertiesMIActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator9">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="cutEventEditMenuItem">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_X" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Cut"/>
-                <Property name="toolTipText" type="java.lang.String" value="Cut selected item"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="copyEventEditMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="saveEventGraphMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_C" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Copy"/>
-                <Property name="toolTipText" type="java.lang.String" value="Copy selected item"/>
+                <Property name="text" type="java.lang.String" value="Save Event Graph"/>
+                <Property name="toolTipText" type="java.lang.String" value="Close selected event graph"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="pasteEventEditMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="saveEventGraphAsMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_V" type="code"/>
+                  <Connection code="KeyEvent.VK_C" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Paste"/>
-                <Property name="toolTipText" type="java.lang.String" value="Paste selected item"/>
+                <Property name="text" type="java.lang.String" value="Save Event Graph As..."/>
+                <Property name="toolTipText" type="java.lang.String" value="Close selected event graph"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="deleteEventEditMenuItem">
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator7">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="javaSourceEventGraphMI">
               <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_V" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Delete"/>
-                <Property name="toolTipText" type="java.lang.String" value="Delete selected item"/>
+                <Property name="text" type="java.lang.String" value="Java Source Generation"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator5">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="addEventNodeMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="imageSaveDiagramEventGraphMI">
               <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_A" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Add Event Node"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
+                <Property name="text" type="java.lang.String" value="Image Save Event Graph Diagram"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="addSimulationParameterMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="xmlViewEventGraphMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Add Simulation Parameter"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="addStateVariableMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Add State Variable"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="addSchedulingEdgeMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Add Scheduling Edge"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="addCancellingEdgeMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Add Cancelling Edge"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="addSelfReferencingSchedulingEdgeMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Add Self-Referencing Scheduling Edge"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="addSelfReferencingCancellingEdgeMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Add Self-Referencing Cancelling Edge"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator3">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="undoEventEditMenuItem">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_U" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Undo"/>
-                <Property name="toolTipText" type="java.lang.String" value="Undo last action"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="redoEventEditMenuItem">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_R" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Redo"/>
-                <Property name="toolTipText" type="java.lang.String" value="Redo last undo"/>
+                <Property name="text" type="java.lang.String" value="XML View"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -254,6 +299,103 @@
             <Property name="text" type="java.lang.String" value="Assembly           "/>
           </Properties>
           <SubComponents>
+            <Menu class="javax.swing.JMenu" name="editAssemblySubMenu">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Edit Assembly..."/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="undoAssemblyEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_U" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Undo"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Undo last action"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="redoAssemblyEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_R" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Redo"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Redo last undo"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator11">
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="cutAssemblyEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_X" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Cut"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Cut selected item"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cutAssemblyEditMenuItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="copyAssemblyEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_C" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Copy"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Copy selected item"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="pasteAssemblyEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_V" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Paste Events"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Paste selected item"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="deleteAssemblyEditMenuItem">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_V" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Delete"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Delete selected item"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator8">
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="addEventGraphMI">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_A" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Add Event Graph"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="addPropertyChangeListenerMI">
+                  <Properties>
+                    <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyEvent.VK_A" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Add Property Change Listener"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
+            <MenuItem class="javax.swing.JMenuItem" name="assemblyPropertiesMI">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Edit Assembly Properties"/>
+                <Property name="toolTipText" type="java.lang.String" value="graph metadata editor"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="assemblyPropertiesMIActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator4">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="newAssemblyMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -278,6 +420,8 @@
                 <Property name="text" type="java.lang.String" value="Open Recent Assembly"/>
               </Properties>
             </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator12">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="closeAssemblyMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -296,96 +440,53 @@
                 <Property name="toolTipText" type="java.lang.String" value="Close all event graphs"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator10">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="assemblyPropertiesMI">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Assembly Properties"/>
-                <Property name="toolTipText" type="java.lang.String" value="graph metadata editor"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="assemblyPropertiesMIActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator4">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="cutAssemblyEditMenuItem">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_X" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Cut"/>
-                <Property name="toolTipText" type="java.lang.String" value="Cut selected item"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cutAssemblyEditMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="copyAssemblyEditMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="saveAssemblyMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_C" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Copy"/>
-                <Property name="toolTipText" type="java.lang.String" value="Copy selected item"/>
+                <Property name="text" type="java.lang.String" value="Save Assembly"/>
+                <Property name="toolTipText" type="java.lang.String" value="Close selected event graph"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="pasteAssemblyEditMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="saveAssemblyAsMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_V" type="code"/>
+                  <Connection code="KeyEvent.VK_C" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Paste"/>
-                <Property name="toolTipText" type="java.lang.String" value="Paste selected item"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="deleteAssemblyEditMenuItem">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_V" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Delete"/>
-                <Property name="toolTipText" type="java.lang.String" value="Delete selected item"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator8">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="addEventGraphMenuItem">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_A" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Add Event Graph"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="addPropertyChangeListenerMenuItem">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_A" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Add Property Change Listener"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
+                <Property name="text" type="java.lang.String" value="Save Assembly As..."/>
+                <Property name="toolTipText" type="java.lang.String" value="Close selected event graph"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator6">
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="undoAssemblyEditMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="javaSourceAssemblyMI">
               <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_U" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Undo"/>
-                <Property name="toolTipText" type="java.lang.String" value="Undo last action"/>
+                <Property name="text" type="java.lang.String" value="Java Source Generation"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="javaSourceAssemblyMIActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="imageSaveDiagramAssemblyMI">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Image Save Assembly Diagram"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="redoAssemblyEditMenuItem">
+            <MenuItem class="javax.swing.JMenuItem" name="initializeAssemblyForSimulationRunMI">
               <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_R" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Redo"/>
-                <Property name="toolTipText" type="java.lang.String" value="Redo last undo"/>
+                <Property name="text" type="java.lang.String" value="Initialize Assembly for Simulation Run"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="xmlViewAssemblyMI">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="XML View"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="exportToClusterFormatMI">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Export to Cluster Format"/>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -395,20 +496,12 @@
             <Property name="text" type="java.lang.String" value="Simulation Run   "/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="showSimulationRunPanelMI">
+            <MenuItem class="javax.swing.JMenuItem" name="copySelectedConsoleTextMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_S" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Show Simulation Console"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="clearSimulationConsoleMI">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_S" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Clear Simulation Console"/>
+                <Property name="text" type="java.lang.String" value="Copy selected console text"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="saveSimulationConsoleMI">
@@ -416,7 +509,23 @@
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_S" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Save Simulation Console"/>
+                <Property name="text" type="java.lang.String" value="Save console text to File"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="selectAllTextSimulationConsoleMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_S" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Select all console text"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="clearSimulationConsoleMI">
+              <Properties>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyEvent.VK_S" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Clear all console text"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="viewConsoleTextEditorMI">
@@ -424,8 +533,11 @@
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_V" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="View Console in Text Editor"/>
+                <Property name="text" type="java.lang.String" value="View console output in text editor"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="viewConsoleTextEditorMIActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -439,7 +551,7 @@
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_D" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Display Analyst Report HTML"/>
+                <Property name="text" type="java.lang.String" value="HTML Analyst Report Display"/>
                 <Property name="toolTipText" type="java.lang.String" value="Display Analyst Report in Web browser"/>
               </Properties>
             </MenuItem>
@@ -448,7 +560,7 @@
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_O" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Open another Analyst Report"/>
+                <Property name="text" type="java.lang.String" value="Open another Analyst Report XML"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="saveAnalystReportXml">
@@ -464,7 +576,7 @@
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="KeyEvent.VK_V" type="code"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="View Analyst Report XML"/>
+                <Property name="text" type="java.lang.String" value="XML View of saved Analyst Report"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -473,11 +585,13 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Design of Experiments"/>
             <Property name="toolTipText" type="java.lang.String" value="DOE"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Menu>
         <Menu class="javax.swing.JMenu" name="gridkitCloudMenu">
           <Properties>
             <Property name="text" type="java.lang.String" value="Cloud"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="viewCloudSimulationControllerMI">
@@ -490,42 +604,23 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="viewMenu">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="View"/>
-          </Properties>
-          <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="viewSavedXmlMI">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_V" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="View Saved XML"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="generateJavaSourceMI">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_G" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Generate Java Source"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="saveScreenImageMI">
-              <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="KeyEvent.VK_I" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Save Screen Image"/>
-              </Properties>
-            </MenuItem>
-          </SubComponents>
-        </Menu>
         <Menu class="javax.swing.JMenu" name="helpMenu">
           <Properties>
             <Property name="text" type="java.lang.String" value="Help"/>
           </Properties>
           <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="contentsMI">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Contents"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="searchMI">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Search"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator13">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="tutorialMI">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -933,8 +1028,8 @@
         <Container class="javax.swing.JPanel" name="designOfExperimentsPanel">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Design of Experiments">
-                <Property name="tabTitle" type="java.lang.String" value="Design of Experiments"/>
+              <JTabbedPaneConstraints tabName="(Design of Experiments)">
+                <Property name="tabTitle" type="java.lang.String" value="(Design of Experiments)"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -953,10 +1048,13 @@
           </Layout>
         </Container>
         <Container class="javax.swing.JTabbedPane" name="cloudSimulationRunTabbedPane">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Cloud Simulation Run">
-                <Property name="tabTitle" type="java.lang.String" value="Cloud Simulation Run"/>
+              <JTabbedPaneConstraints tabName="(Cloud Simulation Run)">
+                <Property name="tabTitle" type="java.lang.String" value="(Cloud Simulation Run)"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
