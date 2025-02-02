@@ -40,7 +40,7 @@ public class HistogramChart {
      */
     public String createChart(String title, String label, double[] data) {
         ViskitProject vkp = ViskitGlobals.instance().getViskitProject();
-        File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "Histogram.png");
+        File fileLocation = new File(vkp.getAnalystReportChartsDirectory(), label + "Histogram.png");
         IntervalXYDataset dataset = createDataset(label, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);
 

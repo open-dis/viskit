@@ -228,7 +228,7 @@ public class FileBasedClassManager {
 
             // TODO: Not used right now, but may be useful for other build/classes paths
 //            if (cacheXML.isEmpty()) {
-//                String s = ViskitGlobals.instance().getWorkDirectory().getCanonicalPath().replaceAll("\\\\", "/");
+//                String s = ViskitGlobals.instance().getProjectWorkingDirectory().getCanonicalPath().replaceAll("\\\\", "/");
 //                if (viskit.ViskitStatics.debug) {
 //                    LOG.debug("Cache is empty, creating workDir entry at " + s);
 //                }

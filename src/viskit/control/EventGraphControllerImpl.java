@@ -90,7 +90,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         } else {
 
             // For a brand new empty project open a default Event Graph
-            File[] eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDir().listFiles();
+            File[] eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory().listFiles();
             if (eventGraphFiles.length == 0) {
                 newEventGraph();
             }

@@ -45,7 +45,7 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         locationTF.getDocument().addDocumentListener(lis);
 
         nameTF.setText(ViskitProject.NEW_PROJECT_NAME);
-        locationTF.setText(ViskitProject.DEFAULT_VISKIT_PROJECTS_DIR);
+        locationTF.setText(ViskitProject.DEFAULT_VISKIT_PROJECTS_DIRECTORY);
     }
 
     class myDocListener implements DocumentListener {

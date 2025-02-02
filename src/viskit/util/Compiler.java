@@ -70,7 +70,7 @@ public class Compiler {
 
             JavaObjectFromString jofs = new JavaObjectFromString(pkg + className, src);
             Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(jofs);
-            File workDir = ViskitGlobals.instance().getWorkDirectory();
+            File workDir = ViskitGlobals.instance().getProjectWorkingDirectory();
             String workDirPath = workDir.getCanonicalPath();
 
             // This is would be the first instance of obtaining a LBL if

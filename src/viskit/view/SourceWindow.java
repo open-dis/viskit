@@ -47,7 +47,7 @@ public class SourceWindow extends JFrame {
         this.src = source;
         if (saveChooser == null) {
             saveChooser = new JFileChooser();
-            saveChooser.setCurrentDirectory(ViskitGlobals.instance().getViskitProject().getSrcDir());
+            saveChooser.setCurrentDirectory(ViskitGlobals.instance().getViskitProject().getSrcDirectory());
         }
         contentPane = new JPanel(new BorderLayout());
         setContentPane(contentPane);

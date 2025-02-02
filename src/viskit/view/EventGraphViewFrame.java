@@ -1217,7 +1217,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
         // Try to open in the current project directory for EventGraphs
         if (ViskitGlobals.instance().getViskitProject() != null) {
-            return new JFileChooser(ViskitGlobals.instance().getViskitProject().getEventGraphsDir());
+            return new JFileChooser(ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory());
         } else {
             return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY));
         }
@@ -1281,7 +1281,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         }
         jfc.setDialogTitle("Save Event Graph");
 
-        File fil = new File(ViskitGlobals.instance().getViskitProject().getEventGraphsDir(), suggName);
+        File fil = new File(ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory(), suggName);
         if (!fil.getParentFile().isDirectory()) {
             fil.getParentFile().mkdirs();
         }

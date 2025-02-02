@@ -103,7 +103,7 @@ public class ViskitGlobals {
     private final MyTypeListener myTypeListener;
     private MainFrame mainFrame;
 
-    private ViskitProject ViskitProject;
+    private ViskitProject viskitProject;
 
     /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
     private SimulationRunPanel simulationRunPanel;
@@ -113,8 +113,11 @@ public class ViskitGlobals {
     /** Flag to denote called systemExit only once */
     private boolean systemExitCalled = false;
 
+    /** The current project name */
+    private File projectName;
+
     /** The current project working directory */
-    private File workingDirectory;
+    private File projectWorkingDirectory;
 
     /** The current project base directory */
     private File projectsBaseDirectory;
@@ -778,23 +781,23 @@ public class ViskitGlobals {
     }
 
     /**
-     * @return current ViskitProject */
+     * @return current viskitProject */
     public ViskitProject getViskitProject() {
-        return ViskitProject;
+        return viskitProject;
     }
 
     /**
-     * @return whether a ViskitProject is currently loaded */
+     * @return whether a viskitProject is currently loaded */
     public boolean hasViskitProject() {
-        return (ViskitProject != null);
+        return (viskitProject != null);
     }
 
     /**
      * @return a project's working directory which is typically the
      * build/classes directory
      */
-    public File getWorkDirectory() {
-        return workingDirectory;
+    public File getProjectWorkingDirectory() {
+        return projectWorkingDirectory;
     }
 
     /**
@@ -805,28 +808,28 @@ public class ViskitGlobals {
      */
     public final void createWorkingDirectory()
     {
-        ViskitConfiguration vConfig = ViskitConfiguration.instance();
-        if (vConfig.getViskitAppConfiguration() == null)
+        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
+        if (viskitConfiguration.getViskitAppConfiguration() == null)
             return;
 
-        String projectName = vConfig.getVal(ViskitConfiguration.PROJECT_NAME_KEY);
+        String projectName = viskitConfiguration.getVal(ViskitConfiguration.PROJECT_NAME_KEY);
         if ((projectName != null) && (!projectName.isEmpty())) {
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }
         projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY);
 
-        if (ViskitProject == null)
-            ViskitProject = new ViskitProject(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
+        if (viskitProject == null)
+            viskitProject = new ViskitProject(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
         else
-            ViskitProject.setProjectRoot(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
+            viskitProject.setProjectRootDirectory(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
 
-        if (ViskitProject.initProject()) {
-            ViskitUserPreferences.saveExtraClasspathEntries(ViskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
+        if (viskitProject.initializeProject()) {
+            ViskitUserPreferences.saveExtraClasspathEntries(viskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
         } else {
             LOG.warn("Unable to create project directory, returning");
             return;
         }
-        workingDirectory = ViskitProject.getClassesDirectory();
+        projectWorkingDirectory = viskitProject.getClassesDirectory();
     }
 
     private ClassLoader workLoader, freshLoader;
@@ -842,7 +845,7 @@ public class ViskitGlobals {
             URL[] urls = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
             LocalBootLoader loader = new LocalBootLoader(urls,
                     Thread.currentThread().getContextClassLoader(),
-                    getWorkDirectory());
+                    getProjectWorkingDirectory());
 
             // Allow Assembly files in the ClassLoader
             workLoader = loader.initialize(true);
@@ -877,7 +880,7 @@ public class ViskitGlobals {
             */
             LocalBootLoader loader = new LocalBootLoader(urlArray,
                 ClassLoader.getPlatformClassLoader(), // <- the parent of the platform loader should be the internal boot loader
-                getWorkDirectory());
+getProjectWorkingDirectory());
 
             // Allow Assembly files in the ClassLoader
             freshLoader = loader.initialize(true);
@@ -1106,6 +1109,15 @@ public class ViskitGlobals {
      */
     public void setInternalSimulationRunner(TextAreaOutputStream internalSimulationRunner) {
         this.internalSimulationRunner = internalSimulationRunner;
+    }
+
+    /**
+     * @return the projectName
+     */
+    public File getProjectName() 
+    {
+//        projectName = viskitProject.get
+        return projectName;
     }
 
 } // end class file ViskitGlobals.java

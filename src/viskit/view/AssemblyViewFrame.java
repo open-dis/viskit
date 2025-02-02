@@ -941,7 +941,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         // A fresh (reset) LocalBootLoader will be instantiated
         // here when compiling EGs for the first time, or when the
         // SimkitXML2Java translator attempts to resolve a ParameterMap
-        addEventGraphsToLegoTree(vkp.getEventGraphsDir(), true);
+        addEventGraphsToLegoTree(vkp.getEventGraphsDirectory(), true);
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
@@ -1152,7 +1152,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         // Try to open in the current project directory for Assemblies
         if (ViskitGlobals.instance().getViskitProject() != null)
-            return new JFileChooser(ViskitGlobals.instance().getViskitProject().getAssembliesDir());
+            return new JFileChooser(ViskitGlobals.instance().getViskitProject().getAssembliesDirectory());
         else
             return new JFileChooser(new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY));
     }
@@ -1205,7 +1205,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             assemblyController.openProject(file); // calls EGVF setTitleApplicationProjectName
             String projectName = new String();
             if (file.exists())
-                projectName = file.getName(); // TODO handle using actual data
+                projectName = file.getName(); // TODO someday, also handle using project metadata <Project name="whassup"/>
             ViskitGlobals.instance().getMainFrame().setTitle(projectName);
         }
     }
@@ -1235,7 +1235,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             jfc = buildOpenSaveChooser();
 
         jfc.setDialogTitle("Save Assembly File");
-        File fil = new File(ViskitGlobals.instance().getViskitProject().getAssembliesDir(), suggName);
+        File fil = new File(ViskitGlobals.instance().getViskitProject().getAssembliesDirectory(), suggName);
         if (!fil.getParentFile().isDirectory())
             fil.getParentFile().mkdirs();
         if (showUniqueName)
@@ -1264,7 +1264,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     public void deleteCanceledSave(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getViskitProject().getEventGraphsDir()))
+                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory()))
                     deleteCanceledSave(file.getParentFile());
             }
         }

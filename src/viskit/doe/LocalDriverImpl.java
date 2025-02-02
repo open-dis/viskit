@@ -27,7 +27,7 @@ public class LocalDriverImpl implements DoeRunDriver {
 
     /** Creates a new instance of LocalDriverImpl */
     public LocalDriverImpl() { // remove if needed in gridkit.jar
-        this(new URL[] {}, viskit.ViskitGlobals.instance().getWorkDirectory());
+        this(new URL[] {}, viskit.ViskitGlobals.instance().getProjectWorkingDirectory());
     }
 
     public LocalDriverImpl(URL[] extClassPaths, File workDir) {

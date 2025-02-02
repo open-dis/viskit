@@ -454,7 +454,7 @@ public class ViskitStatics {
 
         String userDir = System.getProperty("user.dir");
         String userHome = System.getProperty("user.home");
-        String workDir = ViskitGlobals.instance().getWorkDirectory().getPath();
+        String workDir = ViskitGlobals.instance().getProjectWorkingDirectory().getPath();
 
         FindFile finder;
         Path startingDir;

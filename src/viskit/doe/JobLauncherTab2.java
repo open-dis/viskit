@@ -782,7 +782,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             if (gridMode) {
                 doe = new RemoteDriverImpl(clusterTF.getText().trim(), Integer.parseInt(portTF.getText().trim()), unameTF.getText().trim(), new String(upwPF.getPassword()));
             } else {
-                doe = new LocalDriverImpl(ViskitUserPreferences.getExtraClassPathArraytoURLArray(), viskit.ViskitGlobals.instance().getWorkDirectory());
+                doe = new LocalDriverImpl(ViskitUserPreferences.getExtraClassPathArraytoURLArray(), viskit.ViskitGlobals.instance().getProjectWorkingDirectory());
             }
             System.gc();
             qStatisticsConsole.setDoe(doe);

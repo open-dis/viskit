@@ -24,6 +24,7 @@ import org.jdom.JDOMException;
 import viskit.doe.FileHandler;
 
 /**
+ * Persistent key-value store for Viskit configuration values
  * <p>Viskit Discrete Event Simulation (DES) Tool
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
@@ -92,10 +93,10 @@ public class ViskitConfiguration {
 
     static final Logger LOG = LogUtils.getLogger(ViskitConfiguration.class);
 
-    private final Map<String, XMLConfiguration> xmlConfigurations;
-    private final Map<String, String> sessionHM;
-    private CombinedConfiguration combinedConfiguration;
-    private XMLConfiguration projectXMLConfiguration = null;
+    private final Map<String, XMLConfiguration> xmlConfigurationsMap;
+    private final Map<String, String>           sessionHashMap;
+    private CombinedConfiguration               projectCombinedConfiguration;
+    private XMLConfiguration                    projectXMLConfiguration = null;
     
     public static final String VISKIT_WELCOME_MESSAGE = "Welcome to Visual Simkit (Viskit) Discrete Event Simulation (DES) Authoring Tool";
 
@@ -114,9 +115,10 @@ public class ViskitConfiguration {
     private ViskitConfiguration() 
     {
         try {
-            if (!VISKIT_CONFIGURATION_DIR.exists()) {
-                VISKIT_CONFIGURATION_DIR.mkdirs();
-                LOG.info("Created dir: {}", VISKIT_CONFIGURATION_DIR);
+            if (!VISKIT_CONFIGURATION_DIR.exists())
+            {
+                 VISKIT_CONFIGURATION_DIR.mkdirs();
+                 LOG.info("Created dir: {}", VISKIT_CONFIGURATION_DIR);
             }
 
             File cAppSrc = new File("configuration/" + C_APP_FILE.getName());
@@ -131,8 +133,8 @@ public class ViskitConfiguration {
             LOG.error(ex);
         }
         
-        xmlConfigurations = new HashMap<>();
-        sessionHM = new HashMap<>();
+        xmlConfigurationsMap = new HashMap<>();
+        sessionHashMap = new HashMap<>();
         setDefaultConfiguration();
     }
 
@@ -140,22 +142,22 @@ public class ViskitConfiguration {
     private void setDefaultConfiguration() {
         try {
             Parameters params = new Parameters();
-            FileBasedConfigurationBuilder<XMLConfiguration> bldr1
+            FileBasedConfigurationBuilder<XMLConfiguration> builder1
                     = new FileBasedConfigurationBuilder<>(XMLConfiguration.class)
                         .configure(params.xml()
                         .setFileName(C_GUI_FILE.getAbsolutePath()));
-            bldr1.setAutoSave(true);
+            builder1.setAutoSave(true);
 
-            FileBasedConfigurationBuilder<XMLConfiguration> bldr2
+            FileBasedConfigurationBuilder<XMLConfiguration> builder2
                     = new FileBasedConfigurationBuilder<>(XMLConfiguration.class)
                         .configure(params.xml()
                         .setFileName(C_APP_FILE.getAbsolutePath()));
-            bldr2.setAutoSave(true);
+            builder2.setAutoSave(true);
 
             NodeCombiner combiner = new UnionCombiner();
-            combinedConfiguration = new CombinedConfiguration(combiner);
-            combinedConfiguration.addConfiguration(bldr1.getConfiguration(), "gui");
-            combinedConfiguration.addConfiguration(bldr2.getConfiguration(), "app");
+            projectCombinedConfiguration = new CombinedConfiguration(combiner);
+            projectCombinedConfiguration.addConfiguration(builder1.getConfiguration(), "gui");
+            projectCombinedConfiguration.addConfiguration(builder2.getConfiguration(), "app");
         } catch (ConfigurationException e) {
             LOG.error(e);
         }
@@ -164,13 +166,13 @@ public class ViskitConfiguration {
         Object obj;
         XMLConfiguration xc;
         NodeModel m;
-        for (String name : combinedConfiguration.getConfigurationNames()) {
-            obj = combinedConfiguration.getConfiguration(name);
+        for (String name : projectCombinedConfiguration.getConfigurationNames()) {
+            obj = projectCombinedConfiguration.getConfiguration(name);
             if (obj instanceof XMLConfiguration) {
                 xc = (XMLConfiguration) obj;
                 m = xc.getNodeModel();
                 for (ImmutableNode o : m.getInMemoryRepresentation().getChildren()) {
-                    xmlConfigurations.put((o.getNodeName()), xc);
+                    xmlConfigurationsMap.put((o.getNodeName()), xc);
                 }
             }
         }
@@ -185,25 +187,25 @@ public class ViskitConfiguration {
      */
     public void setVal(String key, String val) {
         String cfgKey = key.substring(0, key.indexOf('.'));
-        XMLConfiguration xc = xmlConfigurations.get(cfgKey);
+        XMLConfiguration xc = xmlConfigurationsMap.get(cfgKey);
         xc.setProperty(key, val);
     }
 
     public void setSessionVal(String key, String val) {
-        sessionHM.put(key, val);
+        sessionHashMap.put(key, val);
     }
 
     public String getVal(String key) {
-        String retS = sessionHM.get(key);
+        String retS = sessionHashMap.get(key);
         if (retS != null && retS.length() > 0) {
             return retS;
         }
 
-        return combinedConfiguration.getString(key);
+        return projectCombinedConfiguration.getString(key);
     }
 
     public String[] getConfigurationValues(String key) {
-        return combinedConfiguration.getStringArray(key);
+        return projectCombinedConfiguration.getStringArray(key);
     }
 
     /**
@@ -212,18 +214,18 @@ public class ViskitConfiguration {
     public void setProjectXMLConfig(String f) {
         try {
             Parameters params = new Parameters();
-            FileBasedConfigurationBuilder<XMLConfiguration> bldr
+            FileBasedConfigurationBuilder<XMLConfiguration> fileBasedConfigurationBuilder
                     = new FileBasedConfigurationBuilder<>(XMLConfiguration.class)
                         .configure(params.xml()
                         .setFileName(f));
-            bldr.setAutoSave(true);
-            projectXMLConfiguration = bldr.getConfiguration();
+            fileBasedConfigurationBuilder.setAutoSave(true);
+            projectXMLConfiguration = fileBasedConfigurationBuilder.getConfiguration();
         } catch (ConfigurationException ex) {
             LOG.error(ex);
         }
-        if (combinedConfiguration.getConfiguration("proj") == null || combinedConfiguration.getConfiguration("proj").isEmpty())
-            combinedConfiguration.addConfiguration(projectXMLConfiguration, "proj");
-        xmlConfigurations.put("proj", projectXMLConfiguration);
+        if (projectCombinedConfiguration.getConfiguration("proj") == null || projectCombinedConfiguration.getConfiguration("proj").isEmpty())
+            projectCombinedConfiguration.addConfiguration(projectXMLConfiguration, "proj");
+        xmlConfigurationsMap.put("proj", projectXMLConfiguration);
     }
 
     /** @return the XMLConfiguration for Viskit project */
@@ -235,18 +237,18 @@ public class ViskitConfiguration {
      * @param projConfig the project configuration to remove
      */
     public void removeProjectXMLConfig(XMLConfiguration projConfig) {
-        combinedConfiguration.removeConfiguration(projConfig);
-        xmlConfigurations.remove("proj");
+        projectCombinedConfiguration.removeConfiguration(projConfig);
+        xmlConfigurationsMap.remove("proj");
     }
 
     /** @return the XMLConfiguration for Viskit app */
     public XMLConfiguration getViskitAppConfiguration() {
-        return (XMLConfiguration) combinedConfiguration.getConfiguration("app");
+        return (XMLConfiguration) projectCombinedConfiguration.getConfiguration("app");
     }
 
     /** @return the XMLConfiguration for Viskit gui */
     public XMLConfiguration getViskitGuiConfig() {
-        return (XMLConfiguration) combinedConfiguration.getConfiguration("gui");
+        return (XMLConfiguration) projectCombinedConfiguration.getConfiguration("gui");
     }
 
     /** Used to clear all Viskit Configuration information to create a new

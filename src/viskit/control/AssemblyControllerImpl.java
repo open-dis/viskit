@@ -122,7 +122,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void begin() {
+    public void begin() 
+    {
         File projectPath = ViskitGlobals.instance().getViskitProject().getProjectRoot();
 
         // The initialAssemblyFile is set if we have stated a file "arg" upon startup
@@ -141,7 +142,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 t.execute();
             }
             compileAssembly(initialAssemblyFile);
-        } else {
+        } 
+        else 
+        {
             openProject(projectPath); // calls EventGraphViewFrame setTitleApplicationProjectName
             List<String> files = getOpenAssemblyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", files.size());
@@ -562,7 +565,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             ViskitGlobals.instance().createWorkingDirectory();
 
             // For a brand new empty project open a default Event Graph
-            File[] eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDir().listFiles();
+            File[] eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory().listFiles();
             if (eventGraphFiles.length == 0) {
                 ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
             }
@@ -637,8 +640,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         worker.execute();
     }
 
-    /** Common method between the AssemblyView and this AssemblyController
-     *
+    /** 
+     * Common method between the AssemblyView and this AssemblyController
      * @return indication of continue or cancel
      */
     public boolean handleProjectClosing() 
@@ -650,17 +653,16 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             title = "Close Current Project?";
             message = "Are you sure you want to close the current Viskit Project?";
             // TODO show project name
+            
 
             int returnValue = ((AssemblyView) getView()).genericAskYN(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
             {
                 doProjectCleanup();
                 projectClosed = true;
-                return projectClosed;
             } 
             else {
                 projectClosed = false;
-                return projectClosed;
             }
         }
         else // hopefully not reachable if other logic works OK
@@ -668,9 +670,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             title = "Project already closed";
             message = "Unable to close project since none is open";
             ((AssemblyView) getView()).genericReport(JOptionPane.ERROR_MESSAGE, title, message);
-                projectClosed = true;
-                return projectClosed;
+            projectClosed = true;
         }
+        // TODO what about global status getting set??
+        // TODO confirm title is reset
+        return projectClosed;
     }
 
     @Override
@@ -686,13 +690,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void openProject(File file) {
-        ViskitStatics.setViskitProjectFile(file);
+    public void openProject(File projectDirectory)
+    {
+        ViskitStatics.setViskitProjectFile(projectDirectory);
         ViskitGlobals.instance().createWorkingDirectory();
 
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjectSet(ViskitGlobals.instance().getViskitProject().getProjectRoot());
+        
         ViskitGlobals.instance().getEventGraphViewFrame().setTitleApplicationProjectName();
+        // TODO what about global status getting set??
+        // TODO confirm title is reset
+        
         runner.resetSimulationRunPanel();
     }
 
@@ -1539,7 +1548,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             ViskitProject viskitProject = ViskitGlobals.instance().getViskitProject();
 
             // Create, or find the project's java source and package
-            File srcPkg = new File(viskitProject.getSrcDir(), packagePath);
+            File srcPkg = new File(viskitProject.getSrcDirectory(), packagePath);
             if (!srcPkg.isDirectory())
                 srcPkg.mkdirs();
             File javaFile = new File(srcPkg, baseName + ".java");

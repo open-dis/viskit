@@ -112,7 +112,7 @@ public class LinearRegressionChart {
      */
     public String createChart(String title, String label, double[] data) {
         ViskitProject vkp = ViskitGlobals.instance().getViskitProject();
-        File fileLocation = new File(vkp.getAnalystReportChartsDir(), label + "LinearRegression.png");
+        File fileLocation = new File(vkp.getAnalystReportChartsDirectory(), label + "LinearRegression.png");
         XYDataset dataset = createDataset(label, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);
 
