@@ -87,7 +87,7 @@ public class MainFrame extends JFrame
     public EventGraphControllerImpl getEventGraphController() {
         return eventGraphController;
     }
-    public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation (DES) Tool"; // using Simkit
+    public final String VISKIT_APPLICATION_TITLE = "Viskit Discrete Event Simulation (DES) Modeling and Simulation Tool"; // using Simkit
 
     /** modalMenus: true means choice from traditional modalMenuBarList, false means new combinedMenuBar */
     private boolean modalMenus = false; 
@@ -747,7 +747,9 @@ public class MainFrame extends JFrame
         }
         if  (newProjectName.isBlank())
              newTitle = prefix;
-        else newTitle = prefix + ": " + newProjectName;
+        else if (!newProjectName.toLowerCase().contains("project"))
+             newTitle = prefix + ": Project " + newProjectName;
+        else newTitle = prefix + ": "         + newProjectName;
         setTitle(newTitle);
         super.setTitle(newTitle);
     }
