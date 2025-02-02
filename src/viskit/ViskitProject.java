@@ -61,9 +61,9 @@ import viskit.view.dialog.ViskitUserPreferences;
  * @version $Id: ViskitProject.java 1916 2008-07-04 09:13:41Z tdnorbra $
  * @author abuss
  */
-public class ViskitProject {
-
-    /** This static variable will be set by the user upon first Viskit startup
+public class ViskitProject 
+{
+    /** TODO FIX. This static variable will be set by the user upon first Viskit startup
      * to determine a project home space on the user's machine.  A default
      * home will be the user's working directory where Viskit is installed.
      */
@@ -95,12 +95,12 @@ public class ViskitProject {
     /** This static variable will get updated at launch if user's home directory doesn't exist */
     public static String VISKIT_PROJECTS_DIRECTORY = DEFAULT_VISKIT_PROJECTS_DIRECTORY;
 
-    /** This static variable will be set by the user upon first Viskit startup
+    /** TODO FIX: This static variable will be set by the user upon first Viskit startup
      * to determine a project location space on the user's machine. A default
      * location will be in the user's profile, or home directory.
      */
-    public static String DEFAULT_PROJECT_NAME = "DefaultProject";
-    public static String NEW_PROJECT_NAME     = "MyNewProject";
+    public static final String DEFAULT_PROJECT_NAME = "DefaultProject";
+    public static final String NEW_PROJECT_NAME     = "MyNewProject";
 
     private File projectRootDirectory;
     private File projectFile;
@@ -384,10 +384,10 @@ public class ViskitProject {
 
     public void closeProject() 
     {
-        ViskitConfigurationStore viskitConfiguration = ViskitConfigurationStore.instance();
-        viskitConfiguration.getViskitGuiConfig().setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME, "");
-        viskitConfiguration.cleanup();
-        viskitConfiguration.removeProjectXMLConfig(viskitConfiguration.getProjectXMLConfig());
+        ViskitConfigurationStore viskitConfigurationStore = ViskitConfigurationStore.instance();
+        viskitConfigurationStore.getViskitGuiConfig().setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME, "");
+        viskitConfigurationStore.cleanup();
+        viskitConfigurationStore.removeProjectXMLConfig(viskitConfigurationStore.getProjectXMLConfig());
         setProjectOpen(false);
     }
 
@@ -396,10 +396,21 @@ public class ViskitProject {
         return projectRootDirectory;
     }
 
-    public final void setProjectRootDirectory(File projectRoot) {
+    public final void setProjectRootDirectory(File projectRoot)
+    {
+        if (projectRoot == null)
+        {
+            LOG.error("ViskitProject setProjectRootDirectory received null File projectRoot");
+            return;
+        }
+        else if (!projectRoot.exists())
+        {
+            LOG.error("ViskitProject setProjectRootDirectory received non-existent File projectRoot=" + projectRoot.getPath());
+            return;
+        }
         this.projectRootDirectory = projectRoot;
         XMLConfiguration guiConfig = ViskitConfigurationStore.instance().getViskitGuiConfig();
-        guiConfig.setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME, getProjectRoot().getName());
+        guiConfig.setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME, projectRoot.getName()); // TODO check
     }
 
     public boolean isDirty() {
@@ -706,6 +717,15 @@ public class ViskitProject {
         @Override
         public Icon getIcon(File f) {
             return isViskitProject(f) ? viskitProjIcon : null;
+        }
+        
+        /**
+         * Get project name, which is actually maintained in ViskitGlobals
+         * @return current project name
+         */
+        public String getName() 
+        {
+            return ViskitGlobals.instance().getProjectName();
         }
 
         /**

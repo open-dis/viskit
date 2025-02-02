@@ -184,7 +184,7 @@ private void existingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     else 
     {
         file = ViskitProject.openProjectDirectory(this, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
-        ViskitStatics.setViskitProjectFile(file);
+        ViskitGlobals.instance().setProjectFile(file);
         firstTime = !firstTime;
 
         // NOTE: We have no way of setting the first opened project here as the
@@ -221,7 +221,7 @@ private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         
     } while (true);
 
-    ViskitStatics.setViskitProjectFile(newProjectFile);
+    ViskitGlobals.instance().setProjectFile(newProjectFile);
 
     // NOTE: We have no way of setting the first opened project here as the
     // controller hasn't been created yet to store that info when Viskit first

@@ -69,7 +69,9 @@ import viskit.doe.LocalBootLoader;
 import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
-/** <pre>
+/** 
+ * Viskit classes and methods, provided as static references and links for internal visibility to all other code in Viskit.
+ * <pre>
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
@@ -101,24 +103,6 @@ public class ViskitStatics {
     static final Logger LOG = Log4jUtilities.getLogger(ViskitStatics.class);
 
     public static boolean debug = false;
-
-    /** Utility method to configure a Viskit project
-     *
-     * @param newProjectFile the base directory of a Viskit project
-     */
-    @SuppressWarnings("unchecked")
-    public static void setViskitProjectFile(File newProjectFile) 
-    {
-        if (newProjectFile == null)
-        {
-            LOG.error("*** ViskitStatics setViskitProjectFile() received a null file, ignored...");
-            return;
-        }
-        ViskitProject.VISKIT_PROJECTS_DIRECTORY = newProjectFile.getParent().replaceAll("\\\\", "/"); // de-windows
-        ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
-        ViskitProject.DEFAULT_PROJECT_NAME = newProjectFile.getName();
-        ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
-    }
 
     /**
      * Convert a class name array type to human readable form.
@@ -283,7 +267,7 @@ public class ViskitStatics {
         try {
             c = Class.forName(s, false, clsLoader);
         } catch (ClassNotFoundException e) {
-            c = tryPrimsAndArrays(s, clsLoader);
+            c = tryPrimitivesAndArrays(s, clsLoader);
             if (c == null) {
                 c = tryCommonClasses(s, clsLoader);
                 if (c == null) {
@@ -304,7 +288,7 @@ public class ViskitStatics {
         return c;
     }
 
-    static class retrnChar {
+    static class ReturnChar {
         char c;
     }
 
@@ -362,10 +346,10 @@ public class ViskitStatics {
     }
 
 //    static Class<?> tryPrimitive(String s) {
-//        return tryPrimitive(s, new retrnChar());
+//        return tryPrimitive(s, new ReturnChar());
 //    }
 
-    static Class<?> tryPrimitive(String s, retrnChar rc) {
+    static Class<?> tryPrimitive(String s, ReturnChar rc) {
         switch (s) {
             case "long":
                 rc.c = 'J';
@@ -396,13 +380,13 @@ public class ViskitStatics {
         }
     }
 
-    static Class<?> tryPrimsAndArrays(String s, ClassLoader cLdr) {
+    static Class<?> tryPrimitivesAndArrays(String s, ClassLoader cLdr) {
         String[] spl = s.split("\\[");
         boolean isArray = spl.length > 1;
         char prefix = ' ';
         String name = "";
         char suffix = ' ';
-        retrnChar rc = new retrnChar();
+        ReturnChar rc = new ReturnChar();
         Class<?> c = tryPrimitive(spl[0], rc);
 
         if (c != null) {   // primitive
@@ -437,7 +421,7 @@ public class ViskitStatics {
         } catch (ClassNotFoundException e) {
             // one last check
             if (commonExpansions(name) != null) {
-                return tryPrimsAndArrays(s.replaceFirst(name, commonExpansions(name)), cLdr);
+                return tryPrimitivesAndArrays(s.replaceFirst(name, commonExpansions(name)), cLdr);
             }
             return null;
         }

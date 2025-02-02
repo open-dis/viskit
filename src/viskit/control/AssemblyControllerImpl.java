@@ -72,6 +72,8 @@ import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
 import viskit.assembly.SimulationRunInterface;
 
 /**
+ * AssemblyController full implementation.
+ * 
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
@@ -126,8 +128,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         File projectPath = ViskitGlobals.instance().getViskitProject().getProjectRoot();
 
-        // The initialAssemblyFile is set if we have stated a file "arg" upon startup
-        // from the command line
+        // The initialAssemblyFile is set if we have stated a file "arg" upon startup from the command line
+
         if (initialAssemblyFile != null && !initialAssemblyFile.isBlank() && !initialAssemblyFile.contains("$")) { // Check for $ makes sure that a property
             LOG.debug("Loading initial file: {}", initialAssemblyFile);                             // pointing to a assembly path isn't commented
                                                                                                          // out
@@ -145,7 +147,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         } 
         else 
         {
-            openProject(projectPath); // calls EventGraphViewFrame setTitleApplicationProjectName
+            openProject(projectPath); // calls AssemblyControllerImpl setTitleApplicationProjectName
             List<String> files = getOpenAssemblyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", files.size());
             File file;
@@ -692,7 +694,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void openProject(File projectDirectory)
     {
-        ViskitStatics.setViskitProjectFile(projectDirectory);
+        ViskitGlobals.instance().setProjectFile(projectDirectory);
+        ViskitGlobals.instance().setProjectName(projectDirectory.getName());
         ViskitGlobals.instance().createWorkingDirectory();
 
         // Add our currently opened project to the recently opened projects list

@@ -79,6 +79,7 @@ import viskit.view.ViskitStartupProjectInitializationPanel;
 import viskit.view.dialog.ViskitUserPreferences;
 import viskit.mvc.MvcController;
 import edu.nps.util.SystemExitHandler;
+import static viskit.ViskitProject.DEFAULT_PROJECT_NAME;
 import viskit.control.TextAreaOutputStream;
 import viskit.view.MainFrame;
 
@@ -114,7 +115,10 @@ public class ViskitGlobals {
     private boolean systemExitCalled = false;
 
     /** The current project name */
-    private File projectName;
+    private String projectName;
+
+    /** The current project File */
+    private File projectFile;
 
     /** The current project working directory */
     private File projectWorkingDirectory;
@@ -808,25 +812,32 @@ public class ViskitGlobals {
      */
     public final void createWorkingDirectory()
     {
-        ViskitConfigurationStore viskitConfiguration = ViskitConfigurationStore.instance();
-        if (viskitConfiguration.getViskitAppConfiguration() == null)
+        ViskitConfigurationStore viskitConfigurationStore = ViskitConfigurationStore.instance();
+        if (viskitConfigurationStore.getViskitAppConfiguration() == null)
             return;
 
-        String projectName = viskitConfiguration.getVal(ViskitConfigurationStore.PROJECT_NAME_KEY);
-        if ((projectName != null) && (!projectName.isEmpty())) {
-            ViskitProject.DEFAULT_PROJECT_NAME = projectName;
-        }
+        if ((projectName == null) || projectName.isBlank())
+             projectName = viskitConfigurationStore.getVal(ViskitConfigurationStore.PROJECT_NAME_KEY);
+        if ((projectName == null) || projectName.isBlank()) // double checking
+             projectName = DEFAULT_PROJECT_NAME;
+        setProjectName(projectName);
+        
         projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY);
 
         if (viskitProject == null)
-            viskitProject = new ViskitProject(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
+            viskitProject = new ViskitProject(new File(projectsBaseDirectory, projectName));
         else
+        {
+            // unexpected error condition
             viskitProject.setProjectRootDirectory(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
+        }
 
-        if (viskitProject.initializeProject()) {
+        if (viskitProject.initializeProject()) 
+        {
             ViskitUserPreferences.saveExtraClasspathEntries(viskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
-        } else {
-            LOG.warn("Unable to create project directory, returning");
+        } 
+        else {
+            LOG.error("Unable to create project directory for " + projectsBaseDirectory);
             return;
         }
         projectWorkingDirectory = viskitProject.getClassesDirectory();
@@ -1111,13 +1122,46 @@ getProjectWorkingDirectory());
         this.internalSimulationRunner = internalSimulationRunner;
     }
 
-    /**
-     * @return the projectName
+    /** 
+     * Utility method to configure a Viskit project.
+     * (moved here from ViskitStatics).
+     * @param newProjectFile the base directory of a Viskit project
      */
-    public File getProjectName() 
+//  @SuppressWarnings("unchecked")
+    public void setProjectFile(File newProjectFile) 
     {
-//        projectName = viskitProject.get
+        if (newProjectFile == null)
+        {
+            LOG.error("*** ViskitStatics setViskitProjectFile() received a null file, ignored...");
+            return;
+        }
+        String newProjectName = newProjectFile.getName();
+        ViskitGlobals.instance().setProjectName(newProjectName);
+        ViskitProject.VISKIT_PROJECTS_DIRECTORY = newProjectFile.getParent().replaceAll("\\\\", "/"); // de-windows
+        ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
+        ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.PROJECT_NAME_KEY, newProjectName);
+    }
+
+    /**
+     * @return current projectFile
+     */
+    public File getProjectFile() 
+    {
+        return projectFile;
+    }
+
+    /**
+     * @return current projectName
+     */
+    public String getProjectName() {
         return projectName;
+    }
+
+    /**
+     * @param projectName the projectName to set
+     */
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
 } // end class file ViskitGlobals.java
