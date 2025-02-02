@@ -203,7 +203,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     @Override
     public void open() {
         // Bug fix: 1249
-        File[] files = ((EventGraphView) getView()).openFilesAsk();
+        File[] files = ViskitGlobals.instance().getEventGraphViewFrame().openFilesAsk();
         if (files == null) {
             return;
         }

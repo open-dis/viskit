@@ -143,11 +143,11 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
     /**
      * Constructor; lays out initial GUI objects
-     * @param ctrl the controller for this frame (MVF)
+     * @param mvcController the controller for this frame (MVF)
      */
-    public EventGraphViewFrame(MvcController ctrl) {
+    public EventGraphViewFrame(MvcController mvcController) {
         super(FRAME_DEFAULT_TITLE);
-        initMVC(ctrl);   // set up mvc linkages
+        initMVC(mvcController);       // set up mvc linkages
         initializeUserInterface();    // build widgets
     }
 
@@ -185,10 +185,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
     /**
      * Initialize the MVC connections
-     * @param ctrl the controller for this view
+     * @param mvcController the controller for this view
      */
-    private void initMVC(MvcController ctrl) {
-        setController(ctrl);
+    private void initMVC(MvcController mvcController) {
+        setController(mvcController);
     }
 
     /**
@@ -1211,7 +1211,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             }
         }
     }
-    private JFileChooser jfc;
+    private JFileChooser openSaveChooser;
 
     private JFileChooser buildOpenSaveChooser() {
 
@@ -1224,19 +1224,20 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     @Override
-    public File[] openFilesAsk() {
-        jfc = buildOpenSaveChooser();
-        jfc.setDialogTitle("Open Event Graph Files");
+    public File[] openFilesAsk()
+    {
+        openSaveChooser = buildOpenSaveChooser();
+        openSaveChooser.setDialogTitle("Open Event Graph Files");
 
         // Bug fix: 1246
-        jfc.addChoosableFileFilter(new EventGraphFileFilter(
-                new String[] {"assembly", "smal", "x3d", "x3dv", "java", "class"}));
+        openSaveChooser.addChoosableFileFilter(new EventGraphFileFilter(
+                new String[] {"assembly", "smal", "xml", "x3d", "x3dv", "java", "class"}));
 
         // Bug fix: 1249
-        jfc.setMultiSelectionEnabled(true);
+        openSaveChooser.setMultiSelectionEnabled(true);
 
-        int retv = jfc.showOpenDialog(this);
-        return (retv == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;
+        int retv = openSaveChooser.showOpenDialog(this);
+        return (retv == JFileChooser.APPROVE_OPTION) ? openSaveChooser.getSelectedFiles() : null;
     }
 
     /** Open an already existing Viskit Project.  Called via reflection from
@@ -1276,10 +1277,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
     @Override
     public File saveFileAsk(String suggName, boolean showUniqueName) {
-        if (jfc == null) {
-            jfc = buildOpenSaveChooser();
+        if (openSaveChooser == null) {
+            openSaveChooser = buildOpenSaveChooser();
         }
-        jfc.setDialogTitle("Save Event Graph");
+        openSaveChooser.setDialogTitle("Save Event Graph");
 
         File fil = new File(ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory(), suggName);
         if (!fil.getParentFile().isDirectory()) {
@@ -1289,20 +1290,20 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             fil = getUniqueName(suggName, fil.getParentFile());
         }
 
-        jfc.setSelectedFile(fil);
-        int retv = jfc.showSaveDialog(this);
+        openSaveChooser.setSelectedFile(fil);
+        int retv = openSaveChooser.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
-            if (jfc.getSelectedFile().exists()) {
+            if (openSaveChooser.getSelectedFile().exists()) {
                 if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm")) {
                     return null;
                 }
             }
-            return jfc.getSelectedFile();
+            return openSaveChooser.getSelectedFile();
         }
 
         // We canceled
         deleteCanceledSave(fil.getParentFile());
-        jfc = null;
+        openSaveChooser = null;
         return null;
     }
 

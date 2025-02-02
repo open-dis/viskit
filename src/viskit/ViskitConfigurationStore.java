@@ -45,14 +45,14 @@ public class ViskitConfigurationStore
     public static final File VISKIT_LOGS_DIR = new File("logs");
     public static final File VISKIT_ERROR_LOG = new File(VISKIT_LOGS_DIR, "error.log.0");
 
-    public static final String GUI_BEANSHELL_ERROR_DIALOG = "gui.beanshellerrordialog";
-    public static final String BEANSHELL_ERROR_DIALOG_TITLE = GUI_BEANSHELL_ERROR_DIALOG + ".title";
-    public static final String BEANSHELL_ERROR_DIALOG_LABEL = GUI_BEANSHELL_ERROR_DIALOG + ".label";
-    public static final String BEANSHELL_ERROR_DIALOG_QUESTION = GUI_BEANSHELL_ERROR_DIALOG + ".question";
-    public static final String BEANSHELL_ERROR_DIALOG_SESSIONCHECKBOX = GUI_BEANSHELL_ERROR_DIALOG + ".sessioncheckbox";
-    public static final String BEANSHELL_ERROR_DIALOG_PREFERENCESCHECKBOX = GUI_BEANSHELL_ERROR_DIALOG + ".preferencescheckbox";
-    public static final String BEANSHELL_ERROR_DIALOG_PREFERENCESTOOLTIP = GUI_BEANSHELL_ERROR_DIALOG + ".preferencestooltip";
-    public static final String BEANSHELL_WARNING = "app.beanshell.warning";
+    public static final String GUI_BEANSHELL_ERROR_DIALOG_KEY = "gui.beanshellerrordialog";
+    public static final String BEANSHELL_ERROR_DIALOG_TITLE_KEY = GUI_BEANSHELL_ERROR_DIALOG_KEY + ".title";
+    public static final String BEANSHELL_ERROR_DIALOG_LABEL_KEY = GUI_BEANSHELL_ERROR_DIALOG_KEY + ".label";
+    public static final String BEANSHELL_ERROR_DIALOG_QUESTION_KEY = GUI_BEANSHELL_ERROR_DIALOG_KEY + ".question";
+    public static final String BEANSHELL_ERROR_DIALOG_SESSIONCHECKBOX_KEY = GUI_BEANSHELL_ERROR_DIALOG_KEY + ".sessioncheckbox";
+    public static final String BEANSHELL_ERROR_DIALOG_PREFERENCESCHECKBOX_KEY = GUI_BEANSHELL_ERROR_DIALOG_KEY + ".preferencescheckbox";
+    public static final String BEANSHELL_ERROR_DIALOG_PREFERENCESTOOLTIP_KEY = GUI_BEANSHELL_ERROR_DIALOG_KEY + ".preferencestooltip";
+    public static final String BEANSHELL_WARNING_KEY = "app.beanshell.warning";
     public static final String PROJECT_HOME_CLEAR_KEY = "app.projecthome";
     public static final String PROJECT_PATH_KEY = PROJECT_HOME_CLEAR_KEY + ".path[@dir]";
     public static final String PROJECT_NAME_KEY = PROJECT_HOME_CLEAR_KEY + ".name[@value]";
@@ -83,7 +83,7 @@ public class ViskitConfigurationStore
 
     public static final String APP_MAIN_BOUNDS_KEY = "app.mainframe.size";
     public static final String LOOK_AND_FEEL_KEY = "gui.lookandfeel";
-    public static final String PROJECT_TITLE_NAME = "gui.projecttitle.name[@value]";
+    public static final String PROJECT_TITLE_NAME_KEY = "gui.projecttitle.name[@value]";
     public static final String LOOK_AND_FEEL_DEFAULT = "default";
     public static final String LOOK_AND_FEEL_PLATFORM = "platform";
     
@@ -105,6 +105,7 @@ public class ViskitConfigurationStore
         LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
     }
 
+    /** singleton pattern */
     public static synchronized ViskitConfigurationStore instance() {
         if (me == null) {
             me = new ViskitConfigurationStore();
@@ -112,6 +113,7 @@ public class ViskitConfigurationStore
         return me;
     }
 
+    /** Constructor */
     private ViskitConfigurationStore() 
     {
         try {
@@ -129,10 +131,10 @@ public class ViskitConfigurationStore
             if (!C_GUI_FILE.exists())
                 Files.copy(cGuiSrc.toPath(), C_GUI_FILE.toPath());
 
-        } catch (IOException ex) {
+        } 
+        catch (IOException ex) {
             LOG.error(ex);
         }
-        
         xmlConfigurationsMap = new HashMap<>();
         sessionHashMap = new HashMap<>();
         setDefaultConfiguration();
@@ -179,6 +181,7 @@ public class ViskitConfigurationStore
     }
 
     /**
+     * Sets key=value pair in the persistent ViskitConfigurationStore.
      * Rather screwy - a decent design would allow the CombinedConfiguration object
  to do the saving, but it won't.
      *

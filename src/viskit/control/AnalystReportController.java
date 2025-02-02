@@ -69,13 +69,16 @@ public class AnalystReportController extends MvcAbstractController {
 
     static final Logger LOG = Log4jUtilities.getLogger(AnalystReportController.class);
 
-    private AnalystReportViewFrame analystReportFrame;
+    private AnalystReportViewFrame analystReportViewFrame;
     private File analystReportFile;
     private File currentAssemblyFile;
     private AnalystReportModel analystReportModel;
 
-    /** Creates a new instance of AnalystReportController */
-    public AnalystReportController() {}
+    /** Constructor creates a new instance of AnalystReportController */
+    public AnalystReportController() 
+    {
+        // initializations go here
+    }
 
     /** Called from the InternalSimulationRunner when the temp Analyst report is
      * filled out and ready to copy from a temp to a permanent directory
@@ -102,11 +105,11 @@ public class AnalystReportController extends MvcAbstractController {
             LOG.warn(ioe);
         }
 
-        if (analystReportFrame == null) {
-            analystReportFrame = (AnalystReportViewFrame) getView();
+        if (analystReportViewFrame == null) {
+            analystReportViewFrame = ViskitGlobals.instance().getAnalystReportViewFrame();
         }
 
-        analystReportFrame.setTitleApplicationProjectName();
+//      analystReportFrame.setTitleProjectName(); // unneeded
         buildAnalystReport(targetFile);
     }
 
@@ -125,8 +128,8 @@ public class AnalystReportController extends MvcAbstractController {
 
     public void openAnalystReportXML() 
     {
-        if (analystReportFrame.isReportDirty()) {
-            int result = JOptionPane.showConfirmDialog(analystReportFrame,
+        if (analystReportViewFrame.isReportDirty()) {
+            int result = JOptionPane.showConfirmDialog(analystReportViewFrame,
                     "Save current simulation data and analyst report annotations?",
                     "Confirm",
                     JOptionPane.WARNING_MESSAGE);
@@ -147,7 +150,7 @@ public class AnalystReportController extends MvcAbstractController {
         openAnalystReportChooser.setFileFilter(filter);
         openAnalystReportChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-        int resp = openAnalystReportChooser.showOpenDialog(analystReportFrame);
+        int resp = openAnalystReportChooser.showOpenDialog(analystReportViewFrame);
         if (resp != JFileChooser.APPROVE_OPTION) {
             return;
         }
@@ -172,12 +175,12 @@ public class AnalystReportController extends MvcAbstractController {
         saveAnalystReportXmlChooser.setFileFilter(filter);
         saveAnalystReportXmlChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-        int response = saveAnalystReportXmlChooser.showSaveDialog(analystReportFrame);
+        int response = saveAnalystReportXmlChooser.showSaveDialog(analystReportViewFrame);
 
         if (response != JFileChooser.APPROVE_OPTION) { // cancel
             return;
         }
-        analystReportFrame.unFillLayout();
+        analystReportViewFrame.unFillLayout();
 
         // Ensure user can save a unique name for Analyst Report (Bug fix: 1260)
         analystReportFile = saveAnalystReportXmlChooser.getSelectedFile();
@@ -204,7 +207,7 @@ public class AnalystReportController extends MvcAbstractController {
             return;
         }
 
-        analystReportFrame.unFillLayout();
+        analystReportViewFrame.unFillLayout();
         saveReport(analystReportFile);
 
         String outputHtmlFilePath = analystReportFile.getAbsolutePath();
@@ -245,7 +248,7 @@ public class AnalystReportController extends MvcAbstractController {
     private void saveReport(File f) {
         try {
             analystReportModel.writeToXMLFile(f);
-            analystReportFrame.setReportDirty(false);
+            analystReportViewFrame.setReportDirty(false);
         } catch (Exception e) {
             LOG.error(e);
         }
@@ -255,14 +258,14 @@ public class AnalystReportController extends MvcAbstractController {
         AnalystReportModel analystReportModelLocal = new AnalystReportModel(selectedFile);
         setContent(analystReportModelLocal);
         analystReportFile = selectedFile;
-        analystReportFrame.setReportDirty(false);
+        analystReportViewFrame.setReportDirty(false);
     }
 
     private void buildAnalystReport(File targetFile) {
         LOG.debug("TargetFile is: {}", targetFile);
         AnalystReportModel analystReportModelLocal;
         try {
-            analystReportModelLocal = new AnalystReportModel(analystReportFrame, targetFile, currentAssemblyFile);
+            analystReportModelLocal = new AnalystReportModel(analystReportViewFrame, targetFile, currentAssemblyFile);
         } 
         catch (Exception e) {
             LOG.error("Error parsing analyst report: {}", e);
@@ -271,12 +274,12 @@ public class AnalystReportController extends MvcAbstractController {
         }
         setContent(analystReportModelLocal);
         analystReportFile = targetFile;
-        analystReportFrame.setReportDirty(false);
+        analystReportViewFrame.setReportDirty(false);
     }
 
     private void setContent(AnalystReportModel analystReportModelLocal) {
-        if (analystReportModelLocal != null && analystReportFrame.isReportDirty()) {
-            int resp = JOptionPane.showConfirmDialog(analystReportFrame,
+        if (analystReportModelLocal != null && analystReportViewFrame.isReportDirty()) {
+            int resp = JOptionPane.showConfirmDialog(analystReportViewFrame,
                     "<html><body><p align='center'>The experiment has completed and the report is ready to be displayed.<br>" +
                     "The current report data has not been saved. Save current report before continuing?</p></body></html>",
                     "Save Report",
@@ -287,11 +290,11 @@ public class AnalystReportController extends MvcAbstractController {
             }
         }
 
-        analystReportFrame.setReportDirty(false);
+        analystReportViewFrame.setReportDirty(false);
 
         this.analystReportModel = analystReportModelLocal;
-        analystReportFrame.setReportBuilder(analystReportModelLocal);
-        analystReportFrame.fillLayout();
+        analystReportViewFrame.setReportBuilder(analystReportModelLocal);
+        analystReportViewFrame.fillLayout();
     }
 
     private void showHtmlViewer(String htmlFilename) 

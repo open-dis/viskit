@@ -174,10 +174,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     private int untitledCount = 0;
     
-
-    public AssemblyViewFrame(MvcController controller) {
+    public AssemblyViewFrame(MvcController mvcController)
+    {
         super(FRAME_DEFAULT_TITLE);
-        initializeMVC(controller);   // set up mvc linkages
+        initMVC(mvcController);   // set up mvc linkages
         initializeUserInterface(); // build widgets
     }
 
@@ -197,7 +197,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
      * Initialize the MVC connections
      * @param mvcController the controller for this view
      */
-    private void initializeMVC(MvcController mvcController)
+    private void initMVC(MvcController mvcController)
     {
         setController(mvcController);
     }
@@ -207,6 +207,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
      */
     private void initializeUserInterface()
     {
+        if (assemblyController == null)
+            assemblyController = new AssemblyControllerImpl();
+        
         buildEditMenu(); // must be first
         buildMenus();
         buildToolbar();
@@ -300,8 +303,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         {
             String nameOnly;
             Action currentAction;
-            JMenuItem mi;
-            assemblyController = (AssemblyControllerImpl) getController(); // TODO repetitive
+            JMenuItem menuItem;
+            assemblyController = ViskitGlobals.instance().getAssemblyController(); // TODO repetitive
             Set<String> files = assemblyController.getRecentAssemblyFileSet();
             openRecentAssemblyMenu.removeAll(); // clear prior to rebuilding menu
             openRecentAssemblyMenu.setEnabled(false); // disable unless file is found
@@ -318,9 +321,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 nameOnly = file.getName();
                 currentAction = new ParameterizedAssemblyAction(nameOnly);
                 currentAction.putValue(ViskitStatics.FULL_PATH, fullPath);
-                mi = new JMenuItem(currentAction);
-                mi.setToolTipText(file.getPath());
-                openRecentAssemblyMenu.add(mi);
+                menuItem = new JMenuItem(currentAction);
+                menuItem.setToolTipText(file.getPath());
+                openRecentAssemblyMenu.add(menuItem);
                 openRecentAssemblyMenu.setEnabled(true); // at least one is found
             }
             if (!files.isEmpty()) 
@@ -328,9 +331,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 openRecentAssemblyMenu.add(new JSeparator());
                 currentAction = new ParameterizedAssemblyAction("clear history");
                 currentAction.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
-                mi = new JMenuItem(currentAction);
-                mi.setToolTipText("Clear this list");
-                openRecentAssemblyMenu.add(mi);
+                menuItem = new JMenuItem(currentAction);
+                menuItem.setToolTipText("Clear this list");
+                openRecentAssemblyMenu.add(menuItem);
             }
             // TODO note that some items might remain loaded after "clear menu" and so wondering if that is ambiguous
             
@@ -368,8 +371,6 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         @Override
         public void actionPerformed(ActionEvent ev)
         {
-            assemblyController = (AssemblyControllerImpl) getController(); // TODO repetitive
-
             File fullPath;
             Object obj = getValue(ViskitStatics.FULL_PATH);
             if (obj instanceof String)
@@ -390,8 +391,6 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private void buildEditMenu()
     {
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
-        
-        assemblyController = (AssemblyControllerImpl) getController(); // TODO repetitive
 
         ActionIntrospector.getAction(assemblyController, "undo").setEnabled(false);
         ActionIntrospector.getAction(assemblyController, "redo").setEnabled(false);
@@ -442,7 +441,6 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     private void buildMenus()
     {
-        assemblyController = (AssemblyControllerImpl) getController(); // TODO repetitive
         recentAssemblyFileListener = new RecentAssemblyFileListener();
         assemblyController.addRecentAssemblyFileSetListener(getRecentAssemblyFileListener());
 
@@ -561,7 +559,6 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     private void buildProjectMenu()
     {
-        assemblyController = (AssemblyControllerImpl) getController(); // TODO repetitive
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(); // TODO repetitive
         
         projectMenu = new JMenu("Project");
@@ -1147,7 +1144,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 null, null, initval);
     }    // ViskitView-required methods:
 
-    private JFileChooser jfc;
+    private JFileChooser openSaveChooser;
     private JFileChooser buildOpenSaveChooser() {
 
         // Try to open in the current project directory for Assemblies
@@ -1159,16 +1156,16 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     @Override
     public File[] openFilesAsk() {
-        jfc = buildOpenSaveChooser();
-        jfc.setDialogTitle("Open Assembly Files");
+        openSaveChooser = buildOpenSaveChooser();
+        openSaveChooser.setDialogTitle("Open Assembly Files");
 
         // Look for assembly in the filename, Bug 1247 fix
         FileFilter filter = new AssemblyFileFilter("assembly");
-        jfc.setFileFilter(filter);
-        jfc.setMultiSelectionEnabled(true);
+        openSaveChooser.setFileFilter(filter);
+        openSaveChooser.setMultiSelectionEnabled(true);
 
-        int returnVal = jfc.showOpenDialog(this);
-        return (returnVal == JFileChooser.APPROVE_OPTION) ? jfc.getSelectedFiles() : null;
+        int returnVal = openSaveChooser.showOpenDialog(this);
+        return (returnVal == JFileChooser.APPROVE_OPTION) ? openSaveChooser.getSelectedFiles() : null;
     }
 
     @Override
@@ -1194,7 +1191,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     @Override
     public void openProject()
     {
-        assemblyController = ((AssemblyControllerImpl) getController()); // TODO unscramble impl's
+        assemblyController = ViskitGlobals.instance().getAssemblyController();
 
         if (!assemblyController.handleProjectClosing())
             return;
@@ -1202,7 +1199,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         File file = ViskitProject.openProjectDirectory(this.getContent(), ViskitProject.VISKIT_PROJECTS_DIRECTORY);
         if (file != null)
         {
-            assemblyController.openProject(file); // calls EGVF setTitleApplicationProjectName
+            assemblyController.openProject(file); // calls EGVF setTitleProjectName
             String projectName = new String();
             if (file.exists())
                 projectName = file.getName(); // TODO someday, also handle using project metadata <Project name="whassup"/>
@@ -1231,29 +1228,29 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     @Override
     public File saveFileAsk(String suggName, boolean showUniqueName) {
-        if (jfc == null)
-            jfc = buildOpenSaveChooser();
+        if (openSaveChooser == null)
+            openSaveChooser = buildOpenSaveChooser();
 
-        jfc.setDialogTitle("Save Assembly File");
+        openSaveChooser.setDialogTitle("Save Assembly File");
         File fil = new File(ViskitGlobals.instance().getViskitProject().getAssembliesDirectory(), suggName);
         if (!fil.getParentFile().isDirectory())
             fil.getParentFile().mkdirs();
         if (showUniqueName)
             fil = getUniqueName(suggName);
 
-        jfc.setSelectedFile(fil);
-        int retv = jfc.showSaveDialog(this);
+        openSaveChooser.setSelectedFile(fil);
+        int retv = openSaveChooser.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
-            if (jfc.getSelectedFile().exists()) {
+            if (openSaveChooser.getSelectedFile().exists()) {
                 if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm"))
                     return null;
             }
-            return jfc.getSelectedFile();
+            return openSaveChooser.getSelectedFile();
         }
 
         // We canceled
         deleteCanceledSave(fil.getParentFile());
-        jfc = null;
+        openSaveChooser = null;
         return null;
     }
 

@@ -95,16 +95,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private boolean dirty = false;
     private JMenuBar myMenuBar;
     private JFileChooser locationImageFileChooser;
-
-    public AnalystReportViewFrame(MvcController controller) {
-        super(FRAME_DEFAULT_TITLE);
-        initMVC(controller);
-        setLayout();
-        setBackground(new Color(251, 251, 229)); // yellow
-        buildMenus();
-
-        locationImageFileChooser = new JFileChooser("./images/");
-    }
+    private AnalystReportController analystReportController;
+    
     JTextField titleTF = new JTextField();
     JTextField analystNameTF = new JTextField();
     // , "CONFIDENTIAL", "SECRET", "TOP SECRET"
@@ -112,8 +104,26 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssemblyFile;
 
-    private void initMVC(MvcController cntlr) {
-        setController(cntlr);
+    public AnalystReportViewFrame()
+    {
+        super(FRAME_DEFAULT_TITLE); // necessary
+        analystReportController = new AnalystReportController();
+        initMVC((MvcController) analystReportController);
+        initializeAnalystReportController(analystReportController); // TODO unscramble this hierarchy
+                
+        setLayout();
+        setBackground(new Color(251, 251, 229)); // yellow
+        buildMenus();
+
+        locationImageFileChooser = new JFileChooser("./images/");
+    }
+    
+    private void initMVC(MvcController mvcController) {
+        setController(mvcController);
+    }
+    
+    private void initializeAnalystReportController(AnalystReportController analystReportController) {
+        setController(analystReportController);
     }
 
     /** Captures the name of the assembly file
@@ -941,6 +951,20 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
      */
     public JMenu getAnalystReportMenu() {
         return analystReportMenu;
+    }
+
+    /**
+     * @return the analystReportController
+     */
+    public AnalystReportController getAnalystReportController() {
+        return analystReportController;
+    }
+
+    /**
+     * @param analystReportController the analystReportController to set
+     */
+    public void setAnalystReportController(AnalystReportController analystReportController) {
+        this.analystReportController = analystReportController;
     }
 }
 

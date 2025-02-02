@@ -94,6 +94,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     /** The handler to run an assembly */
     private SimulationRunInterface runner;
+    
+    JTabbedPane mainTabbedPane;
+    int mainTabbedPaneIndex;
 
     /** Creates a new instance of AssemblyController */
     public AssemblyControllerImpl() {
@@ -137,7 +140,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if (!initialAssemblyFile.contains(projectPath.getPath())) {
                 doProjectCleanup();
                 projectPath = new File(initialAssemblyFile).getParentFile().getParentFile().getParentFile();
-                openProject(projectPath); // calls EventGraphViewFrame setTitleApplicationProjectName
+                openProject(projectPath); // calls EventGraphViewFrame setTitleProjectName
 
                 // Add new project EventGraphs for LEGO tree inclusion of our SimEntities
                 ViskitUserPreferences.RebuildLEGOTreePanelTask t = new ViskitUserPreferences.RebuildLEGOTreePanelTask();
@@ -147,7 +150,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         } 
         else 
         {
-            openProject(projectPath); // calls AssemblyControllerImpl setTitleApplicationProjectName
+            openProject(projectPath); // calls AssemblyControllerImpl setTitleProjectName
             List<String> files = getOpenAssemblyFileList(false);
             LOG.debug("Inside begin() and lis.size() is: {}", files.size());
             File file;
@@ -159,7 +162,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
         }
 
-        ((AssemblyViewFrame) getView()).setTitleApplicationProjectName();
+//        ((AssemblyViewFrame) getView()).setTitleProjectName(); // unneeded
         recordProjectFiles();
     }
 
@@ -217,7 +220,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @Override
     public void open() {
-        File[] files = ((AssemblyView) getView()).openFilesAsk();
+        File[] files = ViskitGlobals.instance().getAssemblyViewFrame().openFilesAsk();
         if (files == null)
             return;
 
@@ -231,16 +234,16 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (!file.exists())
             return;
 
-        AssemblyView assemblyView = (AssemblyView) getView();
+        AssemblyViewFrame assemblyViewFrame = ViskitGlobals.instance().getAssemblyViewFrame();
         AssemblyModelImpl assemblyModelImpl = new AssemblyModelImpl(this);
         assemblyModelImpl.initialize();
-        assemblyView.addTab(assemblyModelImpl);
+        assemblyViewFrame.addTab(assemblyModelImpl);
 
         // these may initialize to null on startup, check
         // before doing any openAlready lookups
         AssemblyModel[] assemblyModelOpenAlreadyArray = null;
-        if (assemblyView != null)
-            assemblyModelOpenAlreadyArray = assemblyView.getOpenModels();
+        if (assemblyViewFrame != null)
+            assemblyModelOpenAlreadyArray = assemblyViewFrame.getOpenModels();
 
         boolean isOpenAlready = false;
         String path;
@@ -258,7 +261,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         if (assemblyModelImpl.newModel(file) && !isOpenAlready) 
         {
-            assemblyView.setSelectedAssemblyName(assemblyModelImpl.getMetadata().name);
+            assemblyViewFrame.setSelectedAssemblyName(assemblyModelImpl.getMetadata().name);
             // TODO: Implement an Assembly description block set here
 
             adjustRecentAssemblySet(file);
@@ -270,7 +273,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         } 
         else 
         {
-            assemblyView.deleteTab(assemblyModelImpl);
+            assemblyViewFrame.deleteTab(assemblyModelImpl);
         }
 
         resetRedoUndoStatus();
@@ -688,7 +691,6 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         clearRecentAssemblyFileList();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
         ViskitGlobals.instance().getViskitProject().closeProject();
-        ViskitGlobals.instance().getMainFrame().updateApplicationTitle();
     }
 
     @Override
@@ -701,7 +703,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjectSet(ViskitGlobals.instance().getViskitProject().getProjectRoot());
         
-        ViskitGlobals.instance().getEventGraphViewFrame().setTitleApplicationProjectName();
+        ViskitGlobals.instance().setTitleProjectName(ViskitGlobals.instance().getProjectName());
         // TODO what about global status getting set??
         // TODO confirm title is reset
         
@@ -2081,14 +2083,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private void initializeConfiguration() {
         try {
             historyConfiguration = ViskitConfigurationStore.instance().getViskitAppConfiguration();
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             LOG.error("Error loading history file: {}", e.getMessage());
             LOG.warn("Recent file saving disabled");
             historyConfiguration = null;
         }
     }
-    JTabbedPane mainTabbedPane;
-    int mainTabbedPaneIdx;
 
     /**
      * Sets the Analyst report panel
@@ -2098,10 +2099,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void setMainTabbedPane(JComponent tabbedPane, int idx) {
         this.mainTabbedPane = (JTabbedPane) tabbedPane;
-        mainTabbedPaneIdx = idx;
+        mainTabbedPaneIndex = idx;
     }
     public void makeTopPaneAssemblyTabActive()
     {
-        mainTabbedPane.setSelectedIndex(mainTabbedPaneIdx);
+        mainTabbedPane.setSelectedIndex(mainTabbedPaneIndex);
     }
 }

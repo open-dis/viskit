@@ -71,7 +71,7 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
     @Override
     public void listChanged()
     {
-        AssemblyControllerImpl assemblyController = (AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController();
+        AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
         Set<String> recentProjectFileSet = assemblyController.getRecentProjectFileSet();
         if (openRecentProjectMenus == null)
             openRecentProjectMenus = new ArrayList<>();
@@ -98,7 +98,7 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
                 if  (menu == null)
                      menu = new JMenu(); // TODO why did this happen?
                 nameOnly = f.getName();
-                act = new ParameterizedProjecyAction(nameOnly);
+                act = new ParameterizedProjectAction(nameOnly);
                 act.putValue(ViskitStatics.FULL_PATH, fullPath);
                 mi = new JMenuItem(act);
                 mi.setToolTipText(fullPath);
@@ -112,7 +112,7 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
                 if  (menu == null)
                      menu = new JMenu(); // TODO why did this happen?
                 menu.add(new JSeparator());
-                act = new ParameterizedProjecyAction("clear history");
+                act = new ParameterizedProjectAction("clear history");
                 act.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
                 mi = new JMenuItem(act);
                 mi.setToolTipText("Clear this list");
@@ -121,15 +121,15 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
         }
     }
 
-    class ParameterizedProjecyAction extends AbstractAction {
+    class ParameterizedProjectAction extends AbstractAction {
 
-        ParameterizedProjecyAction(String s) {
+        ParameterizedProjectAction(String s) {
             super(s);
         }
 
         @Override
         public void actionPerformed(ActionEvent ev) {
-            AssemblyController assemblyController = (AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController();
+            AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
 
             File fullPath;
             Object obj = getValue(ViskitStatics.FULL_PATH);
@@ -144,7 +144,7 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
                 assemblyController.doProjectCleanup();
                 assemblyController.openProject(fullPath);
 
-                ((MvcAbstractViewFrame) ((MvcController) assemblyController).getView()).setTitleApplicationProjectName();
+//              ((MvcAbstractViewFrame) ((MvcController) assemblyController).getView()).setTitleProjectName(); // unneeded
             }
         }
     }

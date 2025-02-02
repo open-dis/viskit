@@ -67,7 +67,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     private boolean numericPriority;
 
     public ModelImpl(MvcController newController) {
-        this.eventGraphController = (EventGraphControllerImpl) newController;
+        eventGraphController = (EventGraphControllerImpl) newController;
         graphMetadata = new GraphMetadata(this);
     }
 

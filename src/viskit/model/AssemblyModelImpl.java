@@ -50,9 +50,9 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     private Point2D.Double pointLess;
     private final AssemblyControllerImpl assemblyController;
 
-    public AssemblyModelImpl(MvcController cont) {
+    public AssemblyModelImpl(AssemblyControllerImpl newAssemblyController) {
         pointLess = new Point2D.Double(30, 60);
-        assemblyController = (AssemblyControllerImpl) cont;
+        assemblyController = newAssemblyController;
         graphMetadata = new GraphMetadata(this);
         nodeCache = new LinkedHashMap<>();
     }

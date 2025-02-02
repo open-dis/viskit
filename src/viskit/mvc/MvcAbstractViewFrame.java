@@ -20,7 +20,7 @@ import viskit.util.TitleListener;
 public abstract class MvcAbstractViewFrame extends JFrame implements MvcView, MvcModelListener 
 {    
 
-    protected TitleListener titlelListener;
+    protected TitleListener titleListener;
     protected int titleKey;
     private MvcModel mvcModel;
     private MvcController mvcController;
@@ -42,28 +42,8 @@ public abstract class MvcAbstractViewFrame extends JFrame implements MvcView, Mv
      */
     public void setTitleListener(TitleListener newTitleListener, int keyValue) 
     {
-        titlelListener = newTitleListener;
+        titleListener = newTitleListener;
         titleKey = keyValue;
-
-        setTitleApplicationProjectName();
-    }
-
-    /**
-     * Shows the project name in the frame title bar
-     */
-    public void setTitleApplicationProjectName()
-    {
-        String newTitle = new String();
-        if      ( ViskitConfigurationStore.PROJECT_TITLE_NAME.toLowerCase().contains("project"))
-             newTitle +=         ": " +    ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.PROJECT_TITLE_NAME);
-        else if (!ViskitConfigurationStore.PROJECT_TITLE_NAME.isBlank())
-             newTitle += " Project: " + ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.PROJECT_TITLE_NAME);
-        // otherwise value is unchanged;
-        
-        if (this.titlelListener != null) 
-        {
-            titlelListener.setTitle(newTitle, titleKey);
-        }
     }
 
     @Override
@@ -77,17 +57,17 @@ public abstract class MvcAbstractViewFrame extends JFrame implements MvcView, Mv
     }
 
     @Override
-    public void setController(MvcController controller) {
-        this.mvcController = controller;
+    public void setController(MvcController mvcController) {
+        this.mvcController = mvcController;
     }
 
     @Override
-    public void setModel(MvcModel model) {
-        this.mvcModel = model;
+    public void setModel(MvcModel mvcModel) {
+        this.mvcModel = mvcModel;
         registerWithModel();
     }
 
     @Override
-    public abstract void modelChanged(MvcModelEvent event);
+    public abstract void modelChanged(MvcModelEvent mvcModelEvent);
 
 }

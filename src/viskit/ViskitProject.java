@@ -206,16 +206,19 @@ public class ViskitProject
         }
 
         // If we already have a project file, then load it.  If not, create it
-        setProjectFile(new File(projectRootDirectory, PROJECT_FILE_NAME));
-        if (!projectFile.exists()) {
+        setProjectFile(new File(projectRootDirectory, PROJECT_FILE_NAME)); // sets projectFile
+        if (!projectFile.exists()) 
+        {
             try {
                 getProjectFile().createNewFile();
-            } catch (IOException e) {
+            } 
+            catch (IOException e) {
                 LOG.error(e.getMessage());
             }
             projectDocument = createProjectDocument();
             writeProjectFile();
-        } else {
+        } 
+        else {
             loadProjectFromFile(getProjectFile());
         }
         ViskitConfigurationStore.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
@@ -385,10 +388,11 @@ public class ViskitProject
     public void closeProject() 
     {
         ViskitConfigurationStore viskitConfigurationStore = ViskitConfigurationStore.instance();
-        viskitConfigurationStore.getViskitGuiConfig().setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME, "");
+        viskitConfigurationStore.getViskitGuiConfig().setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME_KEY, "");
         viskitConfigurationStore.cleanup();
         viskitConfigurationStore.removeProjectXMLConfig(viskitConfigurationStore.getProjectXMLConfig());
         setProjectOpen(false);
+        ViskitGlobals.instance().setTitleProjectName("");
     }
 
     /** @return the root directory of this ViskitProject */
@@ -410,7 +414,7 @@ public class ViskitProject
         }
         this.projectRootDirectory = projectRoot;
         XMLConfiguration guiConfig = ViskitConfigurationStore.instance().getViskitGuiConfig();
-        guiConfig.setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME, projectRoot.getName()); // TODO check
+        guiConfig.setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME_KEY, projectRoot.getName()); // TODO check
     }
 
     public boolean isDirty() {
@@ -512,10 +516,20 @@ public class ViskitProject
     }
 
     /**
+     * @return whether projectFile exists
+     */
+    public boolean  hasProjectFile() {
+        return projectFileExists;
+    }
+
+    /**
      * @param projectFile the projectFile to set
      */
     public void setProjectFile(File projectFile) {
         this.projectFile = projectFile;
+        if  (projectFile == null)
+             projectFileExists = false;
+        else projectFileExists = projectFile.exists();
     }
 
     /**

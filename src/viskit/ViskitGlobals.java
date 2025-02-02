@@ -156,13 +156,14 @@ public class ViskitGlobals {
         return (AssemblyViewFrame) assemblyViewFrame;
     }
 
-    /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
-     *
+    /**
+     * Initialize GUI at startup
      * @return the component AssemblyViewFrame
      */
-    public MvcAbstractViewFrame buildAssemblyViewFrame() {
+    public AssemblyViewFrame buildAssemblyViewFrame() 
+    {
         assemblyController = new AssemblyControllerImpl();
-        assemblyViewFrame = new AssemblyViewFrame(assemblyController);
+        assemblyViewFrame  = new AssemblyViewFrame(assemblyController);
         assemblyController.setView(assemblyViewFrame);
         return assemblyViewFrame;
     }
@@ -203,8 +204,8 @@ public class ViskitGlobals {
 
     /* EventGraphViewFrame / EventGraphControllerImpl */
 
-    MvcAbstractViewFrame eventGraphViewFrame;
-    MvcController eContl;
+    EventGraphViewFrame      eventGraphViewFrame;
+    EventGraphControllerImpl eventGraphController;
 
     public EventGraphViewFrame getEventGraphViewFrame() {
         return (EventGraphViewFrame) eventGraphViewFrame;
@@ -220,19 +221,20 @@ public class ViskitGlobals {
      *
      * @return an instance of the EventGraphViewFrame
      */
-    public MvcAbstractViewFrame buildEventGraphViewFrame() {
-        eContl = new EventGraphControllerImpl();
-        eventGraphViewFrame = new EventGraphViewFrame(eContl);
-        eContl.setView(eventGraphViewFrame);
+    public EventGraphViewFrame buildEventGraphViewFrame() 
+    {
+        eventGraphController = new EventGraphControllerImpl();
+        eventGraphViewFrame = new EventGraphViewFrame(eventGraphController);
+        eventGraphController.setView(eventGraphViewFrame);
         return eventGraphViewFrame;
     }
 
-    public MvcController getEventGraphController() {
-        return eContl;
+    public EventGraphControllerImpl getEventGraphController() {
+        return eventGraphController;
     }
 
     public Model getActiveEventGraphModel() {
-        return (Model) eContl.getModel();
+        return (Model) eventGraphController.getModel();
     }
 
     ActionListener defaultEventGraphQuitHandler = new ActionListener() {
@@ -272,39 +274,41 @@ public class ViskitGlobals {
         return new DefaultComboBoxModel<>(getSimParametersList());
     }
 
-    /* AnalystReport model / view / controller */
+    /* AnalystReport model / view / controller, now shifted to stronger class typing */
 
     /* routines to manage the singleton-aspect of the view */
-    MvcAbstractViewFrame aRf;
-    MvcController aRcont;
+    AnalystReportViewFrame  analystReportViewFrame;
+    private AnalystReportController analystReportController;
 
     /**
      * Get a reference to the analyst report view.
      * @return a reference to the analyst report view or null if yet unbuilt.
      */
-    public AnalystReportViewFrame getAnalystReportEditor() {
-        return (AnalystReportViewFrame) aRf;
+    public AnalystReportViewFrame getAnalystReportViewFrame() {
+        return analystReportViewFrame;
     }
 
     /** Called from the EventGraphAssemblyComboMainFrame to initialize at UI startup
      *
      * @return the component AnalystReportViewFrame
      */
-    public MvcAbstractViewFrame buildAnalystReportFrame() {
-        aRcont = new AnalystReportController();
-        aRf = new AnalystReportViewFrame(aRcont);
-        aRcont.setView(aRf);
-        return aRf;
+    public MvcAbstractViewFrame buildAnalystReportFrame()
+    {
+        analystReportController = new AnalystReportController();
+        analystReportViewFrame = new AnalystReportViewFrame();
+        analystReportViewFrame.setAnalystReportController(analystReportController);
+        analystReportController.setView(analystReportViewFrame);
+        return analystReportViewFrame;
     }
 
     /** @return the analyst report builder (model) */
     public AnalystReportModel getAnalystReportModel() {
-        return (AnalystReportModel) aRcont.getModel();
+        return (AnalystReportModel) analystReportController.getModel();
     }
 
     /** @return the analyst report controller */
     public MvcController getAnalystReportController() {
-        return aRcont;
+        return analystReportController;
     }
 
     /******
@@ -1156,12 +1160,26 @@ getProjectWorkingDirectory());
     public String getProjectName() {
         return projectName;
     }
+    
+    /** Utility method calling MainFrame
+     * @param newProjectName */
+    public void setTitleProjectName (String newProjectName)
+    {
+        mainFrame.setTitleProjectName(newProjectName);
+    }
 
     /**
      * @param projectName the projectName to set
      */
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    /**
+     * @param analystReportController the analystReportController to set
+     */
+    public void setAnalystReportController(AnalystReportController analystReportController) {
+        this.analystReportController = analystReportController;
     }
 
 } // end class file ViskitGlobals.java
