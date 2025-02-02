@@ -43,15 +43,15 @@ import org.apache.logging.log4j.core.config.DefaultConfiguration;
 /**
  * Log4j Logging utilities for Log4J2 v19+.
  *
- * @author <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.LogUtils">Terry Norbraten, NPS MOVES</a>
+ * @author <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.Log4jUtilities">Terry Norbraten, NPS MOVES</a>
  */
-public class LogUtils {
+public class Log4jUtilities {
     
     private static final Logger LOG;
 
     static {
 //        configureLog4j("log4j2.properties"); // log4j2.xml will seen on the classpath
-        LOG = getLogger(LogUtils.class);
+        LOG = getLogger(Log4jUtilities.class);
     }
 
     /**<p>
@@ -105,4 +105,4 @@ public class LogUtils {
         return sb.toString();
     }
 
-} // end class file LogUtils.java
+} // end class file Log4jUtilities.java

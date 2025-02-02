@@ -1,6 +1,6 @@
 package simkit.util;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -46,7 +46,7 @@ import simkit.random.RandomVariate;
  */
 public class ClassFinder {
 
-    private static final Logger LOG = LogUtils.getLogger(ClassFinder.class);
+    private static final Logger LOG = Log4jUtilities.getLogger(ClassFinder.class);
 
     private static final String DEFAULT_EXT_DIR = "ext";
 

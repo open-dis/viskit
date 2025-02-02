@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.Desktop;
 import java.awt.Taskbar;
@@ -75,7 +75,7 @@ public class ViskitApplication
 
         } 
         catch (Exception e) {
-            LogUtils.getLogger(ViskitApplication.class).error(e);
+            Log4jUtilities.getLogger(ViskitApplication.class).error(e);
 
             if (e instanceof InvocationTargetException) {
 
@@ -99,7 +99,7 @@ public class ViskitApplication
 
                 ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
             } catch (MalformedURLException | URISyntaxException ex) {
-                LogUtils.getLogger(ViskitApplication.class).fatal(ex);
+                Log4jUtilities.getLogger(ViskitApplication.class).fatal(ex);
             }
         }
     }
@@ -117,9 +117,9 @@ public class ViskitApplication
                 file.delete();
             }
             if (dotViskit.delete())
-                LogUtils.getLogger(ViskitApplication.class).info("{} was found and deleted from your system.", dotViskit.getName());
+                Log4jUtilities.getLogger(ViskitApplication.class).info("{} was found and deleted from your system.", dotViskit.getName());
 
-            LogUtils.getLogger(ViskitApplication.class).info("Please restart Viskit");
+            Log4jUtilities.getLogger(ViskitApplication.class).info("Please restart Viskit");
         }
     }
 
@@ -131,7 +131,7 @@ public class ViskitApplication
             initialAssemblyFile = args[0];
 
         if (viskit.ViskitStatics.debug) {
-            LogUtils.getLogger(ViskitApplication.class).debug("***Inside EventGraphAssembly main {}: ", args.length);
+            Log4jUtilities.getLogger(ViskitApplication.class).debug("***Inside EventGraphAssembly main {}: ", args.length);
         }
         setLookAndFeel();
 
@@ -174,7 +174,7 @@ public class ViskitApplication
                 UIManager.setLookAndFeel(userPreferencesLookAndFeel);
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            LogUtils.getLogger(ViskitApplication.class).error("Error setting {} Look and Feel", userPreferencesLookAndFeel);
+            Log4jUtilities.getLogger(ViskitApplication.class).error("Error setting {} Look and Feel", userPreferencesLookAndFeel);
         }
     }
 

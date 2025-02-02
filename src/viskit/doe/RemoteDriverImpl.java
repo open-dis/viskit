@@ -9,7 +9,7 @@
 
 package viskit.doe;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +40,7 @@ public class RemoteDriverImpl implements DoeDriver {
         } catch (MalformedURLException ex) {
             throw new DoeException("Malformed Url at "+host+":"+port);
         } catch (Exception e) {
-            LogUtils.getLogger(RemoteDriverImpl.class).error(e);
+            Log4jUtilities.getLogger(RemoteDriverImpl.class).error(e);
         }
         if (rpc == null) throw new DoeException("Can't connect to Gridkit service at "+host+":"+port);
 

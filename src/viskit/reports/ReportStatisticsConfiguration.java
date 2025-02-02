@@ -5,7 +5,7 @@
  */
 package viskit.reports;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -48,7 +48,7 @@ import viskit.doe.FileHandler;
  */
 public class ReportStatisticsConfiguration {
 
-    static final Logger LOG = LogUtils.getLogger(ReportStatisticsConfiguration.class);
+    static final Logger LOG = Log4jUtilities.getLogger(ReportStatisticsConfiguration.class);
 
     /**
      * The ordered list of Entities in the simulation that have property change
@@ -156,7 +156,7 @@ public class ReportStatisticsConfiguration {
      * @param replicationStatisticsPropertyChangeListenerArray  replication statistics
      */
     public void processReplicationStatistics(int repNumber, PropertyChangeListener[] replicationStatisticsPropertyChangeListenerArray) {
-        LogUtils.getLogger(ReportStatisticsConfiguration.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
+        Log4jUtilities.getLogger(ReportStatisticsConfiguration.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
 
         Element[] replicationUpdate = new Element[replicationStatisticsPropertyChangeListenerArray.length];
         Element replication;

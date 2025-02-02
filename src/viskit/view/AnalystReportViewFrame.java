@@ -36,7 +36,7 @@ package viskit.view;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.SpringUtilities;
 
 import java.awt.Color;
@@ -83,7 +83,7 @@ import viskit.mvc.MvcController;
  */
 public class AnalystReportViewFrame extends MvcAbstractViewFrame implements OpenAssembly.AssembyChangeListener {
 
-    static final Logger LOG = LogUtils.getLogger(AnalystReportViewFrame.class);
+    static final Logger LOG = Log4jUtilities.getLogger(AnalystReportViewFrame.class);
     private final static String FRAME_DEFAULT_TITLE = "Viskit Analyst Report Editor";
     private AnalystReportModel analystReportModel;
     private JMenu analystReportMenu;

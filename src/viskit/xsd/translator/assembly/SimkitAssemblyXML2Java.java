@@ -1,6 +1,6 @@
 package viskit.xsd.translator.assembly;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,7 +29,7 @@ public class SimkitAssemblyXML2Java {
 
     public static final String ASSEMBLY_BINDINGS = "viskit.xsd.bindings.assembly";
     static final boolean DEBUG = false; // TODO: tie to Vstatics.debug?
-    static final Logger LOG = LogUtils.getLogger(SimkitAssemblyXML2Java.class);
+    static final Logger LOG = Log4jUtilities.getLogger(SimkitAssemblyXML2Java.class);
 
     /* convenience Strings for formatting */
     final private String sp  = SimkitXML2Java.SP;

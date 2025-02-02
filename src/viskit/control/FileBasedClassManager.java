@@ -1,7 +1,7 @@
 package viskit.control;
 
 import edu.nps.util.GenericConversion;
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +50,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class FileBasedClassManager {
 
-    static final Logger LOG = LogUtils.getLogger(FileBasedClassManager.class);
+    static final Logger LOG = Log4jUtilities.getLogger(FileBasedClassManager.class);
 
     // Singleton:
     protected static FileBasedClassManager me;

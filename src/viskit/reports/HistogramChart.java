@@ -1,6 +1,6 @@
 package viskit.reports;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
@@ -119,7 +119,7 @@ public class HistogramChart {
         try {
             ChartUtils.saveChartAsPNG(outFile, chart, 969, 641);
         } catch (IOException ioe) {
-            LogUtils.getLogger(HistogramChart.class).error(ioe);
+            Log4jUtilities.getLogger(HistogramChart.class).error(ioe);
         }
     }
 }

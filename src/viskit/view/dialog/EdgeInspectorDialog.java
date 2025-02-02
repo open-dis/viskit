@@ -15,7 +15,7 @@ import java.util.Vector;
 import java.util.ArrayList;
 
 import edu.nps.util.BoxLayoutUtils;
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import simkit.Priority;
@@ -353,7 +353,7 @@ public class EdgeInspectorDialog extends JDialog {
             }
             jcb.setEditable(true); // this allows anything to be entered
         } catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
-            LogUtils.getLogger(EdgeInspectorDialog.class).error(e);
+            Log4jUtilities.getLogger(EdgeInspectorDialog.class).error(e);
         }
         return jcb;
     }
@@ -466,7 +466,7 @@ public class EdgeInspectorDialog extends JDialog {
                 i++;
             }
 
-            LogUtils.getLogger(EdgeInspectorDialog.class).error("Unknown edge priority: " + pr + " -- setting to DEFAULT)");
+            Log4jUtilities.getLogger(EdgeInspectorDialog.class).error("Unknown edge priority: " + pr + " -- setting to DEFAULT)");
             priorityCB.setSelectedIndex(priorityDefaultIndex);
         }
     }

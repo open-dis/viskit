@@ -6,7 +6,7 @@
  */
 package viskit.gridlet;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -81,7 +81,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     String usid;
     Integer jobID;
     int port;
-    static Logger LOG = LogUtils.getLogger(GridRunner.class);
+    static Logger LOG = Log4jUtilities.getLogger(GridRunner.class);
     Vector<String> eventGraphs;
     Map<String, Object> thirdPartyJars;
     File experimentFile;

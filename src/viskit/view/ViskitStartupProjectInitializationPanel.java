@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.view;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.Dialog;
 import java.io.File;
@@ -83,7 +83,7 @@ public class ViskitStartupProjectInitializationPanel extends javax.swing.JPanel
                 };
                 SwingUtilities.invokeAndWait(r);
             } catch (InterruptedException | InvocationTargetException ex) {
-                LogUtils.getLogger(ViskitStartupProjectInitializationPanel.class).error(ex);
+                Log4jUtilities.getLogger(ViskitStartupProjectInitializationPanel.class).error(ex);
             }
         else
             dialog.setVisible(true);

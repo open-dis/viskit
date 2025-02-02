@@ -1,6 +1,6 @@
 package viskit.model;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -1094,7 +1094,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         pNode.setInstantiator(vc);
 
         pNode.opaqueModelObject = pcl;
-        LogUtils.getLogger(AssemblyModelImpl.class).debug("pNode name: " + pNode.getName());
+        Log4jUtilities.getLogger(AssemblyModelImpl.class).debug("pNode name: " + pNode.getName());
 
         getNodeCache().put(pNode.getName(), pNode);   // key = se
 

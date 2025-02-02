@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -120,7 +120,7 @@ public class Help
             hb = new HelpSet(null, helpSetURL).createHelpBroker();
         } catch (HelpSetException e) {
 //        e.printStackTrace();
-            LogUtils.getLogger(Help.class).error(e);
+            Log4jUtilities.getLogger(Help.class).error(e);
         }
 
         // Here we're setting up the action event peripherals for the tutorial menu selection

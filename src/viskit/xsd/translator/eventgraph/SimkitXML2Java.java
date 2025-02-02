@@ -1,6 +1,6 @@
 package viskit.xsd.translator.eventgraph;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -25,7 +25,7 @@ import viskit.xsd.bindings.eventgraph.*;
  */
 public class SimkitXML2Java {
 
-    static final Logger LOG = LogUtils.getLogger(SimkitXML2Java.class);
+    static final Logger LOG = Log4jUtilities.getLogger(SimkitXML2Java.class);
 
     /* convenience Strings for formatting */
     public final static String SP = " ";
@@ -238,7 +238,7 @@ public class SimkitXML2Java {
         superParams = resolveSuperParams(liParams);
 
         // Logger instantiation (for debugging only)
-//        pw.println(sp4 + "static Logger LogUtils.getLogger() " + eq + " Logger" + pd +
+//        pw.println(sp4 + "static Logger Log4jUtilities.getLogger() " + eq + " Logger" + pd +
 //                "getLogger" + lp + className + pd + "class" + rp + sc);
 //        pw.println();
         pw.println(SP_4 + "/* Simulation Parameters */");

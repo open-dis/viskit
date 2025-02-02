@@ -17,7 +17,7 @@
  */
 package viskit.gridlet;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -33,7 +33,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  */
 public class AssemblyHandler implements XmlRpcHandler {
 
-    static Logger LOG = LogUtils.getLogger(AssemblyHandler.class);
+    static Logger LOG = Log4jUtilities.getLogger(AssemblyHandler.class);
     SessionManager sessionManager;
     Hashtable<String, GridRunner> gridRuns;
 

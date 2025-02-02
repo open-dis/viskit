@@ -35,7 +35,7 @@ package viskit.control;
 
 import viskit.view.SimulationRunPanel;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import java.awt.Desktop;
 
@@ -76,7 +76,7 @@ import viskit.model.AssemblyModelImpl;
  */
 public class TextAreaOutputStream implements PropertyChangeListener 
 {
-    static final Logger LOG = LogUtils.getLogger(TextAreaOutputStream.class);
+    static final Logger LOG = Log4jUtilities.getLogger(TextAreaOutputStream.class);
 
     /** The name of the basicAssembly to run */
     private String assemblyClassName;

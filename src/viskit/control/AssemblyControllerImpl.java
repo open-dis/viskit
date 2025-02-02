@@ -3,7 +3,7 @@ package viskit.control;
 import actions.ActionIntrospector;
 
 import edu.nps.util.DirectoryWatch;
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import edu.nps.util.ZipUtils;
 
@@ -83,7 +83,7 @@ import viskit.assembly.SimulationRunInterface;
  */
 public class AssemblyControllerImpl extends MvcAbstractController implements AssemblyController, OpenAssembly.AssembyChangeListener {
 
-    static final Logger LOG = LogUtils.getLogger(AssemblyControllerImpl.class);
+    static final Logger LOG = Log4jUtilities.getLogger(AssemblyControllerImpl.class);
     private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
 

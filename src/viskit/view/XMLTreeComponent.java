@@ -35,7 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.view;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -63,7 +63,7 @@ import viskit.doe.FileHandler;
  */
 public class XMLTreeComponent extends JTree 
 {   
-    static final Logger LOG = LogUtils.getLogger(XMLTreeComponent.class);
+    static final Logger LOG = Log4jUtilities.getLogger(XMLTreeComponent.class);
 
     DefaultTreeModel mod;
 

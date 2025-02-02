@@ -1,6 +1,6 @@
 package viskit.xsd.cli;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -22,7 +22,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 public class Launcher extends Thread implements Runnable {
 
     static ClassLoader cloader;
-    static Logger log = LogUtils.getLogger(Launcher.class);
+    static Logger log = Log4jUtilities.getLogger(Launcher.class);
     String assembly = null;
     String assemblyName;
     Hashtable<String, String> eventGraphs = new Hashtable<>();

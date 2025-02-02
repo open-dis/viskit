@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.view.dialog;
 
 import static edu.nps.util.BoxLayoutUtils.clampWidth;
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -78,7 +78,7 @@ import viskit.control.AssemblyControllerImpl;
  */
 public class ViskitUserPreferences extends JDialog
 {
-    static final Logger LOG = LogUtils.getLogger(ViskitUserPreferences.class);
+    static final Logger LOG = Log4jUtilities.getLogger(ViskitUserPreferences.class);
 
     private static ViskitUserPreferences settingsDialog;
     private static boolean modified = false;

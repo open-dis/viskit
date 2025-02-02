@@ -58,7 +58,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.util;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.io.File;
 import java.io.IOException;
@@ -101,7 +101,7 @@ import viskit.doe.FileHandler;
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
 public class EventGraphCache {
-    static final Logger LOG = LogUtils.getLogger(EventGraphCache.class);
+    static final Logger LOG = Log4jUtilities.getLogger(EventGraphCache.class);
     private static EventGraphCache me;
 
     /**

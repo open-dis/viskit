@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.control;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.Desktop;
 import java.io.File;
@@ -67,7 +67,7 @@ import viskit.view.AssemblyViewFrame;
  */
 public class AnalystReportController extends MvcAbstractController {
 
-    static final Logger LOG = LogUtils.getLogger(AnalystReportController.class);
+    static final Logger LOG = Log4jUtilities.getLogger(AnalystReportController.class);
 
     private AnalystReportViewFrame analystReportFrame;
     private File analystReportFile;

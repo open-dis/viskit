@@ -1,6 +1,6 @@
 package viskit.util;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -29,7 +29,7 @@ import viskit.ViskitGlobals;
  */
 public class Version {
 
-    static Logger LOG = LogUtils.getLogger(Version.class);
+    static Logger LOG = Log4jUtilities.getLogger(Version.class);
 
     protected String versionString;
 

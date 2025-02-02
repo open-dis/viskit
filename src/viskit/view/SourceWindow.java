@@ -1,6 +1,6 @@
 package viskit.view;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import javax.swing.*;
 import javax.swing.text.DefaultHighlighter;
@@ -32,7 +32,7 @@ import viskit.ViskitStatics;
 @SuppressWarnings("serial")
 public class SourceWindow extends JFrame {
 
-    static final Logger LOGGER = LogUtils.getLogger(SourceWindow.class);
+    static final Logger LOGGER = Log4jUtilities.getLogger(SourceWindow.class);
 
     public final String src;
     JTextArea jta;

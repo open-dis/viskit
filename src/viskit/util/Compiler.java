@@ -1,6 +1,6 @@
 package viskit.util;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -32,7 +32,7 @@ public class Compiler {
     /** Diagnostic message when we have a successful compilation */
     public static final String COMPILE_SUCCESS_MESSAGE = "compile successful!";
 
-    static final Logger LOG = LogUtils.getLogger(Compiler.class);
+    static final Logger LOG = Log4jUtilities.getLogger(Compiler.class);
 
     /** Stream for writing text to an output device */
     private static OutputStream baosOut;

@@ -3,7 +3,7 @@ package viskit.control;
 import actions.ActionIntrospector;
 
 import edu.nps.util.DirectoryWatch;
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 
 import java.awt.BorderLayout;
@@ -65,7 +65,7 @@ import viskit.mvc.MvcRecentFileListener;
  */
 public class EventGraphControllerImpl extends MvcAbstractController implements EventGraphController {
 
-    static final Logger LOG = LogUtils.getLogger(EventGraphControllerImpl.class);
+    static final Logger LOG = Log4jUtilities.getLogger(EventGraphControllerImpl.class);
 
     public EventGraphControllerImpl() {
         initConfig();

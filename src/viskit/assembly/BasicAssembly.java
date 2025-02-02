@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.assembly;
 
 import edu.nps.util.GenericConversion;
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 
 import java.beans.PropertyChangeListener;
@@ -87,7 +87,7 @@ import viskit.view.SimulationRunPanel;
  */
 public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
-    static final Logger LOG = LogUtils.getLogger(BasicAssembly.class);
+    static final Logger LOG = Log4jUtilities.getLogger(BasicAssembly.class);
     
     protected Map<Integer, List<SavedStats>> replicationDataSavedStatisticsList;
     protected PropertyChangeListener[] replicationStatisticsPropertyChangeListenerArray;

@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.jgraph;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.geom.Point2D;
 import java.util.HashMap;
@@ -196,7 +196,7 @@ public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing 
             PropertyChangeListenerNode pn = (PropertyChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();
         } else {
-            LogUtils.getLogger(getClass()).warn("ParentView of " + pv + " is " + o);
+            Log4jUtilities.getLogger(getClass()).warn("ParentView of " + pv + " is " + o);
             return null;
         }
     }

@@ -36,7 +36,7 @@ package viskit.view;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.*;
 import java.awt.dnd.DropTargetAdapter;
@@ -110,7 +110,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 {
     public static String DESCRIPTION_HINT = "Good descriptions reveal model meaning and author intent";
 
-    private static final Logger LOG = LogUtils.getLogger(EventGraphViewFrame.class);
+    private static final Logger LOG = Log4jUtilities.getLogger(EventGraphViewFrame.class);
 
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
     public final static int SELECT_MODE = 0;

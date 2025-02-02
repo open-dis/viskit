@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -90,7 +90,7 @@ public class ViskitProject {
     public static final String DIST_DIRECTORY_NAME = "dist";
     public static final String LIB_DIRECTORY_NAME = "lib";
 
-    static final Logger LOG = LogUtils.getLogger(ViskitProject.class);
+    static final Logger LOG = Log4jUtilities.getLogger(ViskitProject.class);
 
     /** This static variable will get updated at launch if user's home directory doesn't exist */
     public static String VISKIT_PROJECTS_DIRECTORY = DEFAULT_VISKIT_PROJECTS_DIRECTORY;

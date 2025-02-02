@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 package viskit.util;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -53,7 +53,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class BrowserLauncher extends BasicContentViewerUI {
 
-    static final Logger LOG = LogUtils.getLogger(BrowserLauncher.class);
+    static final Logger LOG = Log4jUtilities.getLogger(BrowserLauncher.class);
 
     public static ComponentUI createUI(JComponent x) {
         return new BrowserLauncher((JHelpContentViewer) x);

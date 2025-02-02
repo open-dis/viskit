@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 // Local imports
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import viskit.ViskitConfiguration;
 
@@ -65,7 +65,7 @@ public class XMLValidationTool {
     /** The locally resolved location for simkit schema */
     public static final String LOCAL_EVENT_GRAPH_SCHEMA = "xsd/simkit.xsd";
 
-    static final Logger LOG = LogUtils.getLogger(XMLValidationTool.class);
+    static final Logger LOG = Log4jUtilities.getLogger(XMLValidationTool.class);
 
     private FileWriter fWriter;
     private String xmlFile, schemaFile;
@@ -127,7 +127,7 @@ public class XMLValidationTool {
                 File errorsLog = new File(ViskitConfiguration.VISKIT_LOGS_DIR + "/validationErrors.log");
                 errorsLog.setWritable(true, false);
 
-                // New LogUtils.getLogger() each Viskit startup
+                // New Log4jUtilities.getLogger() each Viskit startup
                 if (errorsLog.exists()) {errorsLog.delete();}
                 fWriter = new FileWriter(errorsLog, true);
                 Calendar cal = Calendar.getInstance();

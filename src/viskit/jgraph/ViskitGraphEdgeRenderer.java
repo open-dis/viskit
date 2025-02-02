@@ -1,6 +1,6 @@
 package viskit.jgraph;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -32,7 +32,7 @@ import org.jgraph.graph.GraphConstants;
  */
 public class ViskitGraphEdgeRenderer extends EdgeRenderer {
     
-    protected static final Logger LOG = LogUtils.getLogger(ViskitGraphEdgeRenderer.class);
+    protected static final Logger LOG = Log4jUtilities.getLogger(ViskitGraphEdgeRenderer.class);
 
     double[] coo = new double[6];
 

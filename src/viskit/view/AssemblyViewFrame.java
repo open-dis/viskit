@@ -36,7 +36,7 @@ package viskit.view;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -135,7 +135,7 @@ import viskit.mvc.MvcRecentFileListener;
  */
 public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyView, DragStartListener
 {
-    static final Logger LOG = LogUtils.getLogger(AssemblyViewFrame.class);
+    static final Logger LOG = Log4jUtilities.getLogger(AssemblyViewFrame.class);
     
     private String title = new String();
     
@@ -643,7 +643,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             return SIMEVLIS_MODE;
         if (propertyChangeListenerMode.isSelected())
             return PCL_MODE;
-        LogUtils.getLogger(AssemblyViewFrame.class).error("assert false : \"getCurrentMode()\"");
+        Log4jUtilities.getLogger(AssemblyViewFrame.class).error("assert false : \"getCurrentMode()\"");
         return 0;
     }
 
@@ -835,7 +835,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            LogUtils.getLogger(AssemblyViewFrame.class).error(tmle);
+            Log4jUtilities.getLogger(AssemblyViewFrame.class).error(tmle);
         }
 
         // the view holds only one assemblyModel, so it gets overwritten with each tab
@@ -931,7 +931,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                     addEventGraphsToLegoTree(file, file.isDirectory()); // recurse directories
             }
         } catch (URISyntaxException ex) {
-            LogUtils.getLogger(getClass()).error(ex);
+            Log4jUtilities.getLogger(getClass()).error(ex);
         }
 
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
@@ -1024,7 +1024,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
                     dragged = null;
                 } catch (UnsupportedFlavorException | IOException e) {
-                    LogUtils.getLogger(AssemblyViewFrame.class).error(e);
+                    Log4jUtilities.getLogger(AssemblyViewFrame.class).error(e);
                 }
             }
         }

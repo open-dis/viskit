@@ -1,6 +1,6 @@
 package viskit.doe;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 
 import java.io.File;
@@ -87,7 +87,7 @@ import viskit.ViskitStatics;
  */
 public class LocalBootLoader extends URLClassLoader {
 
-    private final static Logger LOG = LogUtils.getLogger(LocalBootLoader.class);
+    private final static Logger LOG = Log4jUtilities.getLogger(LocalBootLoader.class);
     
     String[] classPath;
     LocalBootLoader stage1;

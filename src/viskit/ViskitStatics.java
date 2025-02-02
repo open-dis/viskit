@@ -35,7 +35,7 @@ package viskit;
 
 import edu.nps.util.FindFile;
 import edu.nps.util.GenericConversion;
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.Component;
 import java.awt.Desktop;
@@ -98,7 +98,7 @@ public class ViskitStatics {
 
     public static final String OPERATING_SYSTEM = System.getProperty("os.name");
 
-    static final Logger LOG = LogUtils.getLogger(ViskitStatics.class);
+    static final Logger LOG = Log4jUtilities.getLogger(ViskitStatics.class);
 
     public static boolean debug = false;
 

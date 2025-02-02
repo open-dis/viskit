@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.view;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -590,7 +590,7 @@ public class MainFrame extends JFrame
                 // Q: What is setting this true when it's false?
                 // A: The Viskit Setting Dialog, third tab
                 if (viskit.ViskitStatics.debug) {
-                    LogUtils.getLogger(QuitAction.class).info("in actionPerformed");
+                    Log4jUtilities.getLogger(QuitAction.class).info("in actionPerformed");
                 }
 
                 // Remember the size of this main frame set by the user

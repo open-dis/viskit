@@ -58,7 +58,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.reports;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
@@ -191,7 +191,7 @@ public class LinearRegressionChart {
         try {
             ChartUtils.saveChartAsPNG(outFile, chart, 969, 641);
         } catch (IOException ioe) {
-            LogUtils.getLogger(LinearRegressionChart.class).error(ioe);
+            Log4jUtilities.getLogger(LinearRegressionChart.class).error(ioe);
         }
     }
 }

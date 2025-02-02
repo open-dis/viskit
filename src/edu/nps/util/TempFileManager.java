@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class TempFileManager {
 
-    static final Logger LOG = LogUtils.getLogger(TempFileManager.class);
+    static final Logger LOG = Log4jUtilities.getLogger(TempFileManager.class);
 
     /**
      *  Creates a temporary file in the proper directory to allow for cleanup

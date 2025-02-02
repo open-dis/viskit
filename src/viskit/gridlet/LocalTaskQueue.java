@@ -1,6 +1,6 @@
 package viskit.gridlet;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +25,7 @@ import viskit.doe.LocalBootLoader;
 @SuppressWarnings("serial")
 public class LocalTaskQueue extends ArrayList<Object> {
 
-    static Logger log = LogUtils.getLogger(LocalTaskQueue.class);
+    static Logger log = Log4jUtilities.getLogger(LocalTaskQueue.class);
     GridRunner gridRunner;
     int totalTasks;
     File experimentFile;
