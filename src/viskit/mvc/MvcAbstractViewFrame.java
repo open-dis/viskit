@@ -1,7 +1,7 @@
 package viskit.mvc;
 
 import javax.swing.JFrame;
-import viskit.ViskitConfiguration;
+import viskit.ViskitConfigurationStore;
 import viskit.util.TitleListener;
 
 /**
@@ -54,10 +54,10 @@ public abstract class MvcAbstractViewFrame extends JFrame implements MvcView, Mv
     public void setTitleApplicationProjectName()
     {
         String newTitle = new String();
-        if      ( ViskitConfiguration.PROJECT_TITLE_NAME.toLowerCase().contains("project"))
-             newTitle +=         ": " +    ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
-        else if (!ViskitConfiguration.PROJECT_TITLE_NAME.isBlank())
-             newTitle += " Project: " + ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
+        if      ( ViskitConfigurationStore.PROJECT_TITLE_NAME.toLowerCase().contains("project"))
+             newTitle +=         ": " +    ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.PROJECT_TITLE_NAME);
+        else if (!ViskitConfigurationStore.PROJECT_TITLE_NAME.isBlank())
+             newTitle += " Project: " + ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.PROJECT_TITLE_NAME);
         // otherwise value is unchanged;
         
         if (this.titlelListener != null) 

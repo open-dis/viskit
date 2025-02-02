@@ -45,7 +45,7 @@ import javax.swing.event.ChangeListener;
 
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
-import viskit.ViskitConfiguration;
+import viskit.ViskitConfigurationStore;
 import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.AssemblyController;
@@ -114,7 +114,7 @@ public class MainFrame extends JFrame
 
     public MainFrame(String initialAssemblyFile) 
     {
-        super(ViskitConfiguration.VISKIT_FULL_APPLICATION_NAME);
+        super(ViskitConfigurationStore.VISKIT_FULL_APPLICATION_NAME);
         ViskitGlobals.instance().setMainFrame(MainFrame.this);
         
         this.initialAssemblyFile = initialAssemblyFile;
@@ -122,8 +122,8 @@ public class MainFrame extends JFrame
         initializeMainFrame();
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        int w = Integer.parseInt(ViskitConfiguration.instance().getVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
-        int h = Integer.parseInt(ViskitConfiguration.instance().getVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
+        int w = Integer.parseInt(ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]"));
         MainFrame.this.setLocation((d.width - w) / 2, (d.height - h) / 2);
         MainFrame.this.setSize(w, h);
 
@@ -595,11 +595,11 @@ public class MainFrame extends JFrame
 
                 // Remember the size of this main frame set by the user
                 Rectangle bounds = getBounds();
-                ViskitConfiguration.instance().setVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
-                ViskitConfiguration.instance().setVal(ViskitConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
+                ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
+                ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
 
                 // Pretty-fy all xml docs used for configuration
-                ViskitConfiguration.instance().cleanup();
+                ViskitConfigurationStore.instance().cleanup();
 
                 // All other "Frames" were setVisible(false) above
                 setVisible(false);
@@ -695,9 +695,9 @@ public class MainFrame extends JFrame
     {
         String newTitle = VISKIT_APPLICATION_TITLE;
         if      ( newProjectName.toLowerCase().contains("project"))
-             newTitle +=         ": " +    ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
+             newTitle +=         ": " +    ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.PROJECT_TITLE_NAME);
         else if (!newProjectName.isBlank())
-             newTitle += " Project: " + ViskitConfiguration.instance().getVal(ViskitConfiguration.PROJECT_TITLE_NAME);
+             newTitle += " Project: " + ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.PROJECT_TITLE_NAME);
         // otherwise value is unchanged;
         setTitle(newTitle);
     }

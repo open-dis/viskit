@@ -218,10 +218,10 @@ public class ViskitProject {
         } else {
             loadProjectFromFile(getProjectFile());
         }
-        ViskitConfiguration.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
+        ViskitConfigurationStore.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
 
-        XMLConfiguration config = ViskitConfiguration.instance().getProjectXMLConfig();
-        config.setProperty(ViskitConfiguration.VISKIT_PROJECT_NAME, getProjectRoot().getName());
+        XMLConfiguration config = ViskitConfigurationStore.instance().getProjectXMLConfig();
+        config.setProperty(ViskitConfigurationStore.VISKIT_PROJECT_NAME, getProjectRoot().getName());
 
         setProjectOpen(projectFileExists);
         return projectFileExists;
@@ -384,8 +384,8 @@ public class ViskitProject {
 
     public void closeProject() 
     {
-        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
-        viskitConfiguration.getViskitGuiConfig().setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, "");
+        ViskitConfigurationStore viskitConfiguration = ViskitConfigurationStore.instance();
+        viskitConfiguration.getViskitGuiConfig().setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME, "");
         viskitConfiguration.cleanup();
         viskitConfiguration.removeProjectXMLConfig(viskitConfiguration.getProjectXMLConfig());
         setProjectOpen(false);
@@ -398,8 +398,8 @@ public class ViskitProject {
 
     public final void setProjectRootDirectory(File projectRoot) {
         this.projectRootDirectory = projectRoot;
-        XMLConfiguration guiConfig = ViskitConfiguration.instance().getViskitGuiConfig();
-        guiConfig.setProperty(ViskitConfiguration.PROJECT_TITLE_NAME, getProjectRoot().getName());
+        XMLConfiguration guiConfig = ViskitConfigurationStore.instance().getViskitGuiConfig();
+        guiConfig.setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME, getProjectRoot().getName());
     }
 
     public boolean isDirty() {

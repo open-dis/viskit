@@ -71,7 +71,7 @@ import simkit.stat.SimpleStatsTally;
 
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import viskit.ViskitConfiguration;
+import viskit.ViskitConfigurationStore;
 
 import viskit.model.AssemblyNode;
 
@@ -643,7 +643,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                         + "?subject=Assembly%20Run%20Error&body=log%20output:").toURL();
                 
                 String msg = "Assembly run aborted.  <br/>Please "
-                    + "navigate to " + ViskitConfiguration.VISKIT_ERROR_LOG.getPath() + " and "
+                    + "navigate to " + ViskitConfigurationStore.VISKIT_ERROR_LOG.getPath() + " and "
                     + "email the log to "
                     + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then attach the log. Would "

@@ -115,9 +115,9 @@ public class ViskitStatics {
             return;
         }
         ViskitProject.VISKIT_PROJECTS_DIRECTORY = newProjectFile.getParent().replaceAll("\\\\", "/"); // de-windows
-        ViskitConfiguration.instance().setVal(ViskitConfiguration.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
+        ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
         ViskitProject.DEFAULT_PROJECT_NAME = newProjectFile.getName();
-        ViskitConfiguration.instance().setVal(ViskitConfiguration.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
+        ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.PROJECT_NAME_KEY, ViskitProject.DEFAULT_PROJECT_NAME);
     }
 
     /**
@@ -805,7 +805,7 @@ public class ViskitStatics {
                     Desktop.getDesktop().mail(url.toURI());
 
                     if (showLog)
-                        Desktop.getDesktop().browse(ViskitConfiguration.VISKIT_ERROR_LOG.toURI());
+                        Desktop.getDesktop().browse(ViskitConfigurationStore.VISKIT_ERROR_LOG.toURI());
                 }
             } catch (IOException | URISyntaxException ex) {
                 LOG.error(ex);

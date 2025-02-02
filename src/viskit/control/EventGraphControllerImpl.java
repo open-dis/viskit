@@ -34,7 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.jgraph.graph.DefaultGraphCell;
 
 import viskit.ViskitGlobals;
-import viskit.ViskitConfiguration;
+import viskit.ViskitConfigurationStore;
 import viskit.ViskitStatics;
 import viskit.jgraph.ViskitGraphUndoManager;
 import viskit.model.*;
@@ -399,14 +399,14 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private void recordEventGraphFiles() {
         if (historyConfig == null) {initConfig();}
         openEventGraphs = new ArrayList<>(4);
-        List<Object> valueAr = historyConfig.getList(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
+        List<Object> valueAr = historyConfig.getList(ViskitConfigurationStore.EVENTGRAPH_HISTORY_KEY + "[@value]");
         int idx = 0;
         String op;
         String eventGraphFile;
         for (Object s : valueAr) {
             eventGraphFile = (String) s;
             if (recentEventGraphFileSet.add(eventGraphFile)) {
-                op = historyConfig.getString(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]");
+                op = historyConfig.getString(ViskitConfigurationStore.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true")))
                     openEventGraphs.add(eventGraphFile);
@@ -418,12 +418,12 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     private void saveEventGraphHistoryXML(Set<String> recentFiles) {
-        historyConfig.clearTree(ViskitConfiguration.RECENT_EVENTGRAPH_CLEAR_KEY);
+        historyConfig.clearTree(ViskitConfigurationStore.RECENT_EVENTGRAPH_CLEAR_KEY);
         int idx = 0;
 
         // The value's path is already delimited with "/"
         for (String value : recentFiles) {
-            historyConfig.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
+            historyConfig.setProperty(ViskitConfigurationStore.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfig.getDocument().normalize();
@@ -541,7 +541,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         int idx = 0;
         for (String key : recentEventGraphFileSet) {
             if (key.contains(f.getName()))
-                historyConfig.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyConfig.setProperty(ViskitConfigurationStore.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "false");
 
             idx++;
         }
@@ -553,7 +553,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         int idx = 0;
         for (String key : recentEventGraphFileSet) {
             if (key.contains(f.getName()))
-                historyConfig.setProperty(ViskitConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                historyConfig.setProperty(ViskitConfigurationStore.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "true");
 
             idx++;
         }
@@ -1224,7 +1224,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     /** This is the very first caller for getViskitAppConfiguration() upon Viskit startup */
     private void initConfig() {
         try {
-            historyConfig = ViskitConfiguration.instance().getViskitAppConfiguration();
+            historyConfig = ViskitConfigurationStore.instance().getViskitAppConfiguration();
         } catch (Exception e) {
             LOG.error("Error loading history file: {}", e);
             LOG.warn("Recent file saving disabled");

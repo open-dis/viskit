@@ -516,8 +516,8 @@ public class ViskitGlobals {
      * create a new project space, or open another existing one, or exit Viskit
      */
     public final void inititalizeProjectHome() {
-        ViskitConfiguration vConfig = ViskitConfiguration.instance();
-        String projectHome = vConfig.getVal(ViskitConfiguration.PROJECT_PATH_KEY);
+        ViskitConfigurationStore vConfig = ViskitConfigurationStore.instance();
+        String projectHome = vConfig.getVal(ViskitConfigurationStore.PROJECT_PATH_KEY);
         LOG.debug(projectHome);
         if (projectHome.isEmpty() || !(new File(projectHome).exists())) {
             ViskitStartupProjectInitializationPanel.showDialog(); // hopefully, void this
@@ -808,11 +808,11 @@ public class ViskitGlobals {
      */
     public final void createWorkingDirectory()
     {
-        ViskitConfiguration viskitConfiguration = ViskitConfiguration.instance();
+        ViskitConfigurationStore viskitConfiguration = ViskitConfigurationStore.instance();
         if (viskitConfiguration.getViskitAppConfiguration() == null)
             return;
 
-        String projectName = viskitConfiguration.getVal(ViskitConfiguration.PROJECT_NAME_KEY);
+        String projectName = viskitConfiguration.getVal(ViskitConfigurationStore.PROJECT_NAME_KEY);
         if ((projectName != null) && (!projectName.isEmpty())) {
             ViskitProject.DEFAULT_PROJECT_NAME = projectName;
         }

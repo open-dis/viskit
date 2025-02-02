@@ -24,7 +24,7 @@ import org.jdom.JDOMException;
 import viskit.doe.FileHandler;
 
 /**
- * Persistent key-value store for Viskit configuration values
+ * Persistent key-value store for Viskit configuration values.
  * <p>Viskit Discrete Event Simulation (DES) Tool
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
@@ -34,10 +34,10 @@ import viskit.doe.FileHandler;
  * @since 11:09:07 AM
  * @version $Id$
  */
-public class ViskitConfiguration {
-
-    public static final String VISKIT_SHORT_APPLICATION_NAME = "Visual Simkit";
-    public static final String VISKIT_FULL_APPLICATION_NAME  = VISKIT_SHORT_APPLICATION_NAME + " (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
+public class ViskitConfigurationStore 
+{
+    public static final String VISKIT_SHORT_APPLICATION_NAME = "Viskit";
+    public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
 
     public static final File VISKIT_CONFIGURATION_DIR = new File(System.getProperty("user.home"), ".viskit");
     public static final File C_APP_FILE = new File(VISKIT_CONFIGURATION_DIR, "c_app.xml");
@@ -89,9 +89,9 @@ public class ViskitConfiguration {
     
     public static final String VISKIT_PROJECT_NAME = "Project[@name]";
 
-    private static ViskitConfiguration me;
+    private static ViskitConfigurationStore me;
 
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitConfiguration.class);
+    static final Logger LOG = Log4jUtilities.getLogger(ViskitConfigurationStore.class);
 
     private final Map<String, XMLConfiguration> xmlConfigurationsMap;
     private final Map<String, String>           sessionHashMap;
@@ -105,14 +105,14 @@ public class ViskitConfiguration {
         LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
     }
 
-    public static synchronized ViskitConfiguration instance() {
+    public static synchronized ViskitConfigurationStore instance() {
         if (me == null) {
-            me = new ViskitConfiguration();
+            me = new ViskitConfigurationStore();
         }
         return me;
     }
 
-    private ViskitConfiguration() 
+    private ViskitConfigurationStore() 
     {
         try {
             if (!VISKIT_CONFIGURATION_DIR.exists())
@@ -182,7 +182,7 @@ public class ViskitConfiguration {
      * Rather screwy - a decent design would allow the CombinedConfiguration object
  to do the saving, but it won't.
      *
-     * @param key the ViskitConfiguration named key to set
+     * @param key the ViskitConfigurationStore named key to set
      * @param val the value of this key
      */
     public void setVal(String key, String val) {
@@ -255,10 +255,10 @@ public class ViskitConfiguration {
      * Viskit Project
      */
     public void clearViskitConfig() {
-        setVal(ViskitConfiguration.PROJECT_PATH_KEY, "");
-        setVal(ViskitConfiguration.PROJECT_NAME_KEY, "");
-        getViskitAppConfiguration().clearTree(ViskitConfiguration.RECENT_EVENTGRAPH_CLEAR_KEY);
-        getViskitAppConfiguration().clearTree(ViskitConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
+        setVal(ViskitConfigurationStore.PROJECT_PATH_KEY, "");
+        setVal(ViskitConfigurationStore.PROJECT_NAME_KEY, "");
+        getViskitAppConfiguration().clearTree(ViskitConfigurationStore.RECENT_EVENTGRAPH_CLEAR_KEY);
+        getViskitAppConfiguration().clearTree(ViskitConfigurationStore.RECENT_ASSEMBLY_CLEAR_KEY);
 
         // Retain the recent projects list
     }
