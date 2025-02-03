@@ -231,21 +231,21 @@ public class ViskitConfigurationStore
     }
 
     /**
-     * @param f a Viskit project file
+     * @param projectXmlConfigurationFilePath a Viskit project file, viskitProject.xml
      */
-    public void setProjectXMLConfig(String f) {
+    public void setProjectXMLConfiguration(String projectXmlConfigurationFilePath) {
         try {
             Parameters params = new Parameters();
             FileBasedConfigurationBuilder<XMLConfiguration> fileBasedConfigurationBuilder
                     = new FileBasedConfigurationBuilder<>(XMLConfiguration.class)
                         .configure(params.xml()
-                        .setFileName(f));
+                        .setFileName(projectXmlConfigurationFilePath));
             fileBasedConfigurationBuilder.setAutoSave(true);
             projectXMLConfiguration = fileBasedConfigurationBuilder.getConfiguration();
         } catch (ConfigurationException ex) {
             LOG.error(ex);
         }
-        if (projectCombinedConfiguration.getConfiguration("proj") == null || projectCombinedConfiguration.getConfiguration("proj").isEmpty())
+        if ((projectCombinedConfiguration.getConfiguration("proj") == null) || projectCombinedConfiguration.getConfiguration("proj").isEmpty())
             projectCombinedConfiguration.addConfiguration(projectXMLConfiguration, "proj");
         xmlConfigurationsMap.put("proj", projectXMLConfiguration);
     }

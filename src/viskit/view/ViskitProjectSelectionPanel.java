@@ -62,7 +62,7 @@ public class ViskitProjectSelectionPanel extends javax.swing.JPanel
     public void showDialog()
     {
         dialog = new JDialog((Dialog) null, true);  // modal
-        dialog.setTitle("Viskit Project Initialization");
+        dialog.setTitle("Viskit Project Selection");
         dialog.setContentPane(this); // viskitProjectSelectionPanel
         dialog.pack();
 
@@ -182,6 +182,8 @@ private void openExistingProjectButtonActionPerformed(java.awt.event.ActionEvent
         // controller hasn't been created yet to store that info when Viskit
         // first starts up
     }
+    // Since this dialog is modal, need to dispose() before we can move along in the startup
+    dialog.dispose();
 
 }//GEN-LAST:event_openExistingProjectButtonActionPerformed
 

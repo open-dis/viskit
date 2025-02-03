@@ -130,12 +130,12 @@ public class ViskitProject
         setProjectRootDirectory(projectRootDirectory);
     }
 
-    public boolean initializeProject() {
+    public boolean initializeProject() 
+    {
 
         if (!projectRootDirectory.exists()) {
              projectRootDirectory.mkdir();
         }
-
         setAnalystReportsDirectory(new File(projectRootDirectory, ANALYST_REPORTS_DIRECTORY_NAME));
         if (!analystReportsDirectory.exists()) {
             getAnalystReportsDirectory().mkdirs();
@@ -221,7 +221,7 @@ public class ViskitProject
         else {
             loadProjectFromFile(getProjectFile());
         }
-        ViskitConfigurationStore.instance().setProjectXMLConfig(getProjectFile().getAbsolutePath());
+        ViskitConfigurationStore.instance().setProjectXMLConfiguration(getProjectFile().getPath());
 
         XMLConfiguration config = ViskitConfigurationStore.instance().getProjectXMLConfig();
         config.setProperty(ViskitConfigurationStore.VISKIT_PROJECT_NAME, getProjectRoot().getName());

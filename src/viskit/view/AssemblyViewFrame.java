@@ -1223,7 +1223,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             String projectName = new String();
             if (file.exists())
                 projectName = file.getName(); // TODO someday, also handle using project metadata <Project name="whassup"/>
-            ViskitGlobals.instance().getMainFrame().setTitle(projectName);
+            ViskitGlobals.instance().setTitleProjectName(projectName);
+            MainFrame.displayWelcomeGuidance();
         }
     }
 
