@@ -112,7 +112,7 @@ public class ViskitGlobals
         defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
         myTypeListener = new MyTypeListener();
         buildTypePopup();
-        inititalizeProjectHome(); // TODO needed? maybe yes for first time, but not if repeating...
+        initializeProjectHome(); // TODO needed? maybe yes for first time, but not if repeating...
         createWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
     }
     
@@ -573,13 +573,13 @@ public class ViskitGlobals
     }
     
     
-    ViskitProjectSelectionPanel viskitProjectSelectionPanel;
+    static ViskitProjectSelectionPanel viskitProjectSelectionPanel;
 
     /** The entry point for Viskit startup. This method will either identify a
      * recorded project space, or launch a dialog asking the user to either
      * create a new project space, or open another existing one, or exit Viskit
      */
-    public final void inititalizeProjectHome() 
+    public final void initializeProjectHome() 
     {
         String projectHome = viskitConfigurationStore.getVal(ViskitConfigurationStore.PROJECT_PATH_KEY);
 //      String projectHome = ViskitGlobals.instance().getProjectWorkingDirectory().getName();
@@ -588,9 +588,10 @@ public class ViskitGlobals
             !(new File(projectHome).exists()) ||
              (hasViskitProject() && !isProjectOpen()))
         {
+            // no project open, popup special dialog
             if (viskitProjectSelectionPanel == null)
             {
-                viskitProjectSelectionPanel = new ViskitProjectSelectionPanel();
+                viskitProjectSelectionPanel = new ViskitProjectSelectionPanel(); // should only occur once
             }
             viskitProjectSelectionPanel.showDialog(); // blocks
         } 

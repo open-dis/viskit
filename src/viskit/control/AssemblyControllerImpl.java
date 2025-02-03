@@ -586,7 +586,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         if (closeProject()) 
         {
-//          ViskitGlobals.instance().inititalizeProjectHome();
+//          ViskitGlobals.instance().initializeProjectHome();
             ViskitGlobals.instance().createWorkingDirectory();
 
             // For a brand new empty project open a default Event Graph
