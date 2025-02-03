@@ -469,7 +469,7 @@ public class SimkitAssemblyXML2Java {
     // parameter may actually call for a subclass.
     String castIfSimEntity(String type) {
         String sret = "";
-        ClassLoader clsLoader = ViskitGlobals.instance().getWorkClassLoader();
+        ClassLoader clsLoader = ViskitGlobals.instance().getWorkingClassLoader();
         try {
             if ((Class.forName("simkit.SimEntityBase", true, clsLoader)).isAssignableFrom(Class.forName(type, true, clsLoader))
                     ||

@@ -180,7 +180,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     private boolean checkSaveIfDirty() {
         if (localDirty) {
-            StringBuilder sb = new StringBuilder("<html><center>Execution parameters have been modified.<br>(");
+            StringBuilder sb = new StringBuilder("<html><p align='center'>Execution parameters have been modified.<br>(");
 
             for (Iterator<OpenAssembly.AssembyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
                 sb.append(itr.next().getHandle());
@@ -584,9 +584,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void newProject() 
     {
-        if (handleProjectClosing()) 
+        if (closeProject()) 
         {
-            ViskitGlobals.instance().inititalizeProjectHome();
+//          ViskitGlobals.instance().inititalizeProjectHome();
             ViskitGlobals.instance().createWorkingDirectory();
 
             // For a brand new empty project open a default Event Graph
@@ -669,17 +669,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * Common method between the AssemblyView and this AssemblyController
      * @return indication of continue or cancel
      */
-    public boolean handleProjectClosing() 
+    public boolean closeProject() 
     {
         boolean projectClosed;
         String title, message;
         if (ViskitGlobals.instance().getViskitProject().isProjectOpen())
         {
             title = "Close Current Project?";
-            message = "Are you sure you want to close the current Viskit Project?";
-            // TODO show project name
-            
-
+            message = "<html><p align='center'>Are you sure you want to close </p><br/>";
+            String projectName = ViskitGlobals.instance().getProjectName();
+            if  (projectName.toLowerCase().contains("project"))
+                 message += "<p align='center'><i>"         + projectName + "</i></p><br/><p align='center'> the current Viskit Project?</p><br/>";
+            else message += "<p align='center'>Project <i>" + projectName + "</i></p><br/><p align='center'>, the current Viskit Project?</p><br/>";
             int returnValue = ViskitGlobals.instance().getAssemblyViewFrame().genericAskYN(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
             {
@@ -692,13 +693,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         else // hopefully not reachable if other logic works OK
         {
-            title = "Project already closed";
-            message = "Unable to close project since none is open";
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE, title, message);
+//            title = "No project is open";
+//            message  = "<html><p align='center'>Unable to close project, since no project is open.</p><br />";
+//            message +=       "<p align='center'>Use menu <i>Project &gt; Open Project</i> &nbsp;to continue.</p><br />";
+//            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE, title, message);
             projectClosed = true;
         }
-        // TODO what about global status getting set??
-        // TODO confirm title is reset
         return projectClosed;
     }
 
@@ -2003,7 +2003,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * Trim to RECENTLISTSIZE
      * @param file a project file to add to the list
      */
-    private void adjustRecentProjectSet(File file) {
+    private void adjustRecentProjectSet(File file) 
+    {
         String f;
         for (Iterator<String> itr = recentProjectFileSet.iterator(); itr.hasNext();) {
             f = itr.next();

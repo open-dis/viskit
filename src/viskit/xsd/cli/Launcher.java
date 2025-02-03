@@ -72,7 +72,7 @@ public class Launcher extends Thread implements Runnable {
         try {
             URL u;
 
-            cloader = ViskitGlobals.instance().getWorkClassLoader();
+            cloader = ViskitGlobals.instance().getWorkingClassLoader();
             InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);

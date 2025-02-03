@@ -82,8 +82,8 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @since 8:27:07 AM
  * @version $Id$
  */
-public class ViskitStatics {
-
+public class ViskitStatics 
+{
     /* Commonly used class names */
     public static final String RANDOM_NUMBER_CLASS = "simkit.random.RandomNumber";
     public static final String RANDOM_VARIATE_CLASS = "simkit.random.RandomVariate";
@@ -242,7 +242,7 @@ public class ViskitStatics {
      * @return an instantiated class given by s if available from the loader
      */
     public static Class<?> classForName(String s) {
-        Class<?> c = cForName(s, ViskitGlobals.instance().getWorkClassLoader());
+        Class<?> c = cForName(s, ViskitGlobals.instance().getWorkingClassLoader());
 
         if (c == null) {
             c = tryUnqualifiedName(s);
@@ -444,7 +444,7 @@ public class ViskitStatics {
         Path startingDir;
         String pattern = name + "\\.class";
         Class<?> c = null;
-        LocalBootLoader loader = (LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader();
+        LocalBootLoader loader = (LocalBootLoader) ViskitGlobals.instance().getWorkingClassLoader();
         String[] classpaths = loader.getClassPath();
         String clazz;
 

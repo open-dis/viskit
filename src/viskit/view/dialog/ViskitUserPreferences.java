@@ -64,7 +64,6 @@ import viskit.ViskitGlobals;
 import viskit.ViskitConfigurationStore;
 import viskit.ViskitProject;
 import viskit.ViskitStatics;
-import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
 
 /**
@@ -436,7 +435,7 @@ public class ViskitUserPreferences extends JDialog
             setProgress(0);
 
             // Incase we have custom jars, need to add these to the ClassLoader
-            ViskitGlobals.instance().resetWorkClassLoader();
+            ViskitGlobals.instance().resetWorkingClassLoader();
 
             Runnable r = () -> {
                 ViskitGlobals.instance().rebuildLEGOTreePanels();
@@ -688,8 +687,18 @@ public class ViskitUserPreferences extends JDialog
      * Return the value for the platform look and feel
      * @return the value for the platform look and feel
      */
-    public static String getLookAndFeel() {
-        return ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.LOOK_AND_FEEL_KEY);
+    public static String getLookAndFeel()
+    {
+        try // troubleshooting for threading issues, likely unneeded now
+        {
+        if ((ViskitConfigurationStore.instance() != null))
+            return ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.LOOK_AND_FEEL_KEY);
+        else return "";
+        }
+        catch (Exception e)
+        {
+            return "";
+        }
     }
 
     /**

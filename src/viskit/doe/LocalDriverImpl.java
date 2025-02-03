@@ -31,7 +31,7 @@ public class LocalDriverImpl implements DoeRunDriver {
     }
 
     public LocalDriverImpl(URL[] extClassPaths, File workDir) {
-        loader = new LocalBootLoader(extClassPaths, viskit.ViskitGlobals.instance().getWorkClassLoader(), workDir);
+        loader = new LocalBootLoader(extClassPaths, viskit.ViskitGlobals.instance().getWorkingClassLoader(), workDir);
         initGridRunner(loader);
     }
 

@@ -75,7 +75,7 @@ import viskit.view.AnalystReportViewFrame;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.EventGraphViewFrame;
 import viskit.view.SimulationRunPanel;
-import viskit.view.ViskitStartupProjectInitializationPanel;
+import viskit.view.ViskitProjectSelectionPanel;
 import viskit.view.dialog.ViskitUserPreferences;
 import viskit.mvc.MvcController;
 import edu.nps.util.SystemExitHandler;
@@ -84,6 +84,8 @@ import viskit.control.TextAreaOutputStream;
 import viskit.view.MainFrame;
 
 /**
+ * ViskitGlobals contains global methods and variables.
+ * 
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey CA
@@ -93,17 +95,57 @@ import viskit.view.MainFrame;
  * @since 3:20:33 PM
  * @version $Id$
  */
-public class ViskitGlobals {
+public class ViskitGlobals
+{
+    /** Singleton pattern, with final version applied by NetBeans
+     * @see https://stackoverflow.com/questions/2832297/java-singleton-pattern
+     * @see https://stackoverflow.com/questions/70689/what-is-an-efficient-way-to-implement-a-singleton-pattern-in-java
+     */
+    // lazy loading, not immediate loading which can fail
+    private static volatile ViskitGlobals INSTANCE = null;
+   
+    /** Private constructor prevents instantiation from other classes */
+    private ViskitGlobals() 
+    {
+        viskitConfigurationStore = ViskitConfigurationStore.instance();
 
-    private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitGlobals.class);
-    private static ViskitGlobals viskitGlobals;
-    private Interpreter interpreter;
-    private final DefaultComboBoxModel<String> defaultComboBoxModel;
-    private JPopupMenu popupMenu;
-    private final MyTypeListener myTypeListener;
+        defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
+        myTypeListener = new MyTypeListener();
+        buildTypePopup();
+        inititalizeProjectHome(); // TODO needed? maybe yes for first time, but not if repeating...
+        createWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
+    }
+    
+    public static ViskitGlobals instance()
+    {
+        ViskitGlobals INSTANCE = ViskitGlobals.INSTANCE;
+        if (INSTANCE == null) { // Check 1
+            synchronized (ViskitGlobals.class) {
+                INSTANCE = ViskitGlobals.INSTANCE;
+                if (INSTANCE == null) { // Check 2
+                    ViskitGlobals.INSTANCE = INSTANCE = new ViskitGlobals();
+                }
+            }
+        }
+        return INSTANCE;
+        
+//        if (INSTANCE == null) { // Check 1
+//            synchronized (ViskitGlobals.class) {
+//                if (INSTANCE == null) { // Check 2
+//                    INSTANCE = new ViskitGlobals();
+//                }
+//            }
+//        }
+//        return INSTANCE;
+    }
+    
+    /* Topmost frame for the application */
     private MainFrame mainFrame;
+    
+    /** Top-level Viskit application running main() method */
+    private ViskitApplication viskitApplication;
 
+    /** Current Viskit project, only one can be active at a time */
     private ViskitProject viskitProject;
 
     /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
@@ -128,25 +170,20 @@ public class ViskitGlobals {
 
     /** The main app JavaHelp set */
     private Help help;
-
-    public static synchronized ViskitGlobals instance() {
-        if (viskitGlobals == null) {
-            viskitGlobals = new ViskitGlobals();
-        }
-        return viskitGlobals;
-    }
-
-    private ViskitGlobals() {
-        defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
-        myTypeListener = new MyTypeListener();
-        buildTypePopup();
-        inititalizeProjectHome();
-        createWorkingDirectory();
-    }
+    
+    /** Configuration constants and methods */
+    ViskitConfigurationStore viskitConfigurationStore;
 
     /* routines to manage the singleton-aspect of the views. */
     AssemblyViewFrame assemblyViewFrame;
     AssemblyControllerImpl assemblyController;
+
+    static final Logger LOG = Log4jUtilities.getLogger(ViskitGlobals.class);
+    private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
+    private Interpreter interpreter;
+    private final DefaultComboBoxModel<String> defaultComboBoxModel;
+    private JPopupMenu popupMenu;
+    private final MyTypeListener myTypeListener;
 
     /**
      * Get a reference to the assembly editor view.
@@ -534,18 +571,30 @@ public class ViskitGlobals {
     public boolean isGeneric(String type) {
         return type.contains(">");
     }
+    
+    
+    ViskitProjectSelectionPanel viskitProjectSelectionPanel;
 
     /** The entry point for Viskit startup. This method will either identify a
      * recorded project space, or launch a dialog asking the user to either
      * create a new project space, or open another existing one, or exit Viskit
      */
-    public final void inititalizeProjectHome() {
-        ViskitConfigurationStore vConfig = ViskitConfigurationStore.instance();
-        String projectHome = vConfig.getVal(ViskitConfigurationStore.PROJECT_PATH_KEY);
+    public final void inititalizeProjectHome() 
+    {
+        String projectHome = viskitConfigurationStore.getVal(ViskitConfigurationStore.PROJECT_PATH_KEY);
+//      String projectHome = ViskitGlobals.instance().getProjectWorkingDirectory().getName();
         LOG.debug(projectHome);
-        if (projectHome.isEmpty() || !(new File(projectHome).exists())) {
-            ViskitStartupProjectInitializationPanel.showDialog(); // hopefully, void this
-        } else {
+        if (  projectHome.isEmpty() || 
+            !(new File(projectHome).exists()) ||
+             (hasViskitProject() && !isProjectOpen()))
+        {
+            if (viskitProjectSelectionPanel == null)
+            {
+                viskitProjectSelectionPanel = new ViskitProjectSelectionPanel();
+            }
+            viskitProjectSelectionPanel.showDialog(); // blocks
+        } 
+        else {
             ViskitProject.VISKIT_PROJECTS_DIRECTORY = projectHome;
         }
     }
@@ -832,7 +881,6 @@ public class ViskitGlobals {
      */
     public final void createWorkingDirectory()
     {
-        ViskitConfigurationStore viskitConfigurationStore = ViskitConfigurationStore.instance();
         if (viskitConfigurationStore.getViskitAppConfiguration() == null)
             return;
 
@@ -871,7 +919,7 @@ public class ViskitGlobals {
      *
      * @return Viskit's working ClassLoader
      */
-    public ClassLoader getWorkClassLoader() {
+    public ClassLoader getWorkingClassLoader() {
         if (workLoader == null) {
             URL[] urls = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
             LocalBootLoader loader = new LocalBootLoader(urls,
@@ -886,7 +934,7 @@ public class ViskitGlobals {
         return workLoader;
     }
 
-    public void resetWorkClassLoader() {
+    public void resetWorkingClassLoader() {
         workLoader = null;
     }
 
@@ -1219,6 +1267,25 @@ getProjectWorkingDirectory());
     public void selectAnalystReportTab()
     {
         mainFrame.selectAnalystReportTab();
+    }
+    
+    public boolean isProjectOpen()
+    {
+        return getViskitProject().isProjectOpen();
+    }
+
+    /**
+     * @param viskitApplication the viskitApplication to set
+     */
+    public void setViskitApplication(ViskitApplication viskitApplication) {
+        this.viskitApplication = viskitApplication;
+    }
+
+    /**
+     * @return the viskitApplication
+     */
+    public ViskitApplication getViskitApplication() {
+        return viskitApplication;
     }
 
 } // end class file ViskitGlobals.java

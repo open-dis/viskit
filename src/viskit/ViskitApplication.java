@@ -123,7 +123,8 @@ public class ViskitApplication
         }
     }
 
-    private static void createGUI(String[] args) {
+    private static void createGUI(String[] args)
+    {
         boolean isMac = ViskitStatics.OPERATING_SYSTEM.contains("Mac");
         String initialAssemblyFile = null;
 
@@ -139,31 +140,20 @@ public class ViskitApplication
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
         toolTipManager.setDismissDelay(Integer.MAX_VALUE); // never remove automatically
 
-        JFrame mainFrame = new MainFrame(initialAssemblyFile);
+        MainFrame mainFrame = new MainFrame(initialAssemblyFile);
         if (isMac) {
             setupMacUI();
         }
         mainFrame.setVisible(true);
         
         MainFrame.runLater(1000L, () -> {
-            // give file loading a chance to finish...
-            // TODO check if author has entered profile information, offer to help
-
-            if ((ViskitGlobals.instance().hasViskitProject()) &&
-                (ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded() == 0) &&
-                (ViskitGlobals.instance().getAssemblyViewFrame().getNumberAssembliesLoaded()    == 0))
-            {
-                // provide initial guidance to new user who is facing an empty editor
-                String guidance = "<html><body><p align='center'>Welcome to Viskit!</p><br />" +
-                                              "<p align='center'>To get started, create or open an</p><br />" +
-                                              "<p align='center'><i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />";
-                ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
-                    "Add Event Graph or Assembly", guidance);
-            }
+            // give file loading a chance to finish before checking no models loaded...
+            MainFrame.displayWelcomeGuidance() ;
         });
     }
 
-    private static void setLookAndFeel() {
+    private static void setLookAndFeel()
+    {
         String userPreferencesLookAndFeel = ViskitUserPreferences.getLookAndFeel();
         try {
             if (userPreferencesLookAndFeel == null || userPreferencesLookAndFeel.isEmpty() || userPreferencesLookAndFeel.equalsIgnoreCase("default")) {

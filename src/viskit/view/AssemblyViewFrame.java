@@ -61,14 +61,12 @@ import javax.swing.tree.TreePath;
 import org.apache.logging.log4j.Logger;
 import viskit.Help;
 
-import viskit.control.AssemblyController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
-import viskit.assembly.BasicAssembly;
 import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
@@ -500,6 +498,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
         
+        assemblyMenu.add(buildMenuItem(this, "closeProject", "Close Project", KeyEvent.VK_C,
+                null));
+        
         assemblyMenu.add(buildMenuItem(assemblyController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z, null));
         assemblyMenu.addSeparator();
         } // end hasModalMenus
@@ -582,6 +583,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         recentProjectFileSetListener = new RecentProjectFileSetListener();
         getRecentProjectFileSetListener().addMenuItem(openRecentProjectMenu);
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
+        
+        projectMenu.add(buildMenuItem(this, "closeProject", "Close Project", KeyEvent.VK_C,
+                null));
         
         projectMenu.add(buildMenuItem(assemblyController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
                 null));
@@ -939,17 +943,16 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         }
 
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
-        ViskitGlobals vGlobals = ViskitGlobals.instance();
-        ViskitProject vkp = vGlobals.getViskitProject();
+        ViskitProject viskitProject = ViskitGlobals.instance().getViskitProject();
 
         // A fresh (reset) LocalBootLoader will be instantiated
         // here when compiling EGs for the first time, or when the
         // SimkitXML2Java translator attempts to resolve a ParameterMap
-        addEventGraphsToLegoTree(vkp.getEventGraphsDirectory(), true);
+        addEventGraphsToLegoTree(viskitProject.getEventGraphsDirectory(), true);
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
-        String[] classPath = ((LocalBootLoader) vGlobals.getWorkClassLoader()).getClassPath();
+        String[] classPath = ((LocalBootLoader) ViskitGlobals.instance().getWorkingClassLoader()).getClassPath();
         for (String path : classPath) {
             if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
                 addEventGraphsToLegoTree(new File(path), false);
@@ -1195,12 +1198,22 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
     }
 
+    public void closeProject()
+    {
+        assemblyController = ViskitGlobals.instance().getAssemblyController();
+        
+        assemblyController.closeProject();
+
+        ViskitProjectSelectionPanel viskitProjectSelectionPanel = new ViskitProjectSelectionPanel();
+        viskitProjectSelectionPanel.showDialog();
+    }
+
     @Override
     public void openProject()
     {
         assemblyController = ViskitGlobals.instance().getAssemblyController();
 
-        if (!assemblyController.handleProjectClosing())
+        if (!assemblyController.closeProject())
             return;
 
         File file = ViskitProject.openProjectDirectory(this.getContent(), ViskitProject.VISKIT_PROJECTS_DIRECTORY);

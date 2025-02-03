@@ -75,7 +75,7 @@ public class Compiler {
 
             // This is would be the first instance of obtaining a LBL if
             // beginning fresh, so, it is reset on the first instantiation
-            String[] workClassPath = ((LocalBootLoader) (ViskitGlobals.instance().getWorkClassLoader())).getClassPath();
+            String[] workClassPath = ((LocalBootLoader) (ViskitGlobals.instance().getWorkingClassLoader())).getClassPath();
             int wkpLength = workClassPath.length;
             classPaths = new StringBuilder(wkpLength);
             

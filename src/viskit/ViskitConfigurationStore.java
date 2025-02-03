@@ -36,8 +36,42 @@ import viskit.doe.FileHandler;
  */
 public class ViskitConfigurationStore 
 {
+    
+    /** Singleton pattern, with final version applied by NetBeans
+     * @see https://stackoverflow.com/questions/2832297/java-singleton-pattern
+     * @see https://stackoverflow.com/questions/70689/what-is-an-efficient-way-to-implement-a-singleton-pattern-in-java
+     */
+    // lazy loading, not immediate loading which can fail
+    private static volatile ViskitConfigurationStore INSTANCE = null; 
+    
+    /** singleton pattern
+     * @return singleton instance
+     */
+    public static ViskitConfigurationStore instance()
+    {
+        ViskitConfigurationStore INSTANCE = ViskitConfigurationStore.INSTANCE;
+        if (INSTANCE == null) { // Check 1
+            synchronized (ViskitConfigurationStore.class) {
+                INSTANCE = ViskitConfigurationStore.INSTANCE;
+                if (INSTANCE == null) { // Check 2
+                    ViskitConfigurationStore.INSTANCE = INSTANCE = new ViskitConfigurationStore();
+                }
+            }
+        }
+//        if (INSTANCE == null) { // Check 1
+//            synchronized (ViskitConfigurationStore.class) {
+//                if (INSTANCE == null) { // Check 2
+//                    INSTANCE = new ViskitConfigurationStore();
+//                }
+//            }
+//        }
+        return INSTANCE;
+    }
+    
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Viskit";
-    public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Analyst Tool for Discrete Event Simulation (DES)";
+    public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Modeling Tool for Discrete Event Simulation (DES) Analysis";
+    
+    public static final String VISKIT_WELCOME_MESSAGE = "Welcome to " + VISKIT_SHORT_APPLICATION_NAME;
 
     public static final File VISKIT_CONFIGURATION_DIR = new File(System.getProperty("user.home"), ".viskit");
     public static final File C_APP_FILE = new File(VISKIT_CONFIGURATION_DIR, "c_app.xml");
@@ -89,34 +123,20 @@ public class ViskitConfigurationStore
     
     public static final String VISKIT_PROJECT_NAME = "Project[@name]";
 
-    private static ViskitConfigurationStore me;
-
     static final Logger LOG = Log4jUtilities.getLogger(ViskitConfigurationStore.class);
 
     private final Map<String, XMLConfiguration> xmlConfigurationsMap;
     private final Map<String, String>           sessionHashMap;
     private CombinedConfiguration               projectCombinedConfiguration;
     private XMLConfiguration                    projectXMLConfiguration = null;
-    
-    public static final String VISKIT_WELCOME_MESSAGE = "Welcome to Visual Simkit (Viskit) Discrete Event Simulation (DES) Authoring Tool";
 
-    static {
-        LOG.info(VISKIT_WELCOME_MESSAGE);
-        LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
-    }
-
-    /** singleton pattern */
-    public static synchronized ViskitConfigurationStore instance() {
-        if (me == null) {
-            me = new ViskitConfigurationStore();
-        }
-        return me;
-    }
-
-    /** Constructor */
+    /** Private constructor cannot be invoked externally */
     private ViskitConfigurationStore() 
     {
         try {
+            LOG.info(VISKIT_WELCOME_MESSAGE);
+            LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
+        
             if (!VISKIT_CONFIGURATION_DIR.exists())
             {
                  VISKIT_CONFIGURATION_DIR.mkdirs();
@@ -203,7 +223,6 @@ public class ViskitConfigurationStore
         if (retS != null && retS.length() > 0) {
             return retS;
         }
-
         return projectCombinedConfiguration.getString(key);
     }
 
@@ -266,9 +285,11 @@ public class ViskitConfigurationStore
         // Retain the recent projects list
     }
 
-    public void resetViskitConfig() {
-        me = null;
-    }
+//    public void resetViskitConfig()
+//    {
+//        clearViskitConfig(); // not sure what to do here, what is goal of this method?
+////        me = null;
+//    }
 
     public void cleanup() {
         // Lot of hoops to pretty-fy config xml files

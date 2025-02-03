@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -43,7 +43,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import viskit.ViskitGlobals;
-import viskit.ViskitStatics;
 import viskit.ViskitProject;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
 import viskit.mvc.MvcController;
@@ -56,41 +55,41 @@ import viskit.mvc.MvcController;
  * @since Aug 2008
  * @version $Id$
  */
-public class ViskitStartupProjectInitializationPanel extends javax.swing.JPanel
+public class ViskitProjectSelectionPanel extends javax.swing.JPanel
 {
     private static JDialog dialog;
 
-    public static void showDialog()
+    public void showDialog()
     {
-        ViskitStartupProjectInitializationPanel viskitProjectButtonPanel = new ViskitStartupProjectInitializationPanel();
         dialog = new JDialog((Dialog) null, true);  // modal
         dialog.setTitle("Viskit Project Initialization");
-        dialog.setContentPane(viskitProjectButtonPanel);
+        dialog.setContentPane(this); // viskitProjectSelectionPanel
         dialog.pack();
 
         // We don't want a JVM exit when the user closes this dialog and merely
         // disposing doesn't kill the JVM.  Will need to force user the use the
         // Exit button, or chose another project open or creation option
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         // Dialog will appear in center screen
         dialog.setLocationRelativeTo(null);
         
         if (!SwingUtilities.isEventDispatchThread())
+        {
             try {
                 Runnable r = () -> {
                     dialog.setVisible(true);
                 };
                 SwingUtilities.invokeAndWait(r);
             } catch (InterruptedException | InvocationTargetException ex) {
-                Log4jUtilities.getLogger(ViskitStartupProjectInitializationPanel.class).error(ex);
+                Log4jUtilities.getLogger(ViskitProjectSelectionPanel.class).error(ex);
             }
-        else
-            dialog.setVisible(true);
+        }
+        else dialog.setVisible(true);
     }
 
     /** Creates new form ViskitProjectButtonPanel */
-    public ViskitStartupProjectInitializationPanel() {
+    public ViskitProjectSelectionPanel() {
         initComponents();
     }
 
@@ -102,29 +101,21 @@ public class ViskitStartupProjectInitializationPanel extends javax.swing.JPanel
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        defaultButt = new javax.swing.JButton();
-        existingButton = new javax.swing.JButton();
-        createButton = new javax.swing.JButton();
+        openExistingProjectButton = new javax.swing.JButton();
+        createNewProjectButton = new javax.swing.JButton();
         exitButton = new javax.swing.JButton();
 
-        defaultButt.setText("Open default project");
-        defaultButt.addActionListener(new java.awt.event.ActionListener() {
+        openExistingProjectButton.setText("Open existing Viskit project");
+        openExistingProjectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                defaultButtActionPerformed(evt);
+                openExistingProjectButtonActionPerformed(evt);
             }
         });
 
-        existingButton.setText("Open existing Viskit project");
-        existingButton.addActionListener(new java.awt.event.ActionListener() {
+        createNewProjectButton.setText("Create new Viskit project");
+        createNewProjectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                existingButtonActionPerformed(evt);
-            }
-        });
-
-        createButton.setText("Create new Viskit project");
-        createButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                createButtonActionPerformed(evt);
+                createNewProjectButtonActionPerformed(evt);
             }
         });
 
@@ -142,8 +133,8 @@ public class ViskitStartupProjectInitializationPanel extends javax.swing.JPanel
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(createButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(existingButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(createNewProjectButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(openExistingProjectButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(exitButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -151,12 +142,12 @@ public class ViskitStartupProjectInitializationPanel extends javax.swing.JPanel
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(existingButton)
+                .addComponent(openExistingProjectButton)
                 .addGap(18, 18, 18)
-                .addComponent(createButton)
+                .addComponent(createNewProjectButton)
                 .addGap(18, 18, 18)
                 .addComponent(exitButton)
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -168,7 +159,7 @@ public class ViskitStartupProjectInitializationPanel extends javax.swing.JPanel
      *
      * @param evt the open an existing project event action
      */
-private void existingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_existingButtonActionPerformed
+private void openExistingProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openExistingProjectButtonActionPerformed
     File file;
     if (!firstTime) 
     {
@@ -183,25 +174,18 @@ private void existingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     } 
     else 
     {
+        firstTime = !firstTime;
         file = ViskitProject.openProjectDirectory(this, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
         ViskitGlobals.instance().setProjectFile(file);
-        firstTime = !firstTime;
 
         // NOTE: We have no way of setting the first opened project here as the
         // controller hasn't been created yet to store that info when Viskit
         // first starts up
     }
-    defaultButtActionPerformed(null);
 
-}//GEN-LAST:event_existingButtonActionPerformed
+}//GEN-LAST:event_openExistingProjectButtonActionPerformed
 
-private void defaultButtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_defaultButtActionPerformed
-    // TODO setup differently, but for now...
-    dialog.dispose();
-    dialog = null;
-}//GEN-LAST:event_defaultButtActionPerformed
-
-private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
+private void createNewProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createNewProjectButtonActionPerformed
     File newProjectFile;
 
     // What we wish to do here is force the user to create a new project space
@@ -228,15 +212,16 @@ private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     // starts up
 
     // Since this dialog is modal, need to dispose() before we can move along in the startup
-    defaultButtActionPerformed(null);
+    dialog.dispose();
 
     // The work directory will have already been created by default as ViskitGlobals.init
     // was already called which creates the directory ${user.home}/.viskit
     // during constructor init
-}//GEN-LAST:event_createButtonActionPerformed
+}//GEN-LAST:event_createNewProjectButtonActionPerformed
 
 private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitButtonActionPerformed
-    defaultButtActionPerformed(null);
+
+    dialog.dispose();
 
     // I don't like the idea of a SystemExit call right here, but the way each
     // frame component needs to develop while starting Viskit; each has to
@@ -246,9 +231,8 @@ private void exitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_exitButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton createButton;
-    private javax.swing.JButton defaultButt;
-    private javax.swing.JButton existingButton;
+    private javax.swing.JButton createNewProjectButton;
     private javax.swing.JButton exitButton;
+    private javax.swing.JButton openExistingProjectButton;
     // End of variables declaration//GEN-END:variables
 }

@@ -829,7 +829,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
-            ClassLoader localLoader = ViskitGlobals.instance().getWorkClassLoader();
+            ClassLoader localLoader = ViskitGlobals.instance().getWorkingClassLoader();
             try {
                 Class<?> clazz = localLoader.loadClass("viskit.model.AnalystReportModel");
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);

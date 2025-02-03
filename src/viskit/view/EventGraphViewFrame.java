@@ -121,7 +121,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     public final static int SELF_REF_CANCEL_MODE = 5;
 
     private static final String FRAME_DEFAULT_TITLE = " Viskit Event Graph Editor";
-    private static final String LOOK_AND_FEEL = ViskitUserPreferences.getLookAndFeel();;
+    private static final String LOOK_AND_FEEL = ViskitUserPreferences.getLookAndFeel();
 
     /** Toolbar for dropping icons, connecting, etc. */
     private JToolBar toolBar;    // Mode buttons on the toolbar

@@ -129,7 +129,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         simulationRunPanel.vcrStepButton.setEnabled(false);
 
         // Viskit's current working ClassLoader
-        lastLoaderNoReset = ViskitGlobals.instance().getWorkClassLoader();
+        lastLoaderNoReset = ViskitGlobals.instance().getWorkingClassLoader();
 
         // Provide access to Enable Analyst Report checkbox
         ViskitGlobals.instance().setSimulationRunPanel(simulationRunPanel);

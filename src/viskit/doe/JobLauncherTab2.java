@@ -759,7 +759,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     // remove, for testing some loader stuff while writing it
     public void runTesting() {
         writeStatus("JobLauncherTab2.run()");
-        LocalBootLoader localBootLoader = (LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader();
+        LocalBootLoader localBootLoader = (LocalBootLoader) ViskitGlobals.instance().getWorkingClassLoader();
         //loader.setTab(this);
 
         // loader gets own copy of Viskit's libs, initialize method here

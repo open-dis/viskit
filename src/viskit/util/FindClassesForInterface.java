@@ -129,7 +129,7 @@ public class FindClassesForInterface {
      */
     public static List<Class<?>> findClasses(JarFile jarFile, Class<?> implementing) {
         List<Class<?>> found = new ArrayList<>();
-        URLClassLoader loader = ((LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader());
+        URLClassLoader loader = ((LocalBootLoader) ViskitGlobals.instance().getWorkingClassLoader());
         JarEntry nextEntry;
         Class<?> c;
         for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {

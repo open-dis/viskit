@@ -178,7 +178,7 @@ public class FileBasedClassManager {
     private void setFileBasedAssemblyNode(File f) {
 
         // bug fix 1407
-        ClassLoader loader = ViskitGlobals.instance().getWorkClassLoader();
+        ClassLoader loader = ViskitGlobals.instance().getWorkingClassLoader();
 
         // since we're here, cacheXML the parameter names
         try {

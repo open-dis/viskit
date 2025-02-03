@@ -322,14 +322,14 @@ public class AnalystReportController extends MvcAbstractController {
         catch (URISyntaxException ex) {
             ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
-                    "<html><center>URISyntaxException displaying HTML:<br>" + ex.getMessage()
+                    "<html><p align='center'>URISyntaxException displaying HTML:<br>" + ex.getMessage() + "<br /></p></html>"
             );
             System.err.println(ex.getMessage());
         }
         catch (IOException ex) {
             ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
-                    "<html><center>IOException displaying HTML:<br>" + ex.getMessage()
+                    "<html><p align='center'>IOException displaying HTML:<br>" + ex.getMessage() + "<br /></p></html>"
             );
             System.err.println(ex.getMessage());
         }
