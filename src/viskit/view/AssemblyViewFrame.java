@@ -856,8 +856,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         Runnable r = () -> {
             getToolBar().setVisible(true);
             // If an assembly is loaded, make assembly frame active 
-            AssemblyControllerImpl assemblyController = (AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController();
-            assemblyController.makeTopPaneAssemblyTabActive();
+//            if (assemblyController == null)
+//                assemblyController = ViskitGlobals.instance().getAssemblyController(); // unexpected
+//            assemblyController.makeTopPaneAssemblyTabActive();
+            ViskitGlobals.instance().selectAssemblyTab();
         };
         SwingUtilities.invokeLater(r);
     }
@@ -1228,23 +1230,24 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         }
     }
 
-    private File getUniqueName(String suggName) {
-        String appnd = "";
-        String suffix = "";
+    private File getUniqueName(String suggestedName) 
+    {
+        String appendCount = "";
+        String suffix      = "";
 
-        int lastDot = suggName.lastIndexOf('.');
+        int lastDot = suggestedName.lastIndexOf('.');
         if (lastDot != -1) {
-            suffix = suggName.substring(lastDot);
-            suggName = suggName.substring(0, lastDot);
+            suffix = suggestedName.substring(lastDot);
+            suggestedName = suggestedName.substring(0, lastDot);
         }
         int count = -1;
-        File fil = null;
+        File uniqueFile = null;
         do {
-            fil = new File(suggName + appnd + suffix);
-            appnd = "" + ++count;
-        } while (fil.exists());
+            uniqueFile  = new File(suggestedName + appendCount + suffix);
+            appendCount = "" + ++count;
+        } while (uniqueFile.exists());
 
-        return fil;
+        return uniqueFile;
     }
 
     @Override
