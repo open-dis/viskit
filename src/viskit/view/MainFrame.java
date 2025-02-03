@@ -779,16 +779,16 @@ public class MainFrame extends JFrame
             (ViskitGlobals.instance().getAssemblyViewFrame().getNumberAssembliesLoaded()    == 0))
         {
             // provide initial guidance to new user who is facing an empty editor
-            String message = "<html><body><p align='center'>Welcome to Viskit!</p><br />";
+            String message = "<html><body><p align='center'>Welcome to Viskit !!</p><br />";
             if (ViskitGlobals.instance().isProjectOpen())
             {
                 message +=   "<p align='center'>";
                 if (!ViskitGlobals.instance().getProjectName().toLowerCase().contains("project"))
                      message +=   "Project ";
-                message +=   "<i>" + ViskitGlobals.instance().getProjectName() + "</i> is the open project.</p><br />";    
+                message +=   "<i>" + ViskitGlobals.instance().getProjectName() + "</i> is the open project</p><br />";    
             }
             message +=       "<p align='center'>To get started, create or open<br />";  // </p><br />" +
-            message +=       "an <i>Event Graph</i> &nbsp;or <i>Assembly</i>.</p><br />"; // <p align='center'>
+            message +=       "an <i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />"; // <p align='center'>
             ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Next step: add Event Graph or Assembly", message);
         }
