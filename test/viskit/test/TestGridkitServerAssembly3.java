@@ -14,7 +14,7 @@
 
 package viskit.test;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,12 +36,12 @@ import viskit.ViskitGlobals;
  * @version $Id: TestGridkitServerAssembly3.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
 public class TestGridkitServerAssembly3 extends Thread {
-    static Logger log = LogUtils.getLogger(TestGridkitServerAssembly3.class);
+    static Logger log = Log4jUtilities.getLogger(TestGridkitServerAssembly3.class);
     XmlRpcClientLite xmlrpc;
     Vector<Object> args;
     String usid;
     String basedir;
-    ByteArrayOutputStream buffer;
+    ByteArrayOutputStream byteArrayOutputStream;
     Object ret;
     public static final boolean verbose = false; // turns off console output from simkit
 
@@ -49,24 +49,25 @@ public class TestGridkitServerAssembly3 extends Thread {
      * @param server
      * @param port
      * @throws java.lang.Exception */
-    public TestGridkitServerAssembly3(String server, int port) throws Exception {
+    public TestGridkitServerAssembly3(String server, int port) throws Exception
+    {
         xmlrpc = new XmlRpcClientLite(server,port);
         args = new Vector<>();
-        buffer = new ByteArrayOutputStream();
+        byteArrayOutputStream = new ByteArrayOutputStream();
 
         // calculate the base directory, hack, know examples is next to lib
         // this of course only works in a development workspace
 
         // get the jarurl path to viskit.EventGraphAssemblyComboMain
-        URL u = ViskitGlobals.instance().getWorkClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
+        URL url = ViskitGlobals.instance().getWorkingClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
         // strip the injar path
-        log.info(u);
+        log.info(url);
 
         // We're in a jar
-        if (u.getFile().contains("!"))
-            u = new URI((u.getFile().split("!"))[0].trim()).toURL();
+        if (url.getFile().contains("!"))
+            url = new URI((url.getFile().split("!"))[0].trim()).toURL();
 
-        String path = u.getFile();
+        String path = url.getFile();
         path = path.replace('\\','/');
         // gather leading paths
         String[] paths = path.split("/");
@@ -96,9 +97,9 @@ public class TestGridkitServerAssembly3 extends Thread {
             byte[] buf = new byte[256];
             int readIn;
             while ( (readIn = is.read(buf)) > 0 ) {
-                buffer.write(buf,0, readIn);
+                byteArrayOutputStream.write(buf,0, readIn);
             }
-            arrivalProcess = new String(buffer.toByteArray());
+            arrivalProcess = new String(byteArrayOutputStream.toByteArray());
 
             System.out.println(arrivalProcess);
 
@@ -112,11 +113,11 @@ public class TestGridkitServerAssembly3 extends Thread {
             String simpleServer;
             u = new URI(basedir+"MyViskitProjects/DefaultProject/EventGraphs/examples/SimpleServer.xml").toURL();
             is = u.openStream();
-            buffer = new ByteArrayOutputStream();
+            byteArrayOutputStream = new ByteArrayOutputStream();
             while ( (readIn = is.read(buf)) > 0 ) {
-                buffer.write(buf,0, readIn);
+                byteArrayOutputStream.write(buf,0, readIn);
             }
-            simpleServer = new String(buffer.toByteArray());
+            simpleServer = new String(byteArrayOutputStream.toByteArray());
 
             System.out.println(simpleServer);
 
@@ -301,7 +302,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             }
 
             // synchronous single threaded results, uses
-            // a status buffer that locks until results are
+            // a status byteArrayOutputStream that locks until results are
             // in, at which point a select can be performed.
             // this saves server thread resources
 
