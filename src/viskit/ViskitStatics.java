@@ -292,8 +292,10 @@ public class ViskitStatics
                     }
                 }
             }
-        } catch (NoClassDefFoundError e) {
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(
+        } 
+        catch (NoClassDefFoundError e)
+        {
+            ViskitGlobals.instance().getMainFrame().genericReport(
                     JOptionPane.ERROR_MESSAGE,
                     "Missng: " + e.getMessage(),
                     "Please make sure that the library for: " + s
@@ -836,7 +838,7 @@ public class ViskitStatics
 //            String message = "<html><body><p align='center'>ViskitGlobals singleton safety check failure!</p><br />";
 //            message +=       "<p align='center'>viskitGlobalsCreationCount=" + viskitGlobalsCreationCount + "</p><br />";
 //            // watch out for dueling creation problems
-////            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
+////            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE,
 ////                "Singleton safety check error", message);
 //        }
 //    }
@@ -861,7 +863,7 @@ public class ViskitStatics
 //            String message = "<html><body><p align='center'>ViskitConfigurationStore singleton safety check failure!</p><br />";
 //            message +=       "<p align='center'>viskitConfigurationStoreCreationCount=" + viskitConfigurationStoreCreationCount + "</p><br />";
 //            // watch out for dueling creation problems
-////            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
+////            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE,
 ////                "Singleton safety check error", message);
 //        }
 //    }

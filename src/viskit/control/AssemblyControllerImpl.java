@@ -190,7 +190,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             sb.append(")<br>Choose yes if you want to stop this operation, then manually select<br>the indicated tab(s) to ");
             sb.append("save the execution parameters.");
 
-            int yn = (ViskitGlobals.instance().getAssemblyViewFrame().genericAsk2Buttons("Question", sb.toString(), "Stop and let me save",
+            int yn = (ViskitGlobals.instance().getMainFrame().genericAsk2Buttons("Question", sb.toString(), "Stop and let me save",
                     "Ignore my execution parameter changes"));
             // n == -1 if dialog was just closed
             //   ==  0 for first option
@@ -681,7 +681,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if  (projectName.toLowerCase().contains("project"))
                  message += "<p align='center'><i>"         + projectName + "</i></p><br/><p align='center'> the currently active project?</p><br/>";
             else message += "<p align='center'>Project <i>" + projectName + "</i></p><br/><p align='center'>, the currently active project?</p><br/>";
-            int returnValue = ViskitGlobals.instance().getAssemblyViewFrame().genericAskYN(title, message);
+            int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYN(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
             {
                 doProjectCleanup();
@@ -696,7 +696,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 //            title = "No project is open";
 //            message  = "<html><p align='center'>Unable to close project, since no project is open.</p><br />";
 //            message +=       "<p align='center'>Use menu <i>Project &gt; Open Project</i> &nbsp;to continue.</p><br />";
-//            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE, title, message);
+//            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, title, message);
             projectClosed = true;
         }
         return projectClosed;
@@ -786,7 +786,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public void messageUser(int messageType, String messageTitle, String messageBody) // messageType is one of JOptionPane types
     {
         if (ViskitGlobals.instance().getAssemblyViewFrame() != null)
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(messageType, messageTitle, messageBody);
+            ViskitGlobals.instance().getMainFrame().genericReport(messageType, messageTitle, messageBody);
     }
 
     @Override
@@ -967,7 +967,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (!message.toLowerCase().contains("assembly"))
              message += " assembly";
         message += "?";
-        int yn = (ViskitGlobals.instance().getAssemblyViewFrame().genericAsk("Save assembly?", message));
+        int yn = (ViskitGlobals.instance().getMainFrame().genericAsk("Save assembly?", message));
 
         switch (yn) {
             case JOptionPane.YES_OPTION:
@@ -1213,7 +1213,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 }
             }
             String specialNodeMsg = (nodeCount > 0) ? "\n(All unselected but attached edges will also be removed.)" : "";
-            doRemove = ViskitGlobals.instance().getAssemblyViewFrame().genericAsk("Remove element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
+            doRemove = ViskitGlobals.instance().getMainFrame().genericAsk("Remove element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
             if (doRemove) {
                 // do edges first?
                 delete();
@@ -1439,12 +1439,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     private boolean checkSaveForSourceCompile() {
-        AssemblyModel vmod = (AssemblyModel) getModel();
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
 
         // Perhaps a cached file is no longer present in the path
-        if (vmod == null) {return false;}
-        if (vmod.isDirty() || vmod.getLastFile() == null) {
-            int ret = ViskitGlobals.instance().getAssemblyViewFrame().genericAskYN("Confirm", "The model will be saved.\nContinue?");
+        if (assemblyModel == null) {return false;}
+        if (assemblyModel.isDirty() || assemblyModel.getLastFile() == null) {
+            int ret = ViskitGlobals.instance().getMainFrame().genericAskYN("Confirm", "The model will be saved.\nContinue?");
             if (ret != JOptionPane.YES_OPTION) {
                 return false;
             }

@@ -747,7 +747,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 try {
                     Schedule.reset();
                 } catch (ConcurrentModificationException cme) {
-                    ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
+                    ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                             "Assembly Run Error",
                             cme + "\nSimulation will terminate"
                     );

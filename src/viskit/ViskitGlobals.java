@@ -893,7 +893,7 @@ public class ViskitGlobals
              projectName = DEFAULT_PROJECT_NAME;
         setProjectName(projectName);
         
-        // TODO not clear that the next lines are correct
+        // TODO not clear that the next lines are correct.  why is this invoked after a simulation run??
         projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY);
 
         if (viskitProject == null)

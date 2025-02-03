@@ -789,8 +789,34 @@ public class MainFrame extends JFrame
             }
             message +=       "<p align='center'>To get started, create or open<br />";  // </p><br />" +
             message +=       "an <i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />"; // <p align='center'>
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Next step: add Event Graph or Assembly", message);
         }
+    }
+    
+    // user-interaction methods moved from AssemblyViewFrame to MainFrame, up higher in hierarchy
+
+    public String promptForStringOrCancel(String title, String message, String initialValue) {
+        return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE, null, null, initialValue);
+    }
+
+    public int genericAskYN(String title, String message) {
+        return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION);
+    }
+
+    public int genericAsk2Buttons(String title, String message, String buttonLabel1, String buttonLabel2) {
+        return JOptionPane.showOptionDialog(this, message, title, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{buttonLabel1, buttonLabel2}, buttonLabel1);
+    }
+
+    public void genericReport(int messageType, String title, String message) {
+        if (messageType == JOptionPane.ERROR_MESSAGE) {
+            AssemblyViewFrame.LOG.error(message);
+            System.err.println("***" + message);
+        }
+        JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainFrame(), message, title, messageType);
+    }
+
+    public int genericAsk(String title, String message) {
+        return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_CANCEL_OPTION);
     }
 }

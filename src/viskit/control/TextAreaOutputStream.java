@@ -168,7 +168,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         } 
         catch (Throwable throwable) 
         {
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(
+            ViskitGlobals.instance().getMainFrame().genericReport(
                     JOptionPane.ERROR_MESSAGE,
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage()
@@ -525,7 +525,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
             try (Writer bw = new BufferedWriter(new FileWriter(consoleFile))) {
                 bw.write(simulationRunPanel.outputStreamTA.getText());
             } catch (IOException e1) {
-                ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
+                ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
             }
         }
     }
@@ -551,7 +551,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         } 
         else 
         {
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Analyst Report Panel not visible",
                     "<html><body><p align='center'>" +
                     "The Analyst Report tab has not been set to be visible.<br>" +

@@ -60,21 +60,22 @@ public interface AssemblyView {
      */
     void removePropertyChangeListenerFromLEGOTree(File f);
 
-    int genericAsk(String title, String prompt);      // returns JOptionPane constants
-
-    int genericAskYN(String title, String prompt);
-
-    int genericAsk2Buttons(String title, String prompt, String button1, String button2);
-
-    /** A component, e.g., vAMod, wants to say something.
-     *
-     * @param messageType the type of message, i.e. WARN, ERROR, INFO, QUESTION
-     * @param title the title of the message in the dialog frame
-     * @param message the message to transmit
-     */
-    void genericReport(int messageType, String title, String message);
-
-    String promptForStringOrCancel(String title, String message, String initval);
+// user-interaction methods moved from AssemblyViewFrame to MainFrame, up higher in hierarchy
+//    int genericAsk(String title, String prompt);      // returns JOptionPane constants
+//
+//    int genericAskYN(String title, String prompt);
+//
+//    int genericAsk2Buttons(String title, String prompt, String button1, String button2);
+//
+//    /** A component, e.g., vAMod, wants to say something.
+//     *
+//     * @param messageType the type of message, i.e. WARN, ERROR, INFO, QUESTION
+//     * @param title the title of the message in the dialog frame
+//     * @param message the message to transmit
+//     */
+//    void genericReport(int messageType, String title, String message);
+//
+//    String promptForStringOrCancel(String title, String message, String initval);
 
     /** Allow opening of one, or more Assembly files
      *

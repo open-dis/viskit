@@ -58,7 +58,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         } catch (ClassNotFoundException e) {
             String msg = "An object type specified in this element (probably " + parm.getType() + ") was not found.\n" +
                     "Add the XML or class file defining the element to the proper list at left.";
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE, "Event Graph Definition Not Found", msg);
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "Event Graph Definition Not Found", msg);
             eventGraphNodeInspectorDialog = null;
             return false; // unmodified
         }

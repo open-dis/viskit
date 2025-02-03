@@ -1295,7 +1295,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         int retv = openSaveChooser.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (openSaveChooser.getSelectedFile().exists()) {
-                if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm")) {
+                if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYN("File Exists",  "Overwrite? Confirm")) {
                     return null;
                 }
             }
@@ -1348,21 +1348,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         return StateVariableDialog.showDialog(ViskitGlobals.instance().getMainFrame(), var);
     }
 
-    @Override
-    public int genericAsk(String title, String msg) {
-        return ViskitGlobals.instance().getAssemblyViewFrame().genericAsk(title, msg);
-    }
-
-    @Override
-    public int genericAskYN(String title, String msg) {
-        return ViskitGlobals.instance().getAssemblyViewFrame().genericAskYN(title, msg);
-    }
-
-    @Override
-    public void genericReport(int type, String title, String msg) {
-        ViskitGlobals.instance().getAssemblyViewFrame().genericReport(type, title, msg);
-    }
-
+    // TODO duplicate:
     @Override
     public String promptForStringOrCancel(String title, String message, String initval) {
         return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE,

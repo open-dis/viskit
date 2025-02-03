@@ -198,7 +198,7 @@ public class AnalystReportController extends MvcAbstractController {
     public void generateHtmlReport() 
     {
         if (!ViskitGlobals.instance().getSimulationRunPanel().analystReportCB.isSelected()) {
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Enable Analyst Reports not selected",
                     "<html><body><p align='center'>"
                     + "The checkbox for <code>Enable Analyst Reports </code>is not"
@@ -320,14 +320,14 @@ public class AnalystReportController extends MvcAbstractController {
             Desktop.getDesktop().browse(new URI(file.getPath().replaceAll("\\\\", "/")));
         } 
         catch (URISyntaxException ex) {
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
                     "<html><p align='center'>URISyntaxException displaying HTML:<br>" + ex.getMessage() + "<br /></p></html>"
             );
             System.err.println(ex.getMessage());
         }
         catch (IOException ex) {
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
                     "<html><p align='center'>IOException displaying HTML:<br>" + ex.getMessage() + "<br /></p></html>"
             );

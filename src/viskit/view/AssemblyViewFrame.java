@@ -1122,40 +1122,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         pclTree.removeContentRoot(f);
     }
 
-    @Override
-    public int genericAsk(String title, String message) {
-        return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_CANCEL_OPTION);
-    }
-
-    @Override
-    public int genericAskYN(String title, String message) {
-        return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION);
-    }
-
-    @Override
-    public int genericAsk2Buttons(String title, String message, String buttonLabel1, String buttonLabel2) {
-        return JOptionPane.showOptionDialog(this, message, title, JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE, null,
-                new String[]{buttonLabel1, buttonLabel2}, buttonLabel1);
-    }
-
-    @Override
-    public void genericReport(int messageType, String title, String message)
-    {
-        if (messageType == JOptionPane.ERROR_MESSAGE)
-        {
-            LOG.error(message);
-            System.err.println("***" + message);
-        }
-        JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainFrame(), message, title, messageType);
-    }
-
-    @Override
-    public String promptForStringOrCancel(String title, String message, String initialValue) {
-        return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE,
-                null, null, initialValue);
-    }    // ViskitView-required methods:
-
+    // ViskitView-required methods:
     private JFileChooser openSaveChooser;
     private JFileChooser buildOpenSaveChooser() {
 
@@ -1188,7 +1155,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             if (f.exists())
                 return f;
             else
-                genericReport(JOptionPane.ERROR_MESSAGE, "File not found.", f + " does not exist");
+                ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "File not found.", f + " does not exist");
         }
         return null;
     }
@@ -1266,7 +1233,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         int retv = openSaveChooser.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (openSaveChooser.getSelectedFile().exists()) {
-                if (JOptionPane.YES_OPTION != genericAskYN("File Exists",  "Overwrite? Confirm"))
+                if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYN("File Exists",  "Overwrite? Confirm"))
                     return null;
             }
             return openSaveChooser.getSelectedFile();
@@ -1310,7 +1277,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             xmlTreeComponent = XMLTreeComponent.getTreeInPanel(file);
         } 
         catch (Exception e) {
-            genericReport(JOptionPane.ERROR_MESSAGE, "XML Display Error", e.getMessage());
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "XML Display Error", e.getMessage());
             return;
         }
         //xt.setVisibleRowCount(25);

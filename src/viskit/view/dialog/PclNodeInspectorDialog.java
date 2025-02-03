@@ -58,7 +58,7 @@ public class PclNodeInspectorDialog extends JDialog {
         } catch (ClassNotFoundException e) {
             String msg = "An object type specified in this element (probably " + parm.getType() + ") was not found.\n" +
                     "Add the XML or class file defining the element to the proper list at left.";
-            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE, 
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, 
                     "Property Change Listener Definition Not Found", 
                     msg
             );
