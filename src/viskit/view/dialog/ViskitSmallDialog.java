@@ -11,6 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
 
 /** This is a class to help in code reuse.  There are several small Dialogs
@@ -30,7 +31,9 @@ import viskit.ViskitStatics;
  * @since May 3, 2004 : 2:39:34 PM
  * @version $Id$
  */
-public abstract class ViskitSmallDialog extends JDialog {
+public abstract class ViskitSmallDialog extends JDialog
+{
+    static final Logger LOG = Log4jUtilities.getLogger(ViskitSmallDialog.class);
 
     protected static boolean modified = false;
     private static ViskitSmallDialog dialog;
@@ -46,7 +49,7 @@ public abstract class ViskitSmallDialog extends JDialog {
                 Constructor constr = c.getDeclaredConstructor(args);
                 dialog = (ViskitSmallDialog) constr.newInstance(new Object[] {f, var});
             } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
-                Log4jUtilities.getLogger(ViskitSmallDialog.class).error(e);
+                LOG.error(e);
             }
         } else {
             dialog.setParams(f, var);

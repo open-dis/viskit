@@ -651,7 +651,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             return SIMEVLIS_MODE;
         if (propertyChangeListenerMode.isSelected())
             return PCL_MODE;
-        Log4jUtilities.getLogger(AssemblyViewFrame.class).error("assert false : \"getCurrentMode()\"");
+        LOG.error("assert false : \"getCurrentMode()\"");
         return 0;
     }
 
@@ -843,7 +843,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         try {
             graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
-            Log4jUtilities.getLogger(AssemblyViewFrame.class).error(tmle);
+            LOG.error(tmle);
         }
 
         // the view holds only one assemblyModel, so it gets overwritten with each tab
@@ -1031,7 +1031,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
                     dragged = null;
                 } catch (UnsupportedFlavorException | IOException e) {
-                    Log4jUtilities.getLogger(AssemblyViewFrame.class).error(e);
+                    LOG.error(e);
                 }
             }
         }
@@ -1131,10 +1131,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public int genericAsk2Buttons(String title, String message, String butt1, String butt2) {
+    public int genericAsk2Buttons(String title, String message, String buttonLabel1, String buttonLabel2) {
         return JOptionPane.showOptionDialog(this, message, title, JOptionPane.DEFAULT_OPTION,
                 JOptionPane.QUESTION_MESSAGE, null,
-                new String[]{butt1, butt2}, butt1);
+                new String[]{buttonLabel1, buttonLabel2}, buttonLabel1);
     }
 
     @Override
@@ -1149,9 +1149,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public String promptForStringOrCancel(String title, String message, String initval) {
+    public String promptForStringOrCancel(String title, String message, String initialValue) {
         return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE,
-                null, null, initval);
+                null, null, initialValue);
     }    // ViskitView-required methods:
 
     private JFileChooser openSaveChooser;

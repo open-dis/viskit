@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
@@ -27,7 +28,9 @@ import viskit.doe.LocalBootLoader;
  *
  * @author  ahbuss
  */
-public class FindClassesForInterface {
+public class FindClassesForInterface
+{
+    static final Logger LOG = Log4jUtilities.getLogger(FindClassesForInterface.class);
 
     /**
      * Added by Mike Bailey
@@ -102,14 +105,14 @@ public class FindClassesForInterface {
                 throw new ClassNotFoundException(thr.getMessage());
             }
             try {
-                Log4jUtilities.getLogger(FindClassesForInterface.class).debug("Attempting to find " + name);
+                LOG.debug("Attempting to find " + name);
 
                 clazz = defineClass(null, buffer.array(), 0, buffer.capacity()); // do this to get proper name/pkg
                 found.put(name, clazz);
 
-                Log4jUtilities.getLogger(FindClassesForInterface.class).debug("Found Class: " + clazz.getName() + "\n");
+                LOG.debug("Found Class: " + clazz.getName() + "\n");
             } catch (Exception e) {
-                Log4jUtilities.getLogger(FindClassesForInterface.class).error(e);
+                LOG.error(e);
             } finally {
                 try {
                     classFile.close();

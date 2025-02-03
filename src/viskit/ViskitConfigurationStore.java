@@ -55,6 +55,7 @@ public class ViskitConfigurationStore
                 INSTANCE = ViskitConfigurationStore.INSTANCE;
                 if (INSTANCE == null) { // Check 2
                     ViskitConfigurationStore.INSTANCE = INSTANCE = new ViskitConfigurationStore();
+                    // ViskitStatics.incrementViskitConfigurationStoreCreationCount(); // synchronized singleton safety check
                 }
             }
         }
@@ -243,6 +244,7 @@ public class ViskitConfigurationStore
             fileBasedConfigurationBuilder.setAutoSave(true);
             projectXMLConfiguration = fileBasedConfigurationBuilder.getConfiguration();
         } catch (ConfigurationException ex) {
+            // TODO seems to fail when creating new project?
             LOG.error(ex);
         }
         if ((projectCombinedConfiguration.getConfiguration("proj") == null) || projectCombinedConfiguration.getConfiguration("proj").isEmpty())

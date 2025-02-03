@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -23,8 +24,10 @@ import java.lang.reflect.Method;
  * Based on code posted by Stanislav Lapitsky, ghost_s@mail.ru, posted on the Sun developer forum.  Feb 9, 2004.
  * @deprecated invoke with {@link viskit.EventGraphAssemblyComboMain} directly
  */
-@Deprecated(since = "1.0.16", forRemoval = true)
-public class Splash2 extends JFrame {
+@Deprecated(since = "1.0.16", forRemoval = true) // TODO huh? seems to still be in use...
+public class Splash2 extends JFrame
+{
+    static final Logger LOG = Log4jUtilities.getLogger(Splash2.class);
 
     Robot robot;
     BufferedImage screenImg;
@@ -91,7 +94,7 @@ public class Splash2 extends JFrame {
                 robot = new Robot();
             }
         } catch (AWTException ex) {
-            Log4jUtilities.getLogger(getClass()).error(ex);
+            LOG.error(ex);
         }
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -171,7 +174,7 @@ public class Splash2 extends JFrame {
             Method mainMethod = mainClass.getMethod("main", parameterTypes);
             mainMethod.invoke(null, arguments);
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Log4jUtilities.getLogger(Splash2.class).error(ex);
+            LOG.error(ex);
         }
         progressBar.setString("Complete");
 

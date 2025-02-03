@@ -172,10 +172,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @return a final (unmodifiable) reference to the current Assembly open list
      */
     public final List<String> getOpenAssemblyFileList(boolean refresh) {
-        if (refresh || openAssemblies == null)
+        if (refresh || openAssembliesList == null)
             recordAssemblyFiles();
 
-        return openAssemblies;
+        return openAssembliesList;
     }
 
     private boolean checkSaveIfDirty() {
@@ -587,7 +587,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (closeProject()) 
         {
 //          ViskitGlobals.instance().initializeProjectHome();
-            ViskitGlobals.instance().createWorkingDirectory();
+            ViskitGlobals.instance().createProjectWorkingDirectory();
 
             // For a brand new empty project open a default Event Graph
             File[] eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory().listFiles();
@@ -679,8 +679,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             message = "<html><p align='center'>Are you sure you want to close </p><br/>";
             String projectName = ViskitGlobals.instance().getProjectName();
             if  (projectName.toLowerCase().contains("project"))
-                 message += "<p align='center'><i>"         + projectName + "</i></p><br/><p align='center'> the current Viskit Project?</p><br/>";
-            else message += "<p align='center'>Project <i>" + projectName + "</i></p><br/><p align='center'>, the current Viskit Project?</p><br/>";
+                 message += "<p align='center'><i>"         + projectName + "</i></p><br/><p align='center'> the currently active project?</p><br/>";
+            else message += "<p align='center'>Project <i>" + projectName + "</i></p><br/><p align='center'>, the currently active project?</p><br/>";
             int returnValue = ViskitGlobals.instance().getAssemblyViewFrame().genericAskYN(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
             {
@@ -718,14 +718,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         ViskitGlobals.instance().setProjectFile(projectDirectory);
         ViskitGlobals.instance().setProjectName(projectDirectory.getName());
-        ViskitGlobals.instance().createWorkingDirectory();
+        ViskitGlobals.instance().createProjectWorkingDirectory();
 
         // Add our currently opened project to the recently opened projects list
         adjustRecentProjectSet(ViskitGlobals.instance().getViskitProject().getProjectRoot());
         
         ViskitGlobals.instance().setTitleProjectName(ViskitGlobals.instance().getProjectName());
-        // TODO what about global status getting set??
-        // TODO confirm title is reset
         
         runner.resetSimulationRunPanel();
     }
@@ -2001,31 +1999,32 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /**
      * If passed file is in the list, move it to the top. Else insert it;
      * Trim to RECENTLISTSIZE
-     * @param file a project file to add to the list
+     * @param currentProjectDirectory a project to add to the list
      */
-    private void adjustRecentProjectSet(File file) 
+    private void adjustRecentProjectSet(File currentProjectDirectory) 
     {
-        String f;
+        String listedProjectFile;
+        // First remove the project name if it s there...
         for (Iterator<String> itr = recentProjectFileSet.iterator(); itr.hasNext();) {
-            f = itr.next();
-            if (file.getPath().equals(f)) {
+            listedProjectFile = itr.next();
+            if (currentProjectDirectory.getPath().equals(listedProjectFile)) {
                 itr.remove();
                 break;
             }
         }
-
-        if (!recentProjectFileSet.contains(file.getPath()))
-             recentProjectFileSet.add(file.getPath()); // to the top
+        // thenadd it back to the top
+        if (!recentProjectFileSet.contains(currentProjectDirectory.getPath()))
+             recentProjectFileSet.add(currentProjectDirectory.getPath()); 
 
         saveProjectHistoryXML(recentProjectFileSet);
         notifyRecentProjectFileListeners();
     }
 
-    private List<String> openAssemblies;
+    private List<String> openAssembliesList;
 
     @SuppressWarnings("unchecked")
     private void recordAssemblyFiles() {
-        openAssemblies = new ArrayList<>(4);
+        openAssembliesList = new ArrayList<>(4);
         List<Object> valueList = historyConfiguration.getList(ViskitConfigurationStore.ASSEMBLY_HISTORY_KEY + "[@value]");
         LOG.debug("recordAssemblyFiles() valueAr size is: {}", valueList.size());
         int idx = 0;
@@ -2037,7 +2036,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 op = historyConfiguration.getString(ViskitConfigurationStore.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true")))
-                    openAssemblies.add(assemblyFile);
+                    openAssembliesList.add(assemblyFile);
 
                 notifyRecentAssemblyFileListeners();
             }

@@ -155,8 +155,9 @@ public class ReportStatisticsConfiguration {
      * @param repNumber replication number
      * @param replicationStatisticsPropertyChangeListenerArray  replication statistics
      */
-    public void processReplicationStatistics(int repNumber, PropertyChangeListener[] replicationStatisticsPropertyChangeListenerArray) {
-        Log4jUtilities.getLogger(ReportStatisticsConfiguration.class).debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
+    public void processReplicationStatistics(int repNumber, PropertyChangeListener[] replicationStatisticsPropertyChangeListenerArray) 
+    {
+        LOG.debug("\n\nprocessReplicationReport in ReportStatisticsConfig");
 
         Element[] replicationUpdate = new Element[replicationStatisticsPropertyChangeListenerArray.length];
         Element replication;

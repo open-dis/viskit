@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import org.apache.logging.log4j.Logger;
 
 import org.jgraph.graph.CellView;
 import org.jgraph.graph.DefaultEdge;
@@ -64,7 +65,9 @@ import viskit.model.ViskitElement;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.jgraph.ViskitGraphRouting">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing {
+public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing 
+{
+    static Logger LOG = Log4jUtilities.getLogger(ViskitGraphRouting.class);
 
     Map<String, Vector<Object>> nodePairs = new HashMap<>();
 
@@ -196,7 +199,7 @@ public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing 
             PropertyChangeListenerNode pn = (PropertyChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();
         } else {
-            Log4jUtilities.getLogger(getClass()).warn("ParentView of " + pv + " is " + o);
+            LOG.warn("ParentView of " + pv + " is " + o);
             return null;
         }
     }

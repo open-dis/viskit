@@ -1,6 +1,5 @@
 package viskit.model;
 
-import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -18,11 +17,11 @@ import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.control.AssemblyControllerImpl;
+import static viskit.model.ViskitModelInstantiator.LOG;
 import viskit.mvc.MvcAbstractModel;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
-import viskit.mvc.MvcController;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -34,7 +33,9 @@ import viskit.mvc.MvcController;
  * @since 9:16:44 AM
  * @version $Id$
  */
-public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel {
+public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
+{
+    
 
     private static JAXBContext jaxbContext;
     private ObjectFactory objectFactory;
@@ -1095,7 +1096,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         pNode.setInstantiator(vc);
 
         pNode.opaqueModelObject = pcl;
-        Log4jUtilities.getLogger(AssemblyModelImpl.class).debug("pNode name: " + pNode.getName());
+        LOG.debug("pNode name: " + pNode.getName());
 
         getNodeCache().put(pNode.getName(), pNode);   // key = se
 

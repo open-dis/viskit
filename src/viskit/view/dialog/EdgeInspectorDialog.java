@@ -18,6 +18,7 @@ import edu.nps.util.BoxLayoutUtils;
 import edu.nps.util.Log4jUtilities;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import org.apache.logging.log4j.Logger;
 import simkit.Priority;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
@@ -41,7 +42,9 @@ import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
  * @since 2:56:21 PM
  * @version $Id$
  */
-public class EdgeInspectorDialog extends JDialog {
+public class EdgeInspectorDialog extends JDialog
+{
+    static final Logger LOG = Log4jUtilities.getLogger(EdgeInspectorDialog.class);
 
     private static EdgeInspectorDialog dialog;
     private static boolean modified = false;
@@ -353,7 +356,7 @@ public class EdgeInspectorDialog extends JDialog {
             }
             jcb.setEditable(true); // this allows anything to be entered
         } catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
-            Log4jUtilities.getLogger(EdgeInspectorDialog.class).error(e);
+            LOG.error(e);
         }
         return jcb;
     }
@@ -466,7 +469,7 @@ public class EdgeInspectorDialog extends JDialog {
                 i++;
             }
 
-            Log4jUtilities.getLogger(EdgeInspectorDialog.class).error("Unknown edge priority: " + pr + " -- setting to DEFAULT)");
+            LOG.error("Unknown edge priority: " + pr + " -- setting to DEFAULT)");
             priorityCB.setSelectedIndex(priorityDefaultIndex);
         }
     }

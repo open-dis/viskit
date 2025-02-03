@@ -48,6 +48,7 @@ import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
 import javax.help.SwingHelpUtilities;
+import org.apache.logging.log4j.Logger;
 
 import viskit.util.BrowserLauncher;
 import viskit.util.Version;
@@ -58,6 +59,8 @@ import viskit.util.Version;
  */
 public class Help
 {
+    static final Logger LOG = Log4jUtilities.getLogger(Help.class);
+    
     public static final Version VERSION = new Version("version.txt");
     public static final String VERSION_STRING = VERSION.getVersionString();
     public static final String CR = "<br>";
@@ -120,7 +123,7 @@ public class Help
             hb = new HelpSet(null, helpSetURL).createHelpBroker();
         } catch (HelpSetException e) {
 //        e.printStackTrace();
-            Log4jUtilities.getLogger(Help.class).error(e);
+            LOG.error(e);
         }
 
         // Here we're setting up the action event peripherals for the tutorial menu selection

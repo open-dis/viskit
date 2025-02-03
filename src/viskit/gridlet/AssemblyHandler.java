@@ -31,7 +31,8 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  *
  * @author Rick Goldberg
  */
-public class AssemblyHandler implements XmlRpcHandler {
+public class AssemblyHandler implements XmlRpcHandler 
+{
 
     static Logger LOG = Log4jUtilities.getLogger(AssemblyHandler.class);
     SessionManager sessionManager;

@@ -12,6 +12,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.model.*;
 import viskit.view.ArgumentsPanel;
@@ -30,7 +31,9 @@ import viskit.view.TransitionsPanel;
  * @since 2:56:21 PM
  * @version $Id$
  */
-public class EventInspectorDialog extends JDialog {
+public class EventInspectorDialog extends JDialog
+{
+    static final Logger LOG = Log4jUtilities.getLogger(EventInspectorDialog.class);
 
     private static EventInspectorDialog dialog;
     private EventNode node;
@@ -339,12 +342,12 @@ public class EventInspectorDialog extends JDialog {
 
                     // and, this SchedulingEdge is going to this node
                     if (((Edge) ve).to.getName().equals(en.getName())) {
-                        Log4jUtilities.getLogger(EventInspectorDialog.class).debug("Found the SE's 'to' Node that matches this EventNode");
+                        LOG.debug("Found the SE's 'to' Node that matches this EventNode");
 
                         // The lower key values signal when it was connected to
                         // to this event node.  We're interested in the first
                         // SchedulingEdge to this EventNode
-                        Log4jUtilities.getLogger(EventInspectorDialog.class).debug("SE ID is: " + ve.getModelKey());
+                        LOG.debug("SE ID is: " + ve.getModelKey());
 
                         // If this isn't the first time, then skip over this edge
                         if (!((Edge) ve).parameters.isEmpty()) {continue;}

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.*;
+import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
 import viskit.gridlet.SessionManager;
@@ -22,7 +23,10 @@ import viskit.gridlet.SessionManager;
  *
  * @author Rick Goldberg
  */
-public class RemoteDriverImpl implements DoeDriver {
+public class RemoteDriverImpl implements DoeDriver
+{
+    private final static Logger LOG = Log4jUtilities.getLogger(RemoteDriverImpl.class);
+    
     XmlRpcClientLite rpc;
     Vector<Object> args = new Vector<>();
     String usid = SessionManager.LOGIN_ERROR;
@@ -40,7 +44,7 @@ public class RemoteDriverImpl implements DoeDriver {
         } catch (MalformedURLException ex) {
             throw new DoeException("Malformed Url at "+host+":"+port);
         } catch (Exception e) {
-            Log4jUtilities.getLogger(RemoteDriverImpl.class).error(e);
+            LOG.error(e);
         }
         if (rpc == null) throw new DoeException("Can't connect to Gridkit service at "+host+":"+port);
 

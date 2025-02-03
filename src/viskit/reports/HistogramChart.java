@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -25,7 +26,9 @@ import viskit.ViskitProject;
  * @version $Id$
  * @since August 3, 2006, 10:21 AM
  */
-public class HistogramChart {
+public class HistogramChart
+{
+    static Logger LOG = Log4jUtilities.getLogger(HistogramChart.class);    
 
     /** Creates a new instance of HistogramChart */
     public HistogramChart() {}
@@ -119,7 +122,7 @@ public class HistogramChart {
         try {
             ChartUtils.saveChartAsPNG(outFile, chart, 969, 641);
         } catch (IOException ioe) {
-            Log4jUtilities.getLogger(HistogramChart.class).error(ioe);
+            LOG.error(ioe);
         }
     }
 }

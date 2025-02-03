@@ -47,6 +47,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.swing.*;
+import org.apache.logging.log4j.Logger;
 
 import viskit.view.MainFrame;
 import viskit.view.dialog.ViskitUserPreferences;
@@ -61,12 +62,16 @@ import viskit.view.dialog.ViskitUserPreferences;
  */
 public class ViskitApplication
 {
+    
+    static final Logger LOG = Log4jUtilities.getLogger(ViskitApplication.class);
+    
     /**
      * Viskit entry point from the command line, or introspection
      * @param args command line arguments if any
      */
     public static void main(final String[] args)
     {
+        
         // Launch all GUI stuff on, or within the EDT
         try {
             SwingUtilities.invokeLater(() -> {
@@ -75,7 +80,7 @@ public class ViskitApplication
 
         } 
         catch (Exception e) {
-            Log4jUtilities.getLogger(ViskitApplication.class).error(e);
+            LOG.error(e);
 
             if (e instanceof InvocationTargetException) {
 
@@ -99,7 +104,7 @@ public class ViskitApplication
 
                 ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
             } catch (MalformedURLException | URISyntaxException ex) {
-                Log4jUtilities.getLogger(ViskitApplication.class).fatal(ex);
+                LOG.fatal(ex);
             }
         }
     }
@@ -117,9 +122,9 @@ public class ViskitApplication
                 file.delete();
             }
             if (dotViskit.delete())
-                Log4jUtilities.getLogger(ViskitApplication.class).info("{} was found and deleted from your system.", dotViskit.getName());
+                LOG.info("{} was found and deleted from your system.", dotViskit.getName());
 
-            Log4jUtilities.getLogger(ViskitApplication.class).info("Please restart Viskit");
+            LOG.info("Please restart Viskit");
         }
     }
 
@@ -132,8 +137,9 @@ public class ViskitApplication
             initialAssemblyFile = args[0];
 
         if (viskit.ViskitStatics.debug) {
-            Log4jUtilities.getLogger(ViskitApplication.class).debug("***Inside EventGraphAssembly main {}: ", args.length);
+            LOG.debug("***Inside ViskitApplication main, createGUI{}: ", args.length);
         }
+        
         setLookAndFeel();
 
         // Leave tooltips on the screen until mouse movement causes removal
@@ -164,7 +170,7 @@ public class ViskitApplication
                 UIManager.setLookAndFeel(userPreferencesLookAndFeel);
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            Log4jUtilities.getLogger(ViskitApplication.class).error("Error setting {} Look and Feel", userPreferencesLookAndFeel);
+            LOG.error("Error setting {} Look and Feel", userPreferencesLookAndFeel);
         }
     }
 

@@ -46,6 +46,7 @@ import java.util.StringTokenizer;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import org.apache.logging.log4j.Logger;
 
 /**
  * MOVES Institute
@@ -59,6 +60,8 @@ import javax.crypto.NoSuchPaddingException;
  */
 public class CryptoMethods
 {
+    static final Logger LOG = Log4jUtilities.getLogger(CryptoMethods.class);
+    
   private static final byte[] PRIVATE_KEY =
       {106,93,45,-24,68,125,-92,103};
 
@@ -72,7 +75,7 @@ public class CryptoMethods
       return getString(ciphertext);
     }
     catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
-        Log4jUtilities.getLogger(CryptoMethods.class).error(e);
+        LOG.error(e);
     }
     return null;
   }
@@ -88,7 +91,7 @@ public class CryptoMethods
       return new String(cleartext);
     }
     catch (InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException e) {
-        Log4jUtilities.getLogger(CryptoMethods.class).error(e);
+        LOG.error(e);
     }
     return null;
   }
@@ -103,7 +106,7 @@ public class CryptoMethods
       return s;
     }
     catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-        Log4jUtilities.getLogger(CryptoMethods.class).error(e);
+        LOG.error(e);
     }
     return null;
   }

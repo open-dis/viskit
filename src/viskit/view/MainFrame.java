@@ -603,7 +603,7 @@ public class MainFrame extends JFrame
                 // Q: What is setting this true when it's false?
                 // A: The Viskit Setting Dialog, third tab
                 if (viskit.ViskitStatics.debug) {
-                    Log4jUtilities.getLogger(QuitAction.class).info("in actionPerformed");
+                    LOG.info("in actionPerformed");
                 }
 
                 // Remember the size of this main frame set by the user
@@ -779,7 +779,7 @@ public class MainFrame extends JFrame
             (ViskitGlobals.instance().getAssemblyViewFrame().getNumberAssembliesLoaded()    == 0))
         {
             // provide initial guidance to new user who is facing an empty editor
-            String message = "<html><body><p align='center'>Welcome to Viskit !!</p><br />";
+            String message = "<html><body><p align='center'>Welcome to Viskit !</p><br />";
             if (ViskitGlobals.instance().isProjectOpen())
             {
                 message +=   "<p align='center'>";

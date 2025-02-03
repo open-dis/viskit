@@ -27,6 +27,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
 import viskit.model.ViskitModelInstantiator;
 import viskit.xsd.bindings.eventgraph.Parameter;
@@ -40,7 +41,9 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @since 8:31:41 AM
  * @version $Id$
  */
-public class InstantiationPanel extends JPanel implements ActionListener, CaretListener {
+public class InstantiationPanel extends JPanel implements ActionListener, CaretListener
+{
+    static final Logger LOG = Log4jUtilities.getLogger(InstantiationPanel.class);
 
     private static final int FF = 0, CONSTR = 1, FACT = 2;
 
@@ -308,7 +311,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         String typ;
 
         public void setType(String clName) throws ClassNotFoundException {
-            Log4jUtilities.getLogger(InstantiationPanel.class).debug("Constructor for class: {}", clName);
+            LOG.debug("Constructor for class: {}", clName);
             
             List<Object>[] parameters = ViskitStatics.resolveParameters(ViskitStatics.classForName(clName));
             typ = clName;

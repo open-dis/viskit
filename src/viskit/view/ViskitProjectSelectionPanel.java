@@ -41,6 +41,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
 import viskit.ViskitProject;
@@ -57,6 +58,8 @@ import viskit.mvc.MvcController;
  */
 public class ViskitProjectSelectionPanel extends javax.swing.JPanel
 {
+    static final Logger LOG = Log4jUtilities.getLogger(ViskitProjectSelectionPanel.class);
+    
     private static JDialog dialog;
 
     public void showDialog()
@@ -82,7 +85,7 @@ public class ViskitProjectSelectionPanel extends javax.swing.JPanel
                 };
                 SwingUtilities.invokeAndWait(r);
             } catch (InterruptedException | InvocationTargetException ex) {
-                Log4jUtilities.getLogger(ViskitProjectSelectionPanel.class).error(ex);
+                LOG.error(ex);
             }
         }
         else dialog.setVisible(true);

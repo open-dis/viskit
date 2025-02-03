@@ -97,6 +97,8 @@ import viskit.view.MainFrame;
  */
 public class ViskitGlobals
 {
+    static Logger LOG = Log4jUtilities.getLogger(ViskitGlobals.class);
+    
     /** Singleton pattern, with final version applied by NetBeans
      * @see https://stackoverflow.com/questions/2832297/java-singleton-pattern
      * @see https://stackoverflow.com/questions/70689/what-is-an-efficient-way-to-implement-a-singleton-pattern-in-java
@@ -112,8 +114,8 @@ public class ViskitGlobals
         defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
         myTypeListener = new MyTypeListener();
         buildTypePopup();
-        initializeProjectHome(); // TODO needed? maybe yes for first time, but not if repeating...
-        createWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
+        initializeProjectHome();  // TODO needed? maybe yes for first time, but not if repeating...
+        createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
     }
     
     public static ViskitGlobals instance()
@@ -124,6 +126,7 @@ public class ViskitGlobals
                 INSTANCE = ViskitGlobals.INSTANCE;
                 if (INSTANCE == null) { // Check 2
                     ViskitGlobals.INSTANCE = INSTANCE = new ViskitGlobals();
+                    // ViskitStatics.incrementViskitGlobalsCreationCount(); // synchronized singleton safety check
                 }
             }
         }
@@ -178,7 +181,6 @@ public class ViskitGlobals
     AssemblyViewFrame assemblyViewFrame;
     AssemblyControllerImpl assemblyController;
 
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitGlobals.class);
     private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
     private Interpreter interpreter;
     private final DefaultComboBoxModel<String> defaultComboBoxModel;
@@ -875,12 +877,12 @@ public class ViskitGlobals
     }
 
     /**
-     * Not the best Java Bean convention, but performs as a no argument setter
-     * for an open project's working directory (build/classes). Establishes the
-     * class loader, project space, extra classpaths and identifies the path for
-     * .class files of the projects Event Graphs
+     * Establishes the class loader, project space, extra classpaths
+     * and identifies the path for class files of the project's Event Graphs
+     * and Assemblies.  Not the best Java Bean convention, but performs as a 
+     * no-argument setter for an open project's working directory (build/classes).
      */
-    public final void createWorkingDirectory()
+    public final void createProjectWorkingDirectory()
     {
         if (viskitConfigurationStore.getViskitAppConfiguration() == null)
             return;
@@ -891,13 +893,14 @@ public class ViskitGlobals
              projectName = DEFAULT_PROJECT_NAME;
         setProjectName(projectName);
         
+        // TODO not clear that the next lines are correct
         projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY);
 
         if (viskitProject == null)
             viskitProject = new ViskitProject(new File(projectsBaseDirectory, projectName));
         else
         {
-            // unexpected error condition
+            // (questionable) unexpected error condition
             viskitProject.setProjectRootDirectory(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
         }
 

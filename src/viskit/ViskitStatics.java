@@ -84,25 +84,39 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  */
 public class ViskitStatics 
 {
+    static
+    {
+        // ourobouros issue: having an external checker does not work, because 
+        // ViskitStatics would also need to be a singleton as well.
+        // ---------------------------------------------------------------------
+        // precaution: deliberately initialize singleton classes during startup, 
+        // avoiding potential interference by other threads, and  initializing
+        // counts for singleton safety checks below
+        // ViskitGlobals            temp1 = ViskitGlobals.instance();
+        // ViskitConfigurationStore temp2 = ViskitConfigurationStore.instance();
+    }
+        // private static int            viskitGlobalsCreationCount = 0; // singleton safety check
+        // private static int viskitConfigurationStoreCreationCount = 0; // singleton safety check
+    
     /* Commonly used class names */
-    public static final String RANDOM_NUMBER_CLASS = "simkit.random.RandomNumber";
-    public static final String RANDOM_VARIATE_CLASS = "simkit.random.RandomVariate";
-    public static final String RANDOM_VARIATE_FACTORY_CLASS = RANDOM_VARIATE_CLASS + "Factory";
+    public static final String RANDOM_NUMBER_CLASS                   = "simkit.random.RandomNumber";
+    public static final String RANDOM_VARIATE_CLASS                  = "simkit.random.RandomVariate";
+    public static final String RANDOM_VARIATE_FACTORY_CLASS          = RANDOM_VARIATE_CLASS + "Factory";
     public static final String RANDOM_VARIATE_FACTORY_DEFAULT_METHOD = "getInstance";
-    public static final String SIMPLE_PROPERTY_DUMPER = "simkit.util.SimplePropertyDumper";
-    public static final String LOCAL_BOOT_LOADER = "viskit.doe.LocalBootLoader";
-    public static final String JAVA_LANG_STRING = "java.lang.String";
-    public static final String JAVA_LANG_OBJECT = "java.lang.Object";
-    public static final String VISKIT_MAILING_LIST = "brutzman@nps.edu;terry.norbraten@gmail.com";
+    public static final String SIMPLE_PROPERTY_DUMPER                = "simkit.util.SimplePropertyDumper";
+    public static final String LOCAL_BOOT_LOADER                     = "viskit.doe.LocalBootLoader";
+    public static final String JAVA_LANG_STRING                      = "java.lang.String";
+    public static final String JAVA_LANG_OBJECT                      = "java.lang.Object";
+    public static final String VISKIT_MAILING_LIST                   = "brutzman@nps.edu;terry.norbraten@gmail.com";
 
-    public static final String FULL_PATH = "FULLPATH";
+    public static final String FULL_PATH       = "FULLPATH";
     public static final String CLEAR_PATH_FLAG = "<<clearPath>>";
 
     public static final String OPERATING_SYSTEM = System.getProperty("os.name");
 
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitStatics.class);
+    static final Logger        LOG   = Log4jUtilities.getLogger(ViskitStatics.class);
 
-    public static boolean debug = false;
+    public static boolean      debug = false;
 
     /**
      * Convert a class name array type to human readable form.
@@ -764,8 +778,9 @@ public class ViskitStatics
      * @param msg the message to inform the user with
      * @param showLog a flag to denote showing the debug.log in an output text editor
      */
-    public static void showHyperlinkedDialog(Component parent, String cause, final URL url, String msg, final boolean showLog) {
-
+    public static void showHyperlinkedDialog(Component parent, String cause, final URL url, String msg, final boolean showLog) 
+    {
+        // TODO move this together with other notifiers
         // Bugfix 1377
 
         // for copying style
@@ -800,5 +815,55 @@ public class ViskitStatics
 
         JOptionPane.showMessageDialog(parent, ep, cause, JOptionPane.ERROR_MESSAGE);
     }
+
+//    /**
+//     * @return the viskitGlobalsCreationCount singleton safety check
+//     */
+//    public static synchronized int getViskitGlobalsCreationCount() {
+//        return viskitGlobalsCreationCount;
+//    }
+//
+//    /**
+//     * Trust but verify: increment the singleton safety check value with each 
+//     * instantiation, warn if more than one occurs
+//     */
+//    public static synchronized void incrementViskitGlobalsCreationCount() {
+//        viskitGlobalsCreationCount++;
+//        if (viskitGlobalsCreationCount > 1) // unexpected failure
+//        {
+//            LOG.error("Singleton safety check failed, viskitGlobalsCreationCount=" + 
+//                                                      viskitGlobalsCreationCount);
+//            String message = "<html><body><p align='center'>ViskitGlobals singleton safety check failure!</p><br />";
+//            message +=       "<p align='center'>viskitGlobalsCreationCount=" + viskitGlobalsCreationCount + "</p><br />";
+//            // watch out for dueling creation problems
+////            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
+////                "Singleton safety check error", message);
+//        }
+//    }
+//
+//    /**
+//     * @return the viskitConfigurationStorCreationCount singleton safety check
+//     */
+//    public static synchronized int getViskitConfigurationStoreCreationCount() {
+//        return viskitConfigurationStoreCreationCount;
+//    }
+//
+//    /**
+//     * Trust but verify: increment the singleton safety check value with each
+//     * instantiation, warn if more than one occurs
+//     */
+//    public static synchronized void incrementViskitConfigurationStoreCreationCount() {
+//        viskitConfigurationStoreCreationCount++;
+//        if (viskitConfigurationStoreCreationCount > 1) // unexpected failure
+//        {
+//            LOG.error("Singleton safety check failed, viskitConfigurationStoreCreationCount=" + 
+//                                                      viskitConfigurationStoreCreationCount);
+//            String message = "<html><body><p align='center'>ViskitConfigurationStore singleton safety check failure!</p><br />";
+//            message +=       "<p align='center'>viskitConfigurationStoreCreationCount=" + viskitConfigurationStoreCreationCount + "</p><br />";
+//            // watch out for dueling creation problems
+////            ViskitGlobals.instance().getAssemblyViewFrame().genericReport(JOptionPane.ERROR_MESSAGE,
+////                "Singleton safety check error", message);
+//        }
+//    }
 
 } // end class ViskitStatics

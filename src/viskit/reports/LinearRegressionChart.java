@@ -62,6 +62,7 @@ import edu.nps.util.Log4jUtilities;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
+import org.apache.logging.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -97,7 +98,9 @@ import viskit.ViskitProject;
  *   </b></pre>
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
-public class LinearRegressionChart {
+public class LinearRegressionChart
+{
+    static Logger LOG = Log4jUtilities.getLogger(LinearRegressionChart.class);
 
     /** Creates a new instance of LinearRegressionChart */
     public LinearRegressionChart() {}
@@ -191,7 +194,7 @@ public class LinearRegressionChart {
         try {
             ChartUtils.saveChartAsPNG(outFile, chart, 969, 641);
         } catch (IOException ioe) {
-            Log4jUtilities.getLogger(LinearRegressionChart.class).error(ioe);
+            LOG.error(ioe);
         }
     }
 }

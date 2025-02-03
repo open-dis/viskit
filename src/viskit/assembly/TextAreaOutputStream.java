@@ -62,7 +62,7 @@ public class TextAreaOutputStream extends ByteArrayOutputStream implements Actio
   public static final int OUTPUTLIMIT = 1024 * 1024 * 8; // 8Mb
   public static final int BACKOFFSIZE = 1024 * 16;       // 16Kb, must be less than OUTPUTLIMIT
   
-  private static final Logger LOG = Log4jUtilities.getLogger(TextAreaOutputStream.class);
+  static final Logger LOG = Log4jUtilities.getLogger(TextAreaOutputStream.class);
   
   private final JTextArea jTextArea;
   private final Timer swingTimer;

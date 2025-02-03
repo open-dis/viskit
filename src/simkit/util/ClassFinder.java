@@ -46,7 +46,7 @@ import simkit.random.RandomVariate;
  */
 public class ClassFinder {
 
-    private static final Logger LOG = Log4jUtilities.getLogger(ClassFinder.class);
+    static final Logger LOG = Log4jUtilities.getLogger(ClassFinder.class);
 
     private static final String DEFAULT_EXT_DIR = "ext";
 

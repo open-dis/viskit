@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.nps.util.Log4jUtilities;
+import org.apache.logging.log4j.Logger;
 import simkit.random.*;
 import viskit.ViskitStatics;
 
@@ -25,7 +26,9 @@ import viskit.ViskitStatics;
  * @since 10:42:12 AM
  * @version $Id$
  */
-public class VsimkitObjects {
+public class VsimkitObjects
+{
+    static final Logger LOG = Log4jUtilities.getLogger(VsimkitObjects.class);
 
     /**
      * VGlobals uses this field, which combines all the methods below.
@@ -57,12 +60,12 @@ public class VsimkitObjects {
                 // TODO: this breaks on AR1Variate instance "getting"
                 m = method.invoke(null, (Object[]) null);
                 o = new FullNameAndInstance(name, m);
-                Log4jUtilities.getLogger(VsimkitObjects.class).debug("name is: " + name + " noPackageName is: " + noPackageName);
+                LOG.debug("name is: " + name + " noPackageName is: " + noPackageName);
                 HASH_MAP.put(name, o);
                 HASH_MAP.put(noPackageName, o);
             }
         } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            Log4jUtilities.getLogger(VsimkitObjects.class).error(e);
+            LOG.error(e);
 //            e.printStackTrace();
         }
     }

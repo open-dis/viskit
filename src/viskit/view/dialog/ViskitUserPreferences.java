@@ -697,7 +697,7 @@ public class ViskitUserPreferences extends JDialog
         }
         catch (Exception e)
         {
-            return "";
+            return ""; // if reached, then possibly invoked too soon
         }
     }
 
