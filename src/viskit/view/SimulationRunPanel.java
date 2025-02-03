@@ -147,8 +147,8 @@ public class SimulationRunPanel extends JPanel
 
         leftSideHorizontalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
         
-        // reduce magnitude of offset value smaller to provide more room upper-left vcrPanel 
-        leftSideHorizontalSplit.setDividerLocation((h/2) - 50);
+        // reduce magnitude of offset value (add positive increment) to provide more room in upper-left vcrPanel 
+        leftSideHorizontalSplit.setDividerLocation((h/2) - 10);
 
         leftRightSplit.setLeftComponent(leftSideHorizontalSplit);
         leftRightSplit.setRightComponent(scrollPane);
@@ -266,7 +266,7 @@ public class SimulationRunPanel extends JPanel
         verboseReplicationNumberTF.setToolTipText("Which replication run (1..n) will be verbose?");
         upperLeftFlowPanel.add(verboseReplicationNumberTF);
 
-        closeButton = new JButton("Close");
+        closeButton = new JButton( "Close");
         closeButton.setToolTipText("Close this window");
         if (showIncompleteButtons) {
             upperLeftFlowPanel.add(closeButton);
@@ -306,6 +306,8 @@ public class SimulationRunPanel extends JPanel
         runLabelPanel.setToolTipText("Simulation replications control");
         runLabelPanel.add(runLabel);
         upperLeftFlowPanel.add(runLabelPanel);
+        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
+        upperLeftFlowPanel.add(Box.createHorizontalStrut(40)); // indent next button panel
 
         JPanel runButtonsPanel = new JPanel();
         runButtonsPanel.setLayout(new BoxLayout(runButtonsPanel, BoxLayout.X_AXIS));
@@ -341,11 +343,12 @@ public class SimulationRunPanel extends JPanel
         vcrStopButton.setText(null);
         runButtonsPanel.add(vcrStopButton);
         
-        JButton clearConsoleButton = new JButton("X"); // Clear
-        // TODO get icon
+        JButton clearConsoleButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Delete24.gif"))); // Clear
+        
+        ViskitStatics.clampComponentSize(clearConsoleButton, vcrStopButton, vcrStopButton);
         // https://stackoverflow.com/questions/1954674/can-i-make-swing-jbuttons-have-smaller-margins
         clearConsoleButton.setMargin(new Insets(3, 4, 3, 4));
-        clearConsoleButton.setToolTipText("Clear console");
+        clearConsoleButton.setToolTipText("Clear all console text");
         // https://stackoverflow.com/questions/9569700/java-call-method-via-jbutton
         clearConsoleButton.addActionListener(new ActionListener() {
             @Override
