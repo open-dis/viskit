@@ -436,7 +436,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         eventGraphMenu.setText("Event Graph");
         eventGraphMenu.setActionCommand("Event Graph Editor");
 
-        editEventGraphSubMenu.setText("Edit Event Graph...");
+        editEventGraphSubMenu.setText("Edit selected Event Graph...");
 
         undoEventEditMenuItem.setMnemonic(KeyEvent.VK_U);
         undoEventEditMenuItem.setText("Undo");
@@ -501,7 +501,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         eventGraphMenu.add(editEventGraphSubMenu);
 
-        eventGraphPropertiesMI.setText("Edit Event Graph Properties");
+        eventGraphPropertiesMI.setText("Edit selected Event Graph Properties");
         eventGraphPropertiesMI.setToolTipText("graph metadata editor");
         eventGraphPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -558,7 +558,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         assemblyMenu.setText("Assembly           ");
 
-        editAssemblySubMenu.setText("Edit Assembly...");
+        editAssemblySubMenu.setText("Edit selected Assembly...");
 
         undoAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_U);
         undoAssemblyEditMenuItem.setText("Undo");
@@ -609,7 +609,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         assemblyMenu.add(editAssemblySubMenu);
 
-        assemblyPropertiesMI.setText("Edit Assembly Properties");
+        assemblyPropertiesMI.setText("Edit selected Assembly Properties");
         assemblyPropertiesMI.setToolTipText("graph metadata editor");
         assemblyPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

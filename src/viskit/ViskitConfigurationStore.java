@@ -36,6 +36,7 @@ import viskit.doe.FileHandler;
  */
 public class ViskitConfigurationStore 
 {
+    static final Logger LOG = Log4jUtilities.getLogger(ViskitConfigurationStore.class);
     
     /** Singleton pattern, with final version applied by NetBeans
      * @see https://stackoverflow.com/questions/2832297/java-singleton-pattern
@@ -55,10 +56,13 @@ public class ViskitConfigurationStore
                 INSTANCE = ViskitConfigurationStore.INSTANCE;
                 if (INSTANCE == null) { // Check 2
                     ViskitConfigurationStore.INSTANCE = INSTANCE = new ViskitConfigurationStore();
-                    // ViskitStatics.incrementViskitConfigurationStoreCreationCount(); // synchronized singleton safety check
                 }
             }
         }
+        if (INSTANCE == null)
+            LOG.warn ("initial instance creation failed! check logs afterwards for synchronized singleton safety check");
+        return INSTANCE;
+        
 //        if (INSTANCE == null) { // Check 1
 //            synchronized (ViskitConfigurationStore.class) {
 //                if (INSTANCE == null) { // Check 2
@@ -66,7 +70,6 @@ public class ViskitConfigurationStore
 //                }
 //            }
 //        }
-        return INSTANCE;
     }
     
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Viskit";
@@ -123,8 +126,6 @@ public class ViskitConfigurationStore
     public static final String LOOK_AND_FEEL_PLATFORM = "platform";
     
     public static final String VISKIT_PROJECT_NAME = "Project[@name]";
-
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitConfigurationStore.class);
 
     private final Map<String, XMLConfiguration> xmlConfigurationsMap;
     private final Map<String, String>           sessionHashMap;

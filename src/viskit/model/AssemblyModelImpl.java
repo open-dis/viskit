@@ -97,7 +97,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void changeMetaData(GraphMetadata newGraphMetadata) {
+    public void changeMetadata(GraphMetadata newGraphMetadata) {
         this.graphMetadata = newGraphMetadata;
         setDirty(true);
     }
@@ -132,21 +132,21 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                     return false;
                 }
 
-                GraphMetadata myGraphMetaData = new GraphMetadata(this);
-                myGraphMetaData.version = jaxbRoot.getVersion();
-                myGraphMetaData.name = jaxbRoot.getName();
-                myGraphMetaData.packageName = jaxbRoot.getPackage();
+                GraphMetadata myGraphMetadata = new GraphMetadata(this);
+                myGraphMetadata.version = jaxbRoot.getVersion();
+                myGraphMetadata.name = jaxbRoot.getName();
+                myGraphMetadata.packageName = jaxbRoot.getPackage();
 
                 Schedule sch = jaxbRoot.getSchedule();
                 if (sch != null) {
                     String stpTime = sch.getStopTime();
                     if (stpTime != null && stpTime.trim().length() > 0) {
-                        myGraphMetaData.stopTime = stpTime.trim();
+                        myGraphMetadata.stopTime = stpTime.trim();
                     }
-                    myGraphMetaData.verbose = sch.getVerbose().equalsIgnoreCase("true");
+                    myGraphMetadata.verbose = sch.getVerbose().equalsIgnoreCase("true");
                 }
 
-                changeMetaData(myGraphMetaData);
+                changeMetadata(myGraphMetadata);
                 buildEventGraphsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
                 buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
                 buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());

@@ -28,7 +28,7 @@ abstract public class MetadataDialog extends JDialog {
     protected JComponent runtimePanel;
     private JButton cancelButton;
     private JButton okButton;
-    GraphMetadata param;
+    GraphMetadata graphMetadata;
     JTextField nameTf, packageTf, authorTf, versionTf, extendsTf, implementsTf;
     JTextField stopTimeTf;
     JCheckBox verboseCb;
@@ -40,7 +40,7 @@ abstract public class MetadataDialog extends JDialog {
 
     public MetadataDialog(JFrame frame, GraphMetadata graphMetadata, String title) {
         super(frame, title, true);
-        this.param = graphMetadata;
+        this.graphMetadata = graphMetadata;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -162,7 +162,7 @@ abstract public class MetadataDialog extends JDialog {
     }
 
     public final void setParams(Component c, GraphMetadata graphMetadata) {
-        param = graphMetadata;
+        this.graphMetadata = graphMetadata;
 
         fillWidgets();
 
@@ -172,43 +172,45 @@ abstract public class MetadataDialog extends JDialog {
     }
 
     private void fillWidgets() {
-        if (param == null) {
-            param = new GraphMetadata();
+        if (graphMetadata == null) {
+            graphMetadata = new GraphMetadata();
         }
-        nameTf.setText(param.name);
-        packageTf.setText(param.packageName);
-        authorTf.setText(param.author);
-        versionTf.setText(param.version);
-        descriptionTextArea.setText(param.description);
-        extendsTf.setText(param.extendsPackageName);
-        implementsTf.setText(param.implementsPackageName);
-        stopTimeTf.setText(param.stopTime);
-        verboseCb.setSelected(param.verbose);
+        nameTf.setText             (graphMetadata.name);
+        packageTf.setText          (graphMetadata.packageName);
+        authorTf.setText           (graphMetadata.author);
+        versionTf.setText          (graphMetadata.version);
+        descriptionTextArea.setText(graphMetadata.description);
+        extendsTf.setText          (graphMetadata.extendsPackageName);
+        implementsTf.setText       (graphMetadata.implementsPackageName);
+        stopTimeTf.setText         (graphMetadata.stopTime);
+        verboseCb.setSelected      (graphMetadata.verbose);
         nameTf.selectAll();
     }
 
-    private void unloadWidgets() {
-        param.author = authorTf.getText().trim();
-        param.description = descriptionTextArea.getText().trim();
+    private void unloadWidgets() 
+    {
+        // cleanups
+        graphMetadata.author      = authorTf.getText().trim();
+        graphMetadata.description = descriptionTextArea.getText().trim();
 
         if (this instanceof AssemblyMetadataDialog) {
 
             // The default names are AssemblyName, or EventGraphName
-            if (!param.name.contains("Assembly") || param.name.equals("AssemblyName"))
+            if (!graphMetadata.name.contains("Assembly") || graphMetadata.name.equals("AssemblyName"))
 
                 // Note: we need to force "Assembly" in the file name for special recognition
-                param.name = nameTf.getText().trim() + "Assembly";
+                graphMetadata.name = nameTf.getText().trim() + "Assembly";
             else
-                param.name = nameTf.getText().trim();
+                graphMetadata.name = nameTf.getText().trim();
         } else {
-            param.name = nameTf.getText().trim();
+            graphMetadata.name = nameTf.getText().trim();
         }
-        param.packageName = packageTf.getText().trim();
-        param.version = versionTf.getText().trim();
-        param.extendsPackageName = extendsTf.getText().trim();
-        param.implementsPackageName = implementsTf.getText().trim();
-        param.stopTime = stopTimeTf.getText().trim();
-        param.verbose = verboseCb.isSelected();
+        graphMetadata.packageName = packageTf.getText().trim();
+        graphMetadata.version = versionTf.getText().trim();
+        graphMetadata.extendsPackageName = extendsTf.getText().trim();
+        graphMetadata.implementsPackageName = implementsTf.getText().trim();
+        graphMetadata.stopTime = stopTimeTf.getText().trim();
+        graphMetadata.verbose = verboseCb.isSelected();
     }
 
     class cancelButtonListener implements ActionListener {

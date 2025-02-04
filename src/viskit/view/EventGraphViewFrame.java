@@ -220,6 +220,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     {
         return tabbedPane.getTabCount();
     }
+    /** has one or more Event Graphs loaded
+     * @return whether one or more Event Graphs are loaded */
+    public boolean hasEventGraphsLoaded()
+    {
+        return (getNumberEventGraphsLoaded() > 0);
+    }
 
     public ViskitGraphComponentWrapper getCurrentVgraphComponentWrapper() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
@@ -257,11 +263,11 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     class TabSelectionHandler implements ChangeListener {
 
         @Override
-        public void stateChanged(ChangeEvent e) {
+        public void stateChanged(ChangeEvent e) 
+        {
+            ViskitGraphComponentWrapper viskitGraphComponentWrapper = getCurrentVgraphComponentWrapper();
 
-            ViskitGraphComponentWrapper myVgcw = getCurrentVgraphComponentWrapper();
-
-            if (myVgcw == null) {     // last tab has been closed
+            if (viskitGraphComponentWrapper == null) {     // last tab has been closed
                 setSelectedEventGraphName(null);
                 return;
             }
@@ -274,7 +280,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 //                ((EventGraphController)getController()).save();
 //            }
 
-            setModel((MvcModel) myVgcw.model);    // hold on locally
+            setModel((MvcModel) viskitGraphComponentWrapper.model);    // hold on locally
             getController().setModel(getModel());  // tell controller
 
 //            adjustMenus((Model) getModel()); // enable/disable menu items based on new Event Graph
@@ -283,8 +289,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             if (graphMetadata != null) {
                 setSelectedEventGraphName(graphMetadata.name);
                 setSelectedEventGraphDescription(graphMetadata.description);
-                
-            } else if (viskit.ViskitStatics.debug) {
+            } 
+            else if (viskit.ViskitStatics.debug) {
                 System.err.println("error: EventGraphViewFrame metadata null...");
             }
         }
@@ -442,11 +448,11 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     @Override
-    public void setSelectedEventGraphName(String s) {
-        boolean nullString = !(s != null && s.length() > 0);
-        if (!nullString) {
-            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
-        }
+    public void setSelectedEventGraphName(String newName) 
+    {
+        boolean nullString = !(newName != null && newName.length() > 0); // TODO ! isBlank()
+        if  ((!nullString) && (tabbedPane != null))
+             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), newName);
     }
 
     @Override
@@ -694,7 +700,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
-        editMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit Event Graph Properties...", KeyEvent.VK_E,
+        editMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit selected Event Graph Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
         }
     }
@@ -712,7 +718,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphMenu = new JMenu("Event Graph"); // Editor
         eventGraphMenu.setMnemonic(KeyEvent.VK_E);
 
-        editEventGraphSubMenu = new JMenu("Edit Event Graph..."); // submenu
+        editEventGraphSubMenu = new JMenu("Edit selected Event Graph..."); // submenu
         editEventGraphSubMenu.setMnemonic(KeyEvent.VK_E);
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "undo", "Undo", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
@@ -756,7 +762,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         
         // TODO "disable" both of these if no Event Graph is active
         eventGraphMenu.add(editEventGraphSubMenu);
-        eventGraphMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit Event Graph Properties...", KeyEvent.VK_E,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit selected Event Graph Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
         eventGraphMenu.addSeparator();
 

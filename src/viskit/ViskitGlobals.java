@@ -65,7 +65,6 @@ import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphControllerImpl;
 import viskit.doe.LocalBootLoader;
-import viskit.model.AssemblyModel;
 import viskit.model.AnalystReportModel;
 import viskit.model.EventNode;
 import viskit.model.Model;
@@ -77,10 +76,10 @@ import viskit.view.EventGraphViewFrame;
 import viskit.view.SimulationRunPanel;
 import viskit.view.ViskitProjectSelectionPanel;
 import viskit.view.dialog.ViskitUserPreferences;
-import viskit.mvc.MvcController;
 import edu.nps.util.SystemExitHandler;
 import static viskit.ViskitProject.DEFAULT_PROJECT_NAME;
 import viskit.control.TextAreaOutputStream;
+import viskit.model.AssemblyModelImpl;
 import viskit.view.MainFrame;
 
 /**
@@ -126,10 +125,11 @@ public class ViskitGlobals
                 INSTANCE = ViskitGlobals.INSTANCE;
                 if (INSTANCE == null) { // Check 2
                     ViskitGlobals.INSTANCE = INSTANCE = new ViskitGlobals();
-                    // ViskitStatics.incrementViskitGlobalsCreationCount(); // synchronized singleton safety check
                 }
             }
         }
+        if (INSTANCE == null)
+            LOG.warn ("initial instance creation failed! check logs afterwards for synchronized singleton safety check");
         return INSTANCE;
         
 //        if (INSTANCE == null) { // Check 1
@@ -212,8 +212,8 @@ public class ViskitGlobals
         ((AssemblyViewFrame) assemblyViewFrame).rebuildLEGOTreePanels();
     }
 
-    public AssemblyModel getActiveAssemblyModel() {
-        return (AssemblyModel) assemblyController.getModel();
+    public AssemblyModelImpl getActiveAssemblyModel() {
+        return (AssemblyModelImpl) assemblyController.getModel();
     }
 
     public AssemblyControllerImpl getAssemblyController() {
@@ -885,7 +885,7 @@ public class ViskitGlobals
     public final void createProjectWorkingDirectory()
     {
         if (viskitConfigurationStore.getViskitAppConfiguration() == null)
-            return;
+            return; // unexpected condition
 
         if ((projectName == null) || projectName.isBlank())
              projectName = viskitConfigurationStore.getVal(ViskitConfigurationStore.PROJECT_NAME_KEY);
@@ -893,7 +893,9 @@ public class ViskitGlobals
              projectName = DEFAULT_PROJECT_NAME;
         setProjectName(projectName);
         
-        // TODO not clear that the next lines are correct.  why is this invoked after a simulation run??
+        // TODO not clear that the next lines are correct.  
+        // why isn't this returning if already complete?
+        // why is this invoked after a simulation run??
         projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY);
 
         if (viskitProject == null)

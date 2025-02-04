@@ -232,7 +232,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
 
-    public ViskitGraphAssemblyComponentWrapper getCurrentVgacw() {
+    public ViskitGraphAssemblyComponentWrapper getCurrentViskitGraphAssemblyComponentWrapper() {
         JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
         if (jsplt == null) {return null;}
 
@@ -241,7 +241,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     public Component getCurrentJgraphComponent() {
-        ViskitGraphAssemblyComponentWrapper vcw = getCurrentVgacw();
+        ViskitGraphAssemblyComponentWrapper vcw = getCurrentViskitGraphAssemblyComponentWrapper();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getRightComponent();
     }
@@ -268,25 +268,32 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     class TabSelectionHandler implements ChangeListener {
 
         @Override
-        public void stateChanged(ChangeEvent e) {
-            ViskitGraphAssemblyComponentWrapper myVgacw = getCurrentVgacw();
+        public void stateChanged(ChangeEvent e)
+        {
+            ViskitGraphAssemblyComponentWrapper viskitGraphAssemblyComponentWrapper = getCurrentViskitGraphAssemblyComponentWrapper();
 
-            if (myVgacw == null) {     // last tab has been closed
+            if (viskitGraphAssemblyComponentWrapper == null) {     // last tab has been closed
                 setSelectedAssemblyName(null);
                 return;
             }
 
             // Key to getting the LEGOs tree panel in each tab view
-            myVgacw.drawingSplitPane.setLeftComponent(myVgacw.trees);
+            viskitGraphAssemblyComponentWrapper.drawingSplitPane.setLeftComponent(viskitGraphAssemblyComponentWrapper.trees);
 
-            setModel((MvcModel) myVgacw.assemblyModel); // hold on locally
+            setModel((MvcModel) viskitGraphAssemblyComponentWrapper.assemblyModel); // hold on locally
             getController().setModel(getModel()); // tell controller
             AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
+            
+            // TODO alternative failing attempts
+////            ViskitGlobals.instance().setActiveAssemblyModel(ViskitGlobals.instance().getActiveAssemblyModel());
+//                               setModel((MvcModel) viskitGraphAssemblyComponentWrapper.assemblyModel); // hold on locally
+//            assemblyController.setModel((MvcModel) viskitGraphAssemblyComponentWrapper.assemblyModel); // tell controller
+            
+            AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel(); // TODO not found in corresponding EventGraph method
+            if (assemblyModel.getLastFile() != null)
+                ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(assemblyModel.getLastFile(), assemblyModel.getJaxbRoot());
 
-            if (mod.getLastFile() != null)
-                ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(mod.getLastFile(), mod.getJaxbRoot());
-
-            GraphMetadata graphMetadata = mod.getMetadata();
+            GraphMetadata graphMetadata = assemblyModel.getMetadata();
             if (graphMetadata != null)
                 setSelectedAssemblyName(graphMetadata.name);
             else if (viskit.ViskitStatics.debug)
@@ -432,7 +439,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
-        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties", KeyEvent.VK_E,
+        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit selected Assembly Properties", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
         }
     }
@@ -449,7 +456,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.setMnemonic(KeyEvent.VK_A);
 
         // Set up edit submenu
-        JMenu editSubMenu = new JMenu("Edit Assembly...");
+        JMenu editSubMenu = new JMenu("Edit selected Assembly...");
         editSubMenu.setMnemonic(KeyEvent.VK_E);
         if (!ViskitGlobals.instance().getMainFrame().hasModalMenus()) // combined menu integration
         {
@@ -484,7 +491,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         editSubMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
         
         assemblyMenu.add(editSubMenu);
-        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit Assembly Properties", KeyEvent.VK_E,
+        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit selected Assembly Properties", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.addSeparator();
         }
@@ -742,10 +749,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getToolBar().setVisible(false);
 
         zoomIn.addActionListener((ActionEvent e) -> {
-            getCurrentVgacw().setScale(getCurrentVgacw().getScale() + 0.1d);
+            getCurrentViskitGraphAssemblyComponentWrapper().setScale(getCurrentViskitGraphAssemblyComponentWrapper().getScale() + 0.1d);
         });
         zoomOut.addActionListener((ActionEvent e) -> {
-            getCurrentVgacw().setScale(Math.max(getCurrentVgacw().getScale() - 0.1d, 0.1d));
+            getCurrentViskitGraphAssemblyComponentWrapper().setScale(Math.max(getCurrentViskitGraphAssemblyComponentWrapper().getScale() - 0.1d, 0.1d));
         });
 
         // These buttons perform operations that are internal to our view class, and therefore their operations are
@@ -762,7 +769,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                getCurrentVgacw().setPortsVisible(tOrF);
+                getCurrentViskitGraphAssemblyComponentWrapper().setPortsVisible(tOrF);
             }
         }
 
@@ -909,13 +916,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     /** Rebuilds the Listener Event Graph Object (LEGO) tree view */
     public void rebuildLEGOTreePanels() {
-        if (getCurrentVgacw() == null)
+        if (getCurrentViskitGraphAssemblyComponentWrapper() == null)
             return; // no LEGO panel yet
 
         lTree.clear();
         pclTree.clear();
         JSplitPane treeSplit = buildTreePanels();
-        getCurrentVgacw().drawingSplitPane.setTopComponent(treeSplit);
+        getCurrentViskitGraphAssemblyComponentWrapper().drawingSplitPane.setTopComponent(treeSplit);
         treeSplit.setDividerLocation(250);
         lTree.repaint();
         pclTree.repaint();
@@ -1051,7 +1058,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     public void modelChanged(MvcModelEvent event) {
         switch (event.getID()) {
             default:
-                getCurrentVgacw().viskitModelChanged((ModelEvent) event);
+                getCurrentViskitGraphAssemblyComponentWrapper().viskitModelChanged((ModelEvent) event);
                 break;
         }
     }
@@ -1161,10 +1168,11 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public void setSelectedAssemblyName(String s) {
-        boolean nullString = !(s != null && !s.isEmpty());
-        if (!nullString)
-            tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), s);
+    public void setSelectedAssemblyName(String newName) 
+    {
+        boolean nullString = !(newName != null && !newName.isEmpty()); // TODO ! isBlank()
+        if  ((!nullString) && (tabbedPane != null))
+             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), newName);
     }
 
     public void closeProject()
@@ -1353,6 +1361,12 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     public int getNumberAssembliesLoaded()
     {
         return tabbedPane.getTabCount();
+    }
+    /** has one or more Assemblies loaded
+     * @return whether one or more Assemblies are loaded */
+    public boolean hasAssembliesLoaded()
+    {
+        return (getNumberAssembliesLoaded() > 0);
     }
 
     /**

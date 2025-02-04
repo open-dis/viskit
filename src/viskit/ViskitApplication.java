@@ -62,7 +62,6 @@ import viskit.view.dialog.ViskitUserPreferences;
  */
 public class ViskitApplication
 {
-    
     static final Logger LOG = Log4jUtilities.getLogger(ViskitApplication.class);
     
     /**

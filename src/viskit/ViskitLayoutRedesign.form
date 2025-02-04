@@ -94,7 +94,7 @@
           <SubComponents>
             <Menu class="javax.swing.JMenu" name="editEventGraphSubMenu">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit Event Graph..."/>
+                <Property name="text" type="java.lang.String" value="Edit selected Event Graph..."/>
               </Properties>
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="undoEventEditMenuItem">
@@ -204,7 +204,7 @@
             </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="eventGraphPropertiesMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit Event Graph Properties"/>
+                <Property name="text" type="java.lang.String" value="Edit selected Event Graph Properties"/>
                 <Property name="toolTipText" type="java.lang.String" value="graph metadata editor"/>
               </Properties>
               <Events>
@@ -301,7 +301,7 @@
           <SubComponents>
             <Menu class="javax.swing.JMenu" name="editAssemblySubMenu">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit Assembly..."/>
+                <Property name="text" type="java.lang.String" value="Edit selected Assembly..."/>
               </Properties>
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="undoAssemblyEditMenuItem">
@@ -387,7 +387,7 @@
             </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="assemblyPropertiesMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit Assembly Properties"/>
+                <Property name="text" type="java.lang.String" value="Edit selected Assembly Properties"/>
                 <Property name="toolTipText" type="java.lang.String" value="graph metadata editor"/>
               </Properties>
               <Events>

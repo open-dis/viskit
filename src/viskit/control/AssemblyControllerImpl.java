@@ -202,9 +202,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
         }
         boolean ret = true;
-        AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
-        if (mod != null) {
-            if (((AssemblyModel) getModel()).isDirty()) {
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
+        if (assemblyModel != null) {
+            if (assemblyModel.isDirty()) {
                 return askToSaveAndContinue();
             }
         }
@@ -285,8 +285,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private void resetRedoUndoStatus() {
         AssemblyViewFrame assemblyViewFrame = ViskitGlobals.instance().getAssemblyViewFrame();
 
-        if (assemblyViewFrame.getCurrentVgacw() != null) {
-            ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) assemblyViewFrame.getCurrentVgacw().getUndoManager();
+        if (assemblyViewFrame.getCurrentViskitGraphAssemblyComponentWrapper() != null) {
+            ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) assemblyViewFrame.getCurrentViskitGraphAssemblyComponentWrapper().getUndoManager();
             undoMgr.discardAllEdits();
             updateUndoRedoStatus();
         }
@@ -487,7 +487,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 n = n.substring(0, n.length() - 4);
             }
             graphMetadata.name = n;
-            model.changeMetaData(graphMetadata); // might have renamed
+            model.changeMetadata(graphMetadata); // might have renamed
 
             model.saveModel(saveFile);
             assemblyView.setSelectedAssemblyName(graphMetadata.name);
@@ -507,19 +507,21 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 //        GraphMetadata graphMetadata = assemblyModel.getMetadata();
         
         ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
-        Model model = (Model) getModel();
-        if (model == null) 
+        
+        AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
+//        Model model = (Model) getModel();
+        if (assemblyModel == null) 
         {
             return; // not expected
         }
-        GraphMetadata graphMetadata = model.getMetadata();
+        GraphMetadata graphMetadata = assemblyModel.getMetadata();
         
         boolean modified =
                 AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyViewFrame(), graphMetadata);
         if (modified) {
-            ((AssemblyModel) getModel()).changeMetaData(graphMetadata);
+            ((AssemblyModel) getModel()).changeMetadata(graphMetadata);
 
-            // update title bar
+            // update title bar for frame
             ViskitGlobals.instance().getAssemblyViewFrame().setSelectedAssemblyName(graphMetadata.name);
         }
     }
@@ -762,7 +764,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyViewFrame(), graphMetadata);
         if (modified) 
         {
-            ((AssemblyModel) getModel()).changeMetaData(graphMetadata);
+            ((AssemblyModel) getModel()).changeMetadata(graphMetadata);
 
             // update title bar
             ViskitGlobals.instance().getAssemblyViewFrame().setSelectedAssemblyName(graphMetadata.name);
@@ -1342,14 +1344,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         isUndo = true;
 
         AssemblyViewFrame view = ViskitGlobals.instance().getAssemblyViewFrame();
-        Object[] roots = view.getCurrentVgacw().getRoots();
+        Object[] roots = view.getCurrentViskitGraphAssemblyComponentWrapper().getRoots();
         for (Object root : roots) {
             if (root instanceof DefaultGraphCell)
                 redoGraphCell = ((DefaultGraphCell) root);
             if (selectionVector.firstElement().equals(redoGraphCell.getUserObject()))
                 break;
         }
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentViskitGraphAssemblyComponentWrapper().getUndoManager();
 
         // Prevent dups
         if (!selectionVector.contains(redoGraphCell.getUserObject()))
@@ -1358,7 +1360,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         try {
 
             // This will clear the selectionVector via callbacks
-            undoMgr.undo(view.getCurrentVgacw().getGraphLayoutCache());
+            undoMgr.undo(view.getCurrentViskitGraphAssemblyComponentWrapper().getGraphLayoutCache());
         } catch (CannotUndoException ex) {
             LOG.error("Unable to undo: {}", ex);
         } finally {
@@ -1401,9 +1403,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
 
         AssemblyViewFrame view = ViskitGlobals.instance().getAssemblyViewFrame();
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentViskitGraphAssemblyComponentWrapper().getUndoManager();
         try {
-            undoMgr.redo(view.getCurrentVgacw().getGraphLayoutCache());
+            undoMgr.redo(view.getCurrentViskitGraphAssemblyComponentWrapper().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
             LOG.error("Unable to redo: {}", ex);
         } finally {
@@ -1414,10 +1416,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
         AssemblyViewFrame view = ViskitGlobals.instance().getAssemblyViewFrame();
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgacw().getUndoManager();
+        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentViskitGraphAssemblyComponentWrapper().getUndoManager();
 
-        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgacw().getGraphLayoutCache()));
-        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgacw().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentViskitGraphAssemblyComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentViskitGraphAssemblyComponentWrapper().getGraphLayoutCache()));
 
         isUndo = false;
     }
@@ -1748,18 +1750,19 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()
         {
             @Override
-            public Void doInBackground() {
-
+            public Void doInBackground()
+            {
                 // Compile and prep the execStrings
                 initializeAssemblySimulationRun();
 
-                if (execStrings == null) {
-
-                    if (ViskitGlobals.instance().getActiveAssemblyModel() == null)
+                if (execStrings == null)
+                {
+//                  if (ViskitGlobals.instance().getActiveAssemblyModel() == null)
+                    if (!ViskitGlobals.instance().getAssemblyViewFrame().hasAssembliesLoaded())
                     {
                         messageUser(JOptionPane.WARNING_MESSAGE,
-                            "Assembly File Not Opened",
-                            "Please open an Assembly file");
+                            "Assembly File Not Loaded",
+                            "Please load an Assembly file");
                     } 
                     else
                     {
