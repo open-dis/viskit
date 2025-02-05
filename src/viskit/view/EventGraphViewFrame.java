@@ -74,7 +74,7 @@ import viskit.util.EventGraphFileFilter;
 import viskit.view.dialog.ParameterDialog;
 import viskit.view.dialog.EdgeInspectorDialog;
 import viskit.view.dialog.StateVariableDialog;
-import viskit.view.dialog.EventInspectorDialog;
+import viskit.view.dialog.EventNodeInspectorDialog;
 import viskit.view.dialog.ViskitUserPreferences;
 import viskit.mvc.MvcController;
 import viskit.mvc.MvcModel;
@@ -1330,7 +1330,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     @Override
     public boolean doEditNode(EventNode node) {
         selectMode.doClick();     // always go back into select mode
-        return EventInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrame(), node); // blocks
+        return EventNodeInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrame(), node); // blocks
     }
 
     @Override

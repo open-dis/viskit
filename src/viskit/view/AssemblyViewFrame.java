@@ -282,13 +282,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
             setModel((MvcModel) viskitGraphAssemblyComponentWrapper.assemblyModel); // hold on locally
             getController().setModel(getModel()); // tell controller
-            AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
             
             // TODO alternative failing attempts
 ////            ViskitGlobals.instance().setActiveAssemblyModel(ViskitGlobals.instance().getActiveAssemblyModel());
 //                               setModel((MvcModel) viskitGraphAssemblyComponentWrapper.assemblyModel); // hold on locally
 //            assemblyController.setModel((MvcModel) viskitGraphAssemblyComponentWrapper.assemblyModel); // tell controller
             
+            AssemblyModelImpl mod = (AssemblyModelImpl) getModel();
             AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel(); // TODO not found in corresponding EventGraph method
             if (assemblyModel.getLastFile() != null)
                 ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(assemblyModel.getLastFile(), assemblyModel.getJaxbRoot());
