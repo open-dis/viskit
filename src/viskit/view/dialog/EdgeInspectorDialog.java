@@ -649,7 +649,7 @@ public class EdgeInspectorDialog extends JDialog
         }
 
         // Key on the EdgeNode's list of potential arguments
-        // TODO: How do we do this automatically from the EdegeNodeInspectorDialog
+        // TODO: How do we do this automatically from the EventInspectorDialog
         // when we remove an argument?
         if (!edge.to.getArguments().isEmpty()) {
 
