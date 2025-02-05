@@ -290,8 +290,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 //            assemblyController.setModel((MvcModel) viskitGraphAssemblyComponentWrapper.assemblyModel); // tell controller
             
             AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel(); // TODO not found in corresponding EventGraph method
-            if (assemblyModel.getLastFile() != null)
-                ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(assemblyModel.getLastFile(), assemblyModel.getJaxbRoot());
+            if (assemblyModel.getCurrentFile() != null)
+                ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(assemblyModel.getCurrentFile(), assemblyModel.getJaxbRoot());
 
             GraphMetadata graphMetadata = assemblyModel.getMetadata();
             if (graphMetadata != null)
@@ -662,7 +662,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         return 0;
     }
 
-    private void buildToolbar() {
+    private void buildToolbar() 
+    {
         ButtonGroup modeButtonGroup = new ButtonGroup();
         setToolBar(new JToolBar());
 
@@ -1241,7 +1242,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         int retv = openSaveChooser.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (openSaveChooser.getSelectedFile().exists()) {
-                if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYN("File Exists",  "Overwrite? Confirm"))
+                if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYesNo("File Exists",  "Overwrite? Confirm"))
                     return null;
             }
             return openSaveChooser.getSelectedFile();

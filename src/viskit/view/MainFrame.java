@@ -51,7 +51,6 @@ import viskit.control.TextAreaOutputStream;
 import viskit.doe.DoeMain;
 import viskit.doe.JobLauncherTab2;
 import viskit.model.Model;
-import viskit.mvc.MvcAbstractViewFrame;
 import viskit.util.OpenAssembly;
 import viskit.mvc.MvcModel;
 import edu.nps.util.SystemExitHandler;
@@ -301,8 +300,8 @@ public class MainFrame extends JFrame
         ViskitGlobals.instance().setInternalSimulationRunner(internalSimulationRunner);
         
         getSimulationRunTabbedPane().add(ViskitGlobals.instance().getSimulationRunPanel(), TAB1_LOCALRUN_INDEX);
-        getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, "Local Simulation Run");
-        getSimulationRunTabbedPane().setToolTipTextAt(TAB1_LOCALRUN_INDEX, "Run replications on local host");
+        getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, SimulationRunPanel.INITIAL_SIMULATIONRUN_HINT);
+        getSimulationRunTabbedPane().setToolTipTextAt(TAB1_LOCALRUN_INDEX, "Run replications of assembly simulation on local host");
         mainFrameMenuBar = internalSimulationRunner.getMenus();
         modalMenuBarList.add(mainFrameMenuBar);
         doCommonHelp(mainFrameMenuBar);
@@ -800,10 +799,17 @@ public class MainFrame extends JFrame
         return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE, null, null, initialValue);
     }
 
-    public int genericAskYN(String title, String message) {
+    public int genericAskYesNo(String title, String message) {
         return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION);
     }
 
+    /** 
+     * Handle asking a question with 2 responses offered
+     * @param title shown at top of panel
+     * @param message body in display
+     * @param buttonLabel1 for first choice
+     * @param buttonLabel2 for second choice
+     * @return returns -1 if closed, 0 for first button, 1 for second button */
     public int genericAsk2Buttons(String title, String message, String buttonLabel1, String buttonLabel2) {
         return JOptionPane.showOptionDialog(this, message, title, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{buttonLabel1, buttonLabel2}, buttonLabel1);
     }

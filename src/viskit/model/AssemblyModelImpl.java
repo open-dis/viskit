@@ -253,8 +253,14 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public File getLastFile() {
+    public File getCurrentFile() {
         return currentFile;
+    }
+    
+    public String getName() {
+        if  (currentFile != null)
+             return currentFile.getName().substring(0, currentFile.getName().indexOf(".xml"));
+        else return ""; // unexpected
     }
 
     @Override

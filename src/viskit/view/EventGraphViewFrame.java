@@ -1301,7 +1301,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         int retv = openSaveChooser.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (openSaveChooser.getSelectedFile().exists()) {
-                if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYN("File Exists",  "Overwrite? Confirm")) {
+                if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYesNo("File Exists",  "Overwrite? Confirm")) {
                     return null;
                 }
             }

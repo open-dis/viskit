@@ -252,8 +252,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (assemblyModelOpenAlreadyArray != null) 
         {
             for (AssemblyModel assemblyModleOpenAlready : assemblyModelOpenAlreadyArray) {
-                if (assemblyModleOpenAlready.getLastFile() != null) {
-                    path = assemblyModleOpenAlready.getLastFile().getAbsolutePath();
+                if (assemblyModleOpenAlready.getCurrentFile() != null) {
+                    path = assemblyModleOpenAlready.getCurrentFile().getAbsolutePath();
                     if (path.equals(file.getAbsolutePath())){
                         isOpenAlready = true;
                         break;
@@ -298,8 +298,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         // Mark every vAMod opened as "open"
         AssemblyModel[] openAlready = ViskitGlobals.instance().getAssemblyViewFrame().getOpenModels();
         for (AssemblyModel assemblyModel : openAlready) {
-            if (assemblyModel.getLastFile() != null)
-                markAssemblyConfigurationOpen(assemblyModel.getLastFile());
+            if (assemblyModel.getCurrentFile() != null)
+                markAssemblyConfigurationOpen(assemblyModel.getCurrentFile());
         }
     }
 
@@ -356,7 +356,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
 
                     AssemblyModel assemblyModel = (AssemblyModel) getModel();
-                    markAssemblyConfigurationClosed(assemblyModel.getLastFile());
+                    markAssemblyConfigurationClosed(assemblyModel.getCurrentFile());
 
                     AssemblyView view = (AssemblyView) getView();
                     view.deleteTab(assemblyModel);
@@ -370,7 +370,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                         AssemblyModel[] modAr = view.getOpenModels();
                         for (AssemblyModel mod : modAr) {
                             if (!mod.equals(assemblyModel))
-                                openEventGraphs(mod.getLastFile());
+                                openEventGraphs(mod.getCurrentFile());
                         }
                     }
 
@@ -460,11 +460,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
-        if (assemblyModel.getLastFile() == null) {
+        if (assemblyModel.getCurrentFile() == null) {
             saveAs();
         } 
         else {
-            assemblyModel.saveModel(assemblyModel.getLastFile());
+            assemblyModel.saveModel(assemblyModel.getCurrentFile());
         }
     }
 
@@ -683,7 +683,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if  (projectName.toLowerCase().contains("project"))
                  message += "<p align='center'><i>"         + projectName + "</i></p><br/><p align='center'> the currently active project?</p><br/>";
             else message += "<p align='center'>Project <i>" + projectName + "</i></p><br/><p align='center'>, the currently active project?</p><br/>";
-            int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYN(title, message);
+            int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
             {
                 doProjectCleanup();
@@ -1433,11 +1433,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
-        if (!checkSaveForSourceCompile() || assemblyModel.getLastFile() == null) {
+        if (!checkSaveForSourceCompile() || assemblyModel.getCurrentFile() == null) {
             return;
         }
 
-        ViskitGlobals.instance().getAssemblyViewFrame().displayXML(assemblyModel.getLastFile());
+        ViskitGlobals.instance().getAssemblyViewFrame().displayXML(assemblyModel.getCurrentFile());
     }
 
     private boolean checkSaveForSourceCompile() {
@@ -1445,8 +1445,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // Perhaps a cached file is no longer present in the path
         if (assemblyModel == null) {return false;}
-        if (assemblyModel.isDirty() || assemblyModel.getLastFile() == null) {
-            int ret = ViskitGlobals.instance().getMainFrame().genericAskYN("Confirm", "The model will be saved.\nContinue?");
+        if (assemblyModel.isDirty() || assemblyModel.getCurrentFile() == null) {
+            int ret = ViskitGlobals.instance().getMainFrame().genericAskYesNo("Confirm", "The model will be saved.\nContinue?");
             if (ret != JOptionPane.YES_OPTION) {
                 return false;
             }
@@ -1463,16 +1463,16 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (source != null && !source.isEmpty()) {
             String className = assemblyModel.getMetadata().packageName + "." + assemblyModel.getMetadata().name;
-            ViskitGlobals.instance().getAssemblyViewFrame().showAndSaveSource(className, source, assemblyModel.getLastFile().getName());
+            ViskitGlobals.instance().getAssemblyViewFrame().showAndSaveSource(className, source, assemblyModel.getCurrentFile().getName());
         }
     }
 
     private String produceJavaAssemblyClass() {
         AssemblyModel vmod = (AssemblyModel) getModel();
-        if (!checkSaveForSourceCompile() || vmod.getLastFile() == null) {
+        if (!checkSaveForSourceCompile() || vmod.getCurrentFile() == null) {
             return null;
         }
-        return buildJavaAssemblySource(vmod.getLastFile());
+        return buildJavaAssemblySource(vmod.getCurrentFile());
     }
 
     /**
@@ -1787,11 +1787,19 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     (ViskitGlobals.instance().getAssemblyViewFrame()).setTitle(assemblyName);
                     ViskitGlobals.instance().getSimulationRunPanel().setTitle(consoleName);
                     ViskitGlobals.instance().getMainFrame().getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX,  assemblyName);
+                    
                     // Initializes a fresh class loader
                     runner.exec(execStrings);
 
                     // reset
                     execStrings = null;
+                    
+                    // provide user guidance on first initialization
+                    if (!ViskitGlobals.instance().getSimulationRunPanel().hasLoadedAssembly())
+                    {
+                        announceSimulationRunInitialized(assemblyName);
+                    }
+                    ViskitGlobals.instance().getSimulationRunPanel().setHasLoadedAssembly(true);
                 }
 
                 return null;
@@ -1815,6 +1823,22 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
         };
         worker.execute();
+    }
+
+    private void announceSimulationRunInitialized(String newAssemblyName)
+    {
+        String message =
+                "<html><body>" +
+                "<p align='center'>" + newAssemblyName;
+        if (!newAssemblyName.toLowerCase().contains("simulation"))
+            message += " simulation";
+        message +=
+                " is ready to run!</p><br />" +
+                "<p align='center'>Check settings at left, then press Run button to begin.</p><br />" +
+                "<p align='center'>Multiple simulation replications provide data for a draft Analyst Report.</p><br /></body></html>";
+                
+        ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                "Ready to Commence the Simulation Run", message);
     }
 
     public static final int EXEC_TARGET_CLASS_NAME = 0;
@@ -1845,8 +1869,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         String fileName = "AssemblyScreenCapture";
-        if (assemblyModel.getLastFile() != null) {
-            fileName = assemblyModel.getLastFile().getName();
+        if (assemblyModel.getCurrentFile() != null) {
+            fileName = assemblyModel.getCurrentFile().getName();
         }
 
         File assemblyScreenCaptureFile = ViskitGlobals.instance().getAssemblyViewFrame().saveFileAsk(fileName + imgSaveCount + ".png", true);

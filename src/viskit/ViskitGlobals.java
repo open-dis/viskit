@@ -187,6 +187,10 @@ public class ViskitGlobals
     private JPopupMenu popupMenu;
     private final MyTypeListener myTypeListener;
 
+    /* routines to manage the singleton-aspect of the view */
+    private AnalystReportViewFrame  analystReportViewFrame;
+    private AnalystReportController analystReportController;
+
     /**
      * Get a reference to the assembly editor view.
      * @return a reference to the assembly editor view or null if yet unbuilt.
@@ -314,10 +318,6 @@ public class ViskitGlobals
     }
 
     /* AnalystReport model / view / controller, now shifted to stronger class typing */
-
-    /* routines to manage the singleton-aspect of the view */
-    private AnalystReportViewFrame  analystReportViewFrame;
-    private AnalystReportController analystReportController;
 
     /**
      * Get a reference to the analyst report view.
@@ -1210,7 +1210,7 @@ getProjectWorkingDirectory());
             return;
         }
         String newProjectName = newProjectFile.getName();
-        ViskitGlobals.instance().setProjectName(newProjectName);
+        setProjectName(newProjectName);
         ViskitProject.VISKIT_PROJECTS_DIRECTORY = newProjectFile.getParent().replaceAll("\\\\", "/"); // de-windows
         ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
         ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.PROJECT_NAME_KEY, newProjectName);

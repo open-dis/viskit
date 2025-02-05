@@ -106,7 +106,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
     public static final String ASSEMBLY_SIMULATION_RUN_PANEL_TITLE = "Simulation Run Console";
     /**
      * The internal logic for the Assembly Runner panel
-     * @param analystReportPanelVisible if true, the analyst report panel will be visible
+     * @param analystReportPanelVisible if true, the Analyst Report panel will be visible
      */
     public TextAreaOutputStream(boolean analystReportPanelVisible) 
     {
@@ -340,7 +340,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         public void done() {
             setProgress(100);
 
-            // Grab the temp analyst report and signal the AnalystReportFrame
+            // Grab the temp Analyst Report and signal the AnalystReportFrame
             try {
                 Method getAnalystReportMethod = assemblyClass.getMethod("getAnalystReport");
                 analystReportTempFile = (String) getAnalystReportMethod.invoke(assemblyInstance);
@@ -540,7 +540,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         if (analystReportController != null) {
             analystReportController.setReportXML(analystReportTempFile);
 
-            // Switch over to the analyst report tab if we have a report ready
+            // Switch over to the Analyst Report tab if we have a report ready
             // for editing
             AnalystReportModel analystReportModel = (AnalystReportModel) analystReportController.getModel();
             if (analystReportModel != null && analystReportModel.isReportReady())

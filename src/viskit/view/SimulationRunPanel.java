@@ -60,6 +60,8 @@ public class SimulationRunPanel extends JPanel
 {
     public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 30; // also defined twice in viskit.xsd schema
     
+    public final static String INITIAL_SIMULATIONRUN_HINT = "First initialize an Assembly before Simulation Run..."; // Local Run Simulation
+    
     public boolean dump = true;
     public boolean search;
     public String lineEnd = System.getProperty("line.separator");
@@ -84,6 +86,7 @@ public class SimulationRunPanel extends JPanel
     private String viskitRunnerBannerString;
     public JLabel npsLabel;
     private String title;
+    private boolean hasLoadedAssembly = false;
 
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
     private JLabel titleLabel;
@@ -95,7 +98,7 @@ public class SimulationRunPanel extends JPanel
      * @param showExtraButtons if true, supply rewind or pause buttons on VCR,
      * not hooked up, or working right.  A true will enable all VCR buttons.
      * Currently, only start and stop work
-     * @param analystReportPanelVisible if true, will enable the analyst report check box
+     * @param analystReportPanelVisible if true, will enable the Analyst Report check box
      */
     public SimulationRunPanel(String newTitle, boolean showExtraButtons, boolean analystReportPanelVisible)
     {
@@ -106,6 +109,7 @@ public class SimulationRunPanel extends JPanel
         if (newTitle != null)
         {
             titleLabel = new JLabel(newTitle);
+            titleLabel.setToolTipText("Console output is editable to support copying and analysis");
             titleLabel.setHorizontalAlignment(JLabel.CENTER);
             // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
             titleLabel.setBorder(new EmptyBorder(0,0,0,0));
@@ -121,7 +125,6 @@ public class SimulationRunPanel extends JPanel
         outputStreamTA = new JTextArea("Assembly output stream:" + lineEnd +
                 "----------------------" + lineEnd);
         outputStreamTA.setEditable(true); // to allow for additional manual input prior to saving out
-        outputStreamTA.setToolTipText("Console output is editable to support copying and analysis");
         outputStreamTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         outputStreamTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
         // don't force an initial scroller outputStreamTA.setRows(100);
@@ -461,5 +464,19 @@ public class SimulationRunPanel extends JPanel
         titleLabel.setText(newTitle);
         revalidate();
         repaint();
+    }
+
+    /**
+     * @return whether Assembly has been loaded in SimulationRunPanel
+     */
+    public boolean hasLoadedAssembly() {
+        return hasLoadedAssembly;
+    }
+
+    /**
+     * @param hasLoadedAssembly confirm whether Assembly has been loaded in SimulationRunPanel
+     */
+    public void setHasLoadedAssembly(boolean hasLoadedAssembly) {
+        this.hasLoadedAssembly = hasLoadedAssembly;
     }
 }

@@ -60,6 +60,7 @@ import viskit.doe.FileHandler;
 import viskit.mvc.MvcAbstractModel;
 import viskit.reports.HistogramChart;
 import viskit.reports.LinearRegressionChart;
+import viskit.util.XsltUtility;
 
 /** This class constructs and exports an analyst report based on the parameters
  * selected by the Analyst Report panel in the Viskit UI.  This file uses the
@@ -87,8 +88,8 @@ public final class AnalystReportModel extends MvcAbstractModel
     private Document reportJdomDocument;
 
     /** The file name selected by the user from "SAVE AS" menu option */
-    private String  analystReportFileName;
-    private File    analystReportFile;
+    private String  analystReportFileXmlName;
+    private File    analystReportFileXml;
 
     /** The root element of the report xml document */
     private Element rootElement;
@@ -111,7 +112,8 @@ public final class AnalystReportModel extends MvcAbstractModel
      *        used by this Analyst Report
      * @param map the set of PCLs that have specific properties set for type statistic desired
      */
-    public AnalystReportModel(String statisticsReportPath, Map<String, AssemblyNode> map) {
+    public AnalystReportModel(String statisticsReportPath, Map<String, AssemblyNode> map)
+    {        
         Document newDocument = null;
         setStatisticsReportPath(statisticsReportPath);
         try {
@@ -137,7 +139,8 @@ public final class AnalystReportModel extends MvcAbstractModel
      * @param newAssemblyFile the current assembly file to process a report from
      * @throws java.lang.Exception general catchall
      */
-    public AnalystReportModel(JFrame analystReportFrame, File xmlFile, File newAssemblyFile) throws Exception {
+    public AnalystReportModel(JFrame analystReportFrame, File xmlFile, File newAssemblyFile) throws Exception
+    {
         this(xmlFile);
 
         // TODO: This doesn't seem to be doing anything correctly
@@ -155,16 +158,19 @@ public final class AnalystReportModel extends MvcAbstractModel
         }
     }
 
-    /** This constructor for opening a temp report for further
+    /** This constructor for opening a temporary XML report for further
      * annotations, or as required from the analyst/user.  Can be called from
      * the InternalSimulationRunner after a report is ready for display
      *
-     * @param fullReport an existing report to open
+     * @param newAnalystReportFileXml an existing report to open
      */
-    public AnalystReportModel(File fullReport) {
+    public AnalystReportModel(File newAnalystReportFileXml) 
+    {
         try {
-            parseXML(fullReport);
-        } catch (Exception ex) {
+            analystReportFileXml = newAnalystReportFileXml;
+            parseXML(newAnalystReportFileXml);
+        } 
+        catch (Exception ex) {
             LOG.error(ex);
         }
     }
@@ -994,12 +1000,10 @@ public final class AnalystReportModel extends MvcAbstractModel
     public boolean isDebug()                     {return debug;}
 
     public Document   getReportJdomDocument()    {return reportJdomDocument;}
-    public Document   getStatisiticsReport()     {return statisticsReportDocument;}
+    public Document   getStatisticsReport()      {return statisticsReportDocument;}
     public Element    getRootElement()           {return rootElement;}
-    public String     getFileName()              {return analystReportFileName;}
-    public File       getFile()                  {
-        return new File(analystReportFileName);
-    }
+    public String     getAnalystReportFileXmlName() {return analystReportFileXmlName;}
+    public File       getAnalystReportXmlFile()     {return analystReportFileXml;}
     public String     getAuthor()                {return rootElement.getAttributeValue("author");}
     public String     getAccess()                {return rootElement.getAttributeValue("access");}
     public String     getDateOfReport()          {return rootElement.getAttributeValue("date");}
@@ -1093,18 +1097,51 @@ public final class AnalystReportModel extends MvcAbstractModel
         
         String assemblyName = assemblyFile.getName().substring(0, assemblyFile.getName().indexOf(".xml"));
         int numberOfReplications = ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications();
-        String announcement =
+        String popupTitle = "Analyst Report Ready";
+        String message =
                 "<html><body>" +
                 "<p align='center'>" + numberOfReplications + " total replication";
         if (numberOfReplications > 1)
-            announcement = announcement + "s";
-        announcement = announcement +  " performed</p><br />" +
+            message = message + "s";
+        message = message +  " performed, producing data.</p><br />" +
                   // Elapsed clock time: TODO
-                "<p align='center'>Analyst Report " + assemblyName + "</p><br />" +
-                "<p align='center'> is loaded and ready for further editing</p><br /></body></html>";
+                "<p align='center'>" + assemblyName + " Analyst Report</p><br />" +
+                "<p align='center'>is now loaded and ready for further analysis.</p><br /></body></html>";
                 
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
-                "Analyst Report Ready", announcement);
+                popupTitle, message);
+        
+        ViskitGlobals.instance().selectAnalystReportTab();
+        popupTitle = "View HTML Analyst Report?";
+        message =
+                "<html><body>" +
+                "<p align='center'>View HTML Analyst Report</p><br />" +
+                "<p align='center'>or simply continue analysis?</p><br />";
+        int returnValue = ViskitGlobals.instance().getMainFrame().genericAsk2Buttons(popupTitle, message, 
+                "View HTML", "Continue");
+        
+        if  (returnValue == 0) // yes, build and show report
+        {
+            String htmlFilePath = new String();
+        
+            try
+            {                
+                htmlFilePath = getAnalystReportXmlFile().getCanonicalPath();
+            }
+            catch (IOException ioe)
+            {
+                LOG.error("Trying to view HTML report from XML upon first arrival", ioe);
+            }
+            // change file extension. remove timestamp for HTML file path
+            htmlFilePath = htmlFilePath.substring(0,htmlFilePath.indexOf("_AnalystReport")) + "_AnalystReport.html";
+            if (htmlFilePath.startsWith("."))
+                htmlFilePath = htmlFilePath.substring(2); // possible problem
+            XsltUtility.runXslt(getAnalystReportXmlFile().getAbsolutePath(),
+                htmlFilePath, "config/AnalystReportXMLtoHTML.xslt");
+            ViskitGlobals.instance().getAnalystReportController().showHtmlViewer(htmlFilePath); // TODO show HTML, need filename
+//             ViskitGlobals.instance().getAnalystReportController().generateHtmlReport(); // too far back in workflow
+        }
+        // TODO fix other conversion HTML filenames to match this abbrieviated form
     }
 
     /** If a 2D top town image was generated from SavageStudio, then point to
@@ -1124,14 +1161,18 @@ public final class AnalystReportModel extends MvcAbstractModel
         LOG.debug(getLocationImage());
     }
 
-    public void setFileName          (String fileName)           { this.analystReportFileName = fileName; }
-    public void setStatisticsReportDocument       (Document newStatisticsReportDocument)      { this.statisticsReportDocument = newStatisticsReportDocument; }
-    public void setStatisticsReportPath   (String filename)           { this.statisticsReportPath = filename; }
-    public void setAuthor                   (String s) { rootElement.setAttribute("author", s); };
-    public void setAccessLabel           (String s) { rootElement.setAttribute("access", s);}
-    public void setDateOfReport             (String s) { rootElement.setAttribute("date", s);}
-    public void setDebug                    (boolean bool) { this.debug = bool; }
-    public void setReportName              (String s) { rootElement.setAttribute("name", s); }
+    public void setAnalystReportFileName      (String newAnalystReportFileName) 
+                                              { this.analystReportFileXmlName = newAnalystReportFileName; }
+    public void setAnalystReportFile          (File newAnalystReportFile) 
+                                              { this.analystReportFileXml     = newAnalystReportFile; }
+    public void setStatisticsReportDocument   (Document newStatisticsReportDocument)      
+                                              { this.statisticsReportDocument = newStatisticsReportDocument; }
+    public void setStatisticsReportPath       (String filename)           { this.statisticsReportPath = filename; }
+    public void setAuthor                     (String s) { rootElement.setAttribute("author", s); };
+    public void setAccessLabel                (String s) { rootElement.setAttribute("access", s);}
+    public void setDateOfReport               (String s) { rootElement.setAttribute("date", s);}
+    public void setDebug                      (boolean bool) { this.debug = bool; }
+    public void setReportName                 (String s) { rootElement.setAttribute("name", s); }
 
     public boolean isPrintRecommendationsConclusions() { return stringToBoolean(conclusionsRecommendationsElement.getAttributeValue("comments")); }
     public String  getConclusions()                    { return unMakeComments(conclusionsRecommendationsElement);}

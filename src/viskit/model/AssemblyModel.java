@@ -80,7 +80,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * @return a File object representing the last one passed to the two methods
      * above
      */
-    File getLastFile();
+    File getCurrentFile();
 
     /** Retrieve the meta data for this Assembly
      *

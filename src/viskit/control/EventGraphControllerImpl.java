@@ -156,7 +156,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                     "<html><body><p align='center'>Do you wish to start with a <b>\"Run\"</b> Event?</p></body></html>";
             String title = "Confirm Run Event";
 
-            int ret = ViskitGlobals.instance().getMainFrame().genericAskYN(title, msg);
+            int ret = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, msg);
             boolean dirty = false;
             if (ret == JOptionPane.YES_OPTION) {
                 buildNewNode(new Point(30, 60), "Run");
@@ -750,7 +750,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             } // remove leading stuff
 
             String specialNodeMsg = (localNodeCount > 0 ? "\n(All unselected, but attached edges are permanently removed.)" : "");
-            doRemove = ViskitGlobals.instance().getMainFrame().genericAskYN("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
+            doRemove = ViskitGlobals.instance().getMainFrame().genericAskYesNo("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
             if (doRemove) {
                 // do edges first?
                 delete();
@@ -953,7 +953,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (mod.isDirty() || mod.getLastFile() == null) {
             String msg = "The model will be saved.\nContinue?";
             String title = "Confirm";
-            int ret = ViskitGlobals.instance().getMainFrame().genericAskYN(title, msg);
+            int ret = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, msg);
             if (ret != JOptionPane.YES_OPTION) {
                 return false;
             }

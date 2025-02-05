@@ -117,6 +117,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         buildMenus();
 
         locationImageFileChooser = new JFileChooser("./images/");
+        
     }
     
     private void initMVC(MvcController mvcController) {
@@ -889,19 +890,19 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "generateHtmlReport",
-                "HTML analyst report display",
+                "HTML Analyst Report display",
                 KeyEvent.VK_H,
                 KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "openAnalystReportXML",
-                "Open another analyst report XML",
+                "Open another Analyst Report XML",
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "saveAnalystReportXML",
-                "Save analyst report XML",
+                "Save Analyst Report XML",
                 KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
