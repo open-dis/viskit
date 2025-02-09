@@ -26,12 +26,13 @@ import simkit.random.RandomNumber;
 import simkit.random.RandomVariate;
 
 /** NOTE: Overridden to be able to find the ClassFinder.properties file within
- * a /config path found on the ClassLoader's paths. (tdn) 9/27/24
+ * a /configuration path found on the ClassLoader's paths. (tdn) 9/27/24
  *
  * <p>
  * An INSTANCE of this class scans the classpath and creates a Map with keys the
  * unqualified class name and values the corresponding Class object. The first
- * found Class object is the one stored.</p>
+ * found Class object is the one stored.
+ * </p>
  * <p>
  * Both jar files and directories on the classpath are scanned. If the user
  * wishes to skip certain jar files, they are listed in the
@@ -39,29 +40,34 @@ import simkit.random.RandomVariate;
  * directory specified by the key <code>first</code>. This directory is expected
  * to contain jar files that are scanned before any others on the classpath.
  * This allows the user to add classes that will be found and instantiated by
- * the <code>ObjectMaker</code>.</p>
+ * the <code>ObjectMaker</code>.
+ * </p>
  *
  * @author ahbuss
  * @author <a href="mailto:tdnorbra@nps.edu?subject=simkit.util.ClassFinder">Terry Norbraten, NPS MOVES</a>
  */
-public class ClassFinder {
-
+public class ClassFinder
+{
     static final Logger LOG = Log4jUtilities.getLogger(ClassFinder.class);
 
-    private static final String DEFAULT_EXT_DIR = "ext";
+    private static final String DEFAULT_EXT_DIR = "./configuration/ext"; // added empty directory configuration/ext
 
     private static final ClassFinder INSTANCE;
 
     private final Locale locale;
 
-    static {
-        INSTANCE = new ClassFinder();
+    
+    /** Static initializer */
+    static 
+    {
+        INSTANCE = new ClassFinder(); // TODO update singleton pattern to match others
     }
 
     /**
      * @return the INSTANCE
      */
-    public static ClassFinder getINSTANCE() {
+    public static ClassFinder getINSTANCE()  // TODO update singleton pattern to match others
+    {
         return INSTANCE;
     }
 
@@ -73,7 +79,7 @@ public class ClassFinder {
 
     private final List<URL> jarFileURLs;
 
-    private final List<URL> dirURLs;
+    private final List<URL> directoryURLs;
 
     private final List<String> skippedJars;
 
@@ -81,38 +87,46 @@ public class ClassFinder {
 
     private String firstDirectory;
 
-    protected ClassFinder() {
+    /** Constructor */
+    protected ClassFinder() 
+    {
         locale = Locale.getDefault();
         this.firstDirectory = DEFAULT_EXT_DIR;
         foundByQualifiedName = new HashMap<>();
         randomVariateClasses = new HashMap<>();
         randomNumberClasses = new HashMap<>();
         jarFileURLs = new ArrayList<>();
-        dirURLs = new ArrayList<>();
+        directoryURLs = new ArrayList<>();
         skippedJars = new ArrayList<>();
         urlClassLoader = null;
-        loadConfigFile();
+        loadConfigurationFile();
         findJarFiles();
         loadClasses();
     }
 
     /**
-     * Load the skipped jar names from config/ClassFinder.properties into
+     * Load the skipped jar names from configuration/ClassFinder.properties into
      * skippedJars List
      */
-    private void loadConfigFile() {
+    private void loadConfigurationFile()
+    {
         try {
             Properties properties = new Properties();
             properties.load(ClassFinder.class.getClassLoader().getResourceAsStream("config/ClassFinder.properties"));
-            for (Object obj : properties.keySet()) {
-                if (obj.equals("first")) {
-                    firstDirectory = properties.get(obj).toString();
-                } else if (obj.toString().toLowerCase(locale).endsWith(".jar")
-                        && properties.getProperty(obj.toString()).trim().equals("skip")) {
-                    skippedJars.add(obj.toString());
+            for (Object nextObject : properties.keySet()) 
+            {
+                if (nextObject.equals("first")) 
+                {
+                    firstDirectory = properties.get(nextObject).toString();
+                } 
+                else if (nextObject.toString().toLowerCase(locale).endsWith(".jar")  &&
+                         properties.getProperty(nextObject.toString()).trim().equals("skip"))
+                {
+                    skippedJars.add(nextObject.toString());
                 }
             }
-        } catch (IOException ex) {
+        } 
+        catch (IOException ex) {
             LOG.error(ex);
         }
     }
@@ -121,39 +135,53 @@ public class ClassFinder {
      * Finds all the jar files on the class path - first the ones in the "first"
      * directory, then the ones not listed in ClassFinder.properties
      */
-    private void findJarFiles() {
-        File firstDirFile = new File(firstDirectory);
-        if (firstDirFile.exists()) {
-            File[] firstDirJars = firstDirFile.listFiles(new JarFilter());
-            for (File jarFile : firstDirJars) {
+    private void findJarFiles() 
+    {
+        File firstDirectoryFile = new File(firstDirectory);
+        if  (firstDirectoryFile.exists()) 
+        {
+            File[] firstDirectoryJars = firstDirectoryFile.listFiles(new JarFilter());
+            for (File jarFile : firstDirectoryJars) 
+            {
                 try {
                     jarFileURLs.add(jarFile.toURI().toURL());
-                } catch (MalformedURLException ex) {
-                    LOG.error(ex);
+                } 
+                catch (MalformedURLException mue) 
+                {
+                    LOG.error(mue);
                 }
             }
-        } else {
-            LOG.info("No extension directory named {} found", firstDirFile.getAbsolutePath());
+        } 
+        else 
+        {
+            LOG.info("No extension directory named {} found", firstDirectoryFile.getAbsolutePath());
         }
-        String[] classPathElements
+        String[] classPathElementsArray
                 = System.getProperty("java.class.path").split(System.getProperty("path.separator"));
         File classPathFile;
-        for (String classpathItem : classPathElements) {
+        for (String classpathItem : classPathElementsArray)
+        {
             classPathFile = new File(classpathItem);
             try {
-                if (!classPathFile.getName().equalsIgnoreCase(firstDirectory) && !skippedJars.contains(classPathFile.getName())) {
-                    if (classPathFile.isFile() && classPathFile.getName().toLowerCase(locale).endsWith(".jar")) {
+                if (!classPathFile.getName().equalsIgnoreCase(firstDirectory) && 
+                    !skippedJars.contains(classPathFile.getName())) 
+                {
+                    if (classPathFile.isFile() && classPathFile.getName().toLowerCase(locale).endsWith(".jar")) 
+                    {
                         jarFileURLs.add(classPathFile.toURI().toURL());
-                    } else if (classPathFile.isDirectory()) {
-                        dirURLs.add(classPathFile.toURI().toURL()); // TODO: process directories with class files
+                    } 
+                    else if (classPathFile.isDirectory()) 
+                    {
+                        directoryURLs.add(classPathFile.toURI().toURL()); // TODO: process directories with class files
                     }
                 }
-            } catch (MalformedURLException ex) {
-                LOG.error(ex);
+            } 
+            catch (MalformedURLException mue) {
+                LOG.error(mue);
             }
         }
         List<URL> allURLS = new ArrayList<>(jarFileURLs);
-        allURLS.addAll(dirURLs);
+        allURLS.addAll(directoryURLs);
         urlClassLoader = new URLClassLoader(allURLS.toArray(URL[]::new));
     }
 
@@ -214,7 +242,7 @@ public class ClassFinder {
 
         String decodedFile;
         File dirFile;
-        for (URL url : dirURLs) {
+        for (URL url : directoryURLs) {
             try {
                 decodedFile = URLDecoder.decode(url.getFile(), "UTF-8");
                 dirFile = new File(decodedFile);
@@ -317,7 +345,8 @@ public class ClassFinder {
      * @return a copy of the Map from unqualified class names to the
      * corresponding classes.
      */
-    public Map<String, Class<?>> getFoundByQualifiedName() {
+    public Map<String, Class<?>> getFoundByQualifiedName() 
+    {
         return new TreeMap<>(foundByQualifiedName);
     }
 
@@ -329,14 +358,16 @@ public class ClassFinder {
      * @param unqualifiedName Name of unqualified class
      * @return Class object corresponding to given unqualified name
      */
-    public Class<?> findClassByUnqualifiedName(String unqualifiedName) {
+    public Class<?> findClassByUnqualifiedName(String unqualifiedName) 
+    {
         return foundByQualifiedName.get(unqualifiedName);
     }
 
     /**
      * @return the randomVariateClasses
      */
-    public Map<String, Class<? extends RandomVariate>> getRandomVariateClasses() {
+    public Map<String, Class<? extends RandomVariate>> getRandomVariateClasses() 
+    {
         return new HashMap<>(randomVariateClasses);
     }
 
@@ -350,10 +381,11 @@ public class ClassFinder {
     /**
      * Filter to only accept files that end with ".jar"
      */
-    private class JarFilter implements FilenameFilter {
-
+    private class JarFilter implements FilenameFilter 
+    {
         @Override
-        public boolean accept(File dir, String name) {
+        public boolean accept(File dir, String name) 
+        {
             return name.toLowerCase(locale).endsWith(".jar");
         }
 

@@ -1097,7 +1097,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         
         String assemblyName = assemblyFile.getName().substring(0, assemblyFile.getName().indexOf(".xml"));
         int numberOfReplications = ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications();
-        String popupTitle = "Analyst Report Ready";
+        String popupTitle = "Simulation Run Data Collected, Analyst Report Ready";
         String message =
                 "<html><body>" +
                 "<p align='center'>" + numberOfReplications + " total replication";
@@ -1116,9 +1116,9 @@ public final class AnalystReportModel extends MvcAbstractModel
         message =
                 "<html><body>" +
                 "<p align='center'>View HTML Analyst Report</p><br />" +
-                "<p align='center'>or simply continue analysis?</p><br />";
+                "<p align='center'>or simply continue your analysis?</p><br />";
         int returnValue = ViskitGlobals.instance().getMainFrame().genericAsk2Buttons(popupTitle, message, 
-                "View HTML", "Continue");
+                "View HTML", "Continue Analysis");
         
         if  (returnValue == 0) // yes, build and show report
         {
