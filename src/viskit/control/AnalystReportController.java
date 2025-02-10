@@ -189,13 +189,13 @@ public class AnalystReportController extends MvcAbstractController {
 
         // Ensure user can save a unique name for Analyst Report (Bug fix: 1260)
         analystReportModel.setAnalystReportFile(saveAnalystReportXmlChooser.getSelectedFile());
-        saveReport(analystReportModel.getAnalystReportXmlFile());
-        String outputFile = analystReportModel.getAnalystReportXmlFile().getAbsolutePath();
-        int idx = outputFile.lastIndexOf(".");
+        saveReport(analystReportModel.getAnalystReportXmlFile()); // first ensure that current report is saved
+        String outputFileName = analystReportModel.getAnalystReportXmlFile().getAbsolutePath();
+        int idx = outputFileName.lastIndexOf(".");
 
-        outputFile = outputFile.substring(0, idx) + ".xml";
+        outputFileName = outputFileName.substring(0, idx) + ".xml";
         XsltUtility.runXslt(analystReportModel.getAnalystReportXmlFile().getAbsolutePath(),
-                outputFile, "config/AnalystReportXMLtoHTML.xslt");
+                outputFileName, "config/AnalystReportXMLtoHTML.xslt");
     }
 
     public void generateHtmlReport() throws IOException 

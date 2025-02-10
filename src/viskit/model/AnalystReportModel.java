@@ -1103,7 +1103,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                 "<p align='center'>" + numberOfReplications + " total replication";
         if (numberOfReplications > 1)
             message = message + "s";
-        message = message +  " performed, saving data...</p><br />" +
+        message = message +  " performed, with data saved.</p><br />" +
                   // Elapsed clock time: TODO
                 "<p align='center'>" + assemblyName + " Analyst Report</p><br />" +
                 "<p align='center'>is now loaded and ready for further analysis.</p><br /></body></html>";
