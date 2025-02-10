@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="ArrivalProcess" package="examples" version="0.1" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="ArrivalProcess" package="examples" version="0.2" author="Arnie Buss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>Getting started: producing customers at random intervals.</Comment>
     <Parameter name="interarrivalTime" type="simkit.random.RandomVariate">
         <Comment>typical time duration between arrivals</Comment>
     </Parameter>
