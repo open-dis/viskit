@@ -802,7 +802,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
         eventGraphMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Java Source Generation for saved Event Graph", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        eventGraphMenu.add(buildMenuItem(eventGraphController, "captureWindow", "Image Save Event Graph Diagram", KeyEvent.VK_I,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "captureWindow", "Image Save, Event Graph Diagram", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
         eventGraphMenu.add(buildMenuItem(eventGraphController, "viewXML", "XML View of Saved Event Graph", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
 
@@ -1283,18 +1283,19 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     @Override
-    public File saveFileAsk(String suggName, boolean showUniqueName) {
+    public File saveFileAsk(String suggestedName, boolean showUniqueName, String title)
+    {
         if (openSaveChooser == null) {
             openSaveChooser = buildOpenSaveChooser();
         }
-        openSaveChooser.setDialogTitle("Save Event Graph");
+        openSaveChooser.setDialogTitle(title);
 
-        File fil = new File(ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory(), suggName);
+        File fil = new File(ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory(), suggestedName);
         if (!fil.getParentFile().isDirectory()) {
             fil.getParentFile().mkdirs();
         }
         if (showUniqueName) {
-            fil = getUniqueName(suggName, fil.getParentFile());
+            fil = getUniqueName(suggestedName, fil.getParentFile());
         }
 
         openSaveChooser.setSelectedFile(fil);

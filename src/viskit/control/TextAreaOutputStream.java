@@ -532,21 +532,22 @@ public class TextAreaOutputStream implements PropertyChangeListener
 
     private void signalAnalystReportReady()
     {
-        if (analystReportTempFile == null) {
-            // No report to print
+        if (analystReportTempFile == null) 
+        {
+            // No report to print, TODO undexpected
             return;
         }
         AnalystReportController analystReportController = ViskitGlobals.instance().getAnalystReportController();
-        if (analystReportController != null) {
+        if (analystReportController != null)
+        {
             analystReportController.setReportXML(analystReportTempFile);
 
-            // Switch over to the Analyst Report tab if we have a report ready
-            // for editing
+            // Switch over to the Analyst Report tab if we have a report ready for editing
             AnalystReportModel analystReportModel = (AnalystReportModel) analystReportController.getModel();
             if (analystReportModel != null && analystReportModel.isReportReady())
             {
                 analystReportController.mainTabbedPane.setSelectedIndex(analystReportController.mainTabbedPaneIdx);
-                analystReportModel.setReportReady(false);
+                analystReportModel.setReportReady(false); // TODO false??
             }
         } 
         else 

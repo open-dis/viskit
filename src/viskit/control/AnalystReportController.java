@@ -92,26 +92,28 @@ public class AnalystReportController extends MvcAbstractController {
         File analystReportDirectory = ViskitGlobals.instance().getViskitProject().getAnalystReportsDirectory();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
-        String dateOutput = formatter.format(new Date()); // today
+        String dateOutput = formatter.format(new Date()); // today, now
 
         String userName = System.getProperty("user.name");
         String assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getName();
-        String outputFilename = (assemblyName + "_AnalystReport_" + dateOutput + ".xml");
+        String outputFilenameDated = (assemblyName + "_AnalystReport_" + dateOutput + ".xml");
+        String outputFilename      = (assemblyName + "_AnalystReport_"              + ".xml");
 
-        File targetFile = new File(analystReportDirectory, outputFilename);
+        File analystReportXmlFile = new File(analystReportDirectory, outputFilename);
         try {
-            Files.copy(xmlSourceFile.toPath(), targetFile.toPath());
-        } catch (IOException ioe) {
+            Files.copy(xmlSourceFile.toPath(), analystReportXmlFile.toPath());
+        } 
+        catch (IOException ioe) {
             LOG.warn(ioe);
         }
         if (analystReportModel == null)
-            analystReportModel =  new AnalystReportModel(targetFile);
+            analystReportModel =  new AnalystReportModel(analystReportXmlFile);
 
         if (analystReportViewFrame == null) {
             analystReportViewFrame = ViskitGlobals.instance().getAnalystReportViewFrame();
         }
 
-        buildAnalystReport(targetFile);
+        buildAnalystReport(analystReportXmlFile);
     }
 
     JTabbedPane mainTabbedPane;

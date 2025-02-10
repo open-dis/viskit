@@ -138,12 +138,13 @@ public class SimulationRunPanel extends JPanel
         viskitRunnerBannerLabel = new JLabel(viskitRunnerBannerString, JLabel.CENTER);
         viskitRunnerBannerLabel.setVerticalTextPosition(JLabel.TOP);
         
+        // https://stackoverflow.com/questions/6714045/how-to-resize-jlabel-imageicon
         Icon npsIcon = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"));
         String npsString = "";        
         npsLabel = new JLabel(npsString, npsIcon, JLabel.CENTER);
         npsLabel.setVerticalTextPosition(JLabel.TOP);
         npsLabel.setHorizontalTextPosition(JLabel.CENTER);
-        npsLabel.setIconTextGap(50);
+        npsLabel.setIconTextGap(20);
 
         int w = Integer.parseInt(ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]"));
         int h = Integer.parseInt(ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]"));
@@ -151,7 +152,7 @@ public class SimulationRunPanel extends JPanel
         leftSideHorizontalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
         
         // reduce magnitude of offset value (add positive increment) to provide more room in upper-left vcrPanel 
-        leftSideHorizontalSplit.setDividerLocation((h/2) - 10);
+        leftSideHorizontalSplit.setDividerLocation((h/2) + 10);
 
         leftRightSplit.setLeftComponent(leftSideHorizontalSplit);
         leftRightSplit.setRightComponent(scrollPane);
@@ -293,8 +294,8 @@ public class SimulationRunPanel extends JPanel
         analystReportCB.setEnabled(analystReportPanelVisible);
         upperLeftFlowPanel.add(analystReportCB);
         
-        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
-
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
+        
         // Initially, unselected
         resetSeedStateCB = new JCheckBox("Reset seed state each rerun");
 
@@ -303,14 +304,15 @@ public class SimulationRunPanel extends JPanel
 //      flowPanel.add(resetSeedStateCB);
         
         JPanel runLabelPanel = new JPanel();
-        JLabel runLabel = new JLabel("Run assembly:");
+        JLabel runLabel = new JLabel("Run assembly simulation:");
+        runLabel.setToolTipText("Run controls for assembly simulation");
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
         runLabel.setBorder(new EmptyBorder(0,0,0,10));
-        runLabelPanel.setToolTipText("Simulation replications control");
+        runLabelPanel.setToolTipText("Run controls for assembly simulation");
         runLabelPanel.add(runLabel);
         upperLeftFlowPanel.add(runLabelPanel);
-        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
-        upperLeftFlowPanel.add(Box.createHorizontalStrut(40)); // indent next button panel
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
+//        upperLeftFlowPanel.add(Box.createHorizontalStrut(40)); // indent next button panel
 
         JPanel runButtonsPanel = new JPanel();
         runButtonsPanel.setLayout(new BoxLayout(runButtonsPanel, BoxLayout.X_AXIS));
@@ -362,18 +364,18 @@ public class SimulationRunPanel extends JPanel
         });
         runButtonsPanel.add(clearConsoleButton);
 
-        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
         upperLeftFlowPanel.add(runButtonsPanel);
-        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
         
         nowRunningLabel = new JLabel(new String(), JLabel.CENTER);
         nowRunningLabel.setBorder(new EmptyBorder(0,1,0,10));
         nowRunningLabel.setText(lineEnd);
         // text value is set by propertyChange listener
         upperLeftFlowPanel.add(Box.createVerticalBox()); // TODO which?
-        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
         upperLeftFlowPanel.add(nowRunningLabel);
-        upperLeftFlowPanel.add(Box.createVerticalStrut(10));
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
 
         runButtonsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         upperLeftFlowPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);

@@ -594,7 +594,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
         // Allow the user to type specific package names
         String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
-        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false);
+        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false,
+                                         "Save Event Graph as...");
 
         if (saveFile != null) {
             File localLastFile = mod.getLastFile();
@@ -1139,15 +1140,16 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             fileName = localLastFile.getName();
         }
 
-        File fil = ((EventGraphView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", false);
+        File imageFile = ((EventGraphView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", false,
+                "Save Image, Event Graph Diagram...");
 
-        if (fil == null) {
+        if (imageFile == null) {
             return;
         }
 
-        final Timer tim = new Timer(100, new TimerCallback(fil, true, component));
-        tim.setRepeats(false);
-        tim.start();
+        final Timer timer = new Timer(100, new TimerCallback(imageFile, true, component));
+        timer.setRepeats(false);
+        timer.start();
 
         imgSaveCount = "" + (++imgSaveInt);
     }

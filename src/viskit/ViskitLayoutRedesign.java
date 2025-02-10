@@ -548,7 +548,12 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         javaSourceEventGraphMI.setText("Java Source Generation");
         eventGraphMenu.add(javaSourceEventGraphMI);
 
-        imageSaveDiagramEventGraphMI.setText("Image Save Event Graph Diagram");
+        imageSaveDiagramEventGraphMI.setText("Image Save, Event Graph Diagram");
+        imageSaveDiagramEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                imageSaveDiagramEventGraphMIActionPerformed(evt);
+            }
+        });
         eventGraphMenu.add(imageSaveDiagramEventGraphMI);
 
         xmlViewEventGraphMI.setText("XML View");
@@ -822,6 +827,10 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private void viewConsoleTextEditorMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewConsoleTextEditorMIActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_viewConsoleTextEditorMIActionPerformed
+
+    private void imageSaveDiagramEventGraphMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imageSaveDiagramEventGraphMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_imageSaveDiagramEventGraphMIActionPerformed
 
     /**
      * @param args the command line arguments

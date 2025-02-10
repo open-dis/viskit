@@ -171,7 +171,8 @@ abstract public class MetadataDialog extends JDialog {
         setLocationRelativeTo(c);
     }
 
-    private void fillWidgets() {
+    private void fillWidgets() 
+    {
         if (graphMetadata == null) {
             graphMetadata = new GraphMetadata();
         }

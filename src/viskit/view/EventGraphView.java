@@ -80,9 +80,10 @@ public interface EventGraphView {
      *
      * @param suggName the package and file name of the Event Graph
      * @param showUniqueName show Event Graph name only
+     * @param title of dialog box
      * @return a File object of the saved Event Graph
      */
-    File saveFileAsk(String suggName, boolean showUniqueName);
+    File saveFileAsk(String suggName, boolean showUniqueName, String title);
 
     /**
      * Update the name of the EventGraph in the component title bar
