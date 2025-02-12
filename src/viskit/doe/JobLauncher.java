@@ -46,10 +46,12 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import edu.nps.util.DirectoryWatch;
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.SpringUtilities;
 import edu.nps.util.TempFileManager;
 import java.net.URI;
 import java.net.URISyntaxException;
+import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
 import org.jdom.Attribute;
@@ -68,7 +70,9 @@ import viskit.util.TitleListener;
  * @since 12:29:08 PM
  * @version $Id$
  */
-public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.DirectoryChangeListener {
+public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.DirectoryChangeListener 
+{
+    static final Logger LOG = Log4jUtilities.getLogger(JobLauncher.class);
 
     File inputFile;
     File filteredFile;
@@ -370,7 +374,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                     break;
                 default:
                     //assert false:"Program error JobLauncher.java";
-                    System.err.println("Program error JobLauncher.java");
+                    LOG.error("Program error JobLauncher.java");
             }
         }
     }
@@ -562,7 +566,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         try {
             document = FileHandler.unmarshallJdom(f);
         } catch (IOException | JDOMException e) {
-            System.err.println("Error unmarshalling results: " + e.getMessage());
+            LOG.error("Error unmarshalling results: " + e.getMessage());
             return null;
         }
         Element el = document.getRootElement();
@@ -608,13 +612,13 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         res.run = Integer.parseInt(run);
         //assert res.run == nrun :"JobLauncher.doResults";
         if (res.run != nrun) {
-            System.err.println("JobLauncher.doResults");
+            LOG.error("JobLauncher.doResults");
         }
 
         res.dp = Integer.parseInt(design);
         //assert res.dp == dp : "JobLauncher.doResults1";
         if (res.dp != dp) {
-            System.err.println("JobLauncher.doResults1");
+            LOG.error("JobLauncher.doResults1");
         }
 
         res.resultsCount = Integer.parseInt(nums[Gresults.COUNT]);
@@ -679,7 +683,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
             statusURL = new URI(surl).toURL();
             editorPane.setPage(statusURL);
         } catch (IOException | URISyntaxException e) {
-            System.err.println("Error showing cluster status: " + e.getMessage());
+            LOG.error("Error showing cluster status: " + e.getMessage());
             return;
         }
 
@@ -766,7 +770,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                         vbar.setValue(50); //vbar.getMaximum());
                     });
                 } catch (InterruptedException | IOException e) {
-                    System.err.println("statusUpdater kill: " + e.getMessage());
+                    LOG.error("statusUpdater kill: " + e.getMessage());
                 }
             }
         }

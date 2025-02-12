@@ -34,6 +34,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import static java.nio.file.FileVisitResult.*;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Code that finds files that
@@ -51,7 +52,9 @@ import static java.nio.file.FileVisitResult.*;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.FindFile">Terry Norbraten, NPS MOVES</a>
  * @version $Id:$
  */
-public class FindFile extends SimpleFileVisitor<Path> {
+public class FindFile extends SimpleFileVisitor<Path>
+{
+    static final Logger LOG = Log4jUtilities.getLogger(FindFile.class);
 
     private final PathMatcher matcher;
     private Path path;
@@ -103,7 +106,7 @@ public class FindFile extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFileFailed(Path file,
             IOException exc) {
-        System.err.println(exc);
+        LOG.error(exc);
         return CONTINUE;
     }
 
@@ -112,7 +115,7 @@ public class FindFile extends SimpleFileVisitor<Path> {
     }
 
     static void usage() {
-        System.err.println("java Find <path>"
+        LOG.error("java Find <path>"
                 + " -name <regex_pattern>");
     }
 

@@ -178,7 +178,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             return CANCEL_ARC_MODE;
         }
 
-        System.err.println("assert false : \"getCurrentMode()\"");
+        LOG.error("assert false : \"getCurrentMode()\"");
         return 0;
     }
 
@@ -598,7 +598,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 if (!file.exists())
                 {
                     // file not found as expected, something happened externally and so report it
-                    System.err.println("*** [EventGraphViewFrame listChanged] Event graph file not found: " + file.getPath());
+                    LOG.error("*** [EventGraphViewFrame listChanged] Event graph file not found: " + file.getPath());
                     continue; // actual file not found, skip to next file in files loop
                 }
                 nameOnly = file.getName();

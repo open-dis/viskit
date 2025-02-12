@@ -175,7 +175,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                         factPan.factClassCB.requestFocus();
                         break;
                     default:
-                        System.err.println("bad data Instantiation panel");
+                        LOG.error("bad data Instantiation panel");
                 }
             }
         });
@@ -190,7 +190,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             case FACT:
                 return factPan.getData();
             default:
-                System.err.println("bad data Inst. panel getData()");
+                LOG.error("bad data Inst. panel getData()");
                 return null;
         }
     }
@@ -217,7 +217,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
             ffPan.setData((ViskitModelInstantiator.FreeF) myVi);
             methodCB.setSelectedIndex(FF);
         } else {
-            System.err.println("Internal error InstantiationPanel.setData()");
+            LOG.error("Internal error InstantiationPanel.setData()");
         }
 
     }
@@ -414,7 +414,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
 
         private final JPanel topP;
 
-        private ObjListPanel olp;
+        private ObjectListPanel olp;
 
         private String typ;
 
@@ -488,7 +488,7 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
         }
 
         private void addObjListPanel(Vector<Object> params, boolean showLabels) {
-            olp = new ObjListPanel(ip);
+            olp = new ObjectListPanel(ip);
             olp.setBorder(BorderFactory.createTitledBorder(
                     BorderFactory.createLineBorder(Color.black),
                     "Method arguments",

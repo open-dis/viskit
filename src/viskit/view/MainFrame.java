@@ -789,7 +789,7 @@ public class MainFrame extends JFrame
             message +=       "<p align='center'>To get started, create or open<br />";  // </p><br />" +
             message +=       "an <i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />"; // <p align='center'>
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
-                "Next step: add Event Graph or Assembly", message);
+                "Next step: Add a new Event Graph or Assembly", message);
         }
     }
     
@@ -817,7 +817,7 @@ public class MainFrame extends JFrame
     public void genericReport(int messageType, String title, String message) {
         if (messageType == JOptionPane.ERROR_MESSAGE) {
             AssemblyViewFrame.LOG.error(message);
-            System.err.println("***" + message);
+            LOG.error("***" + message);
         }
         JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainFrame(), message, title, messageType);
     }

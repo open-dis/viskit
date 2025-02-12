@@ -1,5 +1,6 @@
 package viskit.view.dialog;
 
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.SpringUtilities;
 
 import javax.swing.*;
@@ -17,6 +18,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.control.AssemblyControllerImpl;
@@ -36,7 +38,9 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class PclEdgeInspectorDialog extends JDialog {
+public class PclEdgeInspectorDialog extends JDialog
+{
+    static final Logger LOG = Log4jUtilities.getLogger(PclEdgeInspectorDialog.class);
 
     private final JLabel sourceLabel;
 
@@ -285,8 +289,8 @@ public class PclEdgeInspectorDialog extends JDialog {
                     propertyTF.setText(nms[which][0]);
                 }
             } catch (ClassNotFoundException | IntrospectionException | HeadlessException e1) {
-                System.err.println("Exception getting bean properties, PclEdgeInspectorDialog: " + e1.getMessage());
-                System.err.println(System.getProperty("java.class.path"));
+                LOG.error("Exception getting bean properties, PclEdgeInspectorDialog: " + e1.getMessage());
+                LOG.error(System.getProperty("java.class.path"));
             }
         }
     }

@@ -89,8 +89,8 @@
         <tocitem text="Edit" expand="false">
           <tocitem text="Cut" target="Cut" />
           <tocitem text="Copy" target="Copy" />
-          <tocitem text="Add Event Graph..." target="AddEventGraph" />
-          <tocitem text="Add Property Change Listener..." target="AddPropertyChange" />
+          <tocitem text="Add a new Event Graph..." target="AddEventGraph" />
+          <tocitem text="Add a new Property Change Listener..." target="AddPropertyChange" />
           <tocitem text="Edit Assembly Properties..." target="EditAssemblyProperties" />
         </tocitem>
         <tocitem text="Help" expand="false">

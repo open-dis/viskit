@@ -406,7 +406,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         try {
             filteredFile = TempFileManager.createTempFile("DoeInputFile", ".xml");
         } catch (IOException e) {
-            System.err.println("couldn't make temp file " + e);
+            LOG.error("couldn't make temp file " + e);
         }
 
         try {
@@ -518,7 +518,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             Integer.valueOf(replications);
         } catch (NumberFormatException e) {
             replications = "1";
-            System.err.println("Bad number of replications...use 1");
+            LOG.error("Bad number of replications...use 1");
         }
         sch.setNumberReplications(replications);                            // rg: 2
         exp.setReplicationsPerDesignPoint(replications);
@@ -528,7 +528,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             Integer.valueOf(samps);
         } catch (NumberFormatException e) {
             samps = "1";
-            System.err.println("Bad number of samples...use 1");
+            LOG.error("Bad number of samples...use 1");
         }
         exp.setTotalSamples(samps);                                // rg: 5
 
@@ -540,7 +540,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             Double.valueOf(stopTime);
         } catch (NumberFormatException e) {
             stopTime = "1000.0";
-            System.err.println("Bad stop time...use 1000");
+            LOG.error("Bad stop time...use 1000");
         }
         sch.setStopTime(stopTime);
 
@@ -642,7 +642,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     try {
                         port = Integer.parseInt(portTF.getText().trim());
                     } catch (NumberFormatException e1) {
-                        System.err.println("Bad number parse: " + e1.getMessage() + "; using " + defaultClusterPort);
+                        LOG.error("Bad number parse: " + e1.getMessage() + "; using " + defaultClusterPort);
                         port = defaultClusterPort;
                     }
                     ClusterAdminDialog.showDialog(clusterTF.getText(), port, configurationDialog, mom);
@@ -687,7 +687,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     break;
                 default:
                     //assert false:"Program error JobLauncher.java";
-                    System.err.println("Program error JobLauncher.java");
+                    LOG.error("Program error JobLauncher.java");
             }
         }
     }
@@ -720,14 +720,14 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 try {
                     t.join(1_000);
                 } catch (InterruptedException e) {
-                    System.err.println("join exception");
+                    LOG.error("join exception");
                 }
             }
             try {
                 doe.clear();
                 doe = null; // will cause doe to logout() on GC if it's a grid run
             } catch (DoeException e) {
-                System.err.println("DoeException: " + e.getMessage());
+                LOG.error("DoeException: " + e.getMessage());
             }
         }, "JobKiller");
         jobKiller.setPriority(Thread.NORM_PRIORITY);
@@ -1041,13 +1041,13 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         res.run = Integer.parseInt(run);
         //assert res.run == nrun :"JobLauncher.doResults";
         if (res.run != nrun) {
-            System.err.println("JobLauncher.doResults");
+            LOG.error("JobLauncher.doResults");
         }
 
         res.dp = Integer.parseInt(design);
         //assert res.dp == dp : "JobLauncher.doResults1";
         if (res.dp != dp) {
-            System.err.println("JobLauncher.doResults1");
+            LOG.error("JobLauncher.doResults1");
         }
 
         res.resultsCount = Integer.parseInt(nums[Gresults.COUNT]);
@@ -1112,7 +1112,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             statusURL = new URI(surl).toURL();
             editorPane.setPage(statusURL);
         } catch (IOException | URISyntaxException e) {
-            System.err.println("Error showing cluster status: " + e.getMessage());
+            LOG.error("Error showing cluster status: " + e.getMessage());
             return;
         }
 
@@ -1278,7 +1278,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         try {
             appConfig = ViskitConfigurationStore.instance().getViskitAppConfiguration();
         } catch (Exception e) {
-            System.err.println("Error loading config file: " + e.getMessage());
+            LOG.error("Error loading config file: " + e.getMessage());
             appConfig = null;
         }
         serverCfg = appConfig.getString(recentClusterKey + "[@server]");

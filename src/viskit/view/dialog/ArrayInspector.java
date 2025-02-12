@@ -11,7 +11,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import viskit.ViskitStatics;
 import viskit.model.ViskitModelInstantiator;
-import viskit.view.ObjListPanel;
+import viskit.view.ObjectListPanel;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -84,11 +84,11 @@ public class ArrayInspector extends JDialog {
         okButton.addActionListener(new applyButtonListener());
         okButton.setEnabled(false);
     }
-    ObjListPanel olp;
+    ObjectListPanel olp;
 
     public void setData(List<Object> lis) // of instantiators
     {
-        olp = new ObjListPanel(listnr);
+        olp = new ObjectListPanel(listnr);
         olp.setDialogInfo((JDialog) getParent());
         olp.setData(lis, false); // don't show the type
 

@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
+import edu.nps.util.Log4jUtilities;
 import org.jdom.Element;
 import org.jdom.Attribute;
 
@@ -44,6 +45,7 @@ import javax.swing.tree.TreeSelectionModel;
 import java.util.List;
 import java.util.Iterator;
 import java.awt.*;
+import org.apache.logging.log4j.Logger;
 
 /**
  * MOVES Institute
@@ -54,7 +56,9 @@ import java.awt.*;
  * @since 1:25:58 PM
  * @version $Id$
  */
-public class ParamTree extends JTree {
+public class ParamTree extends JTree
+{
+    static final Logger LOG = Log4jUtilities.getLogger(ParamTree.class);
 
     public ParamTree(List list) {
         getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
@@ -71,7 +75,7 @@ public class ParamTree extends JTree {
             Element elm = (Element) itr.next();
             // assert elm.getName().equalsIgnoreCase("SimEntity");
             if (!elm.getName().equalsIgnoreCase("SimEntity")) {
-                System.err.println("ParamTree.setParams, unknown element type: " + elm.getName());
+                LOG.error("ParamTree.setParams, unknown element type: " + elm.getName());
             }
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(elm);
             root.add(node);
@@ -92,7 +96,7 @@ public class ParamTree extends JTree {
             else {
                 // assert nm.equalsIgnoreCase("TerminalParameter");
                 if (!nm.equalsIgnoreCase("TerminalParameter")) {
-                    System.err.println("ParamTree.addChildren, unknown element type: " + nm);
+                    LOG.error("ParamTree.addChildren, unknown element type: " + nm);
                 }
 
             }

@@ -471,15 +471,15 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         editEventGraphSubMenu.add(jSeparator5);
 
         addEventNodeMenuItem.setMnemonic(KeyEvent.VK_A);
-        addEventNodeMenuItem.setText("Add Event Node");
+        addEventNodeMenuItem.setText("Add a new Event Node");
         addEventNodeMenuItem.setToolTipText("");
         editEventGraphSubMenu.add(addEventNodeMenuItem);
 
-        addSimulationParameterMenuItem.setText("Add Simulation Parameter");
+        addSimulationParameterMenuItem.setText("Add a new Simulation Parameter");
         addSimulationParameterMenuItem.setToolTipText("");
         editEventGraphSubMenu.add(addSimulationParameterMenuItem);
 
-        addStateVariableMenuItem.setText("Add State Variable");
+        addStateVariableMenuItem.setText("Add a new State Variable");
         addStateVariableMenuItem.setToolTipText("");
         editEventGraphSubMenu.add(addStateVariableMenuItem);
 
@@ -603,13 +603,18 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         editAssemblySubMenu.add(jSeparator8);
 
         addEventGraphMI.setMnemonic(KeyEvent.VK_A);
-        addEventGraphMI.setText("Add Event Graph");
+        addEventGraphMI.setText("Add a new Event Graph");
         addEventGraphMI.setToolTipText("");
         editAssemblySubMenu.add(addEventGraphMI);
 
         addPropertyChangeListenerMI.setMnemonic(KeyEvent.VK_A);
-        addPropertyChangeListenerMI.setText("Add Property Change Listener");
+        addPropertyChangeListenerMI.setText("Add a new Property Change Listener");
         addPropertyChangeListenerMI.setToolTipText("");
+        addPropertyChangeListenerMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addPropertyChangeListenerMIActionPerformed(evt);
+            }
+        });
         editAssemblySubMenu.add(addPropertyChangeListenerMI);
 
         assemblyMenu.add(editAssemblySubMenu);
@@ -831,6 +836,10 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private void imageSaveDiagramEventGraphMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imageSaveDiagramEventGraphMIActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_imageSaveDiagramEventGraphMIActionPerformed
+
+    private void addPropertyChangeListenerMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPropertyChangeListenerMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_addPropertyChangeListenerMIActionPerformed
 
     /**
      * @param args the command line arguments

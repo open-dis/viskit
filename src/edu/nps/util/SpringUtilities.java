@@ -36,6 +36,7 @@ package edu.nps.util;
 import javax.swing.*;
 import javax.swing.SpringLayout;
 import java.awt.*;
+import org.apache.logging.log4j.Logger;
 
 /**
  * From Sun tutorial
@@ -49,7 +50,10 @@ import java.awt.*;
  * @since 11:43:06 AM
  * @version $Id:$
  */
-public class SpringUtilities {
+public class SpringUtilities
+{
+    static final Logger LOG = Log4jUtilities.getLogger(SpringUtilities.class);
+    
     /**
      * A debugging utility that prints to stdout the component's
      * minimum, preferred, and maximum sizes.
@@ -84,7 +88,7 @@ public class SpringUtilities {
         try {
             layout = (SpringLayout)parent.getLayout();
         } catch (ClassCastException exc) {
-            System.err.println("The first argument to makeGrid must use SpringLayout.");
+            LOG.error("The first argument to makeGrid must use SpringLayout.");
             return;
         }
 
@@ -188,7 +192,7 @@ public class SpringUtilities {
         try {
             layout = (SpringLayout)parent.getLayout();
         } catch (ClassCastException exc) {
-            System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
+            LOG.error("The first argument to makeCompactGrid must use SpringLayout.");
             return;
         }
 

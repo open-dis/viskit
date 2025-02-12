@@ -30,9 +30,9 @@ import viskit.ViskitStatics;
  * @version $Id$
  */
 @SuppressWarnings("serial")
-public class SourceWindow extends JFrame {
-
-    static final Logger LOGGER = Log4jUtilities.getLogger(SourceWindow.class);
+public class SourceWindow extends JFrame
+{
+    static final Logger LOG = Log4jUtilities.getLogger(SourceWindow.class);
 
     public final String src;
     JTextArea jta;
@@ -42,8 +42,8 @@ public class SourceWindow extends JFrame {
     private Action startAct;
     private Action againAct;
 
-    public SourceWindow(JFrame main, final String className, String source) {
-
+    public SourceWindow(JFrame main, final String className, String source) 
+    {
         this.src = source;
         if (saveChooser == null) {
             saveChooser = new JFileChooser();
@@ -170,7 +170,7 @@ public class SourceWindow extends JFrame {
                     }
 
                 } catch (BadLocationException ex) {
-                    LOGGER.error(ex);
+                    LOG.error(ex);
                 }
 
                 // Reset the message buffer for the next compilation
@@ -317,7 +317,9 @@ public class SourceWindow extends JFrame {
     }
 }
 
-class Searcher {
+class Searcher
+{
+    static final Logger LOG = Log4jUtilities.getLogger(Searcher.class);
 
     JTextComponent jtc;
     Document doc;
@@ -345,7 +347,7 @@ class Searcher {
                 mat = null;
             }
         } catch (BadLocationException e1) {
-            System.err.println(e1.getMessage());
+            LOG.error(e1.getMessage());
         }
     }
 

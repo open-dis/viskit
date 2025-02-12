@@ -16,27 +16,29 @@ import java.util.List;
  */
 public class ConstructorPanel extends JPanel {
 
-    private final JButton selectButt;
-    private final ActionListener modLis;
-    private final JPanel selectButtPan;
-    private final boolean showButt;
-    private final ActionListener selectButtListener;
-    private ObjListPanel olp;
+    private final JButton selectConstructorButton;
+    private final ActionListener modifiedListener;
+    private final JPanel selectedConstructorPanel;
+    private final boolean showButton;
+    private final ActionListener selectButtonListener;
+    private ObjectListPanel objectListPanel;
     private final JDialog parent;
 
-    public ConstructorPanel(ActionListener modifiedListener, boolean showSelectButt, ActionListener selectListener, JDialog parent) {
-        modLis = modifiedListener;
-        showButt = showSelectButt;
-        selectButtListener = selectListener;
-        this.parent = parent;
+    public ConstructorPanel(ActionListener newModifiedListener, boolean showSelectedButton, ActionListener selectedListener, JDialog parentDialog) 
+    {
+        modifiedListener = newModifiedListener;
+        showButton = showSelectedButton;
+        selectButtonListener = selectedListener;
+        this.parent = parentDialog;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        selectButtPan = new JPanel();
-        selectButtPan.setLayout(new BoxLayout(selectButtPan, BoxLayout.X_AXIS));
-        selectButtPan.add(Box.createHorizontalGlue());
-        selectButt = new JButton("Select this constructor");
-        selectButtPan.add(selectButt);
-        selectButtPan.add(Box.createHorizontalGlue());
+        selectedConstructorPanel = new JPanel();
+        selectedConstructorPanel.setLayout(new BoxLayout(selectedConstructorPanel, BoxLayout.X_AXIS));
+        selectedConstructorPanel.add(Box.createHorizontalGlue());
+        selectConstructorButton = new JButton("Select this constructor");
+        selectConstructorButton.setToolTipText("Selecting a constructor determines which events are passed to the listener, if any");
+        selectedConstructorPanel.add(selectConstructorButton);
+        selectedConstructorPanel.add(Box.createHorizontalGlue());
     }
 
     public void setData(List<Object> args) // of VInstantiators
@@ -44,25 +46,25 @@ public class ConstructorPanel extends JPanel {
         this.removeAll();
         add(Box.createVerticalGlue());
 
-        olp = new ObjListPanel(modLis); // may have to intercept
-        olp.setDialogInfo(parent);
-        olp.setData(args, true);
+        objectListPanel = new ObjectListPanel(modifiedListener); // may have to intercept
+        objectListPanel.setDialogInfo(parent);
+        objectListPanel.setData(args, true);
         if (!args.isEmpty()) {
-            add(olp);
+            add(objectListPanel);
         } else {
             JLabel lab = new JLabel("zero argument constructor");
             lab.setAlignmentX(Box.CENTER_ALIGNMENT);
             add(lab);
         }
-        if (showButt) {
+        if (showButton) {
             add(Box.createVerticalStrut(5));
             add(Box.createVerticalGlue());
 
-            add(selectButtPan);
+            add(selectedConstructorPanel);
             add(Box.createVerticalStrut(5));
 
-            if (selectButtListener != null) {
-                selectButt.addActionListener(selectButtListener);
+            if (selectButtonListener != null) {
+                selectConstructorButton.addActionListener(selectButtonListener);
             }
 
             setSelected(false);
@@ -74,12 +76,13 @@ public class ConstructorPanel extends JPanel {
     }
 
     public List<Object> getData() {
-        return olp.getData(); // of VInstantiators
+        return objectListPanel.getData(); // of VInstantiators
     }
 
-    public void setSelected(boolean tf) {
-        if (olp != null) {
-            olp.setEnabled(tf);
+    public void setSelected(boolean enabled) 
+    {
+        if (objectListPanel != null) {
+            objectListPanel.setEnabled(enabled);
         }  // todo...make this work maybe olp should be built in constructor
     }
 
@@ -87,15 +90,16 @@ public class ConstructorPanel extends JPanel {
      * @param clazz Class&lt;?&gt;[] array, typically from constructor signature
      * @return String identifying Class's signature
      */
-    public static String getSignature(Class<?>[] clazz) {
-        StringBuilder buf = new StringBuilder("(");
+    public static String getSignature(Class<?>[] clazz) 
+    {
+        StringBuilder buffer = new StringBuilder("(");
         for (int i = 0; i < clazz.length; ++i) {
-            buf.append(clazz[i].getName());
+            buffer.append(clazz[i].getName());
             if (i < clazz.length - 1) {
-                buf.append(',');
+                buffer.append(',');
             }
         }
-        buf.append(')');
-        return buf.toString();
+        buffer.append(')');
+        return buffer.toString();
     }
 }

@@ -142,7 +142,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 projectPath = new File(initialAssemblyFile).getParentFile().getParentFile().getParentFile();
                 openProject(projectPath); // calls EventGraphViewFrame setTitleProjectName
 
-                // Add new project EventGraphs for LEGO tree inclusion of our SimEntities
+                // Add a new project EventGraphs for LEGO tree inclusion of our SimEntities
                 ViskitUserPreferences.RebuildLEGOTreePanelTask t = new ViskitUserPreferences.RebuildLEGOTreePanelTask();
                 t.execute();
             }

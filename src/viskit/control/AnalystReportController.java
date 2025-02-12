@@ -333,14 +333,14 @@ public class AnalystReportController extends MvcAbstractController {
                     "Browser Launch Error",
                     "<html><p align='center'>URISyntaxException displaying HTML:<br>" + ex.getMessage() + "<br /></p></html>"
             );
-            System.err.println(ex.getMessage());
+            LOG.error(ex.getMessage());
         }
         catch (IOException ex) {
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
                     "<html><p align='center'>IOException displaying HTML:<br>" + ex.getMessage() + "<br /></p></html>"
             );
-            System.err.println(ex.getMessage());
+            LOG.error(ex.getMessage());
         }
     }
 
@@ -357,14 +357,14 @@ public class AnalystReportController extends MvcAbstractController {
                     "Browser Launch Error",
                     "<html><p align='center'>URISyntaxException displaying HTML:<br>" + ex.getMessage() + "<br /></p></html>"
             );
-            System.err.println(ex.getMessage());
+            LOG.error(ex.getMessage());
         }
         catch (IOException ex) {
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
                     "<html><p align='center'>IOException displaying HTML:<br>" + ex.getMessage() + "<br /></p></html>"
             );
-            System.err.println(ex.getMessage());
+            LOG.error(ex.getMessage());
         }
     }
 

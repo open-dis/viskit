@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import org.jdom.Document;
 import viskit.util.OpenAssembly;
@@ -47,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Naval Postgraduate School, Monterey, CA
@@ -56,7 +58,9 @@ import javax.xml.bind.JAXBElement;
  * @since 12:59:43 PM
  * @version $Id$
  */
-public class DoeFileModel {
+public class DoeFileModel
+{
+    static final Logger LOG = Log4jUtilities.getLogger(DoeFileModel.class);
 
     public File userFile;
     public ParamTable paramTable;
@@ -107,7 +111,7 @@ public class DoeFileModel {
                 //eventGraph.getContent().add(0,src.trim());
                 lis.add(eventGraph);
             } catch (IOException e) {
-                System.err.println("IOException inserting into GRID file " + f.getName() + " :" + e.getMessage());
+                LOG.error("IOException inserting into GRID file " + f.getName() + " :" + e.getMessage());
             }
         }
     }

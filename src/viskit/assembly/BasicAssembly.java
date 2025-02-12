@@ -503,7 +503,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //            try {
 //                Schedule.reset();
 //            } catch (java.util.ConcurrentModificationException cme) {
-//                System.err.println("Maybe not finished in Event List " + Schedule.getDefaultEventList().getID());
+//                LOG.error("Maybe not finished in Event List " + Schedule.getDefaultEventList().getID());
 //            }
 //        }
 //    }
@@ -625,7 +625,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
         stopRun = false;
         if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
-            System.err.println("Assemby already running.");
+            LOG.error("Assemby already running.");
         }
 
         // Incase the user input bad parameters in the XML

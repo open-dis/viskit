@@ -60,7 +60,7 @@ public class RemoteDriverImpl implements DoeDriver
             try {
                 logout();
             } catch (DoeException e) {
-                System.err.println(e.getMessage());
+                LOG.error(e.getMessage());
             }
         }
     }

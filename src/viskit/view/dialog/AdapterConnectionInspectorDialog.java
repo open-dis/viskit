@@ -35,6 +35,7 @@ package viskit.view.dialog;
 
 import edu.nps.util.SpringUtilities;
 import static edu.nps.util.GenericConversion.toArray;
+import edu.nps.util.Log4jUtilities;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.CaretEvent;
@@ -48,6 +49,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
+import org.apache.logging.log4j.Logger;
 import viskit.model.AdapterEdge;
 import viskit.model.EventGraphNode;
 import viskit.ViskitStatics;
@@ -63,7 +65,9 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class AdapterConnectionInspectorDialog extends JDialog {
+public class AdapterConnectionInspectorDialog extends JDialog 
+{
+    static final Logger LOG = Log4jUtilities.getLogger(AdapterConnectionInspectorDialog.class);
 
     public static String xnewProperty;
     public static String newTarget,  newTargetEvent,  newSource,  newSourceEvent;
@@ -371,7 +375,7 @@ public class AdapterConnectionInspectorDialog extends JDialog {
                 selection.setText(evsv.get(which));
             }
         } catch (ClassNotFoundException | SecurityException | HeadlessException t) {
-            System.err.println("Error connecting: " + t.getMessage());
+            LOG.error("Error connecting: " + t.getMessage());
         }
 //    catch (ClassNotFoundException e) {
 //      e.printStackTrace();

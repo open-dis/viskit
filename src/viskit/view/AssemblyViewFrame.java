@@ -297,7 +297,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             if (graphMetadata != null)
                 setSelectedAssemblyName(graphMetadata.name);
             else if (viskit.ViskitStatics.debug)
-                System.err.println("error: AssemblyViewFrame graphMetadata null..");
+                LOG.error("error: AssemblyViewFrame graphMetadata null..");
         }
     }
 
@@ -320,7 +320,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 if (!file.exists())
                 {
                     // file not found as expected, something happened externally and so report it
-                    System.err.println("*** [AssemblyViewFrame listChanged] Event graph file not found: " + file.getPath());
+                    LOG.error("*** [AssemblyViewFrame listChanged] Event graph file not found: " + file.getPath());
                     continue; // actual file not found, skip to next file in files loop
                 }
                 nameOnly = file.getName();
@@ -433,8 +433,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK)));
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add a new Event Graph", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add a new Property Change Listener", KeyEvent.VK_A, null));
         editMenu.addSeparator();
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
@@ -456,7 +456,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.setMnemonic(KeyEvent.VK_A);
 
         // Set up edit submenu
-        JMenu editSubMenu = new JMenu("Edit selected Assembly...");
+        JMenu editSubMenu = new JMenu("Edit selected Assembly");
         editSubMenu.setMnemonic(KeyEvent.VK_E);
         if (!ViskitGlobals.instance().getMainFrame().hasModalMenus()) // combined menu integration
         {
@@ -487,8 +487,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK)));
         editSubMenu.addSeparator();
 
-        editSubMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add Event Graph...", KeyEvent.VK_G, null));
-        editSubMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add Property Change Listener...", KeyEvent.VK_L, null));
+        editSubMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add a new Event Graph", KeyEvent.VK_G, null));
+        editSubMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add a new Property Change Listener", KeyEvent.VK_L, null));
         
         assemblyMenu.add(editSubMenu);
         assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit selected Assembly Properties", KeyEvent.VK_E,
@@ -618,7 +618,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getHelpMenu().addSeparator();
 
         getHelpMenu().add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
-        getHelpMenu().add(buildMenuItem(help, "aboutViskit", "About...", KeyEvent.VK_A, null));
+        getHelpMenu().add(buildMenuItem(help, "aboutViskit", "About Viskit", KeyEvent.VK_A, null));
     }
 
     private JMenu buildMenu(String name) 

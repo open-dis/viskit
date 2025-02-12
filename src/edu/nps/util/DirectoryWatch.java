@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import org.apache.logging.log4j.Logger;
 
 /**
  * MOVES Institute
@@ -50,7 +51,9 @@ import java.util.Vector;
  * @since 10:04:25 AM
  * A class to observe a directory (tree) for changes and report them to listeners
  */
-public class DirectoryWatch {
+public class DirectoryWatch
+{
+    static final Logger LOG = Log4jUtilities.getLogger(DirectoryWatch.class);
 
     private static int sequenceNum = 0;
     private final static int DEFAULTSLEEPTIMEMS = 3 * 1_000; // 3 seconds
@@ -191,7 +194,7 @@ public class DirectoryWatch {
                 try {
                     Thread.sleep(sleepTimeMs);
                 } catch (InterruptedException e) {
-                    System.err.println("DirWatcher killed");
+                    LOG.error("DirWatcher killed");
                     running = false;
                 }
             }
@@ -224,7 +227,7 @@ public class DirectoryWatch {
 
     public interface DirectoryChangeListener {
 
-        int FILE_ADDED = 0;
+        int FILE_ADDED   = 0;
         int FILE_REMOVED = 1;
         int FILE_CHANGED = 2;
 

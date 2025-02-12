@@ -33,7 +33,9 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
+import edu.nps.util.Log4jUtilities;
 import javax.swing.*;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
 
 /**
@@ -45,7 +47,9 @@ import viskit.ViskitStatics;
  * @since 10:36:33 AM
  * @version $Id$
  */
-public class DoeMain implements DoeEvents {
+public class DoeMain implements DoeEvents
+{
+    static final Logger LOG = Log4jUtilities.getLogger(DoeMain.class);
 
     private DoeController controller;
     private DoeMainFrame mainFrame;
@@ -129,7 +133,7 @@ public class DoeMain implements DoeEvents {
         try {
             UIManager.setLookAndFeel(laf);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            System.err.println("can't change l&f");
+            LOG.error("can't change l&f");
         }
     }
 

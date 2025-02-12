@@ -428,7 +428,7 @@ public class LocalBootLoader extends URLClassLoader {
                             isEventGraph = false;
                         
                     } catch (ClassNotFoundException ex) {
-                        System.err.println("Check that viskit.jar has jaxb bindings, or: " + entryClass);
+                        LOG.error("Check that viskit.jar has jaxb bindings, or: " + entryClass);
                         LOG.error(ex);
                     }
 

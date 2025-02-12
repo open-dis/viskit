@@ -43,7 +43,7 @@ public class ClassPanel extends JPanel {
         plus = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/plus.png")));
         plus.setBorder(null);
         plus.setText(null);
-        plus.setToolTipText(plusTT); //"Add event graph class file or directory root to this list");
+        plus.setToolTipText(plusTT); //"Add a new Event Graph class file or directory root to this list");
         Dimension dd = plus.getPreferredSize();
         plus.setMinimumSize(dd);
         plus.setMaximumSize(dd);

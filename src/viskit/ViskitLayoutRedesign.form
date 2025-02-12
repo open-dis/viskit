@@ -160,19 +160,19 @@
                     <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="KeyEvent.VK_A" type="code"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Add Event Node"/>
+                    <Property name="text" type="java.lang.String" value="Add a new Event Node"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="addSimulationParameterMenuItem">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Add Simulation Parameter"/>
+                    <Property name="text" type="java.lang.String" value="Add a new Simulation Parameter"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="addStateVariableMenuItem">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Add State Variable"/>
+                    <Property name="text" type="java.lang.String" value="Add a new State Variable"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </MenuItem>
@@ -373,7 +373,7 @@
                     <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="KeyEvent.VK_A" type="code"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Add Event Graph"/>
+                    <Property name="text" type="java.lang.String" value="Add a new Event Graph"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </MenuItem>
@@ -382,9 +382,12 @@
                     <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="KeyEvent.VK_A" type="code"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Add Property Change Listener"/>
+                    <Property name="text" type="java.lang.String" value="Add a new Property Change Listener"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addPropertyChangeListenerMIActionPerformed"/>
+                  </Events>
                 </MenuItem>
               </SubComponents>
             </Menu>

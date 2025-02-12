@@ -1,5 +1,6 @@
 package viskit.view;
 
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.SpringUtilities;
 
 import java.awt.Color;
@@ -24,6 +25,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
 import viskit.model.ViskitModelInstantiator;
@@ -42,15 +44,17 @@ import viskit.control.AssemblyControllerImpl;
  * @since 3:03:09 PM
  * @version $Id$
  */
-public class ObjListPanel extends JPanel implements ActionListener, CaretListener {
+public class ObjectListPanel extends JPanel implements ActionListener, CaretListener
+{
+    static final Logger LOG = Log4jUtilities.getLogger(ObjectListPanel.class);
 
     private JDialog parent;
-    private JLabel typeLab[];
+    private JLabel typeLabelArray[];
     private JTextField entryTF[];
     private ViskitModelInstantiator shadow[];
     private final ActionListener changeListener;
 
-    public ObjListPanel(ActionListener changeListener) {
+    public ObjectListPanel(ActionListener changeListener) {
         setLayout(new SpringLayout());
         this.changeListener = changeListener;
     }
@@ -59,41 +63,41 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         this.parent = parent;
     }
 
-    public void setData(List<Object> lis, boolean showLabels) // of Vinstantiators
+    public void setData(List<Object> objectList, boolean showLabels) // of Vinstantiators
     {
-        int sz = lis.size();
-        typeLab = new JLabel[sz];
-        JLabel[] nameLab = (sz <= 0 ? null : new JLabel[sz]);
-        entryTF = new JTextField[sz];
-        shadow = new ViskitModelInstantiator[sz];
-        JComponent[] contentObj = new JComponent[sz];
+        int objectListSize = objectList.size();
+        typeLabelArray = new JLabel[objectListSize];
+        JLabel[] nameLabel = (objectListSize <= 0 ? null : new JLabel[objectListSize]);
+        entryTF = new JTextField[objectListSize];
+        shadow = new ViskitModelInstantiator[objectListSize];
+        JComponent[] contentObj = new JComponent[objectListSize];
 
         if (viskit.ViskitStatics.debug) {
-            System.out.println("really has " + sz + "parameters");
+            System.out.println("really has " + objectListSize + "parameters");
         }
         int i = 0;
         String jTFText = "", s;
-        ViskitModelInstantiator inst;
+        ViskitModelInstantiator nextInstance;
         ViskitModelInstantiator.Factory vif;
         ViskitModelInstantiator.FreeF viff;
         JPanel tinyP;
         JButton b;
-        for (Iterator<Object> itr = lis.iterator(); itr.hasNext(); i++) {
-            inst = (ViskitModelInstantiator) itr.next();
-            shadow[i] = inst;
-            typeLab[i] = new JLabel("(" + inst.getType() + ")" + " " + inst.getName(), JLabel.TRAILING); // html screws up table sizing below
-            s = inst.getName();
-            nameLab[i] = new JLabel(s);
-            nameLab[i].setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(0, 2, 0, 2))); // some space at sides
-            nameLab[i].setOpaque(true);
-            nameLab[i].setBackground(new Color(255, 255, 255, 64));
+        for (Iterator<Object> itr = objectList.iterator(); itr.hasNext(); i++) {
+            nextInstance = (ViskitModelInstantiator) itr.next();
+            shadow[i] = nextInstance;
+            typeLabelArray[i] = new JLabel("(" + nextInstance.getType() + ")" + " " + nextInstance.getName(), JLabel.TRAILING); // html screws up table sizing below
+            s = nextInstance.getName();
+            nameLabel[i] = new JLabel(s);
+            nameLabel[i].setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(0, 2, 0, 2))); // some space at sides
+            nameLabel[i].setOpaque(true);
+            nameLabel[i].setBackground(new Color(255, 255, 255, 64));
             if (viskit.ViskitStatics.debug) {
                 System.out.println("really set label " + s);
             }
 
-            s = inst.getDescription();
+            s = nextInstance.getDescription();
             if (s != null && !s.isEmpty()) {
-                nameLab[i].setToolTipText(s);
+                nameLabel[i].setToolTipText(s);
             }
 
             entryTF[i] = new JTextField(8);
@@ -103,24 +107,24 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
 
             // If we have a factory, then reflect the Object... input to the
             // getInstance() method of RVF
-            if (inst instanceof ViskitModelInstantiator.Factory) {
-                vif = (ViskitModelInstantiator.Factory) inst;
+            if (nextInstance instanceof ViskitModelInstantiator.Factory) {
+                vif = (ViskitModelInstantiator.Factory) nextInstance;
                 if (!vif.getParams().isEmpty() && vif.getParams().get(0) instanceof ViskitModelInstantiator.FreeF) {
                     viff = (ViskitModelInstantiator.FreeF) vif.getParams().get(0);
                     jTFText = viff.getValue();
                 }
             } else {
                 // Show the formal parameter type in the TF
-                jTFText = inst.toString();
+                jTFText = nextInstance.toString();
             }
 
             entryTF[i].setText(jTFText);
             entryTF[i].addCaretListener(this);
 
-            Class<?> c = ViskitStatics.getClassForInstantiatorType(inst.getType());
+            Class<?> c = ViskitStatics.getClassForInstantiatorType(nextInstance.getType());
 
             if (c == null) {
-                System.err.println("what to do here for " + inst.getType());
+                LOG.error("what to do here for " + nextInstance.getType());
                 return;
             }
 
@@ -136,7 +140,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
 
                 tinyP.add(b);
                 if (showLabels) {
-                    typeLab[i].setLabelFor(tinyP);
+                    typeLabelArray[i].setLabelFor(tinyP);
                 }
                 contentObj[i] = tinyP;
                 b.setToolTipText("Edit with Instantiation Wizard");
@@ -144,20 +148,20 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
                 b.setActionCommand("" + i);
             } else {
                 if (showLabels) {
-                    typeLab[i].setLabelFor(entryTF[i]);
+                    typeLabelArray[i].setLabelFor(entryTF[i]);
                 }
                 contentObj[i] = entryTF[i];
             }
         }
         if (showLabels) {
-            for (int x = 0; x < typeLab.length; x++) {
-                add(typeLab[x]);
+            for (int x = 0; x < typeLabelArray.length; x++) {
+                add(typeLabelArray[x]);
                 add(contentObj[x]);
             }
 
-            SpringUtilities.makeCompactGrid(this, typeLab.length, 2, 5, 5, 5, 5);
+            SpringUtilities.makeCompactGrid(this, typeLabelArray.length, 2, 5, 5, 5, 5);
         } else {
-            for (int x = 0; x < typeLab.length; x++) {
+            for (int x = 0; x < typeLabelArray.length; x++) {
                 add(contentObj[x]);
             }
             SpringUtilities.makeCompactGrid(this, entryTF.length, 1, 5, 5, 5, 5);
@@ -181,7 +185,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
         ViskitModelInstantiator.Factory vif;
         List<Object> insts, params;
         Vector<Object> v = new Vector<>();
-        for (int i = 0; i < typeLab.length; i++) {
+        for (int i = 0; i < typeLabelArray.length; i++) {
             if (shadow[i] instanceof ViskitModelInstantiator.FreeF) {
                 ((ViskitModelInstantiator.FreeF) shadow[i]).setValue(entryTF[i].getText().trim());
             } else if (shadow[i] instanceof ViskitModelInstantiator.Array) {
@@ -213,7 +217,7 @@ public class ObjListPanel extends JPanel implements ActionListener, CaretListene
 
         Class<?> c = ViskitStatics.getClassForInstantiatorType(inst.getType());
         if (c == null) {
-            System.err.println("what to do here for " + inst.getType());
+            LOG.error("what to do here for " + inst.getType());
             return;
         }
         if (c.isArray()) {

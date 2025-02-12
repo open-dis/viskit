@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
+import edu.nps.util.Log4jUtilities;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import viskit.gridlet.SessionManager;
 
@@ -44,6 +45,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Vector;
+import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcException;
 
 /**
@@ -56,6 +58,8 @@ import org.apache.xmlrpc.XmlRpcException;
  */
 public class ClusterAdminDialog extends JDialog implements ActionListener
 {
+    static final Logger LOG = Log4jUtilities.getLogger(ClusterAdminDialog.class);
+    
   private JButton closeButt;
   private JButton addUserButt;
   private JButton delUserButt;
@@ -295,7 +299,7 @@ public class ClusterAdminDialog extends JDialog implements ActionListener
         xmlrpc.execute("gridkit.logout",args);
       }
       catch (XmlRpcException | IOException e) {
-        System.err.println("Error logging out from cluster.");
+        LOG.error("Error logging out from cluster.");
       }
     }
     ClusterAdminDialog.this.dispose();

@@ -11,7 +11,7 @@ package viskit.view;
  */
 public class LegosPanel extends ClassPanel {
   public LegosPanel(LegoTree ltree) {
-    super(ltree,"Event Graphs","Add event graph class file, XML file or directory root to this list",
+    super(ltree,"Event Graphs","Add a new Event Graph class file, XML file or directory root to this list",
                                "Remove event graph class file, XML file or directory from this list");
   }
 }

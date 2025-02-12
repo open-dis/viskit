@@ -1,11 +1,13 @@
 package viskit.util;
 
+import edu.nps.util.Log4jUtilities;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.apache.logging.log4j.Logger;
 
 /** This class was written by CDR Duane Davis for the AUV Workbench.
  * It was copied to this application to perform handy XSLT conversions.
@@ -14,7 +16,9 @@ import javax.xml.transform.stream.StreamSource;
  * @since March 11, 2004, 4:55 PM
  * @version $Id$
  */
-public class XsltUtility {
+public class XsltUtility 
+{
+    static final Logger LOG = Log4jUtilities.getLogger(XsltUtility.class);
 
     /**
      * Runs an XSL Transformation on an XML file and writes the result to another file
@@ -39,16 +43,16 @@ public class XsltUtility {
             Result result = new StreamResult(new FileOutputStream(outFile));
             xFormer.transform(source, result);
         } catch (FileNotFoundException e) {
-            System.err.println("Unable to load file for XSL Transformation\n" +
+            LOG.error("Unable to load file for XSL Transformation\n" +
                     "   Input file : " + inFile + "\n" +
                     "   Output file: " + outFile + "\n" +
                     "   XSLT file  : " + xslFile);
             return false;
         } catch (TransformerConfigurationException e) {
-            System.err.println("Unable to configure transformer for XSL Transformation");
+            LOG.error("Unable to configure transformer for XSL Transformation");
             return false;
         } catch (TransformerException e) {
-            System.err.println("Exception during XSL Transformation");
+            LOG.error("Exception during XSL Transformation");
             return false;
         }
         return true;

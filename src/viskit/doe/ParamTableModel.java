@@ -35,6 +35,7 @@ package viskit.doe;
 
 import bsh.Interpreter;
 import bsh.NameSpace;
+import edu.nps.util.Log4jUtilities;
 import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.*;
 
@@ -43,6 +44,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import javax.xml.bind.JAXBElement;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Naval Postgraduate School, Monterey, CA
@@ -52,7 +54,9 @@ import javax.xml.bind.JAXBElement;
  * @since 4:13:25 PM
  * @version $Id$
  */
-public class ParamTableModel extends DefaultTableModel implements TableModelListener {
+public class ParamTableModel extends DefaultTableModel implements TableModelListener
+{
+    static final Logger LOG = Log4jUtilities.getLogger(ParamTableModel.class);
 
     public static final int NUM_COLS = 6;
     public static String[] columnNames = {
@@ -89,7 +93,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         int i = 0;
         for (SimEntity se : simEntitiesJaxb) {
             if (!(se instanceof SimEntity)) {
-                System.err.println("Error ParamTableModel(), element not SimEntity");
+                LOG.error("Error ParamTableModel(), element not SimEntity");
             }
             processRow(se, "SimEntity_" + i++);
         }
@@ -97,7 +101,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         if (designParamsJaxb != null) {
             for (TerminalParameter tp : designParamsJaxb) {
                 if (!(tp instanceof TerminalParameter)) {
-                    System.err.println("Error ParamTableModel(), element not TerminalParameter");
+                    LOG.error("Error ParamTableModel(), element not TerminalParameter");
                 }
                 processDesignParam(tp);
             }
@@ -118,7 +122,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
 
         String nm = tp.getName();
         if (nm.isEmpty()) {
-            System.err.println("Terminal param w/out name ref!");
+            LOG.error("Terminal param w/out name ref!");
         }
 
         if (termHashMap.get(nm) == null) {return;}
@@ -254,7 +258,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         } else if (obj instanceof Coordinate) {
             // Do nothing
         } else {
-            System.err.println("Error ParamTableModel.processRow, unknown type: " + obj);
+            LOG.error("Error ParamTableModel.processRow, unknown type: " + obj);
         }
     }
 
@@ -308,7 +312,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
                 return Boolean.class;
             default:
                 //assert false:"Column error in ParamTableModel";
-                System.err.println("Column error in ParamTableModel");
+                LOG.error("Column error in ParamTableModel");
         }
         return null;
     }
