@@ -118,6 +118,8 @@ public class ViskitStatics
 
     public static boolean      debug = false;
 
+    public static String DESCRIPTION_HINT = "Good descriptions reveal model meaning and author intent";
+
     /**
      * Convert a class name array type to human readable form.
      * (See Class.getName());

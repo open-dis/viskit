@@ -62,6 +62,7 @@ import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
+import static viskit.ViskitStatics.DESCRIPTION_HINT;
 import viskit.images.CanArcIcon;
 import viskit.images.EventNodeIcon;
 import viskit.images.SchedArcIcon;
@@ -108,8 +109,6 @@ import viskit.mvc.MvcRecentFileListener;
  */
 public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGraphView
 {
-    public static String DESCRIPTION_HINT = "Good descriptions reveal model meaning and author intent";
-
     static final Logger LOG = Log4jUtilities.getLogger(EventGraphViewFrame.class);
 
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
@@ -338,7 +337,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         parametersPanel.add(Box.createVerticalStrut(5));
 
         JLabel descriptionLabel = new JLabel("Event Graph Description"); // TODO fix this functionality
-        descriptionLabel.setToolTipText(DESCRIPTION_HINT);
+        descriptionLabel.setToolTipText("(" + DESCRIPTION_HINT + ")");
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         parametersPanel.add(descriptionLabel);
 //        parametersPanel.add(Box.createVerticalStrut(5));

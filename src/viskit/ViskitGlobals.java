@@ -417,7 +417,8 @@ public class ViskitGlobals
         if (node != null) {
 
             // Event local variables
-            for (ViskitElement eventLocalVariable : node.getLocalVariables()) {
+            for (ViskitElement eventLocalVariable : node.getLocalVariables()) 
+            {
                 String result;
                 type = eventLocalVariable.getType();
                 name = eventLocalVariable.getName();
@@ -434,9 +435,9 @@ public class ViskitGlobals
             }
 
             // Event arguments
-            for (ViskitElement ea : node.getArguments()) {
-                type = ea.getType();
-                name = ea.getName();
+            for (ViskitElement viskitElement : node.getArguments()) {
+                type = viskitElement.getType();
+                name = viskitElement.getName();
                 String result = handleNameType(name, type);
                 if (result != null) {
                     clearNamespace();
@@ -447,7 +448,8 @@ public class ViskitGlobals
         }
 
         // state variables
-        for (ViskitElement stateVariable : getStateVariablesList()) {
+        for (ViskitElement stateVariable : getStateVariablesList()) 
+        {
             String result;
             type = stateVariable.getType();
             name = stateVariable.getName();
@@ -466,7 +468,8 @@ public class ViskitGlobals
         }
 
         // Sim parameters
-        for (ViskitElement par : getSimParametersList()) {
+        for (ViskitElement par : getSimParametersList())
+        {
             String result;
             type = par.getType();
             name = par.getName();

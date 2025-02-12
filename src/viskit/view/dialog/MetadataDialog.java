@@ -10,7 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import viskit.ViskitGlobals;
-import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
+import static viskit.ViskitStatics.DESCRIPTION_HINT;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -123,7 +123,7 @@ abstract public class MetadataDialog extends JDialog {
 
         c.add(runtimePanel);
 
-        JLabel descriptionLabel = new JLabel("Description");
+        JLabel descriptionLabel = new JLabel("description");
         descriptionLabel.setToolTipText(DESCRIPTION_HINT);
         descriptionLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         c.add(descriptionLabel);

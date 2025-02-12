@@ -14,7 +14,7 @@ import viskit.ViskitGlobals;
 import viskit.model.EventGraphNode;
 import viskit.model.ViskitModelInstantiator;
 import viskit.ViskitStatics;
-import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
+import static viskit.ViskitStatics.DESCRIPTION_HINT;
 import viskit.view.InstantiationPanel;
 
 /**

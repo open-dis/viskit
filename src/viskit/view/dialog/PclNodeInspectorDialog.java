@@ -14,7 +14,7 @@ import javax.swing.event.CaretListener;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.model.PropertyChangeListenerNode;
-import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
+import static viskit.ViskitStatics.DESCRIPTION_HINT;
 import viskit.view.InstantiationPanel;
 
 /**

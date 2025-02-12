@@ -14,7 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import viskit.ViskitGlobals;
-import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
+import static viskit.ViskitStatics.DESCRIPTION_HINT;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.

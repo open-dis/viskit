@@ -18,7 +18,7 @@ import viskit.ViskitConfigurationStore;
 import viskit.control.EventGraphController;
 import viskit.model.Model;
 import viskit.model.ViskitStateVariable;
-import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
+import static viskit.ViskitStatics.DESCRIPTION_HINT;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects

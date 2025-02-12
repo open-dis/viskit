@@ -382,11 +382,11 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
 
                         sb.append("<u>arguments</u><br>");
                         int n = 0;
-                        EventArgument arg;
+                        EventArgument eventArgument;
                         String as;
-                        for (ViskitElement ve : argLis) {
-                            arg = (EventArgument) ve;
-                            as = arg.getName() + " (" + arg.getType() + ")";
+                        for (ViskitElement viskitElement : argLis) {
+                            eventArgument = (EventArgument) viskitElement;
+                            as = eventArgument.getName() + " (" + eventArgument.getType() + ")";
                             sb.append("&nbsp;");
                             sb.append(++n);
                             sb.append(" ");
@@ -395,13 +395,13 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
                         }
                     }
 
-                    List<ViskitElement> locVarLis = en.getLocalVariables();
-                    if (!locVarLis.isEmpty()) {
+                    List<ViskitElement> localVariableList = en.getLocalVariables();
+                    if (!localVariableList.isEmpty()) {
 
-                        sb.append("<u>local variables</u><br>");
+                        sb.append("<u>Local variables</u><br>");
                         EventLocalVariable lv;
                         String val;
-                        for (ViskitElement ve : locVarLis) {
+                        for (ViskitElement ve : localVariableList) {
                             lv = (EventLocalVariable) ve;
                             sb.append("&nbsp;");
                             sb.append(lv.getName());

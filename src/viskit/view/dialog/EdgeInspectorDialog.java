@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import simkit.Priority;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import static viskit.ViskitStatics.DESCRIPTION_HINT;
 import viskit.control.EventGraphController;
 import viskit.model.Edge;
 import viskit.model.EventLocalVariable;
@@ -30,7 +31,6 @@ import viskit.model.ViskitElement;
 import viskit.model.ViskitEdgeParameter;
 import viskit.view.ConditionalExpressionPanel;
 import viskit.view.EdgeParametersPanel;
-import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -174,7 +174,7 @@ public class EdgeInspectorDialog extends JDialog
         descriptionJsp.setToolTipText(DESCRIPTION_HINT);
         descriptionJsp.setBorder(new CompoundBorder(
                 new EmptyBorder(0, 0, 5, 0),
-                BorderFactory.createTitledBorder("Description")));
+                BorderFactory.createTitledBorder("description")));
         edgeInspectorPanel.add(descriptionJsp);
 
         Dimension descriptionJspDimension = descriptionJsp.getPreferredSize();
@@ -591,6 +591,7 @@ public class EdgeInspectorDialog extends JDialog
             setDescription(edge.conditionalDescription);
             hideShowDescription(true);
         }
+        hideShowDescription(true); // always show
 
         setSchedulingType(edge instanceof SchedulingEdge);
     }

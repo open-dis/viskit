@@ -36,6 +36,7 @@ import org.jgraph.graph.DefaultGraphCell;
 import viskit.ViskitGlobals;
 import viskit.ViskitConfigurationStore;
 import viskit.ViskitStatics;
+import static viskit.ViskitStatics.DESCRIPTION_HINT;
 import viskit.jgraph.ViskitGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.MvcAbstractController;
@@ -258,7 +259,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
             eventGraphView.setSelectedEventGraphName(modelImplementation.getMetadata().name);
             if  (modelImplementation.getMetadata().description.isBlank())
-                 eventGraphView.setSelectedEventGraphDescription(EventGraphViewFrame.DESCRIPTION_HINT);
+                 eventGraphView.setSelectedEventGraphDescription(DESCRIPTION_HINT);
             else eventGraphView.setSelectedEventGraphDescription(modelImplementation.getMetadata().description);
             adjustRecentEventGraphFileSet(file);
             markEventGraphFilesAsOpened();
@@ -589,7 +590,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         Model mod = (Model) getModel();
         EventGraphView view = (EventGraphView) getView();
         GraphMetadata graphMetadata = mod.getMetadata();
-        if (graphMetadata.description.equals(EventGraphViewFrame.DESCRIPTION_HINT))
+        if (graphMetadata.description.equals(DESCRIPTION_HINT))
             graphMetadata.description = "";
 
         // Allow the user to type specific package names

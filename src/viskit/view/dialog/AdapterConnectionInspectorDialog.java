@@ -51,7 +51,7 @@ import javax.swing.text.JTextComponent;
 import viskit.model.AdapterEdge;
 import viskit.model.EventGraphNode;
 import viskit.ViskitStatics;
-import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
+import static viskit.ViskitStatics.DESCRIPTION_HINT;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects

@@ -22,7 +22,7 @@ import viskit.model.ViskitElement;
 import viskit.model.ViskitStateVariable;
 import viskit.view.ArgumentsPanel;
 import viskit.view.LocalVariablesPanel;
-import static viskit.view.EventGraphViewFrame.DESCRIPTION_HINT;
+import static viskit.ViskitStatics.DESCRIPTION_HINT;
 
 /**
  * A dialog class that lets the user add a new parameter to the document.
