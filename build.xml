@@ -793,7 +793,6 @@ their descpritions.
                 <include name="**/*.class"/>
                 <include name="**/*.java"/>
             </fileset>
-
         </delete>
     </target>
 
