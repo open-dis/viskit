@@ -54,7 +54,7 @@ public class ParameterDialog extends JDialog {
     }
 
     private ParameterDialog(JFrame parent, ViskitParameter param) {
-        super(parent, "Parameter Inspector", true);
+        super(parent, "Simulation Parameter Inspector", true);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new myCloseListener());
 

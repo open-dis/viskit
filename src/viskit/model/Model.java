@@ -68,7 +68,7 @@ public interface Model {
      *
      * @return Vector of ViskitParameter objects.
      */
-    Vector<ViskitElement> getSimParameters();
+    Vector<ViskitElement> getSimulationParameters();
 
     /**
      * Add a new event to the graph with the given label, at the given point
@@ -138,7 +138,7 @@ public interface Model {
 
     void newStateVariable(String name, String type, String initVal, String comment);
 
-    void newSimParameter(String name, String type, String initVal, String comment);
+    void newSimulationParameter(String name, String type, String initVal, String description);
 
     boolean changeStateVariable(ViskitStateVariable st);
 

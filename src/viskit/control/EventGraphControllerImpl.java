@@ -641,14 +641,15 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void newSimParameter() //------------------------
+    public void newSimulationParameter() //------------------------
     {
         ((EventGraphView) getView()).addParameterDialog();
     }
 
     @Override
-    public void buildNewSimParameter(String name, String type, String initVal, String comment) {
-        ((Model) getModel()).newSimParameter(name, type, initVal, comment);
+    public void buildNewSimulationParameter(String name, String type, String initVal, String description) 
+    {
+        ((Model) getModel()).newSimulationParameter(name, type, initVal, description);
     }
 
     @Override
@@ -1019,7 +1020,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     @Override
     public void buildNewNode(Point p) //--------------------------
     {
-        buildNewNode(p, "evnt_" + nodeCount++);
+        buildNewNode(p, "event_" + nodeCount++);
     }
 
     @Override

@@ -310,7 +310,7 @@ public class ViskitGlobals
     }
 
     public Vector<ViskitElement> getSimParametersList() {
-        return getActiveEventGraphModel().getSimParameters();
+        return getActiveEventGraphModel().getSimulationParameters();
     }
 
     public ComboBoxModel<ViskitElement> getSimParamsCBModel() {

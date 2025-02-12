@@ -31,11 +31,11 @@ import viskit.view.TransitionsPanel;
  * @since 2:56:21 PM
  * @version $Id$
  */
-public class EventInspectorDialog extends JDialog
+public class EventNodeInspectorDialog extends JDialog
 {
-    static final Logger LOG = Log4jUtilities.getLogger(EventInspectorDialog.class);
+    static final Logger LOG = Log4jUtilities.getLogger(EventNodeInspectorDialog.class);
 
-    private static EventInspectorDialog dialog;
+    private static EventNodeInspectorDialog dialog;
     private EventNode node;
     private static boolean modified = false;
     private final JTextField name;
@@ -68,7 +68,7 @@ public class EventInspectorDialog extends JDialog
      */
     public static boolean showDialog(JFrame f, EventNode node) {
         if (dialog == null) {
-            dialog = new EventInspectorDialog(f, node);
+            dialog = new EventNodeInspectorDialog(f, node);
         } else {
             dialog.setParams(f, node);
         }
@@ -78,8 +78,8 @@ public class EventInspectorDialog extends JDialog
         return modified;
     }
 
-    private EventInspectorDialog(final JFrame frame, EventNode node) {
-        super(frame, "Event Inspector: " + node.getName(), true);
+    private EventNodeInspectorDialog(final JFrame frame, EventNode node) {
+        super(frame, "Event Node Inspector: " + node.getName(), true);
         this.node = node;
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -286,10 +286,11 @@ public class EventInspectorDialog extends JDialog
         sizeAndPosition(c);
     }
 
-    private void fillWidgets() {
+    private void fillWidgets() 
+    {
         String nmSt = node.getName();
         nmSt = nmSt.replace(' ', '_');
-        setTitle("Event Inspector: " + nmSt);
+        setTitle("Event Node Inspector: " + nmSt);
         name.setText(nmSt);
 
         Dimension d = descriptionTF.getPreferredSize();
@@ -429,7 +430,7 @@ public class EventInspectorDialog extends JDialog
 //                if (!ps.isEmpty() && ViskitConfig.instance().getVal(ViskitConfig.BEANSHELL_WARNING).equalsIgnoreCase("true")) {
 //                    String parseResults = ViskitGlobals.instance().parseCode(evn, ps);
 //                    if (parseResults != null) {
-//                        boolean ret = BeanshellErrorDialog.showDialog(parseResults, EventInspectorDialog.this);
+//                        boolean ret = BeanshellErrorDialog.showDialog(parseResults, EventNodeInspectorDialog.this);
 //                        if (!ret) // don't ignore
 //                        {
 //                            return;
@@ -526,7 +527,7 @@ public class EventInspectorDialog extends JDialog
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(EventInspectorDialog.this, "Apply changes?",
+                int ret = JOptionPane.showConfirmDialog(EventNodeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
                     okButton.doClick();
@@ -543,12 +544,12 @@ public class EventInspectorDialog extends JDialog
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            StringBuffer sb = new StringBuffer(EventInspectorDialog.this.descriptionTF.getText().trim());
+            StringBuffer sb = new StringBuffer(EventNodeInspectorDialog.this.descriptionTF.getText().trim());
             boolean modded = TextAreaDialog.showTitledDialog("Event Description",
-                    EventInspectorDialog.this, sb);
+                    EventNodeInspectorDialog.this, sb);
             if (modded) {
-                EventInspectorDialog.this.descriptionTF.setText(sb.toString().trim());
-                EventInspectorDialog.this.descriptionTF.setCaretPosition(0);
+                EventNodeInspectorDialog.this.descriptionTF.setText(sb.toString().trim());
+                EventNodeInspectorDialog.this.descriptionTF.setCaretPosition(0);
                 setModified(true);
             }
         }

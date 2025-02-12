@@ -74,7 +74,7 @@ import viskit.util.EventGraphFileFilter;
 import viskit.view.dialog.ParameterDialog;
 import viskit.view.dialog.EdgeInspectorDialog;
 import viskit.view.dialog.StateVariableDialog;
-import viskit.view.dialog.EventInspectorDialog;
+import viskit.view.dialog.EventNodeInspectorDialog;
 import viskit.view.dialog.ViskitUserPreferences;
 import viskit.mvc.MvcController;
 import viskit.mvc.MvcModel;
@@ -373,8 +373,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphParametersSubpanel.setLayout(new BoxLayout(eventGraphParametersSubpanel, BoxLayout.X_AXIS));
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
 
-        JLabel titleLabel = new JLabel("Event Graph Parameters");
-        titleLabel.setToolTipText("Event graph parameters are initialized upon starting each simulation replication");
+        JLabel titleLabel = new JLabel("Simulation Parameters");
+        titleLabel.setToolTipText("Event graph simulation parameters are initialized upon starting each simulation replication");
 
         eventGraphParametersSubpanel.add(titleLabel);
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
@@ -559,7 +559,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     public String addParameterDialog() {
 
         if (ParameterDialog.showDialog(ViskitGlobals.instance().getMainFrame(), null)) {      // blocks here
-            ((EventGraphController) getController()).buildNewSimParameter(ParameterDialog.newName,
+            ((EventGraphController) getController()).buildNewSimulationParameter(ParameterDialog.newName,
                     ParameterDialog.newType,
                     "new value here",
                     ParameterDialog.newComment);
@@ -684,12 +684,9 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         ActionIntrospector.getAction(eventGraphController, "remove").setEnabled(false);
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(eventGraphController, "newNode", "Add Event Node", KeyEvent.VK_A,
-                KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
-        editMenu.add(buildMenuItem(eventGraphController, "newSimParameter", "Add Simulation Parameter...", KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add State Variable...", KeyEvent.VK_A,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
+        editMenu.add(buildMenuItem(eventGraphController, "newNode", "Add new Event Node", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newSimulationParameter", "Add new Simulation Parameter...", KeyEvent.VK_S, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add new State Variable...", KeyEvent.VK_A, null));
         editMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", KeyEvent.VK_A, null));
         editMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", KeyEvent.VK_A, null));
 
@@ -747,12 +744,9 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         ActionIntrospector.getAction(eventGraphController, "remove").setEnabled(false);
         editEventGraphSubMenu.addSeparator();
 
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newNode", "Add Event Node", KeyEvent.VK_A,
-                KeyStroke.getKeyStroke(KeyEvent.VK_N, accelMod)));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSimParameter", "Add Simulation Parameter...", KeyEvent.VK_A,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add State Variable...", KeyEvent.VK_A,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newNode", "Add new Event Node", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSimulationParameter", "Add new Simulation Parameter...", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add new State Variable...", KeyEvent.VK_A, null));
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", KeyEvent.VK_A, null));
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", KeyEvent.VK_A, null));
 
@@ -1331,7 +1325,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     @Override
     public boolean doEditNode(EventNode node) {
         selectMode.doClick();     // always go back into select mode
-        return EventInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrame(), node); // blocks
+        return EventNodeInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrame(), node); // blocks
     }
 
     @Override

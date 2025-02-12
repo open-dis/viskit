@@ -29,7 +29,7 @@ public interface EventGraphController {
      */
     void newNode();
 
-    void newSimParameter();
+    void newSimulationParameter();
 
     /** Comes in from plus button on State Variables panel */
     void newStateVariable();
@@ -37,15 +37,15 @@ public interface EventGraphController {
     /**
      * User has established some entity parameters, model can create objects
      *
-     * @param p the graphical point of new node
+     * @param point the graphical point of new node
      */
-    void buildNewNode(Point p);
+    void buildNewNode(Point point);
 
-    void buildNewNode(Point p, String name);
+    void buildNewNode(Point point, String name);
 
-    void buildNewSimParameter(String name, String type, String initVal, String comment);
+    void buildNewSimulationParameter(String name, String type, String initialValue, String description);
 
-    void buildNewStateVariable(String name, String type, String initVal, String comment);
+    void buildNewStateVariable(String name, String type, String initialValue, String description);
 
     /** Connect a scheduling edge between two nodes
      *

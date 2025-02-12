@@ -54,7 +54,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     Map<Event, EventNode> eventNodeCache = new HashMap<>();
     Map<Object, Edge> edgeCache = new HashMap<>();
     Vector<ViskitElement> stateVariables = new Vector<>();
-    Vector<ViskitElement> simParameters  = new Vector<>();
+    Vector<ViskitElement> simulationParameters  = new Vector<>();
 
     private final String schemaLocation = XMLValidationTool.EVENT_GRAPH_SCHEMA;
     private final String privateIndexVariablePrefix = "_index_variable_";
@@ -114,7 +114,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     public boolean newModel(File f) 
     {
         stateVariables.removeAllElements();
-        simParameters.removeAllElements();
+        simulationParameters.removeAllElements();
         eventNodeCache.clear();
         edgeCache.clear();
 
@@ -332,14 +332,14 @@ public class ModelImpl extends MvcAbstractModel implements Model
         numericPriority = b;
     }
 
-    private boolean stateVarParamNameCheck() {
+    private boolean stateVariableParameterNameCheck() {
         Set<String> hs = new HashSet<>(10);
         for (ViskitElement sv : stateVariables) {
             if (!hs.add(sv.getName())) {
                 return false;
             }
         }
-        for (ViskitElement sp : simParameters) {
+        for (ViskitElement sp : simulationParameters) {
             if (!hs.add(sp.getName())) {
                 return false;
             }
@@ -574,7 +574,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
             stateVariables.add(v);
 
-            if (!stateVarParamNameCheck()) {
+            if (!stateVariableParameterNameCheck()) {
                 mangleName(v);
             }
             notifyChanged(new ModelEvent(v, ModelEvent.STATEVARIABLEADDED, "New state variable"));
@@ -595,9 +595,9 @@ public class ModelImpl extends MvcAbstractModel implements Model
             vp = new ViskitParameter(p.getName(), p.getType(), c.trim());
             vp.opaqueModelObject = p;
 
-            simParameters.add(vp);
+            simulationParameters.add(vp);
 
-            if (!stateVarParamNameCheck()) {
+            if (!stateVariableParameterNameCheck()) {
                 mangleName(vp);
             }
             notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
@@ -615,33 +615,34 @@ public class ModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
-    public Vector<ViskitElement> getSimParameters() {
-        return new Vector<>( simParameters);
+    public Vector<ViskitElement> getSimulationParameters() {
+        return new Vector<>( simulationParameters);
     }
 
     // parameter mods
     // --------------
     @Override
-    public void newSimParameter(String nm, String typ, String xinitVal, String comment) {
-        ViskitParameter vp = new ViskitParameter(nm, typ, comment);
-        simParameters.add(vp);
+    public void newSimulationParameter(String name, String type, String xinitVal, String description) 
+    {
+        ViskitParameter viskitParameter = new ViskitParameter(name, type, description);
+        simulationParameters.add(viskitParameter);
 
-        if (!stateVarParamNameCheck()) {
-            mangleName(vp);
+        if (!stateVariableParameterNameCheck()) {
+            mangleName(viskitParameter);
         }
 
-        //p.setValue(initVal);
-        Parameter p = this.objectFactory.createParameter();
-        p.setName(nIe(nm));
-        p.setType(nIe(typ));
-        p.getComment().add(comment);
+        //parameter.setValue(initVal);
+        Parameter parameter = this.objectFactory.createParameter();
+        parameter.setName(nIe(name));
+        parameter.setType(nIe(type));
+        parameter.getComment().add(description);
 
-        vp.opaqueModelObject = p;
+        viskitParameter.opaqueModelObject = parameter;
 
-        jaxbRoot.getParameter().add(p);
+        jaxbRoot.getParameter().add(parameter);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "new sim parameter"));
+        notifyChanged(new ModelEvent(viskitParameter, ModelEvent.SIMPARAMETERADDED, "new simulation parameter"));
     }
 
     @Override
@@ -654,7 +655,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
                 break;
             }
         }
-        simParameters.remove(vp);
+        simulationParameters.remove(vp);
 
         setDirty(true);
         notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
@@ -669,7 +670,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     @Override
     public boolean changeSimParameter(ViskitParameter vp) {
         boolean retcode = true;
-        if (!stateVarParamNameCheck()) {
+        if (!stateVariableParameterNameCheck()) {
             mangleName(vp);
             retcode = false;
         }
@@ -694,7 +695,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         // get the new one here and show it around
         ViskitStateVariable vsv = new ViskitStateVariable(name, type, comment);
         stateVariables.add(vsv);
-        if (!stateVarParamNameCheck()) {
+        if (!stateVariableParameterNameCheck()) {
             mangleName(vsv);
         }
         StateVariable s = this.objectFactory.createStateVariable();
@@ -729,7 +730,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     @Override
     public boolean changeStateVariable(ViskitStateVariable vsv) {
         boolean retcode = true;
-        if (!stateVarParamNameCheck()) {
+        if (!stateVariableParameterNameCheck()) {
             mangleName(vsv);
             retcode = false;
         }
