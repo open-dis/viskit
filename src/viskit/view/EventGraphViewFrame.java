@@ -290,7 +290,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 setSelectedEventGraphDescription(graphMetadata.description);
             } 
             else if (viskit.ViskitStatics.debug) {
-                System.err.println("error: EventGraphViewFrame metadata null...");
+                LOG.error("error: EventGraphViewFrame metadata is null");
             }
         }
     }
@@ -683,11 +683,11 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         ActionIntrospector.getAction(eventGraphController, "remove").setEnabled(false);
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(eventGraphController, "newNode", "Add new Event Node", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newSimulationParameter", "Add new Simulation Parameter...", KeyEvent.VK_S, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add new State Variable...", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newNode", "Add a new Event Node", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newSimulationParameter", "Add a new Simulation Parameter", KeyEvent.VK_S, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add a new State Variable", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
 
         // Thess start off being disabled, until something is selected
         ActionIntrospector.getAction(eventGraphController, "newSelfRefSchedulingEdge").setEnabled(false);
@@ -743,11 +743,11 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         ActionIntrospector.getAction(eventGraphController, "remove").setEnabled(false);
         editEventGraphSubMenu.addSeparator();
 
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newNode", "Add new Event Node", KeyEvent.VK_A, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSimulationParameter", "Add new Simulation Parameter...", KeyEvent.VK_A, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add new State Variable...", KeyEvent.VK_A, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge...", KeyEvent.VK_A, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge...", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newNode", "Add a new Event Node", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSimulationParameter", "Add a new Simulation Parameter", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add a new State Variable", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
 
         // Thess start off being disabled, until something is selected
         ActionIntrospector.getAction(eventGraphController, "newSelfRefSchedulingEdge").setEnabled(false);
@@ -832,7 +832,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         helpMenu.addSeparator();
 
         helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
-        helpMenu.add(buildMenuItem(help, "aboutViskit", "About...", KeyEvent.VK_A, null));
+        helpMenu.add(buildMenuItem(help, "aboutViskit", "About Viskit", KeyEvent.VK_A, null));
 
         myMenuBar.add(helpMenu);
         }
