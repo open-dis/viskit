@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="Creator" package="examples" version="1.0" author="ahbuss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>Creator process creates customer entites</Comment>
     <StateVariable name="nextID" type="int">
         <Comment></Comment>
     </StateVariable>
     <Event name="Arrival">
-        <Comment></Comment>
+        <Comment>Each customer is sequentially numbered</Comment>
         <StateTransition state="nextID">
             <Assignment value="nextID+1"/>
         </StateTransition>
         <Schedule delay="0.0" event="CustomerArrival" condition="true" priority="DEFAULT">
-            <Comment></Comment>
+            <Comment>Each arriving customer produces an event</Comment>
             <EdgeParameter value="nextID"/>
         </Schedule>
         <Code></Code>

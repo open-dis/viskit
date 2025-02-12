@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="ServerWithReneges" package="examples" version="0.1.5" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Comment>Event graph for server handling customers and reneges</Comment>
     <Parameter name="numberServers" type="int"/>
     <Parameter name="serviceTime" type="simkit.random.RandomVariate"/>
     <Parameter name="renegeTime" type="simkit.random.RandomVariate"/>

@@ -8,6 +8,7 @@
         <Comment>how many customers have arrived</Comment>
     </StateVariable>
     <Event name="Run">
+        <Comment>This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity</Comment>
         <StateTransition state="numberArrivals">
             <Assignment value="0"/>
         </StateTransition>
