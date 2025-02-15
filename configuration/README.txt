@@ -9,3 +9,4 @@ Open-source software for Discrete Event Simulation (DES) can be found at
 For more information please contact
 
 	brutzman@nps.edu
+	tdnorbra@nps.edu
