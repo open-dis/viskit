@@ -681,8 +681,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             message = "<html><p align='center'>Are you sure you want to close </p><br/>";
             String projectName = ViskitGlobals.instance().getProjectName();
             if  (projectName.toLowerCase().contains("project"))
-                 message += "<p align='center'><i>"         + projectName + "</i></p><br/><p align='center'> the currently active project?</p><br/>";
-            else message += "<p align='center'>Project <i>" + projectName + "</i></p><br/><p align='center'>, the currently active project?</p><br/>";
+                 message += "<p align='center'><i>"         + projectName + "</i></p><br/><p align='center'> as the currently active project?</p><br/>";
+            else message += "<p align='center'>Project <i>" + projectName + "</i></p><br/><p align='center'> as the currently active project?</p><br/>";
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
             {
