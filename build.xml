@@ -780,6 +780,14 @@ their descpritions.
         </delete>
     </target>
     
+    <target name="clean.logs">
+        <delete verbose="true">
+            <fileset dir="logs">
+                <include name="*.log"/>
+            </fileset>
+        </delete>
+    </target>
+    
     <target name="clean.DefaultProject">
         <delete verbose="true">
             <fileset dir="MyViskitProjects/DefaultProject/AnalystReports">
