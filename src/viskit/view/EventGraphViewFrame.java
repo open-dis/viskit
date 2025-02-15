@@ -841,7 +841,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     // Use the actions package
     private JMenuItem buildMenuItem(Object source, String method, String name, Integer mnemonic, KeyStroke accelerator)
     {
-        Action a = ActionIntrospector.getAction(source, method);
+        Action action = ActionIntrospector.getAction(source, method);
+        if (action == null)
+        {
+            LOG.error("buildMenuItem reflection failed for name=" + name + " method=" + method + " in " + source.toString());
+            return new JMenuItem("(not working, reflection failed) " + name);
+        }
         Map<String, Object> map = new HashMap<>();
         if (mnemonic != null) {
             map.put(Action.MNEMONIC_KEY, mnemonic);
@@ -853,10 +858,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             map.put(Action.NAME, name);
         }
         if (!map.isEmpty()) {
-            ActionUtilities.decorateAction(a, map);
+            ActionUtilities.decorateAction(action, map);
         }
 
-        return ActionUtilities.createMenuItem(a);
+        return ActionUtilities.createMenuItem(action);
     }
 
     private JMenu buildMenu(String name)
