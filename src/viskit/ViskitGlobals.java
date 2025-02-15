@@ -81,6 +81,7 @@ import static viskit.ViskitProject.DEFAULT_PROJECT_NAME;
 import viskit.control.TextAreaOutputStream;
 import viskit.model.AssemblyModelImpl;
 import viskit.view.MainFrame;
+import viskit.view.dialog.ViskitProjectGenerationDialog3;
 
 /**
  * ViskitGlobals contains global methods and variables.
@@ -111,10 +112,14 @@ public class ViskitGlobals
         viskitConfigurationStore = ViskitConfigurationStore.instance();
 
         defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
-        myTypeListener = new MyTypeListener();
-        buildTypePopup();
+        myViskitTypeListener = new MyViskitTypeListener();
+        buildViskitTypePopupMenu();
+        
+        // TODO are these really needed right here?
         initializeProjectHome();  // TODO needed? maybe yes for first time, but not if repeating...
         createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
+        
+        LOG.info("created singleton, constructor initialization complete"); // TODO threading issue?
     }
     
     public static ViskitGlobals instance()
@@ -178,14 +183,14 @@ public class ViskitGlobals
     ViskitConfigurationStore viskitConfigurationStore;
 
     /* routines to manage the singleton-aspect of the views. */
-    AssemblyViewFrame assemblyViewFrame;
+    AssemblyViewFrame      assemblyViewFrame;
     AssemblyControllerImpl assemblyController;
 
     private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
     private Interpreter interpreter;
     private final DefaultComboBoxModel<String> defaultComboBoxModel;
-    private JPopupMenu popupMenu;
-    private final MyTypeListener myTypeListener;
+    private       JPopupMenu           viskitTypePopupMenu;
+    private final MyViskitTypeListener myViskitTypeListener;
 
     /* routines to manage the singleton-aspect of the view */
     private AnalystReportViewFrame  analystReportViewFrame;
@@ -224,7 +229,7 @@ public class ViskitGlobals
         return assemblyController;
     }
 
-    ActionListener defaultAssemblyQuitHandler = new ActionListener() {
+    ActionListener defaultAssemblyQuitActionListener = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -233,16 +238,16 @@ public class ViskitGlobals
             }
         }
     };
-    ActionListener assemblyQuitHandler = defaultAssemblyQuitHandler;
+    ActionListener assemblyQuitActionListener = defaultAssemblyQuitActionListener;
 
     public void quitAssemblyEditor() {
-        if (assemblyQuitHandler != null) {
-            assemblyQuitHandler.actionPerformed(new ActionEvent(this, 0, "quit Assembly editor"));
+        if (assemblyQuitActionListener != null) {
+            assemblyQuitActionListener.actionPerformed(new ActionEvent(this, 0, "quit Assembly editor"));
         }
     }
 
-    public void setAssemblyQuitHandler(ActionListener lis) {
-        assemblyQuitHandler = lis;
+    public void setAssemblyQuitActionListener(ActionListener newActionListener) {
+        assemblyQuitActionListener = newActionListener;
     }
 
     /* EventGraphViewFrame / EventGraphControllerImpl */
@@ -280,7 +285,7 @@ public class ViskitGlobals
         return (Model) eventGraphController.getModel();
     }
 
-    ActionListener defaultEventGraphQuitHandler = new ActionListener() {
+    ActionListener defaultEventGraphQuitActionListener = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -289,7 +294,7 @@ public class ViskitGlobals
             }
         }
     };
-    ActionListener eventGraphQuitHandler = defaultEventGraphQuitHandler;
+    ActionListener eventGraphQuitHandler = defaultEventGraphQuitActionListener;
 
     public void quitEventGraphEditor() {
         if (eventGraphQuitHandler != null) {
@@ -305,7 +310,7 @@ public class ViskitGlobals
         return getActiveEventGraphModel().getStateVariables();
     }
 
-    public ComboBoxModel<ViskitElement> getStateVariablesCBModel() {
+    public ComboBoxModel<ViskitElement> getStateVariablesComboBoxModel() {
         return new DefaultComboBoxModel<>(getStateVariablesList());
     }
 
@@ -313,7 +318,7 @@ public class ViskitGlobals
         return getActiveEventGraphModel().getSimulationParameters();
     }
 
-    public ComboBoxModel<ViskitElement> getSimParamsCBModel() {
+    public ComboBoxModel<ViskitElement> getSimParamsComboBoxModel() {
         return new DefaultComboBoxModel<>(getSimParametersList());
     }
 
@@ -369,8 +374,8 @@ public class ViskitGlobals
     /******
      * Beanshell code
      ******/
-    private void initBeanShell() {
-
+    private void initializeBeanShell()
+    {
         if (interpreter == null) {
             interpreter = new Interpreter();
             interpreter.setStrictJava(true);       // no loose typing
@@ -387,23 +392,23 @@ public class ViskitGlobals
             }
         }
 
-        NameSpace ns = interpreter.getNameSpace();
-        ns.importPackage("simkit.*");
-        ns.importPackage("simkit.random.*");
-        ns.importPackage("simkit.smdx.*");
-        ns.importPackage("simkit.stat.*");
-        ns.importPackage("simkit.util.*");
-        ns.importPackage("diskit.*");         // 17 Nov 2004
+        NameSpace nameSpace = interpreter.getNameSpace();
+        nameSpace.importPackage("simkit.*");
+        nameSpace.importPackage("simkit.random.*");
+        nameSpace.importPackage("simkit.smdx.*");
+        nameSpace.importPackage("simkit.stat.*");
+        nameSpace.importPackage("simkit.util.*");
+        nameSpace.importPackage("diskit.*");         // 17 Nov 2004
     }
 
     /** Use BeanShell for code parsing to detect potential errors
      *
-     * @param node the SimEntity node being evaluated
+     * @param eventNode the SimEntity node being evaluated
      * @param interpretString the code block to check
      * @return any indication of a parsing error.  A null means all is good.
      */
-    public String parseCode(EventNode node, String interpretString) {
-        initBeanShell();
+    public String parseCode(EventNode eventNode, String interpretString) {
+        initializeBeanShell();
         // Load the interpreter with the state variables and the sim parameters
         // Load up any local variables and event parameters for this particular node
         // Then, parse.
@@ -414,10 +419,10 @@ public class ViskitGlobals
         String name;
         String type;
 
-        if (node != null) {
+        if (eventNode != null) {
 
             // Event local variables
-            for (ViskitElement eventLocalVariable : node.getLocalVariables()) 
+            for (ViskitElement eventLocalVariable : eventNode.getLocalVariables()) 
             {
                 String result;
                 type = eventLocalVariable.getType();
@@ -435,7 +440,7 @@ public class ViskitGlobals
             }
 
             // Event arguments
-            for (ViskitElement viskitElement : node.getArguments()) {
+            for (ViskitElement viskitElement : eventNode.getArguments()) {
                 type = viskitElement.getType();
                 name = viskitElement.getName();
                 String result = handleNameType(name, type);
@@ -468,11 +473,11 @@ public class ViskitGlobals
         }
 
         // Sim parameters
-        for (ViskitElement par : getSimParametersList())
+        for (ViskitElement simParameter : getSimParametersList())
         {
             String result;
-            type = par.getType();
-            name = par.getName();
+            type = simParameter.getType();
+            name = simParameter.getName();
             if (isArray(type)) {
                 result = handleNameType(name, stripArraySize(type));
             } else {
@@ -532,7 +537,7 @@ public class ViskitGlobals
 
     private String handleNameType(String name, String typ) {
         String returnString = null;
-        if (!handlePrimitive(name, typ)) {
+        if (!handlePrimitiveType(name, typ)) {
             returnString = findType(name, typ);
         }
 
@@ -543,7 +548,7 @@ public class ViskitGlobals
     private String findType(String name, String type) {
         String returnString = null;
         try {
-            if (isGeneric(type)) {
+            if (isGenericType(type)) {
                 type = type.substring(0, type.indexOf("<"));
             }
             Object o = instantiateType(type);
@@ -573,7 +578,7 @@ public class ViskitGlobals
      * @param type the type to check
      * @return true if a generic type
      */
-    public boolean isGeneric(String type) {
+    public boolean isGenericType(String type) {
         return type.contains(">");
     }
     
@@ -588,17 +593,59 @@ public class ViskitGlobals
     {
         String projectHome = viskitConfigurationStore.getVal(ViskitConfigurationStore.PROJECT_PATH_KEY);
 //      String projectHome = ViskitGlobals.instance().getProjectWorkingDirectory().getName();
-        LOG.debug(projectHome);
+        LOG.info("projectHome=" + projectHome);
         if (  projectHome.isEmpty() || 
             !(new File(projectHome).exists()) ||
              (hasViskitProject() && !isProjectOpen()))
         {
-            // no project open, popup special dialog
-            if (viskitProjectSelectionPanel == null)
-            {
-                viskitProjectSelectionPanel = new ViskitProjectSelectionPanel(); // should only occur once
+            LOG.info("initializeProjectHome() did not find a previously existing project");
+            // TODO use regular panel
+            File newProjectFile;
+
+            String popupTitle = "New Project or Open Project?";
+            String message =
+                    "<html><body>" +
+                    "<p align='center'>Create a new Viskit project, or</p><br />" +
+                    "<p align='center'>Open an existing Viskit project?</p><br />";
+            int returnValue = ViskitGlobals.instance().getMainFrame().genericAsk2Buttons(popupTitle, message, 
+                    "New Project", "Open Project");
+        
+            if  (returnValue == 0) // new project
+            {    
+
+    // What we wish to do here is force the user to create a new project space
+    // before letting them move on, or, open and existing project, or the only
+    // other option is to exit
+    do {
+        ViskitProjectGenerationDialog3.showDialog();
+        if (ViskitProjectGenerationDialog3.cancelled)
+            return;
+        
+        String newProjectPath = ViskitProjectGenerationDialog3.projectPath;
+        newProjectFile = new File(newProjectPath);
+        if (newProjectFile.exists() && (newProjectFile.isFile() || newProjectFile.list().length > 0))
+            JOptionPane.showMessageDialog(ViskitGlobals.instance().getEventGraphViewFrame().getRootPane(), 
+                    "Chosen project name already exists, please create a new project name.");
+        else
+            break; // out of do
+        
+    } while (true);
+
+    ViskitGlobals.instance().setProjectFile(newProjectFile);
+
+//                File projectDirectory = ViskitProject.openProjectDirectory(ViskitGlobals.instance().getEventGraphViewFrame().getRootPane(),".");
             }
-            viskitProjectSelectionPanel.showDialog(); // blocks
+            else // open project
+            {
+                File projectDirectory = ViskitProject.openProjectDirectory(ViskitGlobals.instance().getEventGraphViewFrame().getRootPane(),".");
+            }
+            
+////            // no project open, popup special dialog
+////            if (viskitProjectSelectionPanel == null)
+////            {
+////                viskitProjectSelectionPanel = new ViskitProjectSelectionPanel(); // should only occur once
+////            }
+////            viskitProjectSelectionPanel.showDialog(); // blocks
         } 
         else {
             ViskitProject.VISKIT_PROJECTS_DIRECTORY = projectHome;
@@ -607,11 +654,11 @@ public class ViskitGlobals
 
     private Object instantiateType(String type) throws Exception {
         Object o = null;
-        boolean isArr = false;
+        boolean isArray = false;
 
         if (isArray(type)) {
             type = type.substring(0, type.length() - "[]".length());
-            isArr = true;
+            isArray = true;
         }
         try {
             Class<?> c = ViskitStatics.classForName(type);
@@ -622,7 +669,7 @@ public class ViskitGlobals
                 // The first constructor should be the default, no argument one
                 for (Constructor<?> constructor : constructors) {
                     if (constructor.getParameterTypes().length == 0) {
-                        if (isArr) {
+                        if (isArray) {
                             o = Array.newInstance(c, 1);
                         } else {
                             o = c.getDeclaredConstructor().newInstance();
@@ -646,69 +693,69 @@ public class ViskitGlobals
         return o;
     }
 
-    private boolean handlePrimitive(String name, String typ) {
+    private boolean handlePrimitiveType(String name, String type) {
         try {
-            if (typ.equals("int")) {
+            if (type.equals("int")) {
                 interpreter.eval("int " + name + " = 0");
                 return true;
             }
-            if (typ.equals("int[]")) {
+            if (type.equals("int[]")) {
                 interpreter.eval("int[] " + name + " = new int[1]");
                 return true;
             }
-            if (typ.equals("boolean")) {
+            if (type.equals("boolean")) {
                 interpreter.eval("boolean " + name + " = false");  // 17Aug04, should have always defaulted to false
                 return true;
             }
-            if (typ.equals("boolean[]")) {
+            if (type.equals("boolean[]")) {
                 interpreter.eval("boolean[] " + name + " = new boolean[1]");
                 return true;
             }
-            if (typ.equals("double")) {
+            if (type.equals("double")) {
                 interpreter.eval("double " + name + " = 0.0d");
                 return true;
             }
-            if (typ.equals("double[]")) {
+            if (type.equals("double[]")) {
                 interpreter.eval("double[] " + name + " = new double[1]");
                 return true;
             }
-            if (typ.equals("float")) {
+            if (type.equals("float")) {
                 interpreter.eval("float " + name + " = 0.0f");
                 return true;
             }
-            if (typ.equals("float[]")) {
+            if (type.equals("float[]")) {
                 interpreter.eval("float[] " + name + " = new float[1]");
                 return true;
             }
-            if (typ.equals("byte")) {
+            if (type.equals("byte")) {
                 interpreter.eval("byte " + name + " = 0");
                 return true;
             }
-            if (typ.equals("byte[]")) {
+            if (type.equals("byte[]")) {
                 interpreter.eval("byte[] " + name + " = new byte[1]");
                 return true;
             }
-            if (typ.equals("char")) {
+            if (type.equals("char")) {
                 interpreter.eval("char " + name + " = '0'");
                 return true;
             }
-            if (typ.equals("char[]")) {
+            if (type.equals("char[]")) {
                 interpreter.eval("char[] " + name + " = new char[1]");
                 return true;
             }
-            if (typ.equals("short")) {
+            if (type.equals("short")) {
                 interpreter.eval("short " + name + " = 0");
                 return true;
             }
-            if (typ.equals("short[]")) {
+            if (type.equals("short[]")) {
                 interpreter.eval("short[] " + name + " = new short[1]");
                 return true;
             }
-            if (typ.equals("long")) {
+            if (type.equals("long")) {
                 interpreter.eval("long " + name + " = 0");
                 return true;
             }
-            if (typ.equals("long[]")) {
+            if (type.equals("long[]")) {
                 interpreter.eval("long[] " + name + " = new long[1]");
                 return true;
             }
@@ -743,23 +790,24 @@ public class ViskitGlobals
             {}
     };
 
-    /** @param ty the type to check if primitive or array
+    /** @param viskitType the type to check if primitive or array
      * @return true if primitive or array
      */
-    public boolean isPrimitiveOrPrimitiveArray(String ty) {
+    public boolean isPrimitiveOrPrimitiveArray(String viskitType) {
         int idx;
-        if ((idx = ty.indexOf('[')) != -1) {
-            ty = ty.substring(0, idx);
+        if ((idx = viskitType.indexOf('[')) != -1) {
+            viskitType = viskitType.substring(0, idx);
         }
-        return isPrimitive(ty);
+        return isPrimitive(viskitType);
     }
 
-    /** @param ty the type to check if primitive type
+    /** @param viskitType the type to check if primitive type
      * @return true if primitive type
      */
-    public boolean isPrimitive(String ty) {
+    public boolean isPrimitive(String viskitType) 
+    {
         for (String s : moreClasses[PRIMITIVES_INDEX]) {
-            if (ty.equals(s)) {
+            if (viskitType.equals(s)) {
                 return true;
             }
         }
@@ -767,18 +815,18 @@ public class ViskitGlobals
     }
 
     Pattern bracketsPattern = Pattern.compile("\\[.*?\\]");
-    Pattern spacesPattern = Pattern.compile("\\s");
+    Pattern   spacesPattern = Pattern.compile("\\s");
 
-    public String stripArraySize(String typ) {
-        Matcher m = bracketsPattern.matcher(typ);
+    public String stripArraySize(String viskitType) {
+        Matcher m = bracketsPattern.matcher(viskitType);
         String r = m.replaceAll("[]");            // [blah] with[]
         m = spacesPattern.matcher(r);
         return m.replaceAll("");
     }
 
-    public String[] getArraySize(String typ) {
+    public String[] getArraySize(String viskitType) {
         Vector<String> v = new Vector<>();
-        Matcher m = bracketsPattern.matcher(typ);
+        Matcher m = bracketsPattern.matcher(viskitType);
 
         while (m.find()) {
             String g = m.group();
@@ -795,54 +843,57 @@ public class ViskitGlobals
      * for a new variable.  We look around to see if we've already got it
      * covered.  If not, we add it to the end of the list.
      *
-     * @param ty the type to evaluate
+     * @param viskitType the type to evaluate
      * @return the String representation of this type if found
      */
-    public String typeChosen(String ty) {
-        ty = ty.replaceAll("\\s", "");              // every whitespace removed
+    public String typeChosen(String viskitType) {
+        viskitType = viskitType.replaceAll("\\s", "");              // every whitespace removed
         for (int i = 0; i < defaultComboBoxModel.getSize(); i++) {
-            if (defaultComboBoxModel.getElementAt(i).equals(ty)) {
-                return ty;
+            if (defaultComboBoxModel.getElementAt(i).equals(viskitType)) {
+                return viskitType;
             }
         }
         // else, put it at the end, but before the "more"
-        defaultComboBoxModel.insertElementAt(ty, defaultComboBoxModel.getSize() - 1);
-        return ty;
+        defaultComboBoxModel.insertElementAt(viskitType, defaultComboBoxModel.getSize() - 1);
+        return viskitType;
     }
 
-    public JComboBox<String> getTypeCB() {
-        JComboBox<String> cb = new JComboBox<>(defaultComboBoxModel);
-        cb.addActionListener(myTypeListener);
-        cb.addItemListener(myTypeListener);
-        cb.setRenderer(new myTypeListRenderer());
-        cb.setEditable(true);
-        return cb;
+    public JComboBox<String> getViskitTypeComboBox() 
+    {
+        JComboBox<String> comboBox = new JComboBox<>(defaultComboBoxModel);
+        comboBox.addActionListener(myViskitTypeListener);
+        comboBox.addItemListener(myViskitTypeListener);
+        comboBox.setRenderer(new myViskitTypeListRenderer());
+        comboBox.setEditable(true);
+        return comboBox;
     }
 
-    private void buildTypePopup() {
+    private void buildViskitTypePopupMenu()
+    {
+        viskitTypePopupMenu = new JPopupMenu();
+        JMenu menu;
+        JMenuItem menuItem;
 
-        popupMenu = new JPopupMenu();
-        JMenu m;
-        JMenuItem mi;
-
-        for (int i = 0; i < morePackages.length; i++) {
+        for (int i = 0; i < morePackages.length; i++) 
+        {
             if (moreClasses[i].length <= 0) {           // if no classes, make the "package" selectable
-                mi = new MyJMenuItem(morePackages[i], null);
-                mi.addActionListener(myTypeListener);
-                popupMenu.add(mi);
-            } else {
-                m = new JMenu(morePackages[i]);
+                menuItem = new MyJMenuItem(morePackages[i], null);
+                menuItem.addActionListener(myViskitTypeListener);
+                viskitTypePopupMenu.add(menuItem);
+            } 
+            else {
+                menu = new JMenu(morePackages[i]);
                 for (String item : moreClasses[i]) {
                     if (i == PRIMITIVES_INDEX) {
-                        mi = new MyJMenuItem(item, item);
+                        menuItem = new MyJMenuItem(item, item);
                     } // no package
                     else {
-                        mi = new MyJMenuItem(item, morePackages[i] + "." + item);
+                        menuItem = new MyJMenuItem(item, morePackages[i] + "." + item);
                     }
-                    mi.addActionListener(myTypeListener);
-                    m.add(mi);
+                    menuItem.addActionListener(myViskitTypeListener);
+                    menu.add(menuItem);
                 }
-                popupMenu.add(m);
+                viskitTypePopupMenu.add(menu);
             }
         }
     }
@@ -920,31 +971,33 @@ public class ViskitGlobals
         projectWorkingDirectory = viskitProject.getClassesDirectory();
     }
 
-    private ClassLoader workLoader, freshLoader;
+    private ClassLoader workingClassLoader, freshClassLoader;
 
     /**
-     * Retrieve Viskit's working ClassLoader. It may be reset from time to
-     * time if extra classpaths are loaded
+     * Retrieve Viskit's working ClassLoader, which may be reset from time to
+     * time if extra classpaths are loaded.
      *
      * @return Viskit's working ClassLoader
      */
-    public ClassLoader getWorkingClassLoader() {
-        if (workLoader == null) {
+    public ClassLoader getWorkingClassLoader() 
+    {
+        if (workingClassLoader == null) {
             URL[] urls = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
-            LocalBootLoader loader = new LocalBootLoader(urls,
+            LocalBootLoader localBootLoader = new LocalBootLoader(urls,
                     Thread.currentThread().getContextClassLoader(),
                     getProjectWorkingDirectory());
 
             // Allow Assembly files in the ClassLoader
-            workLoader = loader.initialize(true);
+            workingClassLoader = localBootLoader.initialize(true);
 
-            Thread.currentThread().setContextClassLoader(workLoader);
+            Thread.currentThread().setContextClassLoader(workingClassLoader);
         }
-        return workLoader;
+        return workingClassLoader;
     }
 
     public void resetWorkingClassLoader() {
-        workLoader = null;
+        workingClassLoader = null;
+        LOG.debug("resetWorkingClassLoader() complete"); // TODO threading issue?
     }
 
     /** This class loader is specific to Assembly running in that it is
@@ -952,9 +1005,10 @@ public class ViskitGlobals
      *
      * @return a pristine class loader for Assembly runs
      */
-    public ClassLoader getFreshClassLoader() {
-        if (freshLoader == null) {
-
+    public ClassLoader getFreshClassLoader() 
+    {
+        if (freshClassLoader == null)
+        {
             // Forcing exposure of extra classpaths here.  Bugfix 1237
             URL[] urlArray = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
 
@@ -966,27 +1020,30 @@ public class ViskitGlobals
                any case we must retain the original bootloader as it has
                references to the loaded module system.
             */
-            LocalBootLoader loader = new LocalBootLoader(urlArray,
+            LocalBootLoader localBootLoader = new LocalBootLoader(urlArray,
                 ClassLoader.getPlatformClassLoader(), // <- the parent of the platform loader should be the internal boot loader
 getProjectWorkingDirectory());
 
             // Allow Assembly files in the ClassLoader
-            freshLoader = loader.initialize(true);
+            freshClassLoader = localBootLoader.initialize(true);
 
             // Set a fresh ClassLoader for this thread to be free of any static
             // state set from the Viskit working ClassLoader
-            Thread.currentThread().setContextClassLoader(freshLoader);
+            Thread.currentThread().setContextClassLoader(freshClassLoader);
         }
-        return freshLoader;
+        LOG.debug("getFreshClassLoader() complete"); // TODO threading issue?
+        return freshClassLoader;
     }
 
     public void resetFreshClassLoader() {
-        freshLoader = null;
+        freshClassLoader = null;
+        LOG.debug("resetFreshClassLoader() complete"); // TODO threading issue?
     }
 
     /** @return a model to print a stack trace of calling classes and their methods */
     @SuppressWarnings({"ThrowableInstanceNotThrown", "ThrowableInstanceNeverThrown", "ThrowableResultIgnored"})
-    public String printCallerLog() {
+    public String printCallerLog() 
+    {
         StringBuilder sb = new StringBuilder();
         sb.append("Calling class: ").append(new Throwable().fillInStackTrace().getStackTrace()[4].getClassName());
         sb.append("\nCalling method: ").append(new Throwable().fillInStackTrace().getStackTrace()[4].getMethodName());
@@ -1056,12 +1113,14 @@ getProjectWorkingDirectory());
 
     /** Called to perform proper thread shutdown without calling System.exit(0)
      *
-     * @param status the status of JVM shutdown
+     * @param status the status code for application shutdown
      */
-    public void systemExit(int status) {
-        if (!isSystemExitCalled()) {
+    public void systemExit(int status) 
+    {
+        if (!isSystemExitCalled()) 
+        {
             systemExitHandler.doSystemExit(status);
-            setSystemExitCalled(true);
+            setSystemExitCalled(true); // avoid repeated calls
         }
     }
 
@@ -1114,7 +1173,7 @@ getProjectWorkingDirectory());
         }
     }
 
-    class MyTypeListener implements ActionListener, ItemListener {
+    class MyViskitTypeListener implements ActionListener, ItemListener {
 
         @Override
         public void itemStateChanged(ItemEvent e) {
@@ -1134,7 +1193,7 @@ getProjectWorkingDirectory());
                     // NOTE: was getting an IllegalComponentStateException for component not showing
                     Runnable r = () -> {
                         if (cb.isShowing())
-                            popupMenu.show(cb, 0, 0);
+                            viskitTypePopupMenu.show(cb, 0, 0);
                     };
 
                     try {
@@ -1156,7 +1215,7 @@ getProjectWorkingDirectory());
     }
 
     @SuppressWarnings("serial")
-    class myTypeListRenderer extends JLabel implements ListCellRenderer<String> {
+    class myViskitTypeListRenderer extends JLabel implements ListCellRenderer<String> {
 
         @Override
         public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {

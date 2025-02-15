@@ -81,7 +81,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
         descriptionField.addFocusListener(focList);
         setMaxHeight(descriptionField);
 
-        stateVarTypeCombo = ViskitGlobals.instance().getTypeCB();
+        stateVarTypeCombo = ViskitGlobals.instance().getViskitTypeComboBox();
         stateVarTypeCombo.getEditor().getEditorComponent().addFocusListener(focList);
         setMaxHeight(stateVarTypeCombo);
 

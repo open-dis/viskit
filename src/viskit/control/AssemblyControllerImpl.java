@@ -678,7 +678,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (ViskitGlobals.instance().getViskitProject().isProjectOpen())
         {
             title = "Close Current Project?";
-            message = "<html><p align='center'>Are you sure you want to close </p><br/>";
+            message = "<html><p align='center'>Are you sure that you want to first close</p><br/>";
             String projectName = ViskitGlobals.instance().getProjectName();
             if  (projectName.toLowerCase().contains("project"))
                  message += "<p align='center'><i>"         + projectName + "</i></p><br/><p align='center'> as the currently active project?</p><br/>";
@@ -1834,11 +1834,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             message += " simulation";
         message +=
                 " is ready to run!</p><br />" +
-                "<p align='center'>Check settings at left, then press Run button to begin.</p><br />" +
+                "<p align='center'>Check the Replication Settings at left, then press Run button to begin.</p><br />" +
                 "<p align='center'>Multiple simulation replications provide data for a draft Analyst Report.</p><br /></body></html>";
                 
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
-                "Ready to Commence the Simulation Run", message);
+                "Ready to Commence Simulation Run", message);
     }
 
     public static final int EXEC_TARGET_CLASS_NAME = 0;

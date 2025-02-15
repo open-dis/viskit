@@ -122,6 +122,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private List<String> entitiesWithStatisticsList;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
+    
+
+            // Because there is no instantiated report builder in the current
+            // thread context, we reflect here
+    private static ClassLoader localWorkingClassLoader = ViskitGlobals.instance().getWorkingClassLoader();
 
     /**
      * Default constructor sets parameters of BasicAssembly to their
@@ -826,12 +831,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             // Creates the temp file only when user required
             initReportFile();
+            
+//            // TODO the following block appears to break ViskitGlobals singleton pattern!
+//            // Because there is no instantiated report builder in the current
+//            // thread context, we reflect here
+//            ClassLoader localLoader = ViskitGlobals.instance().getWorkingClassLoader();
 
-            // Because there is no instantiated report builder in the current
-            // thread context, we reflect here
-            ClassLoader localLoader = ViskitGlobals.instance().getWorkingClassLoader();
             try {
-                Class<?> clazz = localLoader.loadClass("viskit.model.AnalystReportModel");
+                Class<?> clazz = localWorkingClassLoader.loadClass("viskit.model.AnalystReportModel");
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
                 Object arbObject = arbConstructor.newInstance(reportStatisticsConfiguration.getReport(), pclNodeCache);
                 Method writeToXMLFileMethod = clazz.getMethod("writeToXMLFile", File.class);

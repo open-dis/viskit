@@ -132,7 +132,7 @@ public class SimulationRunPanel extends JPanel
         scrollBar = scrollPane.getVerticalScrollBar();
         scrollBar.setUnitIncrement(STEPSIZE);
 
-        JComponent vcrPanel = makeVCRPanel(showExtraButtons);
+        JComponent vcrPanel = makeReplicationSettingsVCRPanel(showExtraButtons);
 
         viskitRunnerBannerString = lineEnd; // provide spacing, presumably
         viskitRunnerBannerLabel = new JLabel(viskitRunnerBannerString, JLabel.CENTER);
@@ -163,14 +163,21 @@ public class SimulationRunPanel extends JPanel
 
     private final String VERBOSE_REPLICATION_DEFAULT_HINT = "[replication #]";
     
-    private JPanel makeVCRPanel()
+    private JPanel makeReplicationSettingsVCRPanel()
     {
-        return makeVCRPanel (false);
+        return makeReplicationSettingsVCRPanel (false);
     }
     
-    private JPanel makeVCRPanel(boolean showIncompleteButtons)
+    private JPanel makeReplicationSettingsVCRPanel(boolean showIncompleteButtons)
     {
         JPanel upperLeftFlowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        JLabel replicationSettingsLabel = new JLabel("Replication Settings", JLabel.CENTER);
+        replicationSettingsLabel.setToolTipText("These settings control simulation replications");
+        upperLeftFlowPanel.add(Box.createHorizontalStrut(10));
+        upperLeftFlowPanel.add(Box.createHorizontalStrut(10));
+        upperLeftFlowPanel.add(Box.createHorizontalStrut(10));
+        upperLeftFlowPanel.add(replicationSettingsLabel);
 
         JLabel vcrStartTimeLabel = new JLabel("Sim start time: ");
         vcrStartTimeLabel.setToolTipText("Initial simulation start time");

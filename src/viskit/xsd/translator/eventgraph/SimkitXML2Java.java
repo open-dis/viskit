@@ -1135,7 +1135,7 @@ public class SimkitXML2Java {
     }
 
     private boolean isGeneric(String type) {
-        return ViskitGlobals.instance().isGeneric(type);
+        return ViskitGlobals.instance().isGenericType(type);
     }
 
     private String stripLength(String s) {

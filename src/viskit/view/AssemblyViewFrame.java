@@ -53,6 +53,7 @@ import java.net.URL;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
@@ -159,7 +160,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private JToolBar toolBar;
     private JToggleButton selectMode;
     private JToggleButton adapterMode,  simEventListenerMode,  propertyChangeListenerMode;
-    private LegoTree lTree, pclTree;
+    private LegoTree legoEventGraphsTree, propertyChangeListenerTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
     private RecentProjectFileSetListener recentProjectFileSetListener;
@@ -837,7 +838,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         vGAmod.setjGraph(graphPane); // TODO fix this
 
         graphPane.assemblyModel = assemblyModel;
-        graphPane.trees = treePanels;
+        graphPane.trees = treePanelsSplitPane;
         graphPane.trees.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         graphPane.trees.setMinimumSize(new Dimension(20, 20));
         graphPane.trees.setDividerLocation(250);
@@ -921,39 +922,42 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     /** Rebuilds the Listener Event Graph Object (LEGO) tree view */
-    public void rebuildLEGOTreePanels() {
+    public void rebuildLEGOTreePanels() 
+    {
         if (getCurrentViskitGraphAssemblyComponentWrapper() == null)
             return; // no LEGO panel yet
 
-        lTree.clear();
-        pclTree.clear();
+        legoEventGraphsTree.clear();
+        propertyChangeListenerTree.clear();
         JSplitPane treeSplit = buildTreePanels();
         getCurrentViskitGraphAssemblyComponentWrapper().drawingSplitPane.setTopComponent(treeSplit);
         treeSplit.setDividerLocation(250);
-        lTree.repaint();
-        pclTree.repaint();
+        legoEventGraphsTree.repaint();
+        propertyChangeListenerTree.repaint();
     }
-    private JSplitPane treePanels;
+    private JSplitPane treePanelsSplitPane;
 
-    private JSplitPane buildTreePanels() {
-        lTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
+    private JSplitPane buildTreePanels() 
+    {
+        legoEventGraphsTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
-        pclTree = new LegoTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
+        propertyChangeListenerTree = new LegoTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
         // Parse any extra/additional classpath for any required dependencies
         File file;
         try {
-            URL[] extraCP = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
-            for (URL path : extraCP) { // tbd same for pcls
+            URL[] extraClassPathUrlArray = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
+            for (URL path : extraClassPathUrlArray) { // tbd same for pcls
                 if (path == null)
                     continue; // can happen if extraClassPaths.path[@value] is null or erroneous
                 file = new File(path.toURI());
                 if (file.exists())
                     addEventGraphsToLegoTree(file, file.isDirectory()); // recurse directories
             }
-        } catch (URISyntaxException ex) {
+        } 
+        catch (URISyntaxException ex) {
             Log4jUtilities.getLogger(getClass()).error(ex);
         }
 
@@ -975,24 +979,24 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             }
         }
 
-        LegosPanel lPan = new LegosPanel(lTree);
-        PropChangeListenersPanel pclPan = new PropChangeListenersPanel(pclTree);
+               LegosEventGraphsPanel       legosEventGraphsPanel = new LegosEventGraphsPanel(legoEventGraphsTree);
+        PropertyChangeListenersPanel propertyChangeListenerPanel = new PropertyChangeListenersPanel(propertyChangeListenerTree);
 
-        lTree.setBackground(background);
-        pclTree.setBackground(background);
+               legoEventGraphsTree.setBackground(background);
+        propertyChangeListenerTree.setBackground(background);
 
-        treePanels = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lPan, pclPan);
-        treePanels.setBorder(null);
-        treePanels.setOneTouchExpandable(true);
+        treePanelsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, legosEventGraphsPanel, propertyChangeListenerPanel);
+        treePanelsSplitPane.setBorder(new EmptyBorder(10, 0, 10, 0));
+        treePanelsSplitPane.setOneTouchExpandable(true);
 
-        pclPan.setMinimumSize(new Dimension(20, 80));
-        lPan.setMinimumSize(new Dimension(20, 80));
-        lPan.setPreferredSize(new Dimension(20, 240)); // give it some height for the initial split
+        propertyChangeListenerPanel.setMinimumSize(new Dimension(20, 80));
+              legosEventGraphsPanel.setMinimumSize(new Dimension(20, 80));
+              legosEventGraphsPanel.setPreferredSize(new Dimension(20, 240)); // give it some height for the initial split
 
-        lTree.setDragEnabled(true);
-        pclTree.setDragEnabled(true);
+        legoEventGraphsTree.setDragEnabled(true);
+        propertyChangeListenerTree.setDragEnabled(true);
 
-        return treePanels;
+        return treePanelsSplitPane;
     }
     Transferable dragged;
 
@@ -1105,34 +1109,34 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     @Override
     public Object getSelectedEventGraph() {
-        return getLeafUO(lTree);
+        return getLeafUO(legoEventGraphsTree);
     }
 
     @Override
     public Object getSelectedPropertyChangeListener() {
-        return getLeafUO(pclTree);
+        return getLeafUO(propertyChangeListenerTree);
     }
 
     @Override
     public void addEventGraphsToLegoTree(File f, boolean b) {
         if (f.exists())
-            lTree.addContentRoot(f, b);
+            legoEventGraphsTree.addContentRoot(f, b);
     }
 
     @Override
     public void addPropertyChangeListenersToLegoTree(File f, boolean b) {
-        pclTree.addContentRoot(f, b);
+        propertyChangeListenerTree.addContentRoot(f, b);
     }
 
     @Override
     public void removeEventGraphFromLEGOTree(File f) {
-        lTree.removeContentRoot(f);
+        legoEventGraphsTree.removeContentRoot(f);
     }
 
     // Not used
     @Override
     public void removePropertyChangeListenerFromLEGOTree(File f) {
-        pclTree.removeContentRoot(f);
+        propertyChangeListenerTree.removeContentRoot(f);
     }
 
     // ViskitView-required methods:
@@ -1187,8 +1191,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         
         assemblyController.closeProject();
 
-        ViskitProjectSelectionPanel viskitProjectSelectionPanel = new ViskitProjectSelectionPanel();
-        viskitProjectSelectionPanel.showDialog();
+//        ViskitProjectSelectionPanel viskitProjectSelectionPanel = new ViskitProjectSelectionPanel();
+//        viskitProjectSelectionPanel.showDialog();
     }
 
     @Override

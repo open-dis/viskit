@@ -161,7 +161,7 @@ public class MainFrame extends JFrame
 
     private void initializeMainFrame() 
     {
-//        ViskitGlobals.instance().setAssemblyQuitHandler(null);
+//        ViskitGlobals.instance().setAssemblyQuitActionListener(null);
 //        ViskitGlobals.instance().setEventGraphQuitHandler(null); <- TODO: investigate why these are here
         int assemblyPaneIndex;
 
@@ -180,7 +180,7 @@ public class MainFrame extends JFrame
             topTabbedPane.add(((EventGraphViewFrame) eventGraphFrame).getContent());
             assemblyPaneIndex = topTabbedPane.indexOfComponent(((EventGraphViewFrame) eventGraphFrame).getContent());
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Event Graph Editor");
-            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Visual editor for simulation entity definitions");
+            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Visual editor for Event Graph definitions");
             mainFrameMenuBar = ((EventGraphViewFrame) eventGraphFrame).getMenus();
             modalMenuBarList.add(mainFrameMenuBar);
             doCommonHelp(mainFrameMenuBar);
@@ -209,7 +209,7 @@ public class MainFrame extends JFrame
             topTabbedPane.add(((AssemblyViewFrame) assemblyFrame).getContent());
             assemblyPaneIndex = topTabbedPane.indexOfComponent(((AssemblyViewFrame) assemblyFrame).getContent());
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Assembly Editor");
-            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Visual editor for simulation defined by assembly");
+            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Visual editor for assembly definitions");
             mainFrameMenuBar = ((AssemblyViewFrame) assemblyFrame).getMenus();
             modalMenuBarList.add(mainFrameMenuBar);
             doCommonHelp(mainFrameMenuBar);
@@ -271,7 +271,7 @@ public class MainFrame extends JFrame
             topTabbedPane.add(analystReportPanel.getContentPane());
             assemblyPaneIndex = topTabbedPane.indexOfComponent(analystReportPanel.getContentPane());
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Analyst Report");
-            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Supports analyst assessment and report generation");
+            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Editor for analyst assessment and report generation");
             mainFrameMenuBar = ((AnalystReportViewFrame) analystReportPanel).getMenus();
             modalMenuBarList.add(mainFrameMenuBar);
             doCommonHelp(mainFrameMenuBar);
@@ -424,7 +424,7 @@ public class MainFrame extends JFrame
             if (i == tabIndices[TAB0_SIMULATIONRUN_INDEX]) 
             {
                 i = topTabbedPane.getTabCount() + getSimulationRunTabbedPane().getSelectedIndex();
-                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], "Run simulation defined by assembly");
+                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], "Run replications of simulation defined by selected Assembly");
             }
             else
             {
@@ -786,10 +786,10 @@ public class MainFrame extends JFrame
                      message +=   "Project ";
                 message +=   "<i>" + ViskitGlobals.instance().getProjectName() + "</i> is the open project</p><br />";    
             }
-            message +=       "<p align='center'>To get started, create or open an<br />";  // </p><br />" +
-            message +=       "<i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />"; // <p align='center'>
+            message +=       "<p align='center'>To get started, open or create an</p><br />";
+            message +=       "<p align='center'><i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />";
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
-                "Next step: Add a new Event Graph or Assembly", message);
+                "Add Event Graph or Assembly", message);
         }
     }
     

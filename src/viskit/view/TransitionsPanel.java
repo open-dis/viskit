@@ -196,7 +196,7 @@ public class TransitionsPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (ViskitGlobals.instance().getStateVariablesCBModel().getSize() <= 0) {
+            if (ViskitGlobals.instance().getStateVariablesComboBoxModel().getSize() <= 0) {
                 ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
                     JOptionPane.ERROR_MESSAGE,
                     "Alert",

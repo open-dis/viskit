@@ -370,7 +370,7 @@ public class EdgeInspectorDialog extends JDialog
     private JComboBox<ViskitElement> buildTimeDelayVarsComboBox() {
         JComboBox<ViskitElement> cb = new JComboBox<>();
 
-        ComboBoxModel<ViskitElement> m = ViskitGlobals.instance().getSimParamsCBModel();
+        ComboBoxModel<ViskitElement> m = ViskitGlobals.instance().getSimParamsComboBoxModel();
 
         // First item should be empty to allow for default zero delay
         ((MutableComboBoxModel<ViskitElement>)m).insertElementAt(new EventLocalVariable("", "", ""), 0);
@@ -400,7 +400,7 @@ public class EdgeInspectorDialog extends JDialog
         for (ViskitElement e : types) {
             typ = e.getType();
 
-            if (ViskitGlobals.instance().isGeneric(typ)) {
+            if (ViskitGlobals.instance().isGenericType(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
             if (ViskitGlobals.instance().isArray(typ)) {

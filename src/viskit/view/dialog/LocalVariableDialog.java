@@ -87,7 +87,7 @@ public class LocalVariableDialog extends JDialog {
         descriptionField = new JTextField(25);
         descriptionField.setToolTipText(DESCRIPTION_HINT);
         setMaxHeight(descriptionField);
-        typeCombo = ViskitGlobals.instance().getTypeCB();
+        typeCombo = ViskitGlobals.instance().getViskitTypeComboBox();
         setMaxHeight(typeCombo);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, nameField));

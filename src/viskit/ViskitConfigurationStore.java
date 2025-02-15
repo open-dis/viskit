@@ -160,6 +160,8 @@ public class ViskitConfigurationStore
         xmlConfigurationsMap = new HashMap<>();
         sessionHashMap = new HashMap<>();
         setDefaultConfiguration();
+        
+        LOG.info("created singleton, constructor initialization complete");        
     }
 
     /** Builds, or rebuilds a default configuration */

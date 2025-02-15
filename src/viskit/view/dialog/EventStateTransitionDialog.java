@@ -235,7 +235,7 @@ public class EventStateTransitionDialog extends JDialog {
         newSVButt.addActionListener((ActionEvent e) -> {
             String nm = ViskitGlobals.instance().getEventGraphViewFrame().addStateVariableDialog();
             if (nm != null) {
-                stateVarsCB.setModel(ViskitGlobals.instance().getStateVariablesCBModel());
+                stateVarsCB.setModel(ViskitGlobals.instance().getStateVariablesComboBoxModel());
                 for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
                     ViskitStateVariable vsv = (ViskitStateVariable) stateVarsCB.getItemAt(i);
                     if (vsv.getName().contains(nm)) {
@@ -286,7 +286,7 @@ public class EventStateTransitionDialog extends JDialog {
             ViskitElement e = stateVarsCB.getItemAt(i);
             typ = e.getType();
 
-            if (ViskitGlobals.instance().isGeneric(typ)) {
+            if (ViskitGlobals.instance().isGenericType(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
             if (ViskitGlobals.instance().isArray(typ)) {
@@ -306,7 +306,7 @@ public class EventStateTransitionDialog extends JDialog {
         for (ViskitElement e : types) {
             typ = e.getType();
 
-            if (ViskitGlobals.instance().isGeneric(typ)) {
+            if (ViskitGlobals.instance().isGenericType(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
             if (ViskitGlobals.instance().isArray(typ)) {
@@ -359,7 +359,7 @@ public class EventStateTransitionDialog extends JDialog {
         for (ViskitElement e : types) {
             typ = e.getType();
 
-            if (ViskitGlobals.instance().isGeneric(typ)) {
+            if (ViskitGlobals.instance().isGenericType(typ)) {
                 typ = typ.substring(0, typ.indexOf("<"));
             }
             if (ViskitGlobals.instance().isArray(typ)) {
@@ -481,7 +481,7 @@ public class EventStateTransitionDialog extends JDialog {
     }
 
     private void setStateVariableCBValue(EventStateTransition est) {
-        stateVarsCB.setModel(ViskitGlobals.instance().getStateVariablesCBModel());
+        stateVarsCB.setModel(ViskitGlobals.instance().getStateVariablesComboBoxModel());
         stateVarsCB.setSelectedIndex(0);
         for (int i = 0; i < stateVarsCB.getItemCount(); i++) {
             ViskitStateVariable sv = (ViskitStateVariable) stateVarsCB.getItemAt(i);

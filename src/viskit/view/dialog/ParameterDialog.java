@@ -85,7 +85,7 @@ public class ParameterDialog extends JDialog {
         descriptionField.setToolTipText(DESCRIPTION_HINT);
         setMaxHeight(descriptionField);
 
-        parameterTypeCombo = ViskitGlobals.instance().getTypeCB();
+        parameterTypeCombo = ViskitGlobals.instance().getViskitTypeComboBox();
         setMaxHeight(parameterTypeCombo);
 
         fieldsPanel.add(new OneLinePanel(nameLab, w, parameterNameField));

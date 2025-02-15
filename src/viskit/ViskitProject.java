@@ -34,6 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit;
 
 import edu.nps.util.Log4jUtilities;
+import java.awt.Component;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -132,8 +133,9 @@ public class ViskitProject
 
     public boolean initializeProject() 
     {
-
-        if (!projectRootDirectory.exists()) {
+        if (projectRootDirectory == null)
+            return false;
+        else if (!projectRootDirectory.exists()) {
              projectRootDirectory.mkdir();
         }
         setAnalystReportsDirectory(new File(projectRootDirectory, ANALYST_REPORTS_DIRECTORY_NAME));
