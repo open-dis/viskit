@@ -846,7 +846,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         if (action == null)
         {
             LOG.error("buildMenuItem reflection failed for name=" + name + " method=" + method + " in " + source.toString());
-            return new JMenuItem("(not working, reflection failed) " + name);
+            return new JMenuItem(name + "(not working, reflection failed) ");
         }
         Map<String, Object> map = new HashMap<>();
         if (mnemonic != null) {
