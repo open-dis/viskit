@@ -629,8 +629,9 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         }
 
         @Override
-        public void actionPerformed(ActionEvent ev) {
-            EventGraphController vcontroller = (EventGraphController) getController();
+        public void actionPerformed(ActionEvent actionEvent) 
+        {
+            EventGraphController eventGraphController = (EventGraphController) getController();
 
             File fullPath;
             Object obj = getValue(ViskitStatics.FULL_PATH);
@@ -640,9 +641,9 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 fullPath = (File) obj;
 
             if (fullPath != null && fullPath.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) {
-                vcontroller.clearRecentEventGraphFileSet();
+                eventGraphController.clearRecentEventGraphFileSet();
             } else {
-                vcontroller.openRecentEventGraph(fullPath);
+                eventGraphController.openRecentEventGraph(fullPath);
             }
         }
     }

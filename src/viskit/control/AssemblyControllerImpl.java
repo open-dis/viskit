@@ -1923,13 +1923,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
 
         @Override
-        public void actionPerformed(ActionEvent ev) {
+        public void actionPerformed(ActionEvent actionEvent) {
 
             // create and save the image
-            AssemblyViewFrame avf = ViskitGlobals.instance().getAssemblyViewFrame();
+            AssemblyViewFrame assemblyViewFrame = ViskitGlobals.instance().getAssemblyViewFrame();
 
             // Get only the jgraph part
-            Component component = avf.getCurrentJgraphComponent();
+            Component component = assemblyViewFrame.getCurrentJgraphComponent();
             if (component == null) {return;}
             if (component instanceof JScrollPane) {
                 component = ((JScrollPane) component).getViewport().getView();

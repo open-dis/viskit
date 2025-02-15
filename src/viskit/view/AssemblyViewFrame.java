@@ -374,7 +374,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         }
 
         @Override
-        public void actionPerformed(ActionEvent ev)
+        public void actionPerformed(ActionEvent actionEvent)
         {
             File fullPath;
             Object obj = getValue(ViskitStatics.FULL_PATH);

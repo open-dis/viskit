@@ -128,7 +128,8 @@ public class RecentProjectFileSetListener implements MvcRecentFileListener {
         }
 
         @Override
-        public void actionPerformed(ActionEvent ev) {
+        public void actionPerformed(ActionEvent actionEvent) 
+        {
             AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
 
             File fullPath;

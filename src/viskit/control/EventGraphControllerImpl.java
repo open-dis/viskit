@@ -1215,7 +1215,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
 
         @Override
-        public void actionPerformed(ActionEvent ev) {
+        public void actionPerformed(ActionEvent actionEvent) {
 
             if (component instanceof JScrollPane) {
                 component = ((JScrollPane) component).getViewport().getView();
