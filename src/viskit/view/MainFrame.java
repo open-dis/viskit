@@ -786,8 +786,8 @@ public class MainFrame extends JFrame
                      message +=   "Project ";
                 message +=   "<i>" + ViskitGlobals.instance().getProjectName() + "</i> is the open project</p><br />";    
             }
-            message +=       "<p align='center'>To get started, create or open<br />";  // </p><br />" +
-            message +=       "an <i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />"; // <p align='center'>
+            message +=       "<p align='center'>To get started, create or open an<br />";  // </p><br />" +
+            message +=       "<i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />"; // <p align='center'>
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Next step: Add a new Event Graph or Assembly", message);
         }
