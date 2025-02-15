@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- values in this file are retrieved by keys such as 'gui.beanshellerrordialog.title' -->
-<!-- the root element name is ignored when assembling keys -->
+<!-- Viskit application configuration file c_gui.xml -->
+
+<!-- Programming note: values in this file are retrieved by keys such as 'gui.beanshellerrordialog.title' -->
+<!-- Programming note: the root element name is ignored when assembling keys -->
 <ViskitConfig>
   <gui>
     <beanshellerrordialog>
