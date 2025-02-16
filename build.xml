@@ -239,6 +239,7 @@ their descpritions.
         <echo message="Base directory: ${basedir}"/>
         <echo message="JAVA_HOME: ${java.home}"/>
         <echo message="viskit.args=${viskit.args}"/>
+        <echo message=".viskit.dir=${dot.viskit.dir}"/>
 
         <mkdir dir="${dir.build}"/>
         <mkdir dir="${dir.build.lib}"/>
@@ -780,14 +781,6 @@ their descpritions.
         </delete>
     </target>
     
-    <target name="clean.logs">
-        <delete verbose="true">
-            <fileset dir="logs">
-                <include name="*.log"/>
-            </fileset>
-        </delete>
-    </target>
-    
     <target name="clean.DefaultProject">
         <delete verbose="true">
             <fileset dir="MyViskitProjects/DefaultProject/AnalystReports">
@@ -806,7 +799,7 @@ their descpritions.
 
     <target name="reset.viskit" description="Replace an out-of-synch configuration with known good defaults">
         <delete includeemptydirs="yes" dir="${dot.viskit.dir}"/>
-        <mkdir dir="${dot.viskit.dir}"/>
+        <mkdir  dir="${dot.viskit.dir}"/>
         <copy todir="${dot.viskit.dir}" file="${c_app.xml}"/>
         <copy todir="${dot.viskit.dir}" file="${c_gui.xml}"/>
         <copy todir="MyViskitProjects/DefaultProject" file="${proj.xml}" overwrite="true"/>
@@ -830,6 +823,14 @@ their descpritions.
             <fileset dir="logs" includes="validationErrors.log"/>
         </concat>
     </target>
+    
+    <target name="clean.logs">
+        <delete verbose="true" failonerror="false">
+            <fileset dir="logs">
+                <include name="*.log"/>
+            </fileset>
+        </delete>
+    </target>
 
     <target name="show.app.xml" depends="init">
         <concat>
@@ -848,8 +849,13 @@ their descpritions.
             <fileset dir="${dot.viskit.dir}" includes="passwd.xml"/>
         </concat>
     </target>
-    
-    
+
+    <target name="show.dot.viskit.dir" depends="init">
+        <concat>
+            <fileset dir="${dot.viskit.dir}" includes="*"/>
+        </concat>
+    </target>
+        
     
     <!-- ensure backwards compatibility of produced jar to specified version of Java, though project itself is JDK 17+ -->
     <property name="java.source"                 value="17"/>
