@@ -1,4 +1,4 @@
-This is a Visual Simkit (viskit) example project archive.
+This is a Visual Simkit (Viskit) example project archive.
 
 Open-source software for Discrete Event Simulation (DES) models can be found at
 
