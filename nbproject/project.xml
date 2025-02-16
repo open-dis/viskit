@@ -35,9 +35,9 @@
                     <script>nbproject/nbjdk.xml</script>
                     <target>jar</target>
                 </action>
-                <action name="clean">
+                <action name="clean.build">
                     <script>nbproject/nbjdk.xml</script>
-                    <target>clean</target>
+                    <target>clean.build</target>
                 </action>
                 <action name="javadoc">
                     <script>nbproject/nbjdk.xml</script>
@@ -53,7 +53,7 @@
                 </action>
                 <action name="rebuild">
                     <script>nbproject/nbjdk.xml</script>
-                    <target>clean</target>
+                    <target>clean.build</target>
                     <target>jar</target>
                 </action>
                 <action name="debug">
@@ -159,7 +159,7 @@
                 <context-menu>
                     <ide-action name="build"/>
                     <ide-action name="rebuild"/>
-                    <ide-action name="clean"/>
+                    <ide-action name="clean.build"/>
                     <ide-action name="javadoc"/>
                     <ide-action name="run"/>
                     <ide-action name="test"/>

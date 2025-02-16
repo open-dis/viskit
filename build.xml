@@ -539,7 +539,7 @@ their descpritions.
     </target>
 
     <!-- === TARGET: dist === -->
-    <target name="dist" depends="versions,clean,build,javadoc.custom">
+    <target name="dist" depends="versions,clean.build,build,javadoc.custom">
         <mkdir dir="${dir.dist}"/>
         <mkdir dir="${dir.dist}/doc/api"/>
         <mkdir dir="${dir.dist}/examples"/>
@@ -760,9 +760,11 @@ their descpritions.
             description="Run Design-Of-Experiments">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
+    
+    <target name="clean.all" depends="clean.build,clean.DefaultProject,clean.logs"/>
 
-    <!--  === TARGET: clean === -->
-    <target name="clean"
+    <!--  === TARGET: clean.build === -->
+    <target name="clean.build"
             depends="reset.viskit"
             description="Deletes build directory, xsd bindings, dist directories, and lib/ext/*.jar(s)">
         <delete dir="${dir.bindings}"/>
@@ -782,6 +784,11 @@ their descpritions.
     </target>
     
     <target name="clean.DefaultProject">
+        <delete verbose="true">
+            <fileset dir="MyViskitProjects/DefaultProject">
+                <include name="viskitProject.xml"/>
+            </fileset>
+        </delete>
         <delete verbose="true">
             <fileset dir="MyViskitProjects/DefaultProject/AnalystReports">
                 <include name="**/*.png"/>
