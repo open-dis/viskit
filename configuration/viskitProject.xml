@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- viskitProject.xml -->
 <ViskitProject>
+  <!-- viskitProject.xml -->
   <AnalystReports name="AnalystReports" />
   <AssembliesDirectory name="Assemblies" />
   <EventGraphsDirectory name="EventGraphs" />
