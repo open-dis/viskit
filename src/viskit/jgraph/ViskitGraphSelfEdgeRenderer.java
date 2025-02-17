@@ -161,8 +161,8 @@ class ViskitGraphSelfEdgeRenderer extends ViskitGraphEdgeRenderer {
                 pi.next();
                 ix++;
             }
-            if (ViskitStatics.debug)
-                System.out.println();
+//            if (ViskitStatics.debug)
+//                LOG.info();
         }
 
         return view.sharedPath;

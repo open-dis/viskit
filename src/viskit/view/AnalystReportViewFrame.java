@@ -202,7 +202,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
         catch (Exception ex)
         {
-            LOG.error ("problem with _fillLayout()" + ex.getMessage());
+            LOG.error (" _fillLayout() exception: " + ex.getMessage());
         }
     }
 

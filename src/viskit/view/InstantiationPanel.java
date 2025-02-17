@@ -378,12 +378,12 @@ public class InstantiationPanel extends JPanel implements ActionListener, CaretL
                 return;
             }
             if (viskit.ViskitStatics.debug) {
-                System.out.println("setting data for " + vi.getType());
+                LOG.info("setting data for " + vi.getType());
             }
 
             int indx = vi.indexOfArgNames(vi.getType(), vi.getArgs());
             if (viskit.ViskitStatics.debug) {
-                System.out.println("found a matching constructor at " + indx);
+                LOG.info("found a matching constructor at " + indx);
             }
             if (indx != -1) {
                 constructorPanels[indx].setData(vi.getArgs());

@@ -111,12 +111,18 @@ public class FindClassesForInterface
                 found.put(name, clazz);
 
                 LOG.debug("Found Class: " + clazz.getName() + "\n");
-            } catch (Exception e) {
-                LOG.error(e);
-            } finally {
+            } 
+            catch (Exception e) {
+                LOG.error("findClass(" + name + ") exception: " + e.getMessage());
+            } 
+            finally {
                 try {
-                    classFile.close();
-                } catch (IOException ioe) {}
+                    if (classFile != null)
+                        classFile.close();
+                } 
+                catch (IOException ioe) {
+                    LOG.error("findClass(" + name + ") finally block, close file exception: " + ioe.getMessage());
+                }
             }
             return clazz;
         }
@@ -164,27 +170,27 @@ public class FindClassesForInterface
         String jarFileName = args.length > 0 ? args[0] : "/R:/Simkit/simkit.jar";
         JarFile jarFile = new JarFile(jarFileName);
         List list = findClasses(jarFile, simkit.BasicSimEntity.class);
-        System.out.println(jarFile.getName());
-        System.out.println("SimEntity:");
+        LOG.info(jarFile.getName());
+        LOG.info("SimEntity:");
         for (int i = 0; i < list.size(); ++i) {
-            System.out.println("\t" + list.get(i));
+            LOG.info("\t" + list.get(i));
         }
         list = findClasses(jarFile, java.beans.PropertyChangeListener.class);
-        System.out.println("PropertyChangeListener:");
+        LOG.info("PropertyChangeListener:");
         for (int i = 0; i < list.size(); ++i) {
-            System.out.println("\t" + list.get(i));
+            LOG.info("\t" + list.get(i));
         }
 
 //        jarFile = new JarFile("R:\\Simkit\\simkit.jar");
-        System.out.println("RandomVariates:");
+        LOG.info("RandomVariates:");
         list = findClasses(jarFile, simkit.random.RandomVariate.class);
         for (int i = 0; i < list.size(); ++i) {
-            System.out.println("\t" + list.get(i));
+            LOG.info("\t" + list.get(i));
         }
-        System.out.println("RandomNumbers:");
+        LOG.info("RandomNumbers:");
         list = findClasses(jarFile, simkit.random.RandomNumber.class);
         for (int i = 0; i < list.size(); ++i) {
-            System.out.println("\t" + list.get(i));
+            LOG.info("\t" + list.get(i));
         }
 
         if (true) {
@@ -192,57 +198,57 @@ public class FindClassesForInterface
         }
         List<Class<?>> simEntities = new ArrayList<>();
         List<Class<?>> propertyChangeListeners = new ArrayList<>();
-        System.out.println(jarFile.getName());
+        LOG.info(jarFile.getName());
         URLClassLoader loader = new URLClassLoader(new URL[]{new File(jarFile.getName()).toURI().toURL()});
         for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {
             JarEntry nextEntry = (JarEntry) entries.nextElement();
             if (nextEntry.getName().startsWith("META")) {
                 continue;
             }
-//            System.out.println(getClassName(nextEntry.getName()));
+//            LOG.info(getClassName(nextEntry.getName()));
 
             try {
                 Class<?> c = loader.loadClass(getClassName(nextEntry.getName()));
                 if (c.isInterface()) {
                     continue;
                 }
-//                System.out.println (c);
+//                LOG.debug(c);
                 if (java.beans.PropertyChangeListener.class.isAssignableFrom(c) && isConcrete(c)) {
                     propertyChangeListeners.add(c);
-//                    System.out.println("\tIs PropertyChangeListener!");
+//                    LOG.info("\tIs PropertyChangeListener!");
                 }
                 if (simkit.SimEntity.class.isAssignableFrom(c) && isConcrete(c)) {
                     simEntities.add(c);
-//                    System.out.println("\tIs SimEntity!");
+//                    LOG.info("\tIs SimEntity!");
                 }
             } catch (ClassNotFoundException t) {
-//                System.out.println("\t" + nextEntry + " not loaded");
+//                LOG.info("\t" + nextEntry + " not loaded");
             }
         }
-        System.out.println("SimEntities:");
+        LOG.info("SimEntities:");
         for (int i = 0; i < simEntities.size(); i++) {
-            System.out.println(simEntities.get(i));
+            LOG.info(simEntities.get(i));
         }
-        System.out.println("PropertyChangeListeners:");
+        LOG.info("PropertyChangeListeners:");
         for (int i = 0; i < propertyChangeListeners.size(); i++) {
-            System.out.println(propertyChangeListeners.get(i));
+            LOG.info(propertyChangeListeners.get(i));
         }
 
         if (true) {
             return;
         }
-        System.out.println(loader);
+        LOG.info(loader);
         Class<?> c = loader.loadClass("png.PNGChunk");
-        System.out.println(c);
+        LOG.info(c);
 
         String ps = System.getProperty("path.separator");
         File file = new File("/C:/tmp/MiscTest/png/PNGData.class");
-        System.out.println(file.getCanonicalPath() + "[" + file.exists() + "]");
+        LOG.info(file.getCanonicalPath() + "[" + file.exists() + "]");
         String fullyQualified = file.getAbsolutePath().substring(0,
                 file.getAbsolutePath().lastIndexOf('.')).replaceAll("\\\\", ".");
-        System.out.println(getClassName(fullyQualified));
+        LOG.info(getClassName(fullyQualified));
     //        for (int i = 0; i < pieces.length; ++i) {
-    //            System.out.println("\t" + pieces[i]);
+    //            LOG.info("\t" + pieces[i]);
     //        }
     }
 

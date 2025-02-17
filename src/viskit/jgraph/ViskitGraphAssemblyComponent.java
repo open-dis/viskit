@@ -213,7 +213,7 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                 viskitGraphAssemblyModel.reDrawNodes();
                 break;
             default:
-            //System.out.println("duh");
+            //LOG.info("duh");
         }
         currentModelEvent = null;
     }

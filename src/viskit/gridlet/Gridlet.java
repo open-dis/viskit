@@ -22,6 +22,7 @@
  */
 package viskit.gridlet;
 
+import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -52,6 +53,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import org.apache.logging.log4j.Logger;
 
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
@@ -97,7 +99,9 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  *
  * @version $Id$
  */
-public class Gridlet extends Thread {
+public class Gridlet extends Thread
+{
+    private final static Logger LOG = Log4jUtilities.getLogger(Gridlet.class);
 
     SimkitAssemblyXML2Java sax2j;
     XmlRpcClientLite xmlrpc;
@@ -155,7 +159,7 @@ public class Gridlet extends Thread {
                 port = Integer.parseInt(props.get("PORT"));
                 pwd = props.get("PWD");
                 sax2j = new SimkitAssemblyXML2Java(new URI("file:"+pwd+"/"+filename).toURL().openStream());
-                System.out.println(taskID+ " "+ jobID+" "+usid+" "+filename+" "+pwd);
+                LOG.info(taskID+ " "+ jobID+" "+usid+" "+filename+" "+pwd);
                 //TBD: should also check if SSL
                 xmlrpc = new XmlRpcClientLite(frontHost,port);
 
@@ -209,8 +213,8 @@ public class Gridlet extends Thread {
         this.filename = expFile.getName();
         try {
             //See comment in LocalTaskQueue, try commenting out the line, and uncommenting the printlns to see it up close
-            //System.out.println("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ ViskitGlobals.instance().getWorkingClassLoader());
-            //System.out.println("Gridlet.setExperimentFile, "+this+"'s loader is "+ getContextClassLoader());
+            //LOG.info("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ ViskitGlobals.instance().getWorkingClassLoader());
+            //LOG.info("Gridlet.setExperimentFile, "+this+"'s loader is "+ getContextClassLoader());
             sax2j = new SimkitAssemblyXML2Java(experimentFile.toURI().toURL().openStream());
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -259,7 +263,7 @@ public class Gridlet extends Thread {
 
         boolean debug_io = Boolean.parseBoolean(exp.getDebug());
         debug_io = false;
-        //if(debug_io)System.out.println(filename+" Grid Task ID "+taskID+" of "+numTasks+" tasks in jobID "+jobID+" which is DesignPoint "+designPtIndex+" of Sample "+ sampleIndex);
+        //if(debug_io)LOG.info(filename+" Grid Task ID "+taskID+" of "+numTasks+" tasks in jobID "+jobID+" which is DesignPoint "+designPtIndex+" of Sample "+ sampleIndex);
 
         //pass design args into design params
         while ( itd.hasNext() && itp.hasNext() ) {
@@ -328,8 +332,8 @@ public class Gridlet extends Thread {
                 sx2j.unmarshal();
 
                 if (debug_io) {
-                    System.out.println("Evaluating generated java Event Graph:");
-                    System.out.println(sx2j.translate());
+                    LOG.info("Evaluating generated java Event Graph:");
+                    LOG.info(sx2j.translate());
                 }
                 // pass the source for this SimEntity in for compile
                 String eventGraphJava = sx2j.translate();
@@ -372,8 +376,8 @@ public class Gridlet extends Thread {
             compiler.getTask(null, fileManager, null, cmdLine, null, compilationUnits).call();
 
             if (/*debug_io*/true) {
-                System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
-                System.out.println(sax2j.translate());
+                LOG.info("Evaluating generated java Simulation "+ root.getName() + ":");
+                LOG.info(sax2j.translate());
                 URI cwd = tempDir.toURI();
                 for (Diagnostic<? extends JavaFileObject> diagnostic :
                     diagnostics.getDiagnostics()) {
@@ -396,12 +400,12 @@ public class Gridlet extends Thread {
             }
 
             ClassLoader cloader = getContextClassLoader();
-            System.out.println(cloader+" Adding file:"+File.separator+tempDir.getCanonicalPath()+File.separator);
+            LOG.info(cloader+" Adding file:"+File.separator+tempDir.getCanonicalPath()+File.separator);
 
             if(cloader instanceof Boot) {
                 ((Boot) cloader).addURL(new URI("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator).toURL());
             } else if (cloader.getClass().getName().equals(ViskitStatics.LOCAL_BOOT_LOADER)) {
-                System.out.println("doAddURL "+"file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator);
+                LOG.info("doAddURL "+"file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator);
                 Method doAddURL = cloader.getClass().getMethod("doAddURL",java.net.URL.class);
                 doAddURL.invoke(cloader, new URI("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator).toURL());
                 //((LocalBootLoader)cloader).doAddURL(new URL("file:"+File.separator+File.separator+tempDir.getCanonicalPath()+File.separator));
@@ -448,7 +452,7 @@ public class Gridlet extends Thread {
                             statXml = sax2j.marshalFragmentToString(statForStat(designPointStat));
                         }
                         if (debug_io) {
-                            System.out.println(statXml);
+                            LOG.info(statXml);
                         }
                         if (gridRunner != null) {
                             // local gridRunner
@@ -464,8 +468,8 @@ public class Gridlet extends Thread {
                             args.add(designPointStats.length);
                             args.add(statXml);
                             if (debug_io) {
-                                System.out.println("sending DesignPointStat " + sampleIndex + " " + designPtIndex);
-                                System.out.println(statXml);
+                                LOG.info("sending DesignPointStat " + sampleIndex + " " + designPtIndex);
+                                LOG.info(statXml);
                             }
                             xmlrpc.execute("gridkit.addDesignPointStat", args);
                         }
@@ -490,7 +494,7 @@ public class Gridlet extends Thread {
                                         statXml = sax2j.marshalToString(statForStat(replicationStat));
                                     }
                                     if (debug_io) {
-                                        System.out.println(statXml);
+                                        LOG.info(statXml);
                                     }
                                     if (gridRunner != null) {
                                         // local is a local gridRunner
@@ -507,23 +511,25 @@ public class Gridlet extends Thread {
                                         args.add(j);
                                         args.add(statXml);
                                         if (debug_io) {
-                                            System.out.println("sending ReplicationStat" + sampleIndex + " " + designPtIndex + " " + j);
-                                            System.out.println(statXml);
+                                            LOG.info("sending ReplicationStat" + sampleIndex + " " + designPtIndex + " " + j);
+                                            LOG.info(statXml);
                                         }
                                         xmlrpc.execute("gridkit.addReplicationStat", args);
                                     }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                                } 
+                                catch (Exception e) {
+                                    LOG.error("run() exception: " + e.getMessage());
                                 }
                             }
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } 
+                catch (Exception e) {
+                    LOG.error("run() exception: " + e.getMessage());
                 }
             }
             else {
-                System.out.println("No DesignPointStats");
+                LOG.info("run() problem: No DesignPointStats");
 
 
                 // reconnect io
@@ -626,8 +632,8 @@ public class Gridlet extends Thread {
                     parms.add(sw.toString());
 
                     if (debug_io) {
-                        System.out.println("sending Result ");
-                        System.out.println(sw.toString());
+                        LOG.info("sending Result ");
+                        LOG.info(sw.toString());
                     }
                     xmlrpc.execute("gridkit.addResult", parms);
 

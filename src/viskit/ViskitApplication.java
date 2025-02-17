@@ -45,6 +45,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 
 import javax.swing.*;
 import org.apache.logging.log4j.Logger;
@@ -79,7 +80,7 @@ public class ViskitApplication
 
         } 
         catch (Exception e) {
-            LOG.error(e);
+            LOG.error("main(" + Arrays.toString(args) + ") exception: " + e.getMessage());
 
             if (e instanceof InvocationTargetException) {
 

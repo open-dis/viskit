@@ -411,8 +411,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         try {
             getParams();
-        } catch (Exception e) {
-            LOG.error(e);
+        } 
+        catch (Exception e) 
+        {
+            LOG.error("setFile(" + file + ", " + title + ") exception: " + e.getMessage());
         }
         doTitle(title);
     }
@@ -440,7 +442,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         @Override
         public void keyTyped(KeyEvent e) {
-            //System.out.println("sending paramlocallyeditted from JobLauncherTab");
+            //LOG.info("sending paramlocallyeditted from JobLauncherTab");
             OpenAssembly.inst().doParamLocallyEditted(JobLauncherTab2.this);     // inform who is listening that we tweeked the params
         }
     };
@@ -835,9 +837,11 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                     writeStatus("Executing job");
 
 
-                } catch (Exception e) {
-                    LOG.error(e);
-                    writeStatus("Error: " + e.getMessage());
+                } 
+                catch (Exception e) 
+                {
+                    writeStatus("run() exception: " + e.getMessage());
+                    LOG.error  ("run() exception: " + e.getMessage());
                     doe = null; // will cause GC to hit finally() which in grid will logout()
                 }
 
@@ -982,7 +986,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
             Gresults res = getSingleResult(oa);
             chartter.addPoint(res);
             if (!res.resultsValid) {
-                System.out.println("Results not retrieved for rep " + idx);
+                LOG.info("Results not retrieved for rep " + idx);
             }
         }
     }
@@ -996,13 +1000,16 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         Document doc;
         try {
             doc = FileHandler.unmarshallJdom(f);
-        } catch (Exception e) {
-            System.out.println("Error unmarshalling results: " + e.getMessage());
+        } 
+        catch (Exception e) 
+        {
+            LOG.error("getSingleResult(" + oa.toString() + ") exception unmarshalling results: " + e.getMessage());
             return null;
         }
         Element el = doc.getRootElement();
-        if (!el.getName().equals("Results")) {
-            System.out.println("Unknown results format, design point = " + dp + ", run = " + nrun);
+        if (!el.getName().equals("Results")) 
+        {
+            LOG.error("getSingleResult(" + oa.toString() + ") unknown results format, design point = " + dp + ", run = " + nrun);
             return res;
         }
         String design = attValue(el, "design");
@@ -1012,7 +1019,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
         Element propCh = el.getChild("PropertyChange");
         if (propCh == null) {
-            System.out.println("PropertyChange results element null, design point = " + dp + ", run = " + nrun);
+            LOG.info("PropertyChange results element null, design point = " + dp + ", run = " + nrun);
             return res;
         }
         String listenerName = attValue(propCh, "listenerName");
@@ -1021,11 +1028,11 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         Text txt = (Text) content.get(0);
         String cstr = txt.getTextTrim();
         if (viskit.ViskitStatics.debug) {
-            System.out.println("got back " + cstr);
+            LOG.info("got back " + cstr);
         }
         String[] sa = cstr.split("\n");
         if (sa.length != 2) {
-            System.out.println("PropertyChange parse error, design point = " + dp + ", run = " + nrun);
+            LOG.info("PropertyChange parse error, design point = " + dp + ", run = " + nrun);
             return res;
         }
         sa[1] = sa[1].trim();
@@ -1069,7 +1076,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
 
     private int saveOutput(String o, int dp, int nrun) {
         if (o == null) {
-            System.out.println("mischief detected!");
+            LOG.info("mischief detected!");
         }
         try {
             File f = File.createTempFile("DoeResults", ".xml", outDir);
@@ -1203,7 +1210,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                         vbar.setValue(50); //vbar.getMaximum());
                     });
                 } catch (IOException | InterruptedException e) {
-                    System.out.println("statusUpdater kill: " + e.getMessage());
+                    LOG.info("statusUpdater kill: " + e.getMessage());
                 }
             }
         }
@@ -1277,8 +1284,9 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     private void initConfig() {
         try {
             appConfig = ViskitConfigurationStore.instance().getViskitAppConfiguration();
-        } catch (Exception e) {
-            LOG.error("Error loading config file: " + e.getMessage());
+        } 
+        catch (Exception e) {
+            LOG.error("initConfig() exception loading ViskitAppConfiguration file: " + e.getMessage());
             appConfig = null;
         }
         serverCfg = appConfig.getString(recentClusterKey + "[@server]");
@@ -1371,7 +1379,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                         // if slower, however, this only gets hit by the swing thread
                         // unmarshaller = jaxbContext.createUnmarshaller();
                         if (viskit.ViskitStatics.debug) {
-                            System.out.println("\tAdding data " + data);
+                            LOG.info("\tAdding data " + data);
                         }
                         SampleStatistics sampleStatistics = (SampleStatistics) unmarshaller.unmarshal(new ByteArrayInputStream(data.getBytes()));
 

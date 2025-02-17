@@ -215,7 +215,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
             doeFrame.installContent();
             doeFrame.setTitle(doeFrame.titleString + " -- " + dfm.userFile.getName());
         } catch (Exception e) {
-            System.out.println("bad file open: " + e.getMessage());
+            LOG.info("bad file open: " + e.getMessage());
         }
     }
 
@@ -296,7 +296,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                 FileHandler.runFile(fil, dfm.userFile.getName() + " " + new Date().toString(), jobLauncher);
             }
         } else {
-            System.out.println("no marshall");
+            LOG.info("no marshall");
         }
     }
 
@@ -312,7 +312,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                 return null;
             }
         } else {
-            System.out.println("no model");
+            LOG.info("no model");
             return null;
         }
     }
@@ -390,15 +390,15 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         public void fileChanged(File file, int action, DirectoryWatch source) {
             switch (action) {
                 case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
-                    //System.out.println("DoeController got Event Graph change message: FILE_ADDED: "+" " + file.getAbsolutePath());
+                    //LOG.info("DoeController got Event Graph change message: FILE_ADDED: "+" " + file.getAbsolutePath());
                     loadedEventGraphs.add(file);
                     break;
                 case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
-                    //System.out.println("DoeController got Event Graph change message: FILE_REMOVED: "+" " + file.getAbsolutePath());
+                    //LOG.info("DoeController got Event Graph change message: FILE_REMOVED: "+" " + file.getAbsolutePath());
                     loadedEventGraphs.remove(file);
                     break;
                 case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
-                    //System.out.println("DoeController got Event Graph change message: FILE_CHANGED: "+" " + file.getAbsolutePath());
+                    //LOG.info("DoeController got Event Graph change message: FILE_CHANGED: "+" " + file.getAbsolutePath());
                     break;
                 default:
             }

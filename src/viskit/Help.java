@@ -194,6 +194,6 @@ public class Help
     }
 
     public static void main(String[] args) {
-        System.out.println("Viskit DES interface: " + VERSION);
+        LOG.info("Viskit DES interface: " + VERSION);
     }
 }

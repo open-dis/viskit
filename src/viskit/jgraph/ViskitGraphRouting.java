@@ -221,7 +221,7 @@ public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing
             // never had an edge between these 2 before
             Vector<Object> v = new Vector<>();
             v.add(edgeKey);
-            //System.out.println("adding edgekey in "+masterKey + " "+ edgeKey);
+            //LOG.info("adding edgekey in "+masterKey + " "+ edgeKey);
             nodePairs.put(masterKey, v);
                 return 0;
         }
@@ -229,7 +229,7 @@ public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing
         // Here if there has been a previous edge between the 2, maybe just this one
         if (!lis.contains(edgeKey)) {
             lis.add(edgeKey);
-            //System.out.println("adding edgekey in "+masterKey + " "+ edgeKey);
+            //LOG.info("adding edgekey in "+masterKey + " "+ edgeKey);
         }
         return lis.indexOf(edgeKey);
     }

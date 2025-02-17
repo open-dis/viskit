@@ -108,7 +108,7 @@ public class ReportStatisticsConfiguration {
         propertyIndex = new String[keyValues.size()];
 
         if (!keyValues.isEmpty()) {
-            System.out.println("Replication Statistic(s) created");
+            System.out.println("Replication Statistic(s) created"); // TODO send to console
             System.out.println("--------------------------------");
             int seperator;
             int idx = 0;

@@ -9,6 +9,7 @@
 
 package viskit.doe;
 
+import edu.nps.util.Log4jUtilities;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.*;
@@ -16,11 +17,15 @@ import java.awt.*;
 import java.awt.event.*;
 import java.text.NumberFormat;
 import javax.swing.text.NumberFormatter;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Rick Goldberg
  */
-public class QStatisticsConsole extends JFrame implements ActionListener, WindowListener {
+public class QStatisticsConsole extends JFrame implements ActionListener, WindowListener 
+{
+    static final Logger LOG = Log4jUtilities.getLogger(QStatisticsConsole.class);
+    
     DoeRunDriver doe;
     int delay = 0;
     boolean paused = true;
@@ -141,8 +146,10 @@ public class QStatisticsConsole extends JFrame implements ActionListener, Window
                 textArea.setRows(lines > MIN_ROWS ? lines : MIN_ROWS);
                 textArea.setText(textArea.getText() + "\n" + data);
                
-            } catch (Exception e) {
-                textArea.setText("Can't qstat! \n" + e.toString());
+            } 
+            catch (Exception e) {
+                textArea.setText("actionPerformed(" + actionEvent + ") can't qstat! \n" + e.toString());
+                LOG.error       ("actionPerformed(" + actionEvent + ") can't qstat! \n" + e.toString());
             }
         }
     }

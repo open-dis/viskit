@@ -81,6 +81,7 @@ import viskit.view.ViskitProjectSelectionPanel;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
 import viskit.view.dialog.ViskitUserPreferences;
 import edu.nps.util.SystemExitHandler;
+import java.lang.reflect.InvocationTargetException;
 import static viskit.ViskitProject.DEFAULT_PROJECT_NAME;
 
 /**
@@ -587,9 +588,9 @@ public class ViskitGlobals
              * beahshell checking
              */
 
-        } catch (Exception ex) {
-            returnString =  ex.getMessage();
-            LOG.error(returnString);
+        } 
+        catch (Exception ex) {
+            LOG.error("findType(" + name + ", " + type + "} exception: " + ex.getMessage());
         }
 
         // good if remains null
@@ -992,17 +993,21 @@ public class ViskitGlobals
      */
     public ClassLoader getWorkingClassLoader() 
     {
-        if (workingClassLoader == null) // workingClassLoader should only get created once
+            if (workingClassLoader == null) // workingClassLoader should only get created once
+            {
+                URL[] urls = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
+                viskit.doe.LocalBootLoader localBootLoader = new LocalBootLoader(urls,
+                        Thread.currentThread().getContextClassLoader(),
+                        getProjectWorkingDirectory());
+
+                // Allow Assembly files in the ClassLoader
+                workingClassLoader = localBootLoader.initialize(true);
+
+                Thread.currentThread().setContextClassLoader(workingClassLoader);
+            }
+        if (workingClassLoader == null)
         {
-            URL[] urls = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
-            viskit.doe.LocalBootLoader localBootLoader = new LocalBootLoader(urls,
-                    Thread.currentThread().getContextClassLoader(),
-                    getProjectWorkingDirectory());
-
-            // Allow Assembly files in the ClassLoader
-            workingClassLoader = localBootLoader.initialize(true);
-
-            Thread.currentThread().setContextClassLoader(workingClassLoader);
+            LOG.error("getWorkingClassLoader() ran without exception but returned null");
         }
         return workingClassLoader;
     }
@@ -1173,8 +1178,9 @@ public class ViskitGlobals
 
                     try {
                         SwingUtilities.invokeLater(r);
-                    } catch (Exception ex) {
-                        LOG.error(ex);
+                    } 
+                    catch (Exception ex) {
+                        LOG.error("actionPerformed(" + actionEvent.toString() + ") exception: " + ex.getMessage());
                     }
                 }
             } 

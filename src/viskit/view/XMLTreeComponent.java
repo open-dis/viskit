@@ -36,12 +36,12 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.view;
 
 import edu.nps.util.Log4jUtilities;
-
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.io.*;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 
@@ -52,6 +52,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.*;
 
 import viskit.ViskitGlobals;
+import static viskit.ViskitGlobals.isFileReady;
 import viskit.ViskitStatics;
 import viskit.doe.FileHandler;
 
@@ -325,12 +326,14 @@ public class XMLTreeComponent extends JTree
             XmlTreePanel p = null;
             try {
                 p = XMLTreeComponent.getTreeInPanel(fil);
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
+            } 
+            catch (Exception e) 
+            {
+                LOG.error("main(" + Arrays.toString(args) + ") exception: " + e.getMessage());
             }
             
             if (p != null)
-                System.out.println(p.xmlTreeComponent.getXML());
+                LOG.info(p.xmlTreeComponent.getXML());
             
             c.add(p, BorderLayout.CENTER);
             f.setSize(500, 400);
@@ -355,18 +358,25 @@ public class XMLTreeComponent extends JTree
 
 class XmlTreePanel extends JPanel
 {
+    static final Logger LOG = Log4jUtilities.getLogger(XmlTreePanel.class);
+    
     public XMLTreeComponent xmlTreeComponent;
     public JTextArea sourceXmlTextArea;
 
     XmlTreePanel(File xmlFile) throws Exception 
     {
+
         super();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        
+        if (!isFileReady(xmlFile))
+            return;
 
         try {
             xmlTreeComponent = new XMLTreeComponent(xmlFile);
         } 
         catch (Exception e) {
+                LOG.error("XmlTreePanel(" + xmlFile.getPath()+ ") exception: " + e.getMessage());
             xmlTreeComponent = null;
             throw (e);
         }

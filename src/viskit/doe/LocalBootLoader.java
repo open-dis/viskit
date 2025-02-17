@@ -316,7 +316,7 @@ public class LocalBootLoader extends URLClassLoader {
                 } else {
                     localBootLoader.loadClass(ViskitStatics.LOCAL_BOOT_LOADER);
                 }
-                //System.out.println("still found existing viskit context, going up one more...");
+                //LOG.info("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
                 localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
             } catch (ClassNotFoundException e) {
@@ -405,7 +405,7 @@ public class LocalBootLoader extends URLClassLoader {
                 entryName = file.getParentFile().getName() + "/" + file.getName();
                 entryClass = entryName.replace('/', '.');
 
-                //System.out.println("Entry Class "+entryClass);
+                //LOG.info("Entry Class "+entryClass);
                 String dotClass = ".class";
                 if (entryClass.endsWith(dotClass)) { // else do nothing
 

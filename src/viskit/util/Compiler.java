@@ -27,12 +27,12 @@ import viskit.doe.LocalBootLoader;
  * @author Rick Goldberg
  * @version $Id$
  */
-public class Compiler {
+public class Compiler 
+{
+    static final Logger LOG = Log4jUtilities.getLogger(Compiler.class);
 
     /** Diagnostic message when we have a successful compilation */
     public static final String COMPILE_SUCCESS_MESSAGE = "compile successful!";
-
-    static final Logger LOG = Log4jUtilities.getLogger(Compiler.class);
 
     /** Stream for writing text to an output device */
     private static OutputStream baosOut;
@@ -113,7 +113,8 @@ public class Compiler {
             // Check for errors
             if (diagnosticMessages.toString().isEmpty())
                 diagnosticMessages.append(COMPILE_SUCCESS_MESSAGE);
-        } catch (Exception ex) {
+        } 
+        catch (Exception ex) {
             if (ex instanceof NullPointerException) {
 
                 String msg = "Your environment variable for Path likely has the JRE's "
@@ -129,8 +130,7 @@ public class Compiler {
                 );
                 LOG.error(msg);
             }
-            LOG.error(ex);
-//            LOG.error("JavaObjectFromString " + pkg + "." + className + "  " + jofs.toString());
+            LOG.error("JavaObjectFromString invoke " + pkg + "." + className + " exception: " + ex.getMessage());
 //            LOG.info("Classpath is {}: ", cp);
         } finally {
             if (sjfm != null) {

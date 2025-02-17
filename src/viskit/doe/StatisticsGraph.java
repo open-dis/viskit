@@ -33,10 +33,12 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
+import edu.nps.util.Log4jUtilities;
 import java.awt.Font;
 import java.util.Hashtable;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import org.apache.logging.log4j.Logger;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -66,7 +68,9 @@ import org.jfree.data.category.DefaultIntervalCategoryDataset;
  * @version $Id$
  * @since April 20, 2006, 11:19 AM
  */
-public class StatisticsGraph extends JPanel {
+public class StatisticsGraph extends JPanel
+{
+    static final Logger LOG = Log4jUtilities.getLogger(StatisticsGraph.class);
 
     int designPoints;
     int samples;
@@ -99,7 +103,7 @@ public class StatisticsGraph extends JPanel {
         tabbedPane.removeAll();
         for (String prop : properties) {
             if (viskit.ViskitStatics.debug) {
-                System.out.println("StatisticsGraph: createDataSets for " + prop);
+                LOG.info("StatisticsGraph: createDataSets for " + prop);
             }
             createDataSets(prop);
             tabbedPane.add(prop, chartPanels.get(prop));
@@ -120,7 +124,7 @@ public class StatisticsGraph extends JPanel {
         DefaultStatisticalCategoryDataset statisticalCategoryDataset = meanAndStandardDeviations.get(name);
         DefaultIntervalCategoryDataset minMax = minMaxs.get(name);
         if (viskit.ViskitStatics.debug) {
-            System.out.println("SampleStatisticType name: " + sample.getName());
+            LOG.info("SampleStatisticType name: " + sample.getName());
         }
         statisticalCategoryDataset.add(Double.parseDouble(sample.getMean()),Double.parseDouble(sample.getStandardDeviation()), "Design Point " + d, "Sample " + s);
         minMax.setStartValue(d, "Sample " + s, Double.valueOf(sample.getMinObs()));

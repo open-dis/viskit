@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
+import edu.nps.util.Log4jUtilities;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,6 +42,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import org.apache.logging.log4j.Logger;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -64,8 +66,10 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  * @since 11:44:06 AM
  * @version $Id$
  */
-public class FileHandler {
-
+public class FileHandler 
+{
+    static final Logger LOG = Log4jUtilities.getLogger(FileHandler.class);
+    
     private static final String SCHEMA_LOC = XMLValidationTool.ASSEMBLY_SCHEMA;
 
     public static DoeFileModel openFile(File f) throws Exception {
@@ -142,14 +146,16 @@ public class FileHandler {
 
     /** Called from the DoeController. Not currently used
      * 
-     * @param fil the assembly file to run
+     * @param file the assembly file to run
      * @param title the title of the run
      * @param mainFrame the parent frame
      */
-    public static void runFile(File fil, String title, JFrame mainFrame) {
+    public static void runFile(File file, String title, JFrame mainFrame) {
         try {
-            new JobLauncher(true, fil.getAbsolutePath(), title, mainFrame); // TODO broken
-        } catch (Exception e) {
+            new JobLauncher(true, file.getAbsolutePath(), title, mainFrame); // TODO broken
+        } 
+        catch (Exception e) {
+            LOG.error("runFile(" + file.getPath() + ", " + title + ") exception: " + e.getMessage());
             e.printStackTrace(System.err);
         }
     }

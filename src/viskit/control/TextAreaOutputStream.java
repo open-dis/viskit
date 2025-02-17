@@ -236,10 +236,10 @@ public class TextAreaOutputStream implements PropertyChangeListener
         {
             // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
             // must occur prior to threading and new freshClassLoader
-            basicAssembly.resetFreshClassLoader();
+            basicAssembly.resetRunSimulationClassLoader();
             basicAssembly.setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
             basicAssembly.setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
-            lastFreshClassLoaderWithReset = basicAssembly.getFreshClassLoader();     
+            lastFreshClassLoaderWithReset = basicAssembly.getRunSimulationClassLoader();     
             
             // Now we are in the pure classloader realm where each basicAssembly run can be independent of any other
             simulationRunAssemblyClass    = lastFreshClassLoaderWithReset.loadClass(simulationRunAssemblyClass.getName());
@@ -315,7 +315,11 @@ public class TextAreaOutputStream implements PropertyChangeListener
         }
         catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException exception) 
         {
-            LOG.error(exception);
+            LOG.error("initializeAssemblySimulationRun() reflection exception: " + exception);
+        }
+        catch (Exception ue) // sometimes strange things happen with reflection and threading
+        {
+            LOG.error("initializeAssemblySimulationRun() reflection uncaught exception: " + ue);
         }
     }
 
@@ -365,7 +369,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
 
             signalAnalystReportReady(); // saves temp report
 
-            System.out.println("Simulation ended");
+            System.out.println("Simulation ended"); // TODO send output to console TextArea
             System.out.println("----------------");
 
             simulationRunPanel.nowRunningLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");

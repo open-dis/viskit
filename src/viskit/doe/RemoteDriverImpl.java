@@ -43,8 +43,9 @@ public class RemoteDriverImpl implements DoeDriver
             rpc = new XmlRpcClientLite(host,port);
         } catch (MalformedURLException ex) {
             throw new DoeException("Malformed Url at "+host+":"+port);
-        } catch (Exception e) {
-            LOG.error(e);
+        } 
+        catch (Exception e) {
+            LOG.error("RemoteDriverImpl(" + host + ", " + port + ", " + user + ", " + password + ") exception: " + e.getMessage());
         }
         if (rpc == null) throw new DoeException("Can't connect to Gridkit service at "+host+":"+port);
 

@@ -13,15 +13,19 @@
  */
 package viskit.gridlet;
 
+import edu.nps.util.Log4jUtilities;
 import java.io.ByteArrayOutputStream;
 import simkit.EventList;
 import java.io.PrintWriter;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Rick Goldberg
  */
-public class GridletEventList extends EventList {
+public class GridletEventList extends EventList
+{
+    static final Logger LOG = Log4jUtilities.getLogger(GridletEventList.class);
     
     private final PrintWriter printWriter;
     private final ByteArrayOutputStream buffer;
@@ -39,7 +43,7 @@ public class GridletEventList extends EventList {
     @Override
     public void dump(String reason) {
         printWriter.println(super.getEventListAsString(reason));
-        System.out.println(getEventListAsString(reason));
+        LOG.info(getEventListAsString(reason));
     }
     
 }

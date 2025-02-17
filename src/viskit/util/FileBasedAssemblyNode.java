@@ -1,6 +1,8 @@
 package viskit.util;
 
+import edu.nps.util.Log4jUtilities;
 import java.io.File;
+import org.apache.logging.log4j.Logger;
 
 /** Utility class to help identify whether an Event Graph or PCL is from XML or *.class
  * form.  Used to help populate the LEGO tree on the Assembly Editor.
@@ -17,7 +19,9 @@ import java.io.File;
  * @since 3:26:42 PM
  * @version $Id$
  */
-public class FileBasedAssemblyNode {
+public class FileBasedAssemblyNode
+{
+    static final Logger LOG = Log4jUtilities.getLogger(FileBasedAssemblyNode.class);
 
     public static final String FBAN_DELIM = "<fbasdelim>";
     public String loadedClass;
@@ -57,8 +61,13 @@ public class FileBasedAssemblyNode {
             } else if (sa.length == 4) {
                 return new FileBasedAssemblyNode(new File(sa[0]), sa[1], new File(sa[2]), sa[3]);
             }
-        } catch (Exception e) {}
-        throw new FileBasedAssemblyNode.exception();
+        } 
+        catch (Exception e)
+        {
+            LOG.error("FileBasedAssemblyNode fromString() exception: " + e.getMessage());
+            throw new FileBasedAssemblyNode.exception();
+        }
+        return null;
     }
 
     public static class exception extends Exception {}

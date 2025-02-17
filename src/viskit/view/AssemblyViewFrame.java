@@ -66,6 +66,7 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
+import static viskit.ViskitGlobals.isFileReady;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
 import viskit.control.RecentProjectFileSetListener;
@@ -1288,20 +1289,26 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public void displayXML(File file)
+    public void displayXML(File xmlFile)
     {
+        if (!isFileReady(xmlFile))
+        {
+            LOG.error("displayXML(xmlFile) unable to continue");
+            return;
+        }
         JComponent xmlTreeComponent;
         try {
-            xmlTreeComponent = XMLTreeComponent.getTreeInPanel(file);
+            xmlTreeComponent = XMLTreeComponent.getTreeInPanel(xmlFile);
         } 
         catch (Exception e) {
+            LOG.error("displayXML(" + xmlFile.getPath() + ") exception " + e.getMessage());
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "XML Display Error", e.getMessage());
             return;
         }
         //xt.setVisibleRowCount(25);
         xmlTreeComponent.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
-        final JFrame xmlDisplayFrame = new JFrame(file.getName());
+        final JFrame xmlDisplayFrame = new JFrame(xmlFile.getName());
 
         JPanel contentPanel = new JPanel();
         xmlDisplayFrame.setContentPane(contentPanel);

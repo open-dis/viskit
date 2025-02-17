@@ -23,9 +23,10 @@ import viskit.doe.LocalBootLoader;
  * @version $Id$
  */
 @SuppressWarnings("serial")
-public class LocalTaskQueue extends ArrayList<Object> {
-
-    static Logger log = Log4jUtilities.getLogger(LocalTaskQueue.class);
+public class LocalTaskQueue extends ArrayList<Object> 
+{
+    static Logger LOG = Log4jUtilities.getLogger(LocalTaskQueue.class);
+    
     GridRunner gridRunner;
     int totalTasks;
     File experimentFile;
@@ -93,7 +94,7 @@ public class LocalTaskQueue extends ArrayList<Object> {
                 task = constr.newInstance(new Object[]{});
                 ((Thread)task).setContextClassLoader(loader);
                 ((Thread)task).setPriority(Thread.MAX_PRIORITY);
-                //System.out.println("At this point, setting "+task+"'s loader to "+loader);
+                //LOG.info("At this point, setting "+task+"'s loader to "+loader);
                 //task.setExperimentFile(experimentFile);
                 Class<?> fileClass = loader.loadClass("java.io.File");
                 Constructor<?> fileConstr = fileClass.getConstructor(java.net.URI.class);
@@ -120,7 +121,7 @@ public class LocalTaskQueue extends ArrayList<Object> {
                 ((Thread) task).start();
 
             } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException | ClassNotFoundException e) {
-                log.error(e);
+                LOG.error("activate(" + i + ") exception: " + e.getMessage());
             }
         }
         return false;

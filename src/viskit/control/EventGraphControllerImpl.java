@@ -64,8 +64,8 @@ import viskit.mvc.MvcRecentFileListener;
  2 instantiate it in the constructor, mapping it to a handler (name)
  3 write the handler
  */
-public class EventGraphControllerImpl extends MvcAbstractController implements EventGraphController {
-
+public class EventGraphControllerImpl extends MvcAbstractController implements EventGraphController 
+{
     static final Logger LOG = Log4jUtilities.getLogger(EventGraphControllerImpl.class);
 
     public EventGraphControllerImpl() {
@@ -1007,7 +1007,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void eventList() {
         // not used
         if (viskit.ViskitStatics.debug) {
-            System.out.println("EventListAction in " + this);
+            LOG.info("EventListAction in " + this);
         }
     }
     private int nodeCount = 0;
@@ -1261,7 +1261,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private void initConfig() {
         try {
             historyConfig = ViskitConfigurationStore.instance().getViskitAppConfiguration();
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             LOG.error("Error loading history file: {}", e);
             LOG.warn("Recent file saving disabled");
             historyConfig = null;

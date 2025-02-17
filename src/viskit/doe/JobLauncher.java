@@ -122,8 +122,11 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         if (!isSubComponent) {
             try {
                 getParams();
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
+            } 
+            catch (Exception e) 
+            {
+                LOG.error("runFile(" + isSubComponent + ", " + file + ", " + title + ") exception: " + e.getMessage());
+//                e.printStackTrace(System.err);
             }
 
             pack();
@@ -222,13 +225,16 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         try {
             filteredFile = TempFileManager.createTempFile("DoeInputFile", ".xml");
         } catch (IOException e) {
-            System.out.println("couldn't make temp file");
+            LOG.info("couldn't make temp file");
         }
 
         try {
             getParams();
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
+        } 
+        catch (Exception e) 
+        {
+            LOG.error("setFile(" + file + ", " + title + ") exception: " + e.getMessage());
+//            e.printStackTrace(System.err);
         }
         doTitle(title);
     }
@@ -309,19 +315,19 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         switch (action) {
             case DirectoryWatch.DirectoryChangeListener.FILE_ADDED:
                 if (viskit.ViskitStatics.debug) {
-                    System.out.println("Grid JobLauncher got assembly change message: FILE_ADDED: " + " " + file.getAbsolutePath());
+                    LOG.info("Grid JobLauncher got assembly change message: FILE_ADDED: " + " " + file.getAbsolutePath());
                 }
                 setFile(file.getAbsolutePath(), file.getName());
                 break;
             case DirectoryWatch.DirectoryChangeListener.FILE_REMOVED:
                 if (viskit.ViskitStatics.debug) {
-                    System.out.println("Grid JobLauncher got assembly change message: FILE_REMOVED: " + " " + file.getAbsolutePath());
+                    LOG.info("Grid JobLauncher got assembly change message: FILE_REMOVED: " + " " + file.getAbsolutePath());
                 }
                 setFile(null, null);
                 break;
             case DirectoryWatch.DirectoryChangeListener.FILE_CHANGED:
                 if (viskit.ViskitStatics.debug) {
-                    System.out.println("Grid JobLauncher got assembly change message: FILE_CHANGED: " + " " + file.getAbsolutePath());
+                    LOG.info("Grid JobLauncher got assembly change message: FILE_CHANGED: " + " " + file.getAbsolutePath());
                 }
                 setFile(file.getAbsolutePath(), file.getName());
                 break;
@@ -420,7 +426,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                 try {
                     t.join(1_000);
                 } catch (InterruptedException e) {
-                    System.out.println("join exception");
+                    LOG.info("join exception");
                 }
 
             }
@@ -447,7 +453,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
     @Override
     public void run() {
-        System.out.println("Hello Run");
+        LOG.info("Hello Run");
     }
 
     public void runOrig() {
@@ -479,11 +485,14 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                 Object o = rpc.execute("experiment.setAssembly", parms);
                 writeStatus("experiment.setAssembly returned " + o);
 
-            } catch (Exception e) {
+            } 
+            catch (Exception e) {
                 if (thread != null) {
                     // If normal error:
-                    writeStatus("Error connecting to server: " + e.getMessage());
+                    writeStatus("runOrig() exception connecting to server: " + e.getMessage());
+                    LOG.info   ("runOrig() exception connecting to server: " + e.getMessage());
                 }
+                else LOG.error ("runOrig() exception connecting to server: " + e.getMessage());
                 break lp3;
             }
             // Bring up the 2 other windows
@@ -520,7 +529,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
                             if (idx != -1) {
                                 plotOutput(idx);
                             } else {
-                                System.out.println("Output not saved");
+                                LOG.info("Output not saved");
                             }
                         } catch (XmlRpcException | IOException e) {
                             if (thread != null) {
@@ -551,7 +560,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
             Gresults res = getSingleResult(oa);
             chartter.addPoint(res);
             if (!res.resultsValid) {
-                System.out.println("Results not retrieved for rep " + idx);
+                LOG.info("Results not retrieved for rep " + idx);
             }
         }
     }
@@ -571,7 +580,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         }
         Element el = document.getRootElement();
         if (!el.getName().equals("Results")) {
-            System.out.println("Unknown results format, design point = " + dp + ", run = " + nrun);
+            LOG.info("Unknown results format, design point = " + dp + ", run = " + nrun);
             return res;
         }
         String design = attValue(el, "design");
@@ -582,7 +591,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         Element propCh = el.getChild("PropertyChange");
         if (propCh == null) {
             if (viskit.ViskitStatics.debug) {
-                System.out.println("PropertyChange results element null, design point = " + dp + ", run = " + nrun);
+                LOG.info("PropertyChange results element null, design point = " + dp + ", run = " + nrun);
             }
             return res;
         }
@@ -592,11 +601,11 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         Text txt = (Text) propertyContent.get(0);
         String cstr = txt.getTextTrim();
         if (viskit.ViskitStatics.debug) {
-            System.out.println("got back " + cstr);
+            LOG.info("got back " + cstr);
         }
         String[] sa = cstr.split("\n");
         if (sa.length != 2) {
-            System.out.println("PropertyChange parse error, design point = " + dp + ", run = " + nrun);
+            LOG.info("PropertyChange parse error, design point = " + dp + ", run = " + nrun);
             return res;
         }
         sa[1] = sa[1].trim();
@@ -640,7 +649,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
     private int saveOutput(String o, int dp, int nrun) {
         if (o == null) {
-            System.out.println("mischief detected!");
+            LOG.info("mischief detected!");
         }
         try {
             File f = File.createTempFile("DoeResults", ".xml", outDir);
@@ -778,7 +787,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
 
     public static void main(final String[] args) {
         if (args.length != 1) {
-            System.out.println("Give .xml file as argument");
+            LOG.info("Give .xml file as argument");
         } else {
 
             Runnable r = () -> {

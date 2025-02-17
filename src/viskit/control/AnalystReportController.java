@@ -52,12 +52,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
+import static viskit.ViskitGlobals.isFileReady;
 import viskit.mvc.MvcAbstractController;
 import viskit.model.AnalystReportModel;
-import viskit.model.Model;
 import viskit.util.XsltUtility;
 import viskit.view.AnalystReportViewFrame;
-import viskit.view.AssemblyViewFrame;
 
 /** A controller for the analyst report panel.  All functions are to be
  * performed here vice the view.
@@ -262,15 +261,19 @@ public class AnalystReportController extends MvcAbstractController {
         saveReport(analystReportModel.getAnalystReportXmlFile());
     }
 
-    private void saveReport(File f)
+    private void saveReport(File reportFile)
     {
-        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
+        if (!isFileReady(reportFile))
+            return;
+        
         try {
-            analystReportModel.writeToXMLFile(f);
+            analystReportModel.writeToXMLFile(reportFile);
             analystReportViewFrame.setReportDirty(false);
-        } catch (Exception e) {
-            LOG.error(e);
+        } 
+        catch (Exception e) {
+            LOG.error("saveReport(" + reportFile.getPath() + ") exception: " + e);
         }
+        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
     }
 
     private void openAnalystReport(File selectedFile)

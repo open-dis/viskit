@@ -523,7 +523,7 @@ public class ViskitStatics
      */
     public static void putParameterList(String type, List<Object>[] p) {
         if (debug) {
-            System.out.println("Vstatics putting " + type + " " + Arrays.toString(p));
+            LOG.info("ViskitStatics putting " + type + " " + Arrays.toString(p));
         }
         parameterMap.remove(type);
         parameterMap.put(type, p);
@@ -586,8 +586,8 @@ public class ViskitStatics
             } catch (NoSuchFieldException ex) {}
 
             if (viskit.ViskitStatics.debug) {
-                System.out.println("adding " + type.getName());
-                System.out.println("\t # constructors: " + constr.length);
+                LOG.info("adding " + type.getName());
+                LOG.info("\t # constructors: " + constr.length);
             }
 
             Class<?>[] ptypes;
@@ -658,9 +658,9 @@ public class ViskitStatics
                                         if (viskit.ViskitStatics.debug)
                                             LOG.debug("\tfrom compiled parameterMap {}", p.getName() + p.getType());
 
-                                    } catch (Exception ex) {
-                                        LOG.error(ex);
-//                                        ex.printStackTrace();
+                                    }
+                                    catch (Exception ex) {
+                                        LOG.error("resolveParameters(" + type + ") initial-loop exception: " + ex.getMessage());
                                     }
                                 }
                             }
@@ -670,7 +670,7 @@ public class ViskitStatics
                         LOG.error(ex);
 //                        ex.printStackTrace();
                     }
-                } else { // unknonws
+                } else { // unknown
                     int k = 0;
                     for (Class<?> ptyp : ptypes) {
                         try {
@@ -687,9 +687,9 @@ public class ViskitStatics
                             if (viskit.ViskitStatics.debug)
                                 LOG.info("\t {}{}", p.getName(), p.getType());
 
-                        } catch (Exception ex) {
-                            LOG.error(ex);
-//                            ex.printStackTrace();
+                        }
+                        catch (Exception ex) {
+                            LOG.error("resolveParameters(" + type + ") secondary-loop exception: " + ex.getMessage());
                         }
                     }
                 }
@@ -762,7 +762,7 @@ public class ViskitStatics
                     return 0;
                 } else {
                     if (debug) {
-                        System.out.println(constrs.length);
+                        LOG.info(constrs.length);
                     }
                     return constrs.length;
                 }

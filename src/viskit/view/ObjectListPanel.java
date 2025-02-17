@@ -73,7 +73,7 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
         JComponent[] contentObj = new JComponent[objectListSize];
 
         if (viskit.ViskitStatics.debug) {
-            System.out.println("really has " + objectListSize + "parameters");
+            LOG.info("really has " + objectListSize + "parameters");
         }
         int i = 0;
         String jTFText = "", s;
@@ -92,7 +92,7 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
             nameLabel[i].setOpaque(true);
             nameLabel[i].setBackground(new Color(255, 255, 255, 64));
             if (viskit.ViskitStatics.debug) {
-                System.out.println("really set label " + s);
+                LOG.info("really set label " + s);
             }
 
             s = nextInstance.getDescription();

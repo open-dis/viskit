@@ -54,6 +54,7 @@ import org.jdom.filter.ElementFilter;
 
 import viskit.util.EventGraphCache;
 import viskit.ViskitGlobals;
+import static viskit.ViskitGlobals.isFileReady;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.doe.FileHandler;
@@ -118,8 +119,9 @@ public final class AnalystReportModel extends MvcAbstractModel
         setStatisticsReportPath(statisticsReportPath);
         try {
             newDocument = EventGraphCache.instance().loadXML(statisticsReportPath);
-        } catch (Exception e) {
-            LOG.error("Exception reading {}", statisticsReportPath + " : " + e.getMessage());
+        }
+        catch (Exception e) {
+            LOG.error("Constructor exception reading {}", statisticsReportPath + " : " + e.getMessage());
         }
         if (newDocument == null)
             return; // statistics XML was not written to, not selected for recording
@@ -166,12 +168,17 @@ public final class AnalystReportModel extends MvcAbstractModel
      */
     public AnalystReportModel(File newAnalystReportFileXml) 
     {
+        if (!isFileReady(newAnalystReportFileXml))
+        {
+            LOG.error("Constructor error reading {}", newAnalystReportFileXml.getPath());
+            return;
+        }
         try {
             analystReportFileXml = newAnalystReportFileXml;
             parseXML(newAnalystReportFileXml);
         } 
         catch (Exception ex) {
-            LOG.error(ex);
+            LOG.error("Constructor exception reading {}", newAnalystReportFileXml.getPath() + " : " + ex.getMessage());
         }
     }
 

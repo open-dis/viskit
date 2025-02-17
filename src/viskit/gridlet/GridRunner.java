@@ -77,11 +77,13 @@ import viskit.xsd.bindings.assembly.*;
  * @author Rick Goldberg
  * @version $Id$
  */
-public class GridRunner /* compliments DoeRunDriver*/ {
+public class GridRunner /* complements DoeRunDriver*/
+{
+    private final static Logger LOG = Log4jUtilities.getLogger(GridRunner.class);
+    
     String usid;
     Integer jobID;
     int port;
-    static Logger LOG = Log4jUtilities.getLogger(GridRunner.class);
     Vector<String> eventGraphs;
     Map<String, Object> thirdPartyJars;
     File experimentFile;
@@ -127,8 +129,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         this.thirdPartyJars = new Hashtable<>();
         try {
             assemblyFactory = new viskit.xsd.bindings.assembly.ObjectFactory();
-        } catch (Exception e) {
-            LOG.error(e);
+        } 
+        catch (Exception e) {
+           LOG.error("constructor assemblyFactory exception: " + e.getMessage());
         }
 
         this.usid = "LOCAL-RUN";
@@ -343,15 +346,15 @@ public class GridRunner /* compliments DoeRunDriver*/ {
      * see TestReader.java in gridkit.tests. If no value for timeout
      * is supplied in the XML-GRD, then it waits indefinitely.
      * @param sample a index for a sample
-     * @param designPt and index for a design point
+     * @param newDesignPoint and index for a design point
      * @return a String representation for the result
      */
-    public synchronized String getResult(int sample, int designPt) {
+    public synchronized String getResult(int sample, int newDesignPoint) {
         try {
             Sample s = root.getExperiment().getSample().get(sample);
-            DesignPoint designPoint = s.getDesignPoint().get(designPt);
+            DesignPoint designPoint = s.getDesignPoint().get(newDesignPoint);
             Results r = designPoint.getResults();
-            int index = sample * designPointCount + designPt;
+            int index = sample * designPointCount + newDesignPoint;
             Boolean notifier = resultsNotifiers.get(index);
             if ( ! notifier ) {
                 try {
@@ -365,16 +368,19 @@ public class GridRunner /* compliments DoeRunDriver*/ {
             if ( r == null ) {
                 try {
                     r = assemblyFactory.createResults();
-                    r.setDesignPoint(""+designPt);
+                    r.setDesignPoint(""+newDesignPoint);
                     r.setSample(""+sample);
 
-                } catch (Exception e) {
-                    LOG.error(e);
+                } 
+                catch (Exception e) {
+                    LOG.error("getResult(" + sample + ", " + newDesignPoint + " exception: " + e.getMessage());
                 }
             }
             return (new SimkitAssemblyXML2Java()).marshalFragmentToString(r);
-        } catch (Exception e) {
-            LOG.error(e); // do nothing, the request came before design was in
+        } 
+        catch (Exception e) {
+            LOG.error("getResult(" + sample + ", " + newDesignPoint + " exception: " + e.getMessage());
+            // do nothing, the request came before design was in
         }
 
         return "WAIT";
@@ -394,7 +400,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 try {
                     notifier.wait();
                 } catch (InterruptedException ie) {
-                    //System.out.println("getDesignPointStats has size  "+stats.size());
+                    //LOG.info("getDesignPointStats has size  "+stats.size());
                 }
             }
         }
@@ -472,7 +478,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 designPointStatsNotifiers.set(index,true);
                 notifier.notify();
 
-                //System.out.println("addDesignPointStat "+stat);
+                //LOG.info("addDesignPointStat "+stat);
             }
 
         } catch (JAXBException e) {
@@ -499,7 +505,7 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                 replicationStatsNotifiers.set(index,true);
                 notifier.notify();
 
-                System.out.println("addReplicationStat "+stat);
+                LOG.info("addReplicationStat "+stat);
             }
         } catch (JAXBException e) {
             LOG.error(e);
@@ -515,9 +521,9 @@ public class GridRunner /* compliments DoeRunDriver*/ {
     // SGE_JOB_ID ( subsequently every other Gridlet's in the array ).
 
     // called by DOE or anybody that indexes by sample and designPt
-    public synchronized Integer removeIndexedTask(int sampleIndex, int designPtIndex) {
+    public synchronized Integer removeIndexedTask(int sampleIndex, int designPointIndex) {
         int taskID = sampleIndex * designPointCount;
-        taskID += designPtIndex;
+        taskID += designPointIndex;
         taskID += 1;
 
         removeTask(jobID,taskID);
@@ -525,13 +531,14 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         // TBD check if result first then make an empty result if needed
         try {
             Results r = assemblyFactory.createResults();
-            r.setDesignPoint(""+designPtIndex);
+            r.setDesignPoint(""+designPointIndex);
             r.setSample(""+sampleIndex);
             // release Results lock on thread
             addResult((new SimkitAssemblyXML2Java()).marshalFragmentToString(r));
-            System.out.println("addResult for "+(new SimkitAssemblyXML2Java()).marshalFragmentToString(r));
-        } catch (Exception e) {
-            LOG.error(e);
+            LOG.info("addResult for "+(new SimkitAssemblyXML2Java()).marshalFragmentToString(r));
+        } 
+        catch (Exception e) {
+            LOG.error("removeIndexedTask(" + sampleIndex + ", " + designPointIndex + " exception: " + e.getMessage());
         }
         return taskID;
     }
@@ -900,7 +907,8 @@ public class GridRunner /* compliments DoeRunDriver*/ {
         return q;
     }
 
-    public Boolean calculateDesignPoints() {
+    public Boolean calculateDesignPoints() 
+    {
         boolean batch;
 
         List<TerminalParameter> params = root.getDesignParameters();
@@ -934,7 +942,11 @@ public class GridRunner /* compliments DoeRunDriver*/ {
                     }
                     //could script via jaxb and beanshell
                     //bsh.eval(root.getExperiment().getScript());
-                } catch (Exception ex) { return Boolean.FALSE; }
+                } 
+                catch (Exception ex) { 
+                    LOG.error("calculateDesignPoints() exception: " + ex.getMessage());
+                    return Boolean.FALSE; 
+                }
             }
 
             return Boolean.TRUE;

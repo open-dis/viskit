@@ -370,7 +370,7 @@ public class ViskitProject
         if (!srcDirectory.exists()) {
             getSrcDirectory().mkdir();
         }
-        System.out.println("Generate source into " + getSrcDirectory());
+        LOG.info("Generate source into " + getSrcDirectory());
     }
 
     public void compileSource() {
@@ -380,7 +380,7 @@ public class ViskitProject
         if (!classesDirectory.exists()) {
             getClassesDirectory().mkdir();
         }
-        System.out.println("Compile Source to " + getClassesDirectory());
+        LOG.info("Compile Source to " + getClassesDirectory());
     }
 
     public void deleteProject() {

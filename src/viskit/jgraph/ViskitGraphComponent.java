@@ -197,7 +197,7 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
                 vGModel.reDrawNodes();
                 break;
             default:
-                //System.out.println("duh");
+                //LOG.info("duh");
         }
         currentModelEvent = null;
     }

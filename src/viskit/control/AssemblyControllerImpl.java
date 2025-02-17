@@ -1003,7 +1003,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         AssemblyNode[] oArr;
         try {
             oArr = checkLegalForSEListenerArc(oA, oB);
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             messageUser(JOptionPane.ERROR_MESSAGE, "Connection error.", "Possible class not found.  All referenced entities must be in a list at left.");
             return;
         }
@@ -1542,7 +1543,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             eventGraphSource = x2j.translate();
         } 
         catch (Exception e) {
-            LOG.error("Error building Java from {}: {}, erroneous event-graph xml found", x2j.getFileBaseName(), e.getMessage());
+            LOG.error("buildJavaEventGraphSource() error building Java from {}: {}, erroneous event-graph xml found", x2j.getFileBaseName(), e.getMessage());
         }
         return eventGraphSource;
     }
@@ -1748,8 +1749,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         try {
             SwingUtilities.invokeLater(r);
-        } catch (Exception e) {
-            LOG.error(e);
+        } 
+        catch (Exception e) {
+            LOG.error("prepareSimulationRunner() SwingUtilities.invokeLater(" + r.toString() + ") exception: " + e.getMessage());
         }
 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()
@@ -1992,7 +1994,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 // _doOpenEventGraph checks if a tab is already opened
                 ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpenEventGraph(file);
             }
-        } catch (Exception ex) {
+        } 
+        catch (Exception ex) {
             LOG.error("Opening EventGraph file: {} caused error: {}", tempFile, ex);
             messageUser(JOptionPane.WARNING_MESSAGE,
                     "EventGraph Opening Error",

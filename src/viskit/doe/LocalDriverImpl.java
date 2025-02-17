@@ -52,7 +52,7 @@ public class LocalDriverImpl implements DoeRunDriver {
                 methods = new Hashtable<>();
                 for(Method m : mthds) {
                     methods.put(m.getName(), m);
-                    //System.out.println("put "+m.getName()+" "+m);
+                    //LOG.info("put "+m.getName()+" "+m);
                 }
                 //runner = (GridRunner) constr.newInstance(new Object[]{});
             } catch (IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException ex) {

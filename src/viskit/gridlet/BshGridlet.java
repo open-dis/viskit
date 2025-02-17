@@ -22,6 +22,7 @@
  */
 package viskit.gridlet;
 
+import edu.nps.util.Log4jUtilities;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,11 +43,13 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
+import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
 import viskit.ViskitGlobals;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.assembly.ViskitAssembly;
+import viskit.control.EventGraphControllerImpl;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.cli.Boot;
 
@@ -54,7 +57,10 @@ import viskit.xsd.cli.Boot;
  * @author Rick Goldberg
  * @version $Id$
  */
-public class BshGridlet extends Thread {
+public class BshGridlet extends Thread
+{
+    static final Logger LOG = Log4jUtilities.getLogger(BshGridlet.class);
+    
     SimkitAssemblyXML2Java sax2j;
     XmlRpcClientLite xmlrpc;
     int taskID;
@@ -88,7 +94,7 @@ public class BshGridlet extends Thread {
                 port = parseInt(p.getProperty("PORT"));
                 pwd = p.getProperty("PWD");
                 sax2j = new SimkitAssemblyXML2Java(new URI("file:"+pwd+"/"+filename).toURL().openStream());
-                System.out.println(taskID+ " "+ jobID+" "+usid+" "+filename+" "+pwd);
+                LOG.info(taskID+ " "+ jobID+" "+usid+" "+filename+" "+pwd);
                 //FIXME: should also check if SSL
                 xmlrpc = new XmlRpcClientLite(frontHost,port);
 
@@ -165,7 +171,7 @@ public class BshGridlet extends Thread {
         boolean debug_io = Boolean.parseBoolean(exp.getDebug());
 
         if(debug_io) {
-            System.out.println(filename + " Grid Task ID " + taskID + " of " + numTasks + " tasks in jobID " + jobID + " which is DesignPoint " + designPtIndex + " of Sample " + sampleIndex);
+            LOG.info(filename + " Grid Task ID " + taskID + " of " + numTasks + " tasks in jobID " + jobID + " which is DesignPoint " + designPtIndex + " of Sample " + sampleIndex);
         }
 
         //pass design args into design params
@@ -216,16 +222,16 @@ public class BshGridlet extends Thread {
                 sx2j.unmarshal();
 
                 if (debug_io) {
-                    System.out.println("Evaluating generated java Event Graph:");
-                    System.out.println(sx2j.translate());
+                    LOG.info("Evaluating generated java Event Graph:");
+                    LOG.info(sx2j.translate());
                 }
                 // pass the source for this SimEntity in for "compile"
                 bsh.eval(sx2j.translate());
             }
 
             if (debug_io) {
-                System.out.println("Evaluating generated java Simulation "+ root.getName() + ":");
-                System.out.println(sax2j.translate());
+                LOG.info("Evaluating generated java Simulation "+ root.getName() + ":");
+                LOG.info(sax2j.translate());
             }
             //
             // Now do the Assembly
@@ -275,7 +281,7 @@ public class BshGridlet extends Thread {
                             statXml = sax2j.marshalToString(statForStat(designPointStat));
                         }
                         if (debug_io) {
-                            System.out.println(statXml);
+                            LOG.info(statXml);
                         }
                         Vector<Object> args = new Vector<>();
                         args.add(usid);
@@ -284,8 +290,8 @@ public class BshGridlet extends Thread {
                         args.add(designPointStats.length);
                         args.add(statXml);
                         if (debug_io) {
-                            System.out.println("sending DesignPointStat " + sampleIndex + " " + designPtIndex);
-                            System.out.println(statXml);
+                            LOG.info("sending DesignPointStat " + sampleIndex + " " + designPtIndex);
+                            LOG.info(statXml);
                         }
                         xmlrpc.execute("gridkit.addDesignPointStat", args);
                         // replication stats similarly
@@ -308,7 +314,7 @@ public class BshGridlet extends Thread {
                                         statXml = sax2j.marshalToString(statForStat(replicationStat));
                                     }
                                     if (debug_io) {
-                                        System.out.println(statXml);
+                                        LOG.info(statXml);
                                     }
                                     args.clear();
                                     args.add(usid);
@@ -317,22 +323,26 @@ public class BshGridlet extends Thread {
                                     args.add(j);
                                     args.add(statXml);
                                     if (debug_io) {
-                                        System.out.println("sending ReplicationStat" + sampleIndex + " " + designPtIndex + " " + j);
-                                        System.out.println(statXml);
+                                        LOG.info("sending ReplicationStat" + sampleIndex + " " + designPtIndex + " " + j);
+                                        LOG.info(statXml);
                                     }
                                     xmlrpc.execute("gridkit.addReplicationStat", args);
-                                }catch (Exception e) {
-                                    e.printStackTrace();
+                                }
+                                catch (Exception e) {
+                                {
+                                    LOG.error("run() exception: " + e.getMessage());
+                                }
                                 }
                             }
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } 
+                catch (Exception e) {
+                    LOG.error("run() exception: " + e.getMessage());
                 }
             }
             else {
-                System.out.println("No DesignPointStats");
+                LOG.info("No DesignPointStats");
                 // reconnect io
             }
 
@@ -417,8 +427,8 @@ public class BshGridlet extends Thread {
                 parms.add(sw.toString());
 
                 if (debug_io) {
-                    System.out.println("sending Result ");
-                    System.out.println(sw.toString());
+                    LOG.info("sending Result ");
+                    LOG.info(sw.toString());
                 }
                 xmlrpc.execute("gridkit.addResult", parms);
 

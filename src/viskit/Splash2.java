@@ -133,7 +133,7 @@ public class Splash2 extends JFrame
     public static void main(String[] args) {
 
         if (viskit.ViskitStatics.debug) {
-            System.out.println(System.getProperty("java.class.path"));
+            LOG.info(System.getProperty("java.class.path"));
         }
 
         final Splash2 spl = new Splash2();

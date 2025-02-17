@@ -133,7 +133,7 @@ public class FindFile extends SimpleFileVisitor<Path>
         Files.walkFileTree(startingDirectory, findFile);
 
         if (findFile.path != null)
-            System.out.println("Path found: " + findFile.path);
+            LOG.info("Path found: " + findFile.path);
     }
 
 } // end class file FindFile.java

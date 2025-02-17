@@ -125,7 +125,7 @@ public class ParamTree extends JTree
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             if (viskit.ViskitStatics.debug) {
-                System.out.println("gettcr selected=" + selected);
+                LOG.info("gettcr selected=" + selected);
             }
             Object o = ((DefaultMutableTreeNode) value).getUserObject();
             if (o instanceof String) {

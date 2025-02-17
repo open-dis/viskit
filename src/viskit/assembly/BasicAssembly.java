@@ -72,7 +72,6 @@ import simkit.stat.SimpleStatsTally;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitConfigurationStore;
-import static viskit.ViskitGlobals.isFileReady;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
 
@@ -127,7 +126,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private List<String> entitiesWithStatisticsList;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
-    private ClassLoader freshClassLoader; // TODO move this out of ViskitGlobals due to thread-clobbering issues
+    private static ClassLoader runSimulationClassLoader; // TODO move this out of ViskitGlobals due to thread-clobbering issues
+    private static ClassLoader workingClassLoader; // TODO move this out of ViskitGlobals due to thread-clobbering issues
     
     /** must be saved prior to running in new thread */
     private File  workingDirectory;
@@ -679,7 +679,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         if (!hookupsCalled)
             throw new RuntimeException("performHookups() hasn't been called!");
 
-        System.out.println("\nStopping at time: " + getStopTime());
+        LOG.info("Planned simulation stop time: " + getStopTime());
         Schedule.stopAtTime(getStopTime());
         Schedule.setEventSourceVerbose(true);
 
@@ -731,21 +731,21 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             int nextRunCount = Schedule.getReruns().size();
             if (nextRunCount != runCount) {
-                System.out.println("Reruns changed old: " + runCount + " new: " + nextRunCount);
+                LOG.info("Reruns changed old: " + runCount + " new: " + nextRunCount);
                 firePropertyChange("rerunCount", runCount, nextRunCount);
                 runCount = nextRunCount;
 
                 // print out new reRuns
                 // Note: too many Sysouts for multiple replications.  Comment
                 // in for debugging only.
-//                System.out.println("ReRun entities added since startup: ");
+//                LOG.info("ReRun entities added since startup: ");
 //                Set<SimEntity> entitiesWithRunEvents = Schedule.getDefaultEventList().getRerun();
 //                for (SimEntity entity : entitiesWithRunEvents) {
 //                    if (!runEntitiesSet.contains(entity)) {
 //                        System.out.print(entity.getName() + " ");
 //                    }
 //                }
-//                System.out.println();
+//                LOG.info();
             }
             if (stopRun) 
             {
@@ -755,7 +755,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             else // continue running replications
             {
                 if (Schedule.isRunning())
-                    System.out.println("Already running.");
+                    LOG.info("Already running.");
                 
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 LOG.info("Starting Replication #" + (replication + 1) + " with RNG seed state = " + seed);
@@ -847,6 +847,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             // Creates the temp file only when user required
             initializeTemporaryAnalystReportFile();
             LOG.info("Temporary analyst report at " + analystReportFile.getAbsolutePath());
+            isFileReady(analystReportFile);
             
 //            // TODO the following block appears to break ViskitGlobals singleton pattern!
 //            // Because there is no instantiated report builder in the current
@@ -864,26 +865,30 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     setWorkingDirectory(new File("./build/classes")); // no longer looking for project classes
 //                  setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
                 }
+                if (false) { // debugging to replace reflection code
                 analystReportModel = new AnalystReportModel(reportStatisticsConfiguration.getReport(), pclNodeCache);
                 analystReportModel.writeToXMLFile(analystReportFile);
                 if (!isFileReady(analystReportFile))
                 {
                     LOG.error("analystReportFile not ready");
                 }
+                }
                 
+                if (workingClassLoader == null)
+                {
+                    LOG.error("run() error preparing for Analyst Report recovery: (workingClassLoader == null)");
+                    return;
+                }
                 // TODO this line provokes the restart of singletons ViskitGlobals and ViskitConfigurationStore if used,
                 // can we employ local reference?
-                if (false) { // replace reflexive code
-                getFreshClassLoader();
-                Class<?> clazz = freshClassLoader.loadClass("viskit.model.AnalystReportModel");
+                Class<?> clazz = workingClassLoader.loadClass("viskit.model.AnalystReportModel");
                 
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
                 
                 Object arbObject = arbConstructor.newInstance(reportStatisticsConfiguration.getReport(), pclNodeCache);
                 Method writeToXMLFileMethod = clazz.getMethod("writeToXMLFile", File.class);
                 writeToXMLFileMethod.invoke(arbObject, analystReportFile);
-                }
-            } 
+            }
             catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException | NullPointerException ex) {
                 LOG.error("run() error during getWorkingClassLoader() and reflection checks: " + ex);
             }
@@ -932,11 +937,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      *
      * @return a pristine class loader for Assembly runs
      */
-    public ClassLoader getFreshClassLoader()
+    public ClassLoader getRunSimulationClassLoader()
     {
         try
         {
-            if (freshClassLoader == null)
+            if (runSimulationClassLoader == null)
             {
                 /* Not sure if this breaks the "fresh" classloader for assembly
                 running, but in post JDK8 land, the Java Platform Module System
@@ -952,24 +957,28 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     // do not use singleton referencing by ViskitGlobals here!
                     workingDirectory); 
                 // Allow Assembly files in the ClassLoader
-                freshClassLoader = localBootLoader.initialize(true);
+                runSimulationClassLoader = localBootLoader.initialize(true);
                 // Set a fresh ClassLoader for this thread to be free of any static
                 // state set from the Viskit WorkingClassLoader
-                Thread.currentThread().setContextClassLoader(freshClassLoader);
+                Thread.currentThread().setContextClassLoader(runSimulationClassLoader);
                 // TODO threading and singleton issues while inside ViskitGlobals?
-                LOG.info("getFreshClassLoader() created new ClassLoader for " + getWorkingDirectory());
+                LOG.info("getRunSimulationClassLoader() created new ClassLoader for " + getWorkingDirectory());
             }
         }
         catch (Exception e)
         {
-            LOG.error("getFreshClassLoader() exception, returning null: " + e);
+            LOG.error("getRunSimulationClassLoader() exception, returning null: " + e);
         }
-        return freshClassLoader;
+        if (runSimulationClassLoader == null)
+        {
+            LOG.error("getRunSimulationClassLoader() ran without exception but returned null");
+        }
+        return runSimulationClassLoader;
     }
 
-    public void resetFreshClassLoader() {
-        freshClassLoader = null;
-        LOG.debug("resetFreshClassLoader() complete"); // TODO threading issue?
+    public void resetRunSimulationClassLoader() {
+        runSimulationClassLoader = null;
+        LOG.debug("resetRunSimulationClassLoader() complete"); // TODO threading issue?
     }
 
     /**
@@ -998,6 +1007,29 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      */
     public void setClassPathUrlArray(URL[] classPathUrlArray) {
         this.classPathUrlArray = classPathUrlArray;
+    }
+    /** Check whether file and contents exist, ready for further work, copied from ViskitGlobals to avoid threading/singleton issues
+     * @param file to check
+     * @return whether ready
+     */
+    public static boolean isFileReady (File file)
+    {
+        if (file == null)
+        {
+            LOG.error("isFileReady() file reference is null");
+            return false;
+        }
+        else if (!file.exists())
+        {
+            LOG.error("isFileReady() file does not exist: " + file.getPath());
+            return false;
+        }
+        else if (file.length() == 0)
+        {
+            LOG.error("isFileReady() file is empty: " + file.getPath());
+            return false;
+        }
+        return true;
     }
 
 } // end class file BasicAssembly.java
