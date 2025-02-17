@@ -7,7 +7,7 @@
  */
 package viskit.test;
 
-import edu.nps.util.LogUtils;
+import edu.nps.util.Log4jUtilities;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -27,7 +27,7 @@ import viskit.ViskitGlobals;
  */
 public class TestGridkitLogin extends Thread {
 
-    static Logger LOG = LogUtils.getLogger(TestGridkitLogin.class);
+    static Logger LOG = Log4jUtilities.getLogger(TestGridkitLogin.class);
 
     XmlRpcClientLite xmlrpc;
 
@@ -148,7 +148,7 @@ public class TestGridkitLogin extends Thread {
 
             // now send a jar to newbies new session
 
-            URL u = ViskitGlobals.instance().getWorkClassLoader().getResource("diskit/DISMover3D.class");
+            URL u = ViskitGlobals.instance().getWorkingClassLoader().getResource("diskit/DISMover3D.class");
             
             LOG.info("Opening " + u);
             u = new URI((u.getFile().split("!"))[0].trim()).toURL();

@@ -62,7 +62,7 @@ public class StaticsTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        loaderNoReset = (LocalBootLoader) ViskitGlobals.instance().getWorkClassLoader();
+        loaderNoReset = (LocalBootLoader) ViskitGlobals.instance().getWorkingClassLoader();
         statics = loaderNoReset.loadClass("viskit.ViskitStatics");
         Constructor sconstr = statics.getConstructor();
         rstatics = sconstr.newInstance();
