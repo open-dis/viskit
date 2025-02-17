@@ -588,7 +588,6 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         if (closeProject()) 
         {
-//          ViskitGlobals.instance().initializeProjectHome();
             ViskitGlobals.instance().createProjectWorkingDirectory();
 
             // For a brand new empty project open a default Event Graph
@@ -709,7 +708,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         closeAll();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
-        ViskitConfigurationStore.instance().clearViskitConfig();
+        ViskitConfigurationStore.instance().clearViskitConfiguration();
         clearRecentAssemblyFileList();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
         ViskitGlobals.instance().getViskitProject().closeProject();
@@ -1482,17 +1481,20 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param f the Assembly file to produce source from
      * @return a string of Assembly source code
      */
-    public String buildJavaAssemblySource(File f) {
+    public String buildJavaAssemblySource(File f) 
+    {
         String assemblySource = null;
 
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xvt = new XMLValidationTool(f.getPath(), XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA);
+        XMLValidationTool xmlValidationTool = new XMLValidationTool(f.getPath(), XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA);
 
-        if (!xvt.isValidXML()) {
-
+        if (!xmlValidationTool.isValidXML()) 
+        {
             // TODO: implement a Dialog pointing to the validationErrors.LOG
+            LOG.error("{} is not valid XML!\n", f);
             return assemblySource;
-        } else {
+        } 
+        else {
             LOG.info("{} is valid XML\n", f);
         }
 
@@ -1501,7 +1503,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             x2j = new SimkitAssemblyXML2Java(f);
             x2j.unmarshal();
             assemblySource = x2j.translate();
-        } catch (FileNotFoundException e) {
+        } 
+        catch (FileNotFoundException e) {
             LOG.error(e);
             assemblySource = "";
         }
@@ -1521,12 +1524,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         String eventGraphSource = null;
 
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xvt = new XMLValidationTool(x2j.getEventGraphFile().getPath(),
+        XMLValidationTool xmlValidationTool = new XMLValidationTool(x2j.getEventGraphFile().getPath(),
                 XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA);
 
-        if (!xvt.isValidXML()) {
-
+        if (!xmlValidationTool.isValidXML())
+        {
             // TODO: implement a Dialog pointing to the validationErrors.LOG
+            LOG.error("{} is not valid XML!\n", x2j.getEventGraphFile().getPath());
             return eventGraphSource;
         } 
         else 
@@ -1536,7 +1540,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         try {
             eventGraphSource = x2j.translate();
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             LOG.error("Error building Java from {}: {}, erroneous event-graph xml found", x2j.getFileBaseName(), e.getMessage());
         }
         return eventGraphSource;
@@ -1603,7 +1608,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
             File classesDir = viskitProject.getClassesDirectory();
 
-            LOG.info("Test compiling " + javaFile.getCanonicalPath());
+            LOG.info("compile " + javaFile.getCanonicalPath());
 
             // This will create a class/package to place the .class file
             String diagnostic = Compiler.invoke(pkg, baseName, src);
@@ -1797,12 +1802,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     // provide user guidance on first initialization
                     if (!ViskitGlobals.instance().getSimulationRunPanel().hasLoadedAssembly())
                     {
-                        announceSimulationRunInitialized(assemblyName);
+                        announceReadyToCommenceSimulationRun(assemblyName); // initialization complete
                     }
                     ViskitGlobals.instance().getSimulationRunPanel().setHasLoadedAssembly(true);
                 }
-
-                return null;
+                
+                // TODO what else?
+                return null; // doInBackground complete
             }
 
             @Override
@@ -1825,7 +1831,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         worker.execute();
     }
 
-    private void announceSimulationRunInitialized(String newAssemblyName)
+    private void announceReadyToCommenceSimulationRun(String newAssemblyName)
     {
         String message =
                 "<html><body>" +

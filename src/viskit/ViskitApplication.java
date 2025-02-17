@@ -102,7 +102,8 @@ public class ViskitApplication
                         + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
                 ViskitStatics.showHyperlinkedDialog(null, e.toString(), url, msg, true);
-            } catch (MalformedURLException | URISyntaxException ex) {
+            } 
+            catch (MalformedURLException | URISyntaxException ex) {
                 LOG.fatal(ex);
             }
         }
@@ -127,34 +128,50 @@ public class ViskitApplication
         }
     }
 
+    /** Static initializer for graphical user interface.
+     * Beware of ExceptionInInitializerError when running this code or initializing a static variable.
+     * @see https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/lang/ExceptionInInitializerError.html
+     * @param args arguments
+     */
     private static void createGUI(String[] args)
     {
-        boolean isMac = ViskitStatics.OPERATING_SYSTEM.contains("Mac");
-        String initialAssemblyFile = null;
+        try 
+        {
+            boolean isMac = ViskitStatics.OPERATING_SYSTEM.contains("Mac");
+            String initialAssemblyFile = null;
 
-        if (args.length > 0)
-            initialAssemblyFile = args[0];
+            if (args.length > 0)
+                initialAssemblyFile = args[0];
 
-        if (viskit.ViskitStatics.debug) {
-            LOG.debug("***Inside ViskitApplication main, createGUI{}: ", args.length);
+            if (viskit.ViskitStatics.debug) {
+                LOG.debug("***Inside ViskitApplication main, createGUI{}: ", args.length);
+            }
+
+            setLookAndFeel();
+
+            // Leave tooltips on the screen until mouse movement causes removal
+            ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+            toolTipManager.setDismissDelay(Integer.MAX_VALUE); // never remove automatically
+
+            // TODO checking that these are really needed right here
+            ViskitGlobals.instance().initializeProjectHome();  // needed for first time, but not if repeating...
+            ViskitGlobals.instance().createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
+
+            MainFrame mainFrame = new MainFrame(initialAssemblyFile);
+            if (isMac) {
+                setupMacUI();
+            }
+            mainFrame.setVisible(true);
+
+            MainFrame.runLater(1000L, () -> {
+                // give file loading a chance to finish before checking no models loaded...
+                MainFrame.displayWelcomeGuidance(); // if no event graph or assembly is open
+            });
         }
-        
-        setLookAndFeel();
-
-        // Leave tooltips on the screen until mouse movement causes removal
-        ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
-        toolTipManager.setDismissDelay(Integer.MAX_VALUE); // never remove automatically
-
-        MainFrame mainFrame = new MainFrame(initialAssemblyFile);
-        if (isMac) {
-            setupMacUI();
+        catch (ExceptionInInitializerError exception)
+        {
+            LOG.error ("createGUI(" + args + ") " + exception);
         }
-        mainFrame.setVisible(true);
-        
-        MainFrame.runLater(1000L, () -> {
-            // give file loading a chance to finish before checking no models loaded...
-            MainFrame.displayWelcomeGuidance() ;
-        });
     }
 
     private static void setLookAndFeel()

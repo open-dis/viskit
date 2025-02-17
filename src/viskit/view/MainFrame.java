@@ -129,6 +129,7 @@ public class MainFrame extends JFrame
     public MainFrame(String initialAssemblyFile) 
     {
         super(ViskitConfigurationStore.VISKIT_FULL_APPLICATION_NAME);
+        
         ViskitGlobals.instance().setMainFrame(MainFrame.this);
         
         this.initialAssemblyFile = initialAssemblyFile;
@@ -362,12 +363,11 @@ public class MainFrame extends JFrame
             // runGridComponent.setTitleListener(myTitleListener, topTabbedAssemblyPane.getTabCount() + TAB1_CLUSTERUN_INDEX);
             assemblyControllerImpl.addAssemblyFileListener(runGridComponent);
         }
-        /* End DIFF between OA3302 branch and trunk */
 
         // let the event graph controller establish Viskit's classpath and open
         // EventGraphs first if an assembly file has not been submitted at startup
         if (initialAssemblyFile == null || initialAssemblyFile.isBlank() || initialAssemblyFile.contains("$")) {
-            runLater(0L, () -> {
+            runLater(100L, () -> {
                 getEventGraphController().begin();
             });
         }
@@ -771,7 +771,7 @@ public class MainFrame extends JFrame
 
     public static void displayWelcomeGuidance()
     {
-        // TODO check if author has entered profile information, offer to help
+        // TODO check if author has entered profile information, offer to help if still needed
 
         if ((ViskitGlobals.instance().hasViskitProject()) &&
             (ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded() == 0) &&

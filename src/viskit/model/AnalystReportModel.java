@@ -197,15 +197,15 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     /**
      * File I/O that saves the report in XML format
-     * @param fil the initial temp file to save for further post-processing
+     * @param file the initial temp file to save for further post-processing
      * @return the initial temp file to saved for further post-processing
      * @throws java.lang.Exception general catchall
      */
-    public File writeToXMLFile(File fil) throws Exception {
-        if (fil == null)
-            fil = writeToXMLFile();
-        _writeCommon(fil);
-        return fil;
+    public File writeToXMLFile(File file) throws Exception {
+        if (file == null)
+            file = writeToXMLFile();
+        _writeCommon(file);
+        return file;
     }
 
     /** @return the initial temp file to be saved for further post-processing
@@ -228,15 +228,16 @@ public final class AnalystReportModel extends MvcAbstractModel
      * @param file the XML file to parse
      * @throws Exception is a parsing error is encountered
      */
-    private void parseXML(File file) throws Exception {
-        reportJdomDocument = EventGraphCache.instance().loadXML(file);
-        rootElement = reportJdomDocument.getRootElement();
-        exececutiveSummaryElement = rootElement.getChild("ExecutiveSummary");
-        simulationLocationElement = rootElement.getChild("Location");
-        simulationConfigurationElement = rootElement.getChild("SimulationConfiguration");
-        entityParametersElement = rootElement.getChild("EntityParameters");
-        behaviorDescriptionsElement = rootElement.getChild("BehaviorDescriptions");
-        statisticalResultsElement = rootElement.getChild("StatisticalResults");
+    private void parseXML(File file) throws Exception 
+    {
+        reportJdomDocument                = EventGraphCache.instance().loadXML(file);
+        rootElement                       = reportJdomDocument.getRootElement();
+        exececutiveSummaryElement         = rootElement.getChild("ExecutiveSummary");
+        simulationLocationElement         = rootElement.getChild("Location");
+        simulationConfigurationElement    = rootElement.getChild("SimulationConfiguration");
+        entityParametersElement           = rootElement.getChild("EntityParameters");
+        behaviorDescriptionsElement       = rootElement.getChild("BehaviorDescriptions");
+        statisticalResultsElement         = rootElement.getChild("StatisticalResults");
         conclusionsRecommendationsElement = rootElement.getChild("ConclusionsRecommendations");
     }
 
@@ -255,14 +256,14 @@ public final class AnalystReportModel extends MvcAbstractModel
      */
     public void createExecutiveSummary() {
         exececutiveSummaryElement = new Element("ExecutiveSummary");
-        exececutiveSummaryElement.setAttribute("comments", "true");
+        exececutiveSummaryElement.setAttribute("comments", "true"); // TODO description
         rootElement.addContent(exececutiveSummaryElement);
     }
 
     /** Creates the SimulationLocation portion of the analyst report XML */
     public void createSimulationLocation() {
         simulationLocationElement = new Element("Location");
-        simulationLocationElement.setAttribute("comments", "true");
+        simulationLocationElement.setAttribute("comments", "true"); // TODO description
         simulationLocationElement.setAttribute("images", "true");
         makeComments(simulationLocationElement, "SL", "");
         makeProductionNotes(simulationLocationElement, "SL", "");
@@ -273,10 +274,10 @@ public final class AnalystReportModel extends MvcAbstractModel
     /** Creates the simulation configuration portion of the Analyst report XML */
     private void createSimulationConfiguration() {
         simulationConfigurationElement = new Element("SimulationConfiguration");
-        simulationConfigurationElement.setAttribute("comments", "true");
+        simulationConfigurationElement.setAttribute("comments", "true"); // TODO description
         simulationConfigurationElement.setAttribute("image", "true");
         simulationConfigurationElement.setAttribute("entityTable", "true");
-        makeComments(simulationConfigurationElement, "SC", "");
+        makeComments(simulationConfigurationElement, "SC", ""); // TODO description
         makeProductionNotes(simulationConfigurationElement, "SC", "");
         makeConclusions(simulationConfigurationElement, "SC", "");
         if (assemblyFile != null) {
@@ -289,7 +290,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     /** Creates the entity parameter section of this analyst report */
     private void createEntityParameters() {
         entityParametersElement = new Element("EntityParameters");
-        entityParametersElement.setAttribute("comments", "true");
+        entityParametersElement.setAttribute("comments", "true"); // TODO description
         entityParametersElement.setAttribute("parameterTables", "true");
         makeComments(entityParametersElement, "EP", "");
         makeConclusions(entityParametersElement, "EP", "");
@@ -303,7 +304,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     /** Creates the behavior descriptions portion of the report */
     private void createBehaviorDescriptions() {
         behaviorDescriptionsElement = new Element("BehaviorDescriptions");
-        behaviorDescriptionsElement.setAttribute("comments", "true");
+        behaviorDescriptionsElement.setAttribute("comments", "true"); // TODO description
         behaviorDescriptionsElement.setAttribute("descriptions", "true");
         behaviorDescriptionsElement.setAttribute("image", "true");
         behaviorDescriptionsElement.setAttribute("details", "true");
@@ -323,7 +324,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         statisticalResultsElement = new Element("StatisticalResults");
         rootElement.addContent(statisticalResultsElement);
 
-        statisticalResultsElement.setAttribute("comments", "true");
+        statisticalResultsElement.setAttribute("comments", "true"); // TODO description
         statisticalResultsElement.setAttribute("replicationStats", "true"); // TODO full name
         statisticalResultsElement.setAttribute("summaryStats", "true");     // TODO full name
         makeComments(statisticalResultsElement,"SR", "");
@@ -424,7 +425,7 @@ public final class AnalystReportModel extends MvcAbstractModel
      */
     private void createConclusionsRecommendations() {
         conclusionsRecommendationsElement = new Element("ConclusionsRecommendations");
-        conclusionsRecommendationsElement.setAttribute("comments", "true");
+        conclusionsRecommendationsElement.setAttribute("comments", "true"); // TODO description
         makeComments(conclusionsRecommendationsElement, "CR", "");
         makeConclusions(conclusionsRecommendationsElement, "CR", "");
         rootElement.addContent(conclusionsRecommendationsElement);
@@ -1174,24 +1175,24 @@ public final class AnalystReportModel extends MvcAbstractModel
     public void setDebug                      (boolean bool) { this.debug = bool; }
     public void setReportName                 (String s) { rootElement.setAttribute("name", s); }
 
-    public boolean isPrintRecommendationsConclusions() { return stringToBoolean(conclusionsRecommendationsElement.getAttributeValue("comments")); }
+    public boolean isPrintRecommendationsConclusions() { return stringToBoolean(conclusionsRecommendationsElement.getAttributeValue("comments")); } // TODO description
     public String  getConclusions()                    { return unMakeComments(conclusionsRecommendationsElement);}
     public String  getRecommendations()                { return unMakeConclusions(conclusionsRecommendationsElement);}
-    public void setPrintRecommendationsConclusions(boolean bool) { conclusionsRecommendationsElement.setAttribute("comments", booleanToString(bool)); }
+    public void setPrintRecommendationsConclusions(boolean bool) { conclusionsRecommendationsElement.setAttribute("comments", booleanToString(bool)); } // TODO description
     public void setConclusions                     (String s)     { makeComments(conclusionsRecommendationsElement,"CR", s); }   // watch the wording
     public void setRecommendations                 (String s)     { makeConclusions(conclusionsRecommendationsElement,"CR", s); }
 
     // exec summary:
     // good
-    public boolean isExecutiveSummaryComments() { return stringToBoolean(exececutiveSummaryElement.getAttributeValue("comments"));}
-    public void    setExecutiveSummaryComments  (boolean bool) {exececutiveSummaryElement.setAttribute("comments", booleanToString(bool));}
+    public boolean isExecutiveSummaryComments() { return stringToBoolean(exececutiveSummaryElement.getAttributeValue("comments"));} // TODO description
+    public void    setExecutiveSummaryComments  (boolean bool) {exececutiveSummaryElement.setAttribute("comments", booleanToString(bool));} // TODO description
     public String  getExecutiveSummary() { return unMakeComments(exececutiveSummaryElement);}
-    public void    setExecutiveSummary   (String s) { makeComments(exececutiveSummaryElement,"ES", s);}
+    public void    setExecutiveSummary   (String s) { makeComments(exececutiveSummaryElement,"ES", s);} // TODO description
 
     // sim-location:
     // good
-    public boolean isPrintSimulationLocationComments() {return stringToBoolean(simulationLocationElement.getAttributeValue("comments"));}
-    public void    setPrintSimulationLocationComments  (boolean bool) {simulationLocationElement.setAttribute("comments", booleanToString(bool));}
+    public boolean isPrintSimulationLocationComments() {return stringToBoolean(simulationLocationElement.getAttributeValue("comments"));} // TODO description
+    public void    setPrintSimulationLocationComments  (boolean bool) {simulationLocationElement.setAttribute("comments", booleanToString(bool));} // TODO description
     public boolean isPrintSimulationLocationImage()    {return stringToBoolean(simulationLocationElement.getAttributeValue("images"));}
     public void    setPrintSimulationLocationImage     (boolean bool) {simulationLocationElement.setAttribute("images", booleanToString(bool));}
 
@@ -1209,12 +1210,12 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     // entity-parameters
     //good
-    public boolean isPrintParameterComments() { return stringToBoolean(entityParametersElement.getAttributeValue("comments"));}
+    public boolean isPrintParameterComments() { return stringToBoolean(entityParametersElement.getAttributeValue("comments"));} // TODO description
     public boolean isPrintParameterTable()    { return stringToBoolean(entityParametersElement.getAttributeValue("parameterTables")); }
-    public void setPrintParameterComments   (boolean bool) { entityParametersElement.setAttribute("comments", booleanToString(bool)); }
+    public void setPrintParameterComments   (boolean bool) { entityParametersElement.setAttribute("comments", booleanToString(bool)); } // TODO description
     public void setPrintParameterTable      (boolean bool) { entityParametersElement.setAttribute("parameterTables", booleanToString(bool)); }
 
-    public String  getParameterComments()    { return unMakeComments(entityParametersElement);}
+    public String  getParameterComments()    { return unMakeComments(entityParametersElement);} // TODO description
     public String  getParameterConclusions() { return unMakeConclusions(entityParametersElement);}
     public Vector<Object[]> getParameterTables() {return unMakeParameterTables(entityParametersElement);}
     public void setParameterDescription         (String s){ makeComments(entityParametersElement,"EP", s); }
@@ -1222,8 +1223,8 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     // behavior descriptions:
     //good
-    public boolean isPrintBehaviorDefComments()  { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("comments"));}
-    public void setPrintBehaviorDefComments(boolean bool) { behaviorDescriptionsElement.setAttribute("comments", booleanToString(bool)); }
+    public boolean isPrintBehaviorDefComments()  { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("comments"));} // TODO description
+    public void setPrintBehaviorDefComments(boolean bool) { behaviorDescriptionsElement.setAttribute("comments", booleanToString(bool)); } // TODO description
 
     public boolean isPrintBehaviorDescriptions() { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("descriptions"));}
     public boolean isPrintEventGraphDetails()    { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("details"));}
@@ -1239,10 +1240,10 @@ public final class AnalystReportModel extends MvcAbstractModel
     public List getBehaviorList()          { return unMakeBehaviorList(behaviorDescriptionsElement); }
     // sim-config:
     //good
-    public boolean isPrintSimulationConfigurationComments() { return stringToBoolean(simulationConfigurationElement.getAttributeValue("comments"));}
+    public boolean isPrintSimulationConfigurationComments() { return stringToBoolean(simulationConfigurationElement.getAttributeValue("comments"));} // TODO description
     public boolean isPrintEntityTable()       { return stringToBoolean(simulationConfigurationElement.getAttributeValue("entityTable"));}
     public boolean isPrintAssemblyImage()     { return stringToBoolean(simulationConfigurationElement.getAttributeValue("image"));}
-    public void    setPrintSimulationConfigurationComments  (boolean bool) { simulationConfigurationElement.setAttribute("comments", booleanToString(bool));}
+    public void    setPrintSimulationConfigurationComments  (boolean bool) { simulationConfigurationElement.setAttribute("comments", booleanToString(bool));} // TODO description
     public void    setPrintEntityTable        (boolean bool) { simulationConfigurationElement.setAttribute("entityTable", booleanToString(bool)); }
     public void    setPrintAssemblyImage      (boolean bool) { simulationConfigurationElement.setAttribute("image", booleanToString(bool)); }
 
@@ -1261,12 +1262,12 @@ public final class AnalystReportModel extends MvcAbstractModel
     // stat results:
     // good
     public boolean isPrintReplicationStatistics() { return stringToBoolean(statisticalResultsElement.getAttributeValue("replicationStats")); }
-    public boolean isPrintStatisticsComments()    { return stringToBoolean(statisticalResultsElement.getAttributeValue("comments")); }
+    public boolean isPrintStatisticsComments()    { return stringToBoolean(statisticalResultsElement.getAttributeValue("comments")); } // TODO description
     public boolean isPrintSummaryStatistics()     { return stringToBoolean(statisticalResultsElement.getAttributeValue("summaryStats")); }
     public boolean isPrintStatisticsCharts()      { return stringToBoolean(statisticalResultsElement.getAttributeValue("charts")); }
     //todo later public boolean isOverlayStatsCharts()    { return stringToBoolean(statisticalResults.getAttributeValue("overlay")); }
     public void setPrintReplicationStatistics   (boolean bool) { statisticalResultsElement.setAttribute("replicationStats", booleanToString(bool)); }
-    public void setPrintStatisticsComments      (boolean bool) { statisticalResultsElement.setAttribute("comments", booleanToString(bool)); }
+    public void setPrintStatisticsComments      (boolean bool) { statisticalResultsElement.setAttribute("comments", booleanToString(bool)); } // TODO description
     public void setPrintSummaryStatistics       (boolean bool) { statisticalResultsElement.setAttribute("summaryStats", booleanToString(bool)); }
     public void setPrintStatsCharts        (boolean bool) { statisticalResultsElement.setAttribute("charts", booleanToString(bool)); }
     //todo later public void setOverlayStatsCharts      (boolean bool) { statisticalResults.setAttribute("overlay", booleanToString(bool)); }

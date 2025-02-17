@@ -64,8 +64,10 @@ import org.apache.logging.log4j.Logger;
 import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphControllerImpl;
+import viskit.control.TextAreaOutputStream;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
+import viskit.model.AssemblyModelImpl;
 import viskit.model.EventNode;
 import viskit.model.Model;
 import viskit.model.ViskitElement;
@@ -73,15 +75,13 @@ import viskit.mvc.MvcAbstractViewFrame;
 import viskit.view.AnalystReportViewFrame;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.EventGraphViewFrame;
+import viskit.view.MainFrame;
 import viskit.view.SimulationRunPanel;
 import viskit.view.ViskitProjectSelectionPanel;
+import viskit.view.dialog.ViskitProjectGenerationDialog3;
 import viskit.view.dialog.ViskitUserPreferences;
 import edu.nps.util.SystemExitHandler;
 import static viskit.ViskitProject.DEFAULT_PROJECT_NAME;
-import viskit.control.TextAreaOutputStream;
-import viskit.model.AssemblyModelImpl;
-import viskit.view.MainFrame;
-import viskit.view.dialog.ViskitProjectGenerationDialog3;
 
 /**
  * ViskitGlobals contains global methods and variables.
@@ -106,19 +106,14 @@ public class ViskitGlobals
     // lazy loading, not immediate loading which can fail
     private static volatile ViskitGlobals INSTANCE = null;
    
-    /** Private constructor prevents instantiation from other classes */
+    /** Private constructor prevents instantiation from other classes.
+     *  Other initialization checks moved out of this constructor to avoid breaking singleton pattern.
+     */
     private ViskitGlobals() 
     {
-        viskitConfigurationStore = ViskitConfigurationStore.instance();
-
-        defaultComboBoxModel = new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
-        myViskitTypeListener = new MyViskitTypeListener();
-        buildViskitTypePopupMenu();
-        
-        // TODO are these really needed right here?
-        initializeProjectHome();  // TODO needed? maybe yes for first time, but not if repeating...
-        createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
-        
+        // This should only occur once
+        // Other initialization checks moved out of this constructor to avoid breaking singleton pattern
+        // TODO does LOG interfere with singleton pattern?
         LOG.info("created singleton, constructor initialization complete"); // TODO threading issue?
     }
     
@@ -146,6 +141,30 @@ public class ViskitGlobals
 //        }
 //        return INSTANCE;
     }
+
+    /* Dynamic variable type list processing.  Build Type combo boxes and manage
+     * user-typed object types.
+     */
+    private final String moreTypesString = "more...";
+    private final String[] defaultTypeStrings = {
+            "int",
+            "double",
+            "Integer",
+            "Double",
+            "String",
+            moreTypesString};
+    private final String[] morePackages = {"primitives", "java.lang", "java.util", "simkit.random", "cancel"};
+
+    // these are for the moreClasses array
+    private final int PRIMITIVES_INDEX = 0;
+
+    private final String[][] moreClasses =
+            {{"boolean", "byte", "char", "double", "float", "int", "long", "short"},
+            {"Boolean", "Byte", "Character", "Double", "Float", "Integer", "Long", "Short", "String", "StringBuilder"},
+            {"HashMap<K,V>", "HashSet<E>", "LinkedList<E>", "Properties", "Random", "TreeMap<K,V>", "TreeSet<E>", "Vector<E>"},
+            {"RandomNumber", "RandomVariate"},
+            {}
+    };
     
     /* Topmost frame for the application */
     private MainFrame mainFrame;
@@ -159,7 +178,7 @@ public class ViskitGlobals
     /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
     private SimulationRunPanel simulationRunPanel;
     
-    private TextAreaOutputStream internalSimulationRunner;
+    private TextAreaOutputStream simulationTextAreaOutputStream;
 
     /** Flag to denote called systemExit only once */
     private boolean systemExitCalled = false;
@@ -179,8 +198,7 @@ public class ViskitGlobals
     /** The main app JavaHelp set */
     private Help help;
     
-    /** Configuration constants and methods */
-    ViskitConfigurationStore viskitConfigurationStore;
+    /* Configuration constants and methods */
 
     /* routines to manage the singleton-aspect of the views. */
     AssemblyViewFrame      assemblyViewFrame;
@@ -188,13 +206,18 @@ public class ViskitGlobals
 
     private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
     private Interpreter interpreter;
-    private final DefaultComboBoxModel<String> defaultComboBoxModel;
-    private       JPopupMenu           viskitTypePopupMenu;
-    private final MyViskitTypeListener myViskitTypeListener;
+    private final DefaultComboBoxModel<String> defaultComboBoxModel = 
+                                new DefaultComboBoxModel<>(new Vector<>(Arrays.asList(defaultTypeStrings)));
+    private JPopupMenu           viskitTypePopupMenu;
+    private MyViskitTypeListener myViskitTypeListener;
 
     /* routines to manage the singleton-aspect of the view */
     private AnalystReportViewFrame  analystReportViewFrame;
     private AnalystReportController analystReportController;
+    
+    /** this loader seems to provoke repeated ViskitGlobals singleton creation, and so 
+     * putting it ViskitGlobals in attempt to avoid side effects */
+//    private static ClassLoader localWorkingClassLoader; // TODO confirm deconfliction
 
     /**
      * Get a reference to the assembly editor view.
@@ -259,9 +282,9 @@ public class ViskitGlobals
         return (EventGraphViewFrame) eventGraphViewFrame;
     }
 
-    /** This method starts the chain of various Viskit startup steps.  By
-     * calling for a new EventGraphControllerImpl(), in its constructor is a call
-     * to initConfig() which is the first time that the vConfig.xml is
+    /** This method starts the chain of various Viskit startup steps. 
+     * By calling for a new EventGraphControllerImpl(), in its constructor is a
+     * call to initConfig() which is the first time that the vConfig.xml is
      * looked for, or if one is not there, to create one from the template. The
      * vConfig.xml is an important file that holds information on recent
      * assembly and event graph openings, and caching of compiled source from
@@ -272,7 +295,7 @@ public class ViskitGlobals
     public EventGraphViewFrame buildEventGraphViewFrame() 
     {
         eventGraphController = new EventGraphControllerImpl();
-        eventGraphViewFrame = new EventGraphViewFrame(eventGraphController);
+        eventGraphViewFrame  = new EventGraphViewFrame(eventGraphController);
         eventGraphController.setView(eventGraphViewFrame);
         return eventGraphViewFrame;
     }
@@ -381,7 +404,7 @@ public class ViskitGlobals
             interpreter.setStrictJava(true);       // no loose typing
         }
 
-        String[] workCP = ViskitUserPreferences.getExtraClassPath();
+        String[] workCP = ViskitUserPreferences.getExtraClassPathArray();
         if (workCP != null && workCP.length > 0) {
             for (String path : workCP) {
                 try {
@@ -582,8 +605,7 @@ public class ViskitGlobals
         return type.contains(">");
     }
     
-    
-    static ViskitProjectSelectionPanel viskitProjectSelectionPanel;
+    static ViskitProjectSelectionPanel viskitProjectSelectionPanel; // TODO replace
 
     /** The entry point for Viskit startup. This method will either identify a
      * recorded project space, or launch a dialog asking the user to either
@@ -591,9 +613,10 @@ public class ViskitGlobals
      */
     public final void initializeProjectHome() 
     {
-        String projectHome = viskitConfigurationStore.getVal(ViskitConfigurationStore.PROJECT_PATH_KEY);
+        String projectHome = ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.PROJECT_PATH_KEY);
 //      String projectHome = ViskitGlobals.instance().getProjectWorkingDirectory().getName();
-        LOG.info("projectHome=" + projectHome);
+
+        LOG.info("initializeProjectHome() projectHome=" + projectHome);
         if (  projectHome.isEmpty() || 
             !(new File(projectHome).exists()) ||
              (hasViskitProject() && !isProjectOpen()))
@@ -627,9 +650,9 @@ public class ViskitGlobals
             JOptionPane.showMessageDialog(ViskitGlobals.instance().getEventGraphViewFrame().getRootPane(), 
                     "Chosen project name already exists, please create a new project name.");
         else
-            break; // out of do
+            break; // out of do-while
         
-    } while (true);
+    } while (true); // until break
 
     ViskitGlobals.instance().setProjectFile(newProjectFile);
 
@@ -647,7 +670,8 @@ public class ViskitGlobals
 ////            }
 ////            viskitProjectSelectionPanel.showDialog(); // blocks
         } 
-        else {
+        else
+        {
             ViskitProject.VISKIT_PROJECTS_DIRECTORY = projectHome;
         }
     }
@@ -766,30 +790,6 @@ public class ViskitGlobals
         return false;
     }
 
-    /* Dynamic variable type list processing.  Build Type combo boxes and manage
-     * user-typed object types.
-     */
-    private final String moreTypesString = "more...";
-    private final String[] defaultTypeStrings = {
-            "int",
-            "double",
-            "Integer",
-            "Double",
-            "String",
-            moreTypesString};
-    private final String[] morePackages = {"primitives", "java.lang", "java.util", "simkit.random", "cancel"};
-
-    // these are for the moreClasses array
-    private final int PRIMITIVES_INDEX = 0;
-
-    private final String[][] moreClasses =
-            {{"boolean", "byte", "char", "double", "float", "int", "long", "short"},
-            {"Boolean", "Byte", "Character", "Double", "Float", "Integer", "Long", "Short", "String", "StringBuilder"},
-            {"HashMap<K,V>", "HashSet<E>", "LinkedList<E>", "Properties", "Random", "TreeMap<K,V>", "TreeSet<E>", "Vector<E>"},
-            {"RandomNumber", "RandomVariate"},
-            {}
-    };
-
     /** @param viskitType the type to check if primitive or array
      * @return true if primitive or array
      */
@@ -848,7 +848,8 @@ public class ViskitGlobals
      */
     public String typeChosen(String viskitType) {
         viskitType = viskitType.replaceAll("\\s", "");              // every whitespace removed
-        for (int i = 0; i < defaultComboBoxModel.getSize(); i++) {
+        for (int i = 0; i < defaultComboBoxModel.getSize(); i++) 
+        {
             if (defaultComboBoxModel.getElementAt(i).equals(viskitType)) {
                 return viskitType;
             }
@@ -860,6 +861,9 @@ public class ViskitGlobals
 
     public JComboBox<String> getViskitTypeComboBox() 
     {
+        if (myViskitTypeListener == null)  
+            myViskitTypeListener = new MyViskitTypeListener();
+        
         JComboBox<String> comboBox = new JComboBox<>(defaultComboBoxModel);
         comboBox.addActionListener(myViskitTypeListener);
         comboBox.addItemListener(myViskitTypeListener);
@@ -897,7 +901,7 @@ public class ViskitGlobals
             }
         }
     }
-    JComboBox pending;
+    JComboBox pendingComboBox;
     Object lastSelected = "void";
 
     public SimulationRunPanel getSimulationRunPanel()
@@ -915,6 +919,13 @@ public class ViskitGlobals
     public ViskitProject getViskitProject() {
         return viskitProject;
     }
+    
+    /**
+     * @return current viskitProject root directory path */
+    public String getProjectRootDirectoryPath()
+    {
+        return viskitProject.getProjectRootDirectoryPath();
+    }
 
     /**
      * @return whether a viskitProject is currently loaded */
@@ -924,7 +935,7 @@ public class ViskitGlobals
 
     /**
      * @return a project's working directory which is typically the
-     * build/classes directory
+     * build/classes directory (NOT the project directory)
      */
     public File getProjectWorkingDirectory() {
         return projectWorkingDirectory;
@@ -938,11 +949,11 @@ public class ViskitGlobals
      */
     public final void createProjectWorkingDirectory()
     {
-        if (viskitConfigurationStore.getViskitAppConfiguration() == null)
+        if (ViskitConfigurationStore.instance().getViskitAppConfiguration() == null)
             return; // unexpected condition
 
         if ((projectName == null) || projectName.isBlank())
-             projectName = viskitConfigurationStore.getVal(ViskitConfigurationStore.PROJECT_NAME_KEY);
+             projectName = ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.PROJECT_NAME_KEY);
         if ((projectName == null) || projectName.isBlank()) // double checking
              projectName = DEFAULT_PROJECT_NAME;
         setProjectName(projectName);
@@ -971,19 +982,20 @@ public class ViskitGlobals
         projectWorkingDirectory = viskitProject.getClassesDirectory();
     }
 
-    private ClassLoader workingClassLoader, freshClassLoader;
+    private ClassLoader workingClassLoader;
 
     /**
-     * Retrieve Viskit's working ClassLoader, which may be reset from time to
+     * Retrieve the ViskitWorkingClassLoader, which may be reset from time to
      * time if extra classpaths are loaded.
      *
      * @return Viskit's working ClassLoader
      */
     public ClassLoader getWorkingClassLoader() 
     {
-        if (workingClassLoader == null) {
+        if (workingClassLoader == null) // workingClassLoader should only get created once
+        {
             URL[] urls = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
-            LocalBootLoader localBootLoader = new LocalBootLoader(urls,
+            viskit.doe.LocalBootLoader localBootLoader = new LocalBootLoader(urls,
                     Thread.currentThread().getContextClassLoader(),
                     getProjectWorkingDirectory());
 
@@ -1000,45 +1012,6 @@ public class ViskitGlobals
         LOG.debug("resetWorkingClassLoader() complete"); // TODO threading issue?
     }
 
-    /** This class loader is specific to Assembly running in that it is
-     * pristine from the working class loader in use for normal Viskit operations
-     *
-     * @return a pristine class loader for Assembly runs
-     */
-    public ClassLoader getFreshClassLoader() 
-    {
-        if (freshClassLoader == null)
-        {
-            // Forcing exposure of extra classpaths here.  Bugfix 1237
-            URL[] urlArray = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
-
-            /* Not sure if this breaks the "fresh" classloader for assembly
-               running, but in post JDK8 land, the Java Platform Module System
-               (JPMS) rules and as such we need to retain certain modules, i.e.
-               java.sql. With retaining the boot class loader, not sure if that
-               causes sibling classloader static variables to be retained. In
-               any case we must retain the original bootloader as it has
-               references to the loaded module system.
-            */
-            LocalBootLoader localBootLoader = new LocalBootLoader(urlArray,
-                ClassLoader.getPlatformClassLoader(), // <- the parent of the platform loader should be the internal boot loader
-getProjectWorkingDirectory());
-
-            // Allow Assembly files in the ClassLoader
-            freshClassLoader = localBootLoader.initialize(true);
-
-            // Set a fresh ClassLoader for this thread to be free of any static
-            // state set from the Viskit working ClassLoader
-            Thread.currentThread().setContextClassLoader(freshClassLoader);
-        }
-        LOG.debug("getFreshClassLoader() complete"); // TODO threading issue?
-        return freshClassLoader;
-    }
-
-    public void resetFreshClassLoader() {
-        freshClassLoader = null;
-        LOG.debug("resetFreshClassLoader() complete"); // TODO threading issue?
-    }
 
     /** @return a model to print a stack trace of calling classes and their methods */
     @SuppressWarnings({"ThrowableInstanceNotThrown", "ThrowableInstanceNeverThrown", "ThrowableResultIgnored"})
@@ -1159,22 +1132,21 @@ getProjectWorkingDirectory());
      * un-qualified name;
      */
     @SuppressWarnings("serial")
-    class MyJMenuItem extends JMenuItem {
-
+    class MyJMenuItem extends JMenuItem
+    {
         private final String fullName;
 
-        MyJMenuItem(String nm, String fullName) {
-            super(nm);
+        MyJMenuItem(String shortName, String fullName) {
+            super(shortName);
             this.fullName = fullName;
         }
-
         public String getFullName() {
             return fullName;
         }
     }
 
-    class MyViskitTypeListener implements ActionListener, ItemListener {
-
+    class MyViskitTypeListener implements ActionListener, ItemListener
+    {
         @Override
         public void itemStateChanged(ItemEvent e) {
             if (e.getStateChange() == ItemEvent.DESELECTED) {
@@ -1183,17 +1155,20 @@ getProjectWorkingDirectory());
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
-            Object o = e.getSource();
+        public void actionPerformed(ActionEvent actionEvent) {
+            Object o = actionEvent.getSource();
+        
+            if (viskitTypePopupMenu == null)  
+                buildViskitTypePopupMenu();
             if (o instanceof JComboBox) {
-                final JComboBox cb = (JComboBox) o;
-                pending = cb;
-                if (cb.getSelectedItem().toString().equals(moreTypesString)) {
+                final JComboBox comboBox = (JComboBox) o;
+                pendingComboBox = comboBox;
+                if (comboBox.getSelectedItem().toString().equals(moreTypesString)) {
 
                     // NOTE: was getting an IllegalComponentStateException for component not showing
                     Runnable r = () -> {
-                        if (cb.isShowing())
-                            viskitTypePopupMenu.show(cb, 0, 0);
+                        if (comboBox.isShowing())
+                            viskitTypePopupMenu.show(comboBox, 0, 0);
                     };
 
                     try {
@@ -1202,30 +1177,30 @@ getProjectWorkingDirectory());
                         LOG.error(ex);
                     }
                 }
-            } else {
+            } 
+            else {
                 MyJMenuItem mi = (MyJMenuItem) o;
                 if (mi != null && !mi.getText().equals("cancel")) {
-                    pending.setSelectedItem(mi.getFullName());
+                    pendingComboBox.setSelectedItem(mi.getFullName());
                 }
                 else {
-                    pending.setSelectedItem(lastSelected);
+                    pendingComboBox.setSelectedItem(lastSelected);
                 }
             }
         }
     }
 
     @SuppressWarnings("serial")
-    class myViskitTypeListRenderer extends JLabel implements ListCellRenderer<String> {
-
+    class myViskitTypeListRenderer extends JLabel implements ListCellRenderer<String> 
+    {
         @Override
         public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {
 
-            JLabel lab = new JLabel(value);
+            JLabel valueLabel = new JLabel(value);
             if (value.equals(moreTypesString)) {
-                lab.setBorder(BorderFactory.createRaisedBevelBorder());
+                valueLabel.setBorder(BorderFactory.createRaisedBevelBorder());
             }
-
-            return lab;
+            return valueLabel;
         }
     }
     
@@ -1234,7 +1209,8 @@ getProjectWorkingDirectory());
      * @param string
      * @return whether numeric
      */
-    public static boolean isNumeric(String string) {
+    public static boolean isNumeric(String string)
+    {
         try {
             Double.valueOf(string);
             return true;
@@ -1245,17 +1221,17 @@ getProjectWorkingDirectory());
     }
 
     /**
-     * @return the internalSimulationRunner
+     * @return the simulationTextAreaOutputStream
      */
     public TextAreaOutputStream getInternalSimulationRunner() {
-        return internalSimulationRunner;
+        return simulationTextAreaOutputStream;
     }
 
     /**
-     * @param internalSimulationRunner the internalSimulationRunner to set
+     * @param newSimulationTextAreaOutputStream the simulationTextAreaOutputStream to set
      */
-    public void setInternalSimulationRunner(TextAreaOutputStream internalSimulationRunner) {
-        this.internalSimulationRunner = internalSimulationRunner;
+    public void setInternalSimulationRunner(TextAreaOutputStream newSimulationTextAreaOutputStream) {
+        this.simulationTextAreaOutputStream = newSimulationTextAreaOutputStream;
     }
 
     /** 
@@ -1354,6 +1330,44 @@ getProjectWorkingDirectory());
      */
     public ViskitApplication getViskitApplication() {
         return viskitApplication;
+    }
+
+//////    /**
+//////     * @return the localWorkingClassLoader
+//////     */
+//////    public static ClassLoader getLocalWorkingClassLoader() {
+//////        return localWorkingClassLoader;
+//////    }
+//////
+//////    /**
+//////     * @param newLocalWorkingClassLoader the localWorkingClassLoader to set
+//////     */
+//////    public static void setLocalWorkingClassLoader(ClassLoader newLocalWorkingClassLoader) {
+//////        localWorkingClassLoader = newLocalWorkingClassLoader;
+//////    }
+    
+    /** Check whether file and contents exist, ready for further work
+     * @param file to check
+     * @return whether ready
+     */
+    public static boolean isFileReady (File file)
+    {
+        if (file == null)
+        {
+            LOG.error("isFileReady() file reference is null");
+            return false;
+        }
+        else if (!file.exists())
+        {
+            LOG.error("isFileReady() file does not exist: " + file.getPath());
+            return false;
+        }
+        else if (file.length() == 0)
+        {
+            LOG.error("isFileReady() file is empty: " + file.getPath());
+            return false;
+        }
+        return true;
     }
 
 } // end class file ViskitGlobals.java

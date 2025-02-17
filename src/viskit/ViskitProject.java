@@ -225,7 +225,7 @@ public class ViskitProject
         }
         ViskitConfigurationStore.instance().setProjectXMLConfiguration(getProjectFile().getPath());
 
-        XMLConfiguration config = ViskitConfigurationStore.instance().getProjectXMLConfig();
+        XMLConfiguration config = ViskitConfigurationStore.instance().getProjectXMLConfiguration();
         config.setProperty(ViskitConfigurationStore.VISKIT_PROJECT_NAME, getProjectRoot().getName());
 
         setProjectOpen(projectFileExists);
@@ -316,7 +316,7 @@ public class ViskitProject
     public String[] getProjectAdditionalClasspaths() 
     {
         // Prevent duplicate entries
-        Set<String> classpathSet = new HashSet<>();
+        Set<String> classPathSet = new HashSet<>();
 
         // Find and list JARs and ZIPs, from the project's lib directory, in the extra classpath widget
         try {
@@ -327,22 +327,22 @@ public class ViskitProject
                 {
                     additionalJarZipFilePath = additionalFile.getCanonicalPath().replaceAll("\\\\", "/");
                     LOG.debug(additionalJarZipFilePath);
-                    classpathSet.add(additionalJarZipFilePath);
+                    classPathSet.add(additionalJarZipFilePath);
                 }
             }
             LOG.debug(getEventGraphsDirectory().getCanonicalPath());
 
             // Now list any paths inside/outside of the project space, i.e. ${other path}/build/classes
-            String[] classPaths = ViskitUserPreferences.getExtraClassPath();
-            classpathSet.addAll(Arrays.asList(classPaths));
-            LOG.debug("Project cp: {}", classpathSet);
+            String[] extraClassPathsArray = ViskitUserPreferences.getExtraClassPathArray();
+            if (extraClassPathsArray.length > 0)
+                classPathSet.addAll(Arrays.asList(extraClassPathsArray));
+            LOG.debug("Project classPathSet: {}", classPathSet);
 
-        } catch (IOException ex) {
+        } catch (IOException | NullPointerException ex) {
             LOG.error(ex);
-        } catch (NullPointerException npe) {
-            return null;
+            return new String[0];
         }
-        return classpathSet.toArray(String[]::new);
+        return classPathSet.toArray(String[]::new);
     }
 
     public void clean() {
@@ -390,9 +390,9 @@ public class ViskitProject
     public void closeProject() 
     {
         ViskitConfigurationStore viskitConfigurationStore = ViskitConfigurationStore.instance();
-        viskitConfigurationStore.getViskitGuiConfig().setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME_KEY, "");
+        viskitConfigurationStore.getViskitGuiConfiguration().setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME_KEY, "");
         viskitConfigurationStore.cleanup();
-        viskitConfigurationStore.removeProjectXMLConfig(viskitConfigurationStore.getProjectXMLConfig());
+        viskitConfigurationStore.removeProjectXMLConfiguration(viskitConfigurationStore.getProjectXMLConfiguration());
         setProjectOpen(false);
         ViskitGlobals.instance().setTitleProjectName("");
     }
@@ -415,8 +415,13 @@ public class ViskitProject
             return;
         }
         this.projectRootDirectory = projectRoot;
-        XMLConfiguration guiConfig = ViskitConfigurationStore.instance().getViskitGuiConfig();
+        XMLConfiguration guiConfig = ViskitConfigurationStore.instance().getViskitGuiConfiguration();
         guiConfig.setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME_KEY, projectRoot.getName()); // TODO check
+    }
+    
+    public String getProjectRootDirectoryPath()
+    {
+        return projectRootDirectory.getAbsolutePath();
     }
 
     public boolean isDirty() {
@@ -679,7 +684,7 @@ public class ViskitProject
         if (!projectDirectory.exists())
         {
             // likely user has not created their own projects yet, fall back to Viskit's embedded MyViskitProjects
-            initialDirectoryPath = "./MyViskitProjects/"; // allow user to choose DefaultProject or whatever else is there
+            initialDirectoryPath = "MyViskitProjects/"; // allow user to choose DefaultProject or whatever else is there
         }
         initializeProjectChooser(initialDirectoryPath);
 

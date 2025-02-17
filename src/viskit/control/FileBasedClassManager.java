@@ -54,7 +54,7 @@ public class FileBasedClassManager {
 
     // Singleton:
     protected static FileBasedClassManager me;
-    private static XMLConfiguration projectConfig;
+    private static XMLConfiguration projectXMLConfiguration;
     private final Map<String, Class<?>> classMap;
 
     public static synchronized FileBasedClassManager instance() {
@@ -63,7 +63,7 @@ public class FileBasedClassManager {
         }
 
         // This requires reinitializing everytime this FBM is called
-        projectConfig = ViskitConfigurationStore.instance().getProjectXMLConfig();
+        projectXMLConfiguration = ViskitConfigurationStore.instance().getProjectXMLConfiguration();
         return me;
     }
 
@@ -232,16 +232,16 @@ public class FileBasedClassManager {
 //                if (viskit.ViskitStatics.debug) {
 //                    LOG.debug("Cache is empty, creating workDir entry at " + s);
 //                }
-//                projectConfig.setProperty(ViskitConfigurationStore.CACHED_WORKING_DIR_KEY, s);
+//                projectXMLConfiguration.setProperty(ViskitConfigurationStore.CACHED_WORKING_DIR_KEY, s);
 //            }
             if (viskit.ViskitStatics.debug) {
                 LOG.debug("Adding cache " + xmlEventGraphFile + " " + classFile);
             }
 
             if (cache != null) {
-                projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@xml]", xmlEventGraphFile.getCanonicalPath().replaceAll("\\\\", "/"));
-                projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@class]", classFile.getCanonicalPath().replaceAll("\\\\", "/"));
-                projectConfig.setProperty("Cached.EventGraphs(" + cache.size() + ")[@digest]", createMessageDigest(xmlEventGraphFile, classFile));
+                projectXMLConfiguration.setProperty("Cached.EventGraphs(" + cache.size() + ")[@xml]", xmlEventGraphFile.getCanonicalPath().replaceAll("\\\\", "/"));
+                projectXMLConfiguration.setProperty("Cached.EventGraphs(" + cache.size() + ")[@class]", classFile.getCanonicalPath().replaceAll("\\\\", "/"));
+                projectXMLConfiguration.setProperty("Cached.EventGraphs(" + cache.size() + ")[@digest]", createMessageDigest(xmlEventGraphFile, classFile));
             }
             // if used to miss, unmiss it
             removeCacheMiss(xmlEventGraphFile);
@@ -386,9 +386,9 @@ public class FileBasedClassManager {
                 deletedCache = file;
             }
             if (index >= 0) {
-                projectConfig.clearProperty("Cached.EventGraphs(" + index + ")[@xml]");
-                projectConfig.clearProperty("Cached.EventGraphs(" + index + ")[@class]");
-                projectConfig.clearProperty("Cached.EventGraphs(" + index + ")[@digest]");
+                projectXMLConfiguration.clearProperty("Cached.EventGraphs(" + index + ")[@xml]");
+                projectXMLConfiguration.clearProperty("Cached.EventGraphs(" + index + ")[@class]");
+                projectXMLConfiguration.clearProperty("Cached.EventGraphs(" + index + ")[@digest]");
 
                 boolean didDelete = false;
                 if (deletedCache != null)
@@ -431,8 +431,8 @@ public class FileBasedClassManager {
         removeCacheMiss(file); // remove any old ones
         int index = ViskitConfigurationStore.instance().getConfigurationValues(ViskitConfigurationStore.CACHED_MISS_FILE_KEY).length;
         try {
-            projectConfig.addProperty("Cached.Miss(" + index + ")[@file]", file.getCanonicalPath().replaceAll("\\\\", "/"));
-            projectConfig.addProperty("Cached.Miss(" + index + ")[@digest]", createMessageDigest(file));
+            projectXMLConfiguration.addProperty("Cached.Miss(" + index + ")[@file]", file.getCanonicalPath().replaceAll("\\\\", "/"));
+            projectXMLConfiguration.addProperty("Cached.Miss(" + index + ")[@digest]", createMessageDigest(file));
         } catch (IOException ex) {
             LOG.error(ex);
 //            ex.printStackTrace();
@@ -444,8 +444,8 @@ public class FileBasedClassManager {
         int index;
         try {
             if ((index = cacheMisses.lastIndexOf(file.getCanonicalPath().replaceAll("\\\\", "/"))) > -1) {
-                projectConfig.clearProperty("Cached.Miss(" + index + ")[@file]");
-                projectConfig.clearProperty("Cached.Miss(" + index + ")[@digest]");
+                projectXMLConfiguration.clearProperty("Cached.Miss(" + index + ")[@file]");
+                projectXMLConfiguration.clearProperty("Cached.Miss(" + index + ")[@digest]");
             }
         } catch (IOException ex) {
             LOG.error(ex);

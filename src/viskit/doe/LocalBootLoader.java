@@ -89,23 +89,23 @@ public class LocalBootLoader extends URLClassLoader {
 
     private final static Logger LOG = Log4jUtilities.getLogger(LocalBootLoader.class);
     
-    String[] classPath;
-    LocalBootLoader stage1;
-    File workDir;
-    URL[] extUrls;
+    String[] classPathArray;
+    LocalBootLoader localBootLoader; // formerly "stage1"
+    File workingDirectory;
+    URL[] externalUrlArray;
     
     boolean allowAssembly = false;
     private boolean reloadSimkit = false;
 
     /** Creates a new instance of LocalBootLoader
-     * @param classes external classpath urls
-     * @param parent the parent Classloader to this one
-     * @param workDir the current project working directory
+     * @param classesUrlArray external classpath urls
+     * @param parentClassLoader the parent Classloader to this one
+     * @param workingDirectory the current project working directory
      */
-    public LocalBootLoader(URL[] classes, ClassLoader parent, File workDir) {
-        super(new URL[] {}, parent);
-        extUrls = classes;
-        this.workDir = workDir;
+    public LocalBootLoader(URL[] classesUrlArray, ClassLoader parentClassLoader, File workingDirectory) {
+        super(new URL[] {}, parentClassLoader);
+        externalUrlArray = classesUrlArray;
+        this.workingDirectory = workingDirectory;
         LOG.debug(ViskitGlobals.instance().printCallerLog());
     }
 
@@ -133,22 +133,22 @@ public class LocalBootLoader extends URLClassLoader {
         // Capture the current runtime classpath
         initializeStage1();
 
-        stage1.allowAssembly = this.allowAssembly;
+        localBootLoader.allowAssembly = this.allowAssembly;
 
         // Now add any external classpaths
-        for (URL ext : extUrls) {
+        for (URL ext : externalUrlArray) {
 
             // can happen if extraClassPaths.path[@value] is null or erroneous
             if (ext == null) {continue;}
 
-            stage1.addURL(ext);
+            localBootLoader.addURL(ext);
             tempClasspath = new String[getClassPath().length + 1];
-            System.arraycopy(getClassPath(), 0, tempClasspath, 0, classPath.length);
+            System.arraycopy(getClassPath(), 0, tempClasspath, 0, classPathArray.length);
             try {
                 tempUrl = new File(ext.toURI());
                 tempClasspath[tempClasspath.length - 1] = tempUrl.getPath();
                 LOG.debug("Extra path: {}",tempUrl.getPath());
-                classPath = tempClasspath;
+                classPathArray = tempClasspath;
             } catch (URISyntaxException ex) {
                 LOG.error(ex);
             }
@@ -165,12 +165,12 @@ public class LocalBootLoader extends URLClassLoader {
         // Now add our project's working directory, i.e. build/classes
         try {
 
-            stage1.addURL(getWorkDirectory().toURI().toURL());
+            localBootLoader.addURL(getWorkDirectory().toURI().toURL());
             tempClasspath = new String[getClassPath().length + 1];
-            System.arraycopy(getClassPath(), 0, tempClasspath, 0, classPath.length);
+            System.arraycopy(getClassPath(), 0, tempClasspath, 0, classPathArray.length);
             try {
                 tempClasspath[tempClasspath.length - 1] = getWorkDirectory().getCanonicalPath();
-                classPath = tempClasspath;
+                classPathArray = tempClasspath;
             } catch (IOException ex) {
                 LOG.error(ex);
             }
@@ -180,7 +180,7 @@ public class LocalBootLoader extends URLClassLoader {
 
 //        jar = buildCleanWorkJar(); // See TODO note above
 
-        // stage1 gets dirty during bring up of clean jar <-- Why?
+        // localBootLoader gets dirty during bring up of clean jar <-- Why?
         // reboot it with cleanWorkJar
         LOG.debug("Stage1 reinit");
 //        initStage1();
@@ -192,12 +192,12 @@ public class LocalBootLoader extends URLClassLoader {
 //
 //                // If this is the first time through, and no cached Event Graphs, we are
 //                // now adding our project's build/classes path here
-//                stage1.addURL(jar.toURI().toURL());
+//                localBootLoader.addURL(jar.toURI().toURL());
 //                String[] tmp = new String[getClassPath().length + 1];
 //                System.arraycopy(getClassPath(), 0, tmp, 0, getClassPath().length);
 //                try {
 //                    tmp[tmp.length - 1] = jar.getCanonicalPath();
-//                    classPath = tmp;
+//                    classPathArray = tmp;
 //                } catch (IOException ex) {
 //                    LOG.error(ex);
 //                }
@@ -214,8 +214,8 @@ public class LocalBootLoader extends URLClassLoader {
             idx++;
         }
 
-        stage1.classPath = tempClasspath;
-        return stage1;
+        localBootLoader.classPathArray = tempClasspath;
+        return localBootLoader;
     }
 
     /**
@@ -231,24 +231,24 @@ public class LocalBootLoader extends URLClassLoader {
      * @return a URL[] of External ClassPath paths
      */
     public URL[] getExtUrls() {
-        return extUrls;
+        return externalUrlArray;
     }
 
     /** @return a custom String[] with our classpath */
     public String[] getClassPath() {
 
         // very verbose when "debug" mode
-        for (String path : classPath) {
+        for (String path : classPathArray) {
             path = path.replaceAll("\\\\", "/");
             LOG.debug(path);
         }
         LOG.debug("End ClassPath entries\n");
-        return classPath;
+        return classPathArray;
     }
 
     /** @return the working class directory for this project */
     public File getWorkDirectory() {
-        return workDir;
+        return workingDirectory;
     }
 
     /** @return an indication for allowing an Assembly to be jarred up */
@@ -266,7 +266,7 @@ public class LocalBootLoader extends URLClassLoader {
         this.reloadSimkit = reload;
     }
 
-    /** Creates new instances of the stage1 LocalBootLoader */
+    /** Creates new instances of the localBootLoader LocalBootLoader */
     private void initializeStage1() {
 
         String classPathProp = System.getProperty("java.class.path");
@@ -293,15 +293,15 @@ public class LocalBootLoader extends URLClassLoader {
                 LOG.error(ex);
             }
 
-            classPath = cPath.toString().split(sep);
+            classPathArray = cPath.toString().split(sep);
 
         } else {
-            classPath = classPathProp.split(sep);
+            classPathArray = classPathProp.split(sep);
         }
 
         ClassLoader parentClassLoader = getParent();
 
-        stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
+        localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
         boolean loop = !allowAssembly;
 
         // if each LocalBootLoader individually has to read from
@@ -312,22 +312,22 @@ public class LocalBootLoader extends URLClassLoader {
         while (loop) {
             try {
                 if (reloadSimkit) {
-                    stage1.loadClass(ViskitStatics.RANDOM_VARIATE_CLASS);
+                    localBootLoader.loadClass(ViskitStatics.RANDOM_VARIATE_CLASS);
                 } else {
-                    stage1.loadClass(ViskitStatics.LOCAL_BOOT_LOADER);
+                    localBootLoader.loadClass(ViskitStatics.LOCAL_BOOT_LOADER);
                 }
                 //System.out.println("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
-                stage1 = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
+                localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
             } catch (ClassNotFoundException e) {
                 loop = false;
             }
         }
 
-        // build up stage1 libs
+        // build up localBootLoader libs
         for (String path : getClassPath()) {
             try {
-                stage1.addURL(new File(path).toURI().toURL());
+                localBootLoader.addURL(new File(path).toURI().toURL());
             } catch (MalformedURLException ex) {
                 LOG.error(ex);
             }
@@ -345,12 +345,12 @@ public class LocalBootLoader extends URLClassLoader {
             // Don't jar up an empty build/classes directory
             if (getWorkDirectory().listFiles().length == 0) {return null;}
 
-            // this potentially "dirties" this instance of stage1
+            // this potentially "dirties" this instance of localBootLoader
             // meaning it could have Assembly classes in it
-            stage1.addURL(getWorkDirectory().toURI().toURL());
+            localBootLoader.addURL(getWorkDirectory().toURI().toURL());
 
             // make a clean version of the file in jar form
-            // to be added to a newer stage1 (rebooted) instance.
+            // to be added to a newer localBootLoader (rebooted) instance.
             newJar = makeJarFileFromDirectory(getWorkDirectory());
 
         } catch (MalformedURLException ex) {
@@ -417,13 +417,13 @@ public class LocalBootLoader extends URLClassLoader {
                     // to change each DesignPoint, the class file is pruned from the
                     // cleaned jar so that the runner thread can regenerate the class
                     // each time, as the original class definition would otherwise be
-                    // conflictingly already in the loader. On second pass of the stage1
+                    // conflictingly already in the loader. On second pass of the localBootLoader
                     // bring up, this cleaned-up jar is then added to the classpath without
                     // loading the original directory.
                     boolean isEventGraph = true;
                     try {
-                        clz = stage1.loadClass(entryClass);
-                        vzClz = stage1.loadClass("viskit.assembly.ViskitAssembly");
+                        clz = localBootLoader.loadClass(entryClass);
+                        vzClz = localBootLoader.loadClass("viskit.assembly.ViskitAssembly");
                         if (vzClz.isAssignableFrom(clz))
                             isEventGraph = false;
                         

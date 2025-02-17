@@ -69,9 +69,9 @@ public class TextAreaOutputStream extends ByteArrayOutputStream implements Actio
   private final int delay = 125; //250;   // Performance adjuster for slow machines
   private final String warningMsg = "Output limit exceeded / previous text deleted.\n" +
                                     "----------------------------------------------\n";
-  public TextAreaOutputStream(JTextArea textArea, int buffSize)
+  public TextAreaOutputStream(JTextArea textArea, int bufferSize)
   {
-    super(buffSize);
+    super(bufferSize);
     jTextArea = textArea;
     swingTimer = new Timer(delay, this);
     swingTimer.start();

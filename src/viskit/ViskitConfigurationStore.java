@@ -5,10 +5,12 @@ import edu.nps.util.Log4jUtilities;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.configuration2.*;
+import org.apache.commons.configuration2.CombinedConfiguration;
+import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -17,10 +19,8 @@ import org.apache.commons.configuration2.tree.NodeCombiner;
 import org.apache.commons.configuration2.tree.NodeModel;
 import org.apache.commons.configuration2.tree.UnionCombiner;
 import org.apache.logging.log4j.Logger;
-
 import org.jdom.Document;
 import org.jdom.JDOMException;
-
 import viskit.doe.FileHandler;
 
 /**
@@ -103,13 +103,20 @@ public class ViskitConfigurationStore
     public static final String EVENTGRAPH_HISTORY_KEY = RECENT_EVENTGRAPH_CLEAR_KEY + ".EventGraphFile";
     public static final String ASSEMBLY_HISTORY_KEY = RECENT_ASSEMBLY_CLEAR_KEY + ".AssemblyFile";
     public static final String PROJECT_HISTORY_KEY = RECENT_PROJECT_CLEAR_KEY + ".Project";
+    
     public static final String EVENTGRAPH_EDITOR_VISIBLE_KEY = "app.tabs.EventGraphEditor[@visible]";
     public static final String ASSEMBLY_EDITOR_VISIBLE_KEY = "app.tabs.AssemblyEditor[@visible]";
-    public static final String ASSEMBLY_SIMULATION_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
+    public static final String SIMULATION_RUN_VISIBLE_KEY = "app.tabs.AssemblyRun[@visible]";
     public static final String ANALYST_REPORT_VISIBLE_KEY = "app.tabs.AnalystReport[@visible]";
     public static final String DESIGNOFEXPERIMENTS_DOE_EDITOR_VISIBLE_KEY = "app.tabs.DesignOfExperiments[@visible]";
     public static final String CLOUD_SIMULATION_RUN_VISIBLE_KEY = "app.tabs.ClusterRun[@visible]";
     public static final String VERBOSE_DEBUG_MESSAGES_KEY = "app.debug";
+    // https://stackoverflow.com/questions/1005073/initialization-of-an-arraylist-in-one-line
+    public static final ArrayList<String> tabVisibilityUserPreferenceKeyList = new ArrayList<>(
+           Arrays.asList(EVENTGRAPH_EDITOR_VISIBLE_KEY, ASSEMBLY_EDITOR_VISIBLE_KEY, 
+                           SIMULATION_RUN_VISIBLE_KEY,ANALYST_REPORT_VISIBLE_KEY,
+                           DESIGNOFEXPERIMENTS_DOE_EDITOR_VISIBLE_KEY, CLOUD_SIMULATION_RUN_VISIBLE_KEY,
+                           VERBOSE_DEBUG_MESSAGES_KEY));
 
     /** A cached path to satisfactorily compiled, or not, XML EventGraphs and their respective .class versions */
     public static final String CACHED_CLEAR_KEY = "Cached";
@@ -127,13 +134,23 @@ public class ViskitConfigurationStore
     
     public static final String VISKIT_PROJECT_NAME = "Project[@name]";
 
-    private final Map<String, XMLConfiguration> xmlConfigurationsMap;
-    private final Map<String, String>           sessionHashMap;
-    private CombinedConfiguration               projectCombinedConfiguration;
-    private XMLConfiguration                    projectXMLConfiguration = null;
+    private static final Map<String, XMLConfiguration> xmlConfigurationsMap = new HashMap<>();
+    private static final Map<String, String>                 sessionHashMap = new HashMap<>();
+    private static       CombinedConfiguration         projectCombinedConfiguration;
+    private static       XMLConfiguration              projectXMLConfiguration = null;
+    
+    private static boolean initalized = false;
 
     /** Private constructor cannot be invoked externally */
     private ViskitConfigurationStore() 
+    {
+        if (!initalized)
+            initialize(); // this should only occur once
+        // TODO does LOG message interfere with threading?
+        LOG.info("created singleton, constructor initialization complete");        
+    }
+    
+    public final static void initialize()
     {
         try {
             LOG.info(VISKIT_WELCOME_MESSAGE);
@@ -152,20 +169,17 @@ public class ViskitConfigurationStore
             File cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
             if (!C_GUI_FILE.exists())
                 Files.copy(cGuiSrc.toPath(), C_GUI_FILE.toPath());
-
         } 
         catch (IOException ex) {
             LOG.error(ex);
         }
-        xmlConfigurationsMap = new HashMap<>();
-        sessionHashMap = new HashMap<>();
         setDefaultConfiguration();
-        
-        LOG.info("created singleton, constructor initialization complete");        
+        initalized = true;
     }
 
     /** Builds, or rebuilds a default configuration */
-    private void setDefaultConfiguration() {
+    private static void setDefaultConfiguration() 
+    {
         try {
             Parameters params = new Parameters();
             FileBasedConfigurationBuilder<XMLConfiguration> builder1
@@ -184,7 +198,8 @@ public class ViskitConfigurationStore
             projectCombinedConfiguration = new CombinedConfiguration(combiner);
             projectCombinedConfiguration.addConfiguration(builder1.getConfiguration(), "gui");
             projectCombinedConfiguration.addConfiguration(builder2.getConfiguration(), "app");
-        } catch (ConfigurationException e) {
+        } 
+        catch (ConfigurationException e) {
             LOG.error(e);
         }
         
@@ -256,14 +271,14 @@ public class ViskitConfigurationStore
     }
 
     /** @return the XMLConfiguration for Viskit project */
-    public XMLConfiguration getProjectXMLConfig() {
+    public XMLConfiguration getProjectXMLConfiguration() {
         return projectXMLConfiguration;
     }
 
     /** Remove a project's XML configuration upon closing a Viskit project
      * @param projConfig the project configuration to remove
      */
-    public void removeProjectXMLConfig(XMLConfiguration projConfig) {
+    public void removeProjectXMLConfiguration(XMLConfiguration projConfig) {
         projectCombinedConfiguration.removeConfiguration(projConfig);
         xmlConfigurationsMap.remove("proj");
     }
@@ -274,14 +289,14 @@ public class ViskitConfigurationStore
     }
 
     /** @return the XMLConfiguration for Viskit gui */
-    public XMLConfiguration getViskitGuiConfig() {
+    public XMLConfiguration getViskitGuiConfiguration() {
         return (XMLConfiguration) projectCombinedConfiguration.getConfiguration("gui");
     }
 
     /** Used to clear all Viskit Configuration information to create a new
      * Viskit Project
      */
-    public void clearViskitConfig() {
+    public void clearViskitConfiguration() {
         setVal(ViskitConfigurationStore.PROJECT_PATH_KEY, "");
         setVal(ViskitConfigurationStore.PROJECT_NAME_KEY, "");
         getViskitAppConfiguration().clearTree(ViskitConfigurationStore.RECENT_EVENTGRAPH_CLEAR_KEY);
@@ -290,30 +305,39 @@ public class ViskitConfigurationStore
         // Retain the recent projects list
     }
 
-//    public void resetViskitConfig()
+//    public void resetViskitConfigurationv()
 //    {
-//        clearViskitConfig(); // not sure what to do here, what is goal of this method?
+//        clearViskitConfiguration(); // not sure what to do here, what is goal of this method?
 ////        me = null;
 //    }
 
     public void cleanup() {
         // Lot of hoops to pretty-fy config xml files
-        Document doc;
-        try {
-
+        Document document;
+        try
+        {
             // For c_app.xml
-            doc = FileHandler.unmarshallJdom(C_APP_FILE);
-            FileHandler.marshallJdom(C_APP_FILE, doc, false);
+            document = FileHandler.unmarshallJdom(C_APP_FILE);
+            FileHandler.marshallJdom(C_APP_FILE, document, false);
 
             // For c_gui.xml
-            doc = FileHandler.unmarshallJdom(C_GUI_FILE);
-            FileHandler.marshallJdom(C_GUI_FILE, doc, false);
+            document = FileHandler.unmarshallJdom(C_GUI_FILE);
+            FileHandler.marshallJdom(C_GUI_FILE, document, false);
 
             // For the current viskitProject.xml file
-            doc = FileHandler.unmarshallJdom(ViskitGlobals.instance().getViskitProject().getProjectFile());
-            FileHandler.marshallJdom(ViskitGlobals.instance().getViskitProject().getProjectFile(), doc, false);
-        } catch (IOException | JDOMException e) {
-            LOG.error("Bad JDOM cleanup {}: ", e);
+            File projectFile = ViskitGlobals.instance().getViskitProject().getProjectFile();
+            if      (projectFile == null)
+                    LOG.error("cleanup() null projectFile ");
+            else if (!projectFile.exists())
+                     LOG.error("cleanup() nonexistent projectFile " + projectFile.getPath());
+            else
+            {
+                document = FileHandler.unmarshallJdom(projectFile);
+                FileHandler.marshallJdom(projectFile, document, false);
+            }
+        } 
+        catch (IOException | JDOMException e) {
+            LOG.error("Problem with JDOM cleanup {}: ", e);
         }
     }
 }

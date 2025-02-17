@@ -62,6 +62,7 @@ import viskit.ViskitStatics;
 import viskit.assembly.BasicAssembly;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
+import viskit.view.dialog.ViskitUserPreferences;
 
 /** Controller for the Assembly Run panel
  *
@@ -79,7 +80,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
     static final Logger LOG = Log4jUtilities.getLogger(TextAreaOutputStream.class);
 
     /** The name of the basicAssembly to run */
-    private String assemblyClassName;
+    private String simulationRunAssemblyClassName;
     private SimulationRunPanel simulationRunPanel;
     private ActionListener saveListener;
     private JMenuBar myMenuBar;
@@ -91,17 +92,20 @@ public class TextAreaOutputStream implements PropertyChangeListener
     private String analystReportTempFile = null;
 
     /** The basicAssembly to be run from java source */
-    Class<?> assemblyClass;
+    Class<?> simulationRunAssemblyClass;
 
     /** Instance of the basicAssembly to run from java source */
-    Object assemblyInstance;
+    Object simulationRunAssemblyInstance;
     private static int mutex = 0;
-    private final ClassLoader lastLoaderNoReset;
-    private ClassLoader lastLoaderWithReset;
+    
+    private final ClassLoader lastWorkingClassLoaderNoReset;
+    private       ClassLoader lastFreshClassLoaderWithReset;
 
     /** Captures the original RNG seed state */
     private long[] seeds;
     private final StopListener assemblySimulationRunStopListener;
+    
+    private AnalystReportModel analystReportModel;
 
     public static final String ASSEMBLY_SIMULATION_RUN_PANEL_TITLE = "Simulation Run Console";
     /**
@@ -128,8 +132,8 @@ public class TextAreaOutputStream implements PropertyChangeListener
         simulationRunPanel.vcrRewindButton.setEnabled(false);
         simulationRunPanel.vcrStepButton.setEnabled(false);
 
-        // Viskit's current working ClassLoader
-        lastLoaderNoReset = ViskitGlobals.instance().getWorkingClassLoader();
+        // Save Viskit's current working ClassLoader for later restoration
+        lastWorkingClassLoaderNoReset = ViskitGlobals.instance().getWorkingClassLoader();
 
         // Provide access to Enable Analyst Report checkbox
         ViskitGlobals.instance().setSimulationRunPanel(simulationRunPanel);
@@ -153,8 +157,8 @@ public class TextAreaOutputStream implements PropertyChangeListener
 //            LOG.info("VM argument is: {}", s);
 //        }
 
-        assemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
-        doTitle(assemblyClassName);
+        simulationRunAssemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
+        doTitle(simulationRunAssemblyClassName);
 
         simulationRunPanel.vcrStartTimeTF.setText("0.0");
 
@@ -180,46 +184,49 @@ public class TextAreaOutputStream implements PropertyChangeListener
         vcrButtonPressDisplayUpdate(Event.REWIND);
     }
 
-    private void fillSimulationRunButtonsFromAssemblyInitialization(boolean verbose, boolean saveReplicationDataToXml, double stopTime) throws Throwable {
-
-        assemblyClass = ViskitStatics.classForName(assemblyClassName);
-        if (assemblyClass == null) {
+    private void fillSimulationRunButtonsFromAssemblyInitialization(boolean verbose, boolean saveReplicationDataToXml, double stopTime) throws Throwable 
+    {
+        simulationRunAssemblyClass = ViskitStatics.classForName(simulationRunAssemblyClassName);
+        if (simulationRunAssemblyClass == null) {
             throw new ClassNotFoundException();
         }
-        assemblyInstance = assemblyClass.getDeclaredConstructor().newInstance();
+        simulationRunAssemblyInstance = simulationRunAssemblyClass.getDeclaredConstructor().newInstance();
 
         /* in order to resolve the basicAssembly as a BasicAssembly, it must be
          * loaded using the the same ClassLoader as the one used to compile
-         * it. Used in the verboseListener within the working Viskit
-         * ClassLoader
-         */
-        basicAssembly = (BasicAssembly) assemblyInstance;
+         * it. Used in the verboseListener within the working Viskit ClassLoader */
+        // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
+        // must occur prior to threading and new freshClassLoader
+        basicAssembly = (BasicAssembly) simulationRunAssemblyInstance;
 
-        Method getNumberReplicationsMethod = assemblyClass.getMethod("getNumberReplications");
-        Method isSaveReplicationData = assemblyClass.getMethod("isSaveReplicationData"); // TODO hook this up
-        Method isPrintReplicationReportsMethod = assemblyClass.getMethod("isPrintReplicationReports");
-        Method isPrintSummaryReportMethod = assemblyClass.getMethod("isPrintSummaryReport");
-        Method setVerboseMethod = assemblyClass.getMethod("setVerbose", boolean.class);
-        Method isVerboseMethod = assemblyClass.getMethod("isVerbose");
-        Method setStopTimeMethod = assemblyClass.getMethod("setStopTime", double.class);
-        Method getStopTimeMethod = assemblyClass.getMethod("getStopTime");
+        basicAssembly.setWorkingDirectory (ViskitGlobals.instance().getProjectWorkingDirectory());     
+        basicAssembly.setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
 
-        simulationRunPanel.numberReplicationsTF.setText("" + getNumberReplicationsMethod.invoke(assemblyInstance));
-        simulationRunPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReportsMethod.invoke(assemblyInstance));
-        simulationRunPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReportMethod.invoke(assemblyInstance));
+        Method getNumberReplicationsMethod = simulationRunAssemblyClass.getMethod("getNumberReplications");
+        Method isSaveReplicationData = simulationRunAssemblyClass.getMethod("isSaveReplicationData"); // TODO hook this up
+        Method isPrintReplicationReportsMethod = simulationRunAssemblyClass.getMethod("isPrintReplicationReports");
+        Method isPrintSummaryReportMethod = simulationRunAssemblyClass.getMethod("isPrintSummaryReport");
+        Method setVerboseMethod = simulationRunAssemblyClass.getMethod("setVerbose", boolean.class);
+        Method isVerboseMethod = simulationRunAssemblyClass.getMethod("isVerbose");
+        Method setStopTimeMethod = simulationRunAssemblyClass.getMethod("setStopTime", double.class);
+        Method getStopTimeMethod = simulationRunAssemblyClass.getMethod("getStopTime");
+
+        simulationRunPanel.numberReplicationsTF.setText("" + getNumberReplicationsMethod.invoke(simulationRunAssemblyInstance));
+        simulationRunPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReportsMethod.invoke(simulationRunAssemblyInstance));
+        simulationRunPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReportMethod.invoke(simulationRunAssemblyInstance));
         simulationRunPanel.saveReplicationDataCB.setSelected(saveReplicationDataToXml);
 
         // Set the run panel verboseness according to what the basicAssembly XML value is
-        setVerboseMethod.invoke(assemblyInstance, verbose);
-        simulationRunPanel.vcrVerboseCB.setSelected((Boolean) isVerboseMethod.invoke(assemblyInstance));
-        setStopTimeMethod.invoke(assemblyInstance, stopTime);
-        simulationRunPanel.vcrStopTimeTF.setText("" + getStopTimeMethod.invoke(assemblyInstance));
+        setVerboseMethod.invoke(simulationRunAssemblyInstance, verbose);
+        simulationRunPanel.vcrVerboseCB.setSelected((Boolean) isVerboseMethod.invoke(simulationRunAssemblyInstance));
+        setStopTimeMethod.invoke(simulationRunAssemblyInstance, stopTime);
+        simulationRunPanel.vcrStopTimeTF.setText("" + getStopTimeMethod.invoke(simulationRunAssemblyInstance));
     }
     viskit.assembly.TextAreaOutputStream textAreaOutputStream;
     Runnable assemblyRunnable;
 
-    protected void initializeAssemblySimulationRun() {
-
+    protected void initializeAssemblySimulationRun() 
+    {
         // Prevent multiple pushes of the sim run button
         mutex++;
         if (mutex > 1)
@@ -227,30 +234,29 @@ public class TextAreaOutputStream implements PropertyChangeListener
 
         try // initializeAssemblySimulationRun
         {
-            ViskitGlobals.instance().resetFreshClassLoader();
-            lastLoaderWithReset = ViskitGlobals.instance().getFreshClassLoader();
-
-            // Test for Bug 1237
-//            for (String s : ((LocalBootLoader)lastLoaderWithReset).getClassPath()) {
-//                LOG.info(s);
-//            }
-//            LOG.info("\n");
-
+            // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
+            // must occur prior to threading and new freshClassLoader
+            basicAssembly.resetFreshClassLoader();
+            basicAssembly.setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
+            basicAssembly.setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
+            lastFreshClassLoaderWithReset = basicAssembly.getFreshClassLoader();     
+            
             // Now we are in the pure classloader realm where each basicAssembly run can be independent of any other
-            assemblyClass = lastLoaderWithReset.loadClass(assemblyClass.getName());
-            assemblyInstance = assemblyClass.getDeclaredConstructor().newInstance();
+            simulationRunAssemblyClass    = lastFreshClassLoaderWithReset.loadClass(simulationRunAssemblyClass.getName());
+            // TODO the BasicAssembly instantiation and constuctor is now causing the singleton failure
+            simulationRunAssemblyInstance = simulationRunAssemblyClass.getDeclaredConstructor().newInstance();
 
-            Method setOutputStreamMethod = assemblyClass.getMethod("setOutputStream", OutputStream.class);
-            Method setNumberReplicationsMethod = assemblyClass.getMethod("setNumberReplications", int.class);
-            Method setPrintReplicationReportsMethod = assemblyClass.getMethod("setPrintReplicationReports", boolean.class);
-            Method setPrintSummaryReportMethod = assemblyClass.getMethod("setPrintSummaryReport", boolean.class);
-            Method setSaveReplicationDataMethod = assemblyClass.getMethod("setSaveReplicationData", boolean.class);
-            Method setEnableAnalystReports = assemblyClass.getMethod("setEnableAnalystReports", boolean.class);
-            Method setVerboseMethod = assemblyClass.getMethod("setVerbose", boolean.class);
-            Method setStopTimeMethod = assemblyClass.getMethod("setStopTime", double.class);
-            Method setVerboseReplicationMethod = assemblyClass.getMethod("setVerboseReplication", int.class);
-            Method setPclNodeCacheMethod = assemblyClass.getMethod("setPclNodeCache", Map.class);
-            Method addPropertyChangeListenerMethod = assemblyClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
+            Method setOutputStreamMethod            = simulationRunAssemblyClass.getMethod("setOutputStream", OutputStream.class);
+            Method setNumberReplicationsMethod      = simulationRunAssemblyClass.getMethod("setNumberReplications", int.class);
+            Method setPrintReplicationReportsMethod = simulationRunAssemblyClass.getMethod("setPrintReplicationReports", boolean.class);
+            Method setPrintSummaryReportMethod      = simulationRunAssemblyClass.getMethod("setPrintSummaryReport", boolean.class);
+            Method setSaveReplicationDataMethod     = simulationRunAssemblyClass.getMethod("setSaveReplicationData", boolean.class);
+            Method setEnableAnalystReports          = simulationRunAssemblyClass.getMethod("setEnableAnalystReports", boolean.class);
+            Method setVerboseMethod                 = simulationRunAssemblyClass.getMethod("setVerbose", boolean.class);
+            Method setStopTimeMethod                = simulationRunAssemblyClass.getMethod("setStopTime", double.class);
+            Method setVerboseReplicationMethod      = simulationRunAssemblyClass.getMethod("setVerboseReplication", int.class);
+            Method setPclNodeCacheMethod            = simulationRunAssemblyClass.getMethod("setPclNodeCache", Map.class);
+            Method addPropertyChangeListenerMethod  = simulationRunAssemblyClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
 
             // As of discussion held 09 APR 2015, resetting the RNG seed state
             // is not necessary for basic Viskit operation.  Pseudo random
@@ -262,14 +268,14 @@ public class TextAreaOutputStream implements PropertyChangeListener
             // enabled nor visible
             if (simulationRunPanel.resetSeedStateCB.isSelected()) 
             {
-                Class<?> rVFactClass = lastLoaderWithReset.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
+                Class<?> rVFactClass = lastFreshClassLoaderWithReset.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
                 Method getDefaultRandomNumberMethod = rVFactClass.getMethod("getDefaultRandomNumber");
                 Object rn = getDefaultRandomNumberMethod.invoke(null);
 
                 Method getSeedsMethod = rn.getClass().getMethod("getSeeds");
                 seeds = (long[]) getSeedsMethod.invoke(rn);
 
-                Class<?> rNClass = lastLoaderWithReset.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
+                Class<?> rNClass = lastFreshClassLoaderWithReset.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
                 Method setSeedsMethod = rNClass.getMethod("setSeeds", long[].class);
                 setSeedsMethod.invoke(rn, seeds);
 
@@ -280,31 +286,32 @@ public class TextAreaOutputStream implements PropertyChangeListener
 
             textAreaOutputStream = new viskit.assembly.TextAreaOutputStream(simulationRunPanel.outputStreamTA, 16*1024);
 
-            setOutputStreamMethod.invoke(assemblyInstance, textAreaOutputStream);
-            setNumberReplicationsMethod.invoke(assemblyInstance, Integer.valueOf(simulationRunPanel.numberReplicationsTF.getText().trim()));
-            setPrintReplicationReportsMethod.invoke(assemblyInstance, simulationRunPanel.printReplicationReportsCB.isSelected());
-            setPrintSummaryReportMethod.invoke(assemblyInstance, simulationRunPanel.printSummaryReportsCB.isSelected());
+            setOutputStreamMethod.invoke(simulationRunAssemblyInstance, textAreaOutputStream);
+            setNumberReplicationsMethod.invoke(simulationRunAssemblyInstance, Integer.valueOf(simulationRunPanel.numberReplicationsTF.getText().trim()));
+            setPrintReplicationReportsMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.printReplicationReportsCB.isSelected());
+            setPrintSummaryReportMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.printSummaryReportsCB.isSelected());
 
-            /* DIFF between OA3302 branch and trunk */
-            setSaveReplicationDataMethod.invoke(assemblyInstance, simulationRunPanel.saveReplicationDataCB.isSelected());
-            setEnableAnalystReports.invoke(assemblyInstance, simulationRunPanel.analystReportCB.isSelected());
+            setSaveReplicationDataMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.saveReplicationDataCB.isSelected());
+            setEnableAnalystReports.invoke(simulationRunAssemblyInstance, simulationRunPanel.analystReportCB.isSelected());
             /* End DIFF between OA3302 branch and trunk */
 
             // Allow panel values to override XML set values
-            setStopTimeMethod.invoke(assemblyInstance, getStopTime());
-            setVerboseMethod.invoke(assemblyInstance, getVerbose());
+            setStopTimeMethod.invoke(simulationRunAssemblyInstance, getStopTime());
+            setVerboseMethod.invoke(simulationRunAssemblyInstance, getVerbose());
 
-            setVerboseReplicationMethod.invoke(assemblyInstance, getVerboseReplicationNumber());
-            setPclNodeCacheMethod.invoke(assemblyInstance, ((AssemblyModelImpl) ViskitGlobals.instance().getActiveAssemblyModel()).getNodeCache());
-            addPropertyChangeListenerMethod.invoke(assemblyInstance, this);
-            assemblyRunnable = (Runnable) assemblyInstance;
+            setVerboseReplicationMethod.invoke(simulationRunAssemblyInstance, getVerboseReplicationNumber());
+            setPclNodeCacheMethod.invoke(simulationRunAssemblyInstance, ((AssemblyModelImpl) ViskitGlobals.instance().getActiveAssemblyModel()).getNodeCache());
+            addPropertyChangeListenerMethod.invoke(simulationRunAssemblyInstance, this);
+            assemblyRunnable = (Runnable) simulationRunAssemblyInstance;
 
-            // Start the simulation run(s)
+            // Simulation run start the in a separate thread
             simulationRunThread = new Thread(assemblyRunnable);
             new SimulationRunMonitor(simulationRunThread).execute();
+            // Simulation Run thread is nowl aunched and will execute separately
 
-            // Restore Viskit's working ClassLoader
-            Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+            // Restore thread context to Viskit's WorkingClassLoader prior to returning control
+            Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset);
+            LOG.info("initializeAssemblySimulationRun() complete");
         }
         catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException exception) 
         {
@@ -315,20 +322,22 @@ public class TextAreaOutputStream implements PropertyChangeListener
     /** Thread to perform simulation run and end of run cleanup items */
     public class SimulationRunMonitor extends SwingWorker<Void, Void> 
     {
-        Thread waitOn;
+        Thread simulationRunMonitorThread;
 
-        public SimulationRunMonitor(Thread toWaitOn) {
-            waitOn = toWaitOn;
+        public SimulationRunMonitor(Thread newSimulationRunMonitorThread) {
+              simulationRunMonitorThread = newSimulationRunMonitorThread;
         }
 
         @Override
         public Void doInBackground() {
             setProgress(0);
 
-            waitOn.start();
+            simulationRunMonitorThread.start();
             try {
-                waitOn.join();
-            } catch (InterruptedException ex) {
+                simulationRunMonitorThread.join();
+                LOG.info("SimulationRunMonitor now running in simulationRunThread");
+            } 
+            catch (InterruptedException ex) {
                 LOG.error(ex);
 //                ex.printStackTrace();
             }
@@ -337,27 +346,34 @@ public class TextAreaOutputStream implements PropertyChangeListener
 
         // Perform simulation stop and reset calls
         @Override
-        public void done() {
+        public void done()
+        {
             setProgress(100);
+            
+            // TODO perform analyst report work here, avoid reflection!!
+            
 
             // Grab the temp Analyst Report and signal the AnalystReportFrame
             try {
-                Method getAnalystReportMethod = assemblyClass.getMethod("getAnalystReport");
-                analystReportTempFile = (String) getAnalystReportMethod.invoke(assemblyInstance);
-            } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
+                Method getAnalystReportMethod = simulationRunAssemblyClass.getMethod("getAnalystReport");
+                analystReportTempFile = (String) getAnalystReportMethod.invoke(simulationRunAssemblyInstance);
+            } 
+            catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
                 LOG.error(ex);
                 return;
             }
 
-            signalAnalystReportReady();
+            signalAnalystReportReady(); // saves temp report
 
             System.out.println("Simulation ended");
             System.out.println("----------------");
 
             simulationRunPanel.nowRunningLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
             assemblySimulationRunStopListener.actionPerformed(null);
+            
+            // TODO when do we clean up this thread, or does it automatically get removed?
         }
-    }
+    } // end SimulationRunMonitor class
 
     public ActionListener getAssemblyRunStopListener() {
         return assemblySimulationRunStopListener;
@@ -397,12 +413,12 @@ public class TextAreaOutputStream implements PropertyChangeListener
         {
             try // StepListener
             {
-                if (assemblyInstance != null) {
+                if (simulationRunAssemblyInstance != null) {
 
-                    Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+                    Thread.currentThread().setContextClassLoader(lastFreshClassLoaderWithReset);
 
-                    Method setStepRunMethod = assemblyClass.getMethod("setStepRun", boolean.class);
-                    setStepRunMethod.invoke(assemblyInstance, true);
+                    Method setStepRunMethod = simulationRunAssemblyClass.getMethod("setStepRun", boolean.class);
+                    setStepRunMethod.invoke(simulationRunAssemblyInstance, true);
 
 //                    if (textAreaOutputStream != null)
 //                        textAreaOutputStream.kill();
@@ -412,10 +428,11 @@ public class TextAreaOutputStream implements PropertyChangeListener
 
                 Schedule.coldReset();
 
-                ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                if (loader != null && !loader.equals(lastLoaderNoReset))
-                    Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                if ((classLoader != null) && !classLoader.equals(lastWorkingClassLoaderNoReset))
+                    Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset); // rejoin regular thread
 
+                // TODO should prior thread be removed?
             } 
             catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
 
@@ -441,12 +458,12 @@ public class TextAreaOutputStream implements PropertyChangeListener
         {
             try // StopListener
             {
-                if (assemblyInstance != null) {
+                if (simulationRunAssemblyInstance != null) {
 
-                    Thread.currentThread().setContextClassLoader(lastLoaderWithReset);
+                    Thread.currentThread().setContextClassLoader(lastFreshClassLoaderWithReset);
 
-                    Method setStopRunMethod = assemblyClass.getMethod("setStopRun", boolean.class);
-                    setStopRunMethod.invoke(assemblyInstance, true);
+                    Method setStopRunMethod = simulationRunAssemblyClass.getMethod("setStopRun", boolean.class);
+                    setStopRunMethod.invoke(simulationRunAssemblyInstance, true);
 
                     if (textAreaOutputStream != null)
                         textAreaOutputStream.kill();
@@ -456,9 +473,9 @@ public class TextAreaOutputStream implements PropertyChangeListener
 
                 Schedule.coldReset();
 
-                ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                if (loader != null && !loader.equals(lastLoaderNoReset))
-                    Thread.currentThread().setContextClassLoader(lastLoaderNoReset);
+                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                if ((classLoader != null) && !classLoader.equals(lastWorkingClassLoaderNoReset))
+                    Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset); // rejoin regular thread
 
             } 
             catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
@@ -543,7 +560,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
             analystReportController.setReportXML(analystReportTempFile);
 
             // Switch over to the Analyst Report tab if we have a report ready for editing
-            AnalystReportModel analystReportModel = (AnalystReportModel) analystReportController.getModel();
+            analystReportModel = (AnalystReportModel) analystReportController.getModel();
             if (analystReportModel != null && analystReportModel.isReportReady())
             {
                 analystReportController.mainTabbedPane.setSelectedIndex(analystReportController.mainTabbedPaneIdx);

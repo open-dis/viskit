@@ -183,20 +183,26 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         });
     }
 
-    private void _fillLayout() {
-        try {
-        fillHeader();
-        fillExecutiveSummary();
-        fillSimulationLocation();
-        fillSimulationConfiguration();
-        fillEntityParams();
-        fillBehaviors();
-        fillStatisticsPanel();
-        fillConclusionsRecommendationsPanel();
-        }
-        catch (Exception e)
+    private void _fillLayout() 
+    {
+        if (!ViskitGlobals.isFileReady(analystReportModel.getAnalystReportXmlFile()))
         {
-            LOG.error ("problem with _fillLayout()" + e.getMessage());
+            LOG.error ("problem with _fillLayout(), file not ready");
+            return;
+        }
+        try {
+            fillHeader();
+            fillExecutiveSummary();
+            fillSimulationLocation();
+            fillSimulationConfiguration();
+            fillEntityParams();
+            fillBehaviors();
+            fillStatisticsPanel();
+            fillConclusionsRecommendationsPanel();
+        }
+        catch (Exception ex)
+        {
+            LOG.error ("problem with _fillLayout()" + ex.getMessage());
         }
     }
 
@@ -213,7 +219,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
     private void fillHeader()
     {
-        titleTF.setText(analystReportModel.getReportName());
+              titleTF.setText(analystReportModel.getReportName());
         analystNameTF.setText(analystReportModel.getAuthor());
         String date = analystReportModel.getDateOfReport();
         if (date != null && date.length() > 0) {

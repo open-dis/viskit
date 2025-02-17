@@ -121,7 +121,7 @@ public class XMLValidationTool {
 
             // 6. Parse, validate and report any errors.
             try {
-                LOG.info("Validating: " + source.getSystemId());
+                LOG.debug("Validating: " + source.getSystemId());
 
                 // Prepare error errorsLog with current DTG
                 File errorsLog = new File(ViskitConfigurationStore.VISKIT_LOGS_DIR + "/validationErrors.log");
