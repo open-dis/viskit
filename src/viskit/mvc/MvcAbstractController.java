@@ -17,6 +17,7 @@ public abstract class MvcAbstractController implements MvcController {
     private MvcView view;
     private MvcModel model;
 
+    @Override
     public MvcModel getModel() {
         return model;
     }
