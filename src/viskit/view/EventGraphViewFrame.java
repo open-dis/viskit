@@ -930,7 +930,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
         selectMode = makeJToggleButton(null, "viskit/images/selectNode.png",
-                "Select items on the graph");
+                "Select an item on the graph");
 
         arcMode = makeJToggleButton(null, "viskit/images/schedArc.png",
                 "Connect nodes with a scheduling edge");

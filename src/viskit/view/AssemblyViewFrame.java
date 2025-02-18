@@ -679,7 +679,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         selectMode = makeJToggleButton(
                 null,
                 "viskit/images/selectNode.png",
-                "Select items on the graph"
+                "Select an item on the graph"
         );
         Border defBor = selectMode.getBorder();
         selectMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(Color.lightGray, 2)));
