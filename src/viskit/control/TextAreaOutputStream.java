@@ -369,8 +369,9 @@ public class TextAreaOutputStream implements PropertyChangeListener
 
             signalAnalystReportReady(); // saves temp report
 
-            System.out.println("Simulation ended"); // TODO send output to console TextArea
-            System.out.println("----------------");
+            System.out.println("+------------------+"); // output goes to console TextArea
+            System.out.println("| Simulation ended |");
+            System.out.println("+------------------+");
 
             simulationRunPanel.nowRunningLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
             assemblySimulationRunStopListener.actionPerformed(null);

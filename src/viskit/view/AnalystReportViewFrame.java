@@ -904,18 +904,19 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
                 "openAnalystReportXML",
                 "Open another Analyst Report XML",
                 KeyEvent.VK_O,
-                KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+                null));
         
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "saveAnalystReportXML",
                 "Save Analyst Report XML",
                 KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+                null));
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController, 
                 "viewXML", 
                 "XML view of saved Analyst Report",
-                KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+                KeyEvent.VK_X, 
+                null));
 
         myMenuBar.add(getAnalystReportMenu());
     }

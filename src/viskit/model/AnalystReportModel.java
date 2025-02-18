@@ -1116,6 +1116,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                 "<p align='center'>" + assemblyName + " Analyst Report</p><br />" +
                 "<p align='center'>is now loaded and ready for further analysis.</p><br /></body></html>";
                 
+        ViskitGlobals.instance().selectSimulationRunTab();
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 popupTitle, message);
         

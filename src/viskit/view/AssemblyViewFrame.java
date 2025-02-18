@@ -429,7 +429,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
         editMenu.add(buildMenuItem(assemblyController, "copy", "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
-        editMenu.add(buildMenuItem(assemblyController, "paste", "Paste Events", KeyEvent.VK_P,
+        editMenu.add(buildMenuItem(assemblyController, "paste", "Paste Event Node", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
         editMenu.add(buildMenuItem(assemblyController, "remove", "Delete", KeyEvent.VK_R,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK)));
@@ -472,21 +472,21 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         ActionIntrospector.getAction(assemblyController, "paste").setEnabled(false);
 
         editSubMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         editSubMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_Y,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         editSubMenu.addSeparator();
 
         // the next four are disabled until something is selected
         editSubMenu.add(buildMenuItem(assemblyController, "cut", "Cut", KeyEvent.VK_X,
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         editSubMenu.getItem(editSubMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
         editSubMenu.add(buildMenuItem(assemblyController, "copy", "Copy", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
-        editSubMenu.add(buildMenuItem(assemblyController, "paste", "Paste Events", KeyEvent.VK_V,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+        editSubMenu.add(buildMenuItem(assemblyController, "paste", "Paste Event Node", KeyEvent.VK_V,
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         editSubMenu.add(buildMenuItem(assemblyController, "remove", "Delete", KeyEvent.VK_DELETE,
-                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         editSubMenu.addSeparator();
 
         editSubMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add a new Event Graph", KeyEvent.VK_G, null));
@@ -494,7 +494,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         
         assemblyMenu.add(editSubMenu);
         assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit selected Assembly Properties", KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.addSeparator();
         }
 
@@ -520,10 +520,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         
         assemblyMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly", KeyEvent.VK_N,
-                KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         assemblyMenu.add(buildMenuItem(assemblyController, "open", "Open Assembly", KeyEvent.VK_O,
-                KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
         openRecentAssemblyMenu.setMnemonic('O');
         openRecentAssemblyMenu.setEnabled(false); // inactive until needed, reset by listener
@@ -531,23 +531,23 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.addSeparator();
         // Bug fix: 1195
         assemblyMenu.add(buildMenuItem(assemblyController, "close", "Close Assembly", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "closeAll", "Close All Assemblies", KeyEvent.VK_C, null));
         assemblyMenu.add(buildMenuItem(assemblyController, "save", "Save Assembly", KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+        assemblyMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         assemblyMenu.addSeparator();
         assemblyMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Java Source Generation for Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
-                KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "captureWindow", "Image Save Assembly Diagram", KeyEvent.VK_I,
-                KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+        assemblyMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         
         assemblyMenu.addSeparator();
         // TODO add icon?
         assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly for Simulation Run", KeyEvent.VK_I,
-                KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK)));
+                KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         /*
         // TODO: Unknown as to what this does exactly

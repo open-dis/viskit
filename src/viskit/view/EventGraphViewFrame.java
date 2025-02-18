@@ -672,7 +672,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
         editMenu.add(buildMenuItem(eventGraphController, "copy", "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
-        editMenu.add(buildMenuItem(eventGraphController, "paste", "Paste Events", KeyEvent.VK_P,
+        editMenu.add(buildMenuItem(eventGraphController, "paste", "Paste Event Node", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
         editMenu.add(buildMenuItem(eventGraphController, "remove", "Delete", KeyEvent.VK_D,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod)));
@@ -732,7 +732,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         editEventGraphSubMenu.getItem(editEventGraphSubMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "copy", "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, accelMod)));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "paste", "Paste Events", KeyEvent.VK_V,
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "paste", "Paste Event Node", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, accelMod)));
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "remove", "Delete", KeyEvent.VK_DELETE,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod)));
