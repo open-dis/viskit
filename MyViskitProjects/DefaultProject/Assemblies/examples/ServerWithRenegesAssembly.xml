@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimkitAssembly name="ServerWithRenegesAssembly" version="1.0" package="examples" description="TODO add description" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <SimEntity name="arrivalProcess" type="examples.ArrivalProcess">
+    <SimEntity name="arrivalProcess" type="examples.ArrivalProcess" description="customers are produced sequentially at random intervals.">
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter name="" value="Exponential" type="java.lang.String"/>
             <TerminalParameter name="" value="1.5" type="double"/>
         </FactoryParameter>
         <Coordinate x="40.0" y="140.0"/>
     </SimEntity>
-    <SimEntity name="creator" type="examples.Creator">
+    <SimEntity name="creator" type="examples.Creator" description="Creator process creates customer entites">
         <Coordinate x="190.0" y="140.0"/>
     </SimEntity>
-    <SimEntity name="serverWithReneges" type="examples.ServerWithReneges" description="Event graph for server handling customers and reneges">
+    <SimEntity name="serverWithReneges" type="examples.ServerWithReneges" description="Event graph for server handling customers, either for service or for reneges">
         <TerminalParameter name="numberServers" value="2" type="int"/>
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter name="" value="Gamma" type="java.lang.String"/>
@@ -54,6 +54,9 @@
     <Output entity="creator"/>
     <Output entity="arrivalProcess"/>
     <Output entity="serverWithReneges"/>
+    <Output entity="Creator"/>
+    <Output entity="ArrivalProcess"/>
+    <Output entity="ServerWithReneges"/>
     <Schedule stopTime="100.0" verbose="false" saveReplicationData="true"/>
     <Experiment replicationsPerDesignPoint="30" totalSamples="1" timeout="5000"/>
 </SimkitAssembly>
