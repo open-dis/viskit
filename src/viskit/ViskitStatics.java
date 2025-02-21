@@ -84,6 +84,16 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  */
 public class ViskitStatics 
 {
+    /** Inaccessible private constructor to prevent external instantiation, 
+     * replacing default Java constructor which is otherwise created automatically.
+     *@see https://stackoverflow.com/questions/13773710/can-a-class-have-no-constructor
+     */
+    private ViskitStatics()
+    {
+        // unreachable externally and not used inside this class
+        // LOG message notifies if this occurs more than once
+        LOG.error("created private unreachable constructor with static initialization block");
+    }
     static
     {
         // ourobouros issue: having an external checker does not work, because 
