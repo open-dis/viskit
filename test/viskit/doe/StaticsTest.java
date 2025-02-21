@@ -63,6 +63,7 @@ public class StaticsTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         loaderNoReset = (LocalBootLoader) ViskitGlobals.instance().getWorkingClassLoader();
+        // TODO getRunSimulationClassLoader() or getWorkingClassLoader() ?
         statics = loaderNoReset.loadClass("viskit.ViskitStatics");
         Constructor sconstr = statics.getConstructor();
         rstatics = sconstr.newInstance();
@@ -83,7 +84,8 @@ public class StaticsTest extends TestCase {
 
     public void testStatics() throws Exception {
         
-        LocalBootLoader loaderWithReset = (LocalBootLoader) ViskitGlobals.instance().getFreshClassLoader();
+        LocalBootLoader loaderWithReset = (LocalBootLoader) ViskitGlobals.instance().getWorkingClassLoader(); 
+        // TODO getRunSimulationClassLoader() or getWorkingClassLoader() ?
         Class<?> staticz = loaderWithReset.loadClass("viskit.ViskitStatics");
         Constructor sconstr = staticz.getConstructor();
         Object rstaticz = sconstr.newInstance();
