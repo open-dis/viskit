@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="SimpleServer" package="examples" version="0.1" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>One of the most fundamental examples, a simple server</Comment>
+    <Comment>One of the most fundamental examples, a simple server that handles client customers</Comment>
     <Parameter name="serviceTime" type="simkit.random.RandomVariate">
         <Comment>time duration to perform service</Comment>
     </Parameter>
