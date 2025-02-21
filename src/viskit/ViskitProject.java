@@ -726,18 +726,18 @@ public class ViskitProject
 
     private static class ViskitProjectFileView extends FileView {
 
-        Icon viskitProjIcon;
+        Icon viskitProjectIcon;
 
         public ViskitProjectFileView() {
 
             // Can't use VGlobals.instance().getWorkingClassLoader() b/c it will
             // hang if this is the first frest startup of Viskit
-            viskitProjIcon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitIcon.gif"));
+            viskitProjectIcon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitIcon.gif"));
         }
 
         @Override
         public Icon getIcon(File f) {
-            return isViskitProject(f) ? viskitProjIcon : null;
+            return isViskitProject(f) ? viskitProjectIcon : null;
         }
         
         /**
