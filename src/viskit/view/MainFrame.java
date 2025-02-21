@@ -629,7 +629,7 @@ public class MainFrame extends JFrame
         // do nothing
     };
 
-    /** Prepares the Assembly with a fresh class loader free of static artifacts for
+    /** Prepares the Assembly with a RunSimulation class loader free of static artifacts for
      * a completely independent run
      */
     class SimulationRunPlug implements SimulationRunInterface {
@@ -644,7 +644,7 @@ public class MainFrame extends JFrame
                 topTabbedPane.setSelectedIndex(tabIndices[TAB0_SIMULATIONRUN_INDEX]);
                 getSimulationRunTabbedPane().setSelectedIndex(TAB1_LOCALRUN_INDEX);
 
-                // initializes a fresh class loader
+                // initializes a RunSimulation class loader
                 internalSimulationRunner.preInitRun(execStrings);
             }
         }

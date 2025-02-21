@@ -865,7 +865,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     setWorkingDirectory(new File("./build/classes")); // no longer looking for project classes
 //                  setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
                 }
-                if (false) { // debugging to replace reflection code
+                if (false)  // debugging to replace reflection code
+                {
                 analystReportModel = new AnalystReportModel(reportStatisticsConfiguration.getReport(), pclNodeCache);
                 analystReportModel.writeToXMLFile(analystReportFile);
                 if (!isFileReady(analystReportFile))
@@ -943,7 +944,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         {
             if (runSimulationClassLoader == null)
             {
-                /* Not sure if this breaks the "fresh" classloader for assembly
+                /* Not sure if this breaks the "RunSimulation" classloader for assembly
                 running, but in post JDK8 land, the Java Platform Module System
                 (JPMS) rules and as such we need to retain certain modules, i.e.
                 java.sql. With retaining the boot class loader, not sure if that
@@ -958,7 +959,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     workingDirectory); 
                 // Allow Assembly files in the ClassLoader
                 runSimulationClassLoader = localBootLoader.initialize(true);
-                // Set a fresh ClassLoader for this thread to be free of any static
+                // Set a RunSimulation ClassLoader for this thread to be free of any static
                 // state set from the Viskit WorkingClassLoader
                 Thread.currentThread().setContextClassLoader(runSimulationClassLoader);
                 // TODO threading and singleton issues while inside ViskitGlobals?

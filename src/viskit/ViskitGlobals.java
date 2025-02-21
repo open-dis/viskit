@@ -1069,11 +1069,11 @@ public class ViskitGlobals
          */
         Thread[] threads = new Thread[Thread.activeCount()];
         Thread.enumerate(threads);
-        for (Thread t : threads) {
-            LOG.debug("Thread before exit {}: ", t);
+        for (Thread thread : threads) {
+            LOG.debug("Thread before exit {}: ", thread);
 
             // Attempt to release the URLClassLoader's file lock on open JARs
-            t.setContextClassLoader(ClassLoader.getSystemClassLoader());
+            thread.setContextClassLoader(ClassLoader.getSystemClassLoader());
 //            if (t.getName().contains("SwingWorker"))
 //                t.interrupt(); // not working as expected
 //            if (t.getName().contains("Image Fetcher"))

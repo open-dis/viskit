@@ -965,7 +965,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities
         ViskitProject viskitProject = ViskitGlobals.instance().getViskitProject();
 
-        // A fresh (reset) LocalBootLoader will be instantiated
+        // A RunSimulation (reset) LocalBootLoader will be instantiated
         // here when compiling EGs for the first time, or when the
         // SimkitXML2Java translator attempts to resolve a ParameterMap
         addEventGraphsToLegoTree(viskitProject.getEventGraphsDirectory(), true);

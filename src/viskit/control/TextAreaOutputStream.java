@@ -99,7 +99,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
     private static int mutex = 0;
     
     private final ClassLoader lastWorkingClassLoaderNoReset;
-    private       ClassLoader lastFreshClassLoaderWithReset;
+    private       ClassLoader lastRunSimulationClassLoader;
 
     /** Captures the original RNG seed state */
     private long[] seeds;
@@ -196,7 +196,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
          * loaded using the the same ClassLoader as the one used to compile
          * it. Used in the verboseListener within the working Viskit ClassLoader */
         // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
-        // must occur prior to threading and new freshClassLoader
+        // must occur prior to threading and new RunSimulationClassLoader
         basicAssembly = (BasicAssembly) simulationRunAssemblyInstance;
 
         basicAssembly.setWorkingDirectory (ViskitGlobals.instance().getProjectWorkingDirectory());     
@@ -235,14 +235,14 @@ public class TextAreaOutputStream implements PropertyChangeListener
         try // initializeAssemblySimulationRun
         {
             // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
-            // must occur prior to threading and new freshClassLoader
+            // must occur prior to threading and new RunSimulationClassLoader
             basicAssembly.resetRunSimulationClassLoader();
             basicAssembly.setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
             basicAssembly.setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
-            lastFreshClassLoaderWithReset = basicAssembly.getRunSimulationClassLoader();     
+            lastRunSimulationClassLoader = basicAssembly.getRunSimulationClassLoader(); // TODO reset?
             
             // Now we are in the pure classloader realm where each basicAssembly run can be independent of any other
-            simulationRunAssemblyClass    = lastFreshClassLoaderWithReset.loadClass(simulationRunAssemblyClass.getName());
+            simulationRunAssemblyClass    = lastRunSimulationClassLoader.loadClass(simulationRunAssemblyClass.getName());
             // TODO the BasicAssembly instantiation and constuctor is now causing the singleton failure
             simulationRunAssemblyInstance = simulationRunAssemblyClass.getDeclaredConstructor().newInstance();
 
@@ -268,14 +268,14 @@ public class TextAreaOutputStream implements PropertyChangeListener
             // enabled nor visible
             if (simulationRunPanel.resetSeedStateCB.isSelected()) 
             {
-                Class<?> rVFactClass = lastFreshClassLoaderWithReset.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
+                Class<?> rVFactClass = lastRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
                 Method getDefaultRandomNumberMethod = rVFactClass.getMethod("getDefaultRandomNumber");
                 Object rn = getDefaultRandomNumberMethod.invoke(null);
 
                 Method getSeedsMethod = rn.getClass().getMethod("getSeeds");
                 seeds = (long[]) getSeedsMethod.invoke(rn);
 
-                Class<?> rNClass = lastFreshClassLoaderWithReset.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
+                Class<?> rNClass = lastRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
                 Method setSeedsMethod = rNClass.getMethod("setSeeds", long[].class);
                 setSeedsMethod.invoke(rn, seeds);
 
@@ -420,7 +420,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
             {
                 if (simulationRunAssemblyInstance != null) {
 
-                    Thread.currentThread().setContextClassLoader(lastFreshClassLoaderWithReset);
+                    Thread.currentThread().setContextClassLoader(lastRunSimulationClassLoader);
 
                     Method setStepRunMethod = simulationRunAssemblyClass.getMethod("setStepRun", boolean.class);
                     setStepRunMethod.invoke(simulationRunAssemblyInstance, true);
@@ -465,7 +465,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
             {
                 if (simulationRunAssemblyInstance != null) {
 
-                    Thread.currentThread().setContextClassLoader(lastFreshClassLoaderWithReset);
+                    Thread.currentThread().setContextClassLoader(lastRunSimulationClassLoader);
 
                     Method setStopRunMethod = simulationRunAssemblyClass.getMethod("setStopRun", boolean.class);
                     setStopRunMethod.invoke(simulationRunAssemblyInstance, true);
