@@ -96,7 +96,7 @@ public class AnalystReportController extends MvcAbstractController {
         String userName = System.getProperty("user.name");
         String assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getName();
         String outputFilenameDated = (assemblyName + "_AnalystReport_" + dateOutput + ".xml");
-        String outputFilename      = (assemblyName + "_AnalystReport_"              + ".xml");
+        String outputFilename      = (assemblyName + "_AnalystReport"               + ".xml");
 
         File analystReportXmlFile = new File(analystReportDirectory, outputFilename);
         try {
@@ -192,7 +192,7 @@ public class AnalystReportController extends MvcAbstractController {
         String outputFileName = analystReportModel.getAnalystReportXmlFile().getAbsolutePath();
         int idx = outputFileName.lastIndexOf(".");
 
-        outputFileName = outputFileName.substring(0, idx) + ".xml";
+        outputFileName = outputFileName.substring(0, idx) + ".xml"; // TODO superfluous?
         XsltUtility.runXslt(analystReportModel.getAnalystReportXmlFile().getAbsolutePath(),
                 outputFileName, "config/AnalystReportXMLtoHTML.xslt");
     }

@@ -307,7 +307,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
             // Simulation run start the in a separate thread
             simulationRunThread = new Thread(assemblyRunnable);
             new SimulationRunMonitor(simulationRunThread).execute();
-            // Simulation Run thread is nowl aunched and will execute separately
+            // Simulation Run thread is now launched and will execute separately
 
             // Restore thread context to Viskit's WorkingClassLoader prior to returning control
             Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset);

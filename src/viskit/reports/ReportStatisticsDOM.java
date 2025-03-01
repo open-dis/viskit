@@ -23,7 +23,7 @@ public class ReportStatisticsDOM {
     /**
      * The DOM object which is created and saved for use by the analyst report
      */
-    public Document reportStatistics;
+    public Document reportStatisticsDocument;
     /**
      * The root element of the document
      */
@@ -35,18 +35,19 @@ public class ReportStatisticsDOM {
     /**
      *The names that correspond to the order of the data being sent
      */
-    private String[] entityNames;
+    private String[] entityNamesArray;
     /**
      * The properties in order of the data being sent
      */
-    private String[] properties;
+    private String[] propertiesArray;
 
-    /** Creates a new instance of ReportStatisticsDOM */
-    public ReportStatisticsDOM() {
-        reportStatistics = new Document();
+    /** Constructor creates a new instance of ReportStatisticsDOM */
+    public ReportStatisticsDOM()
+    {
+        reportStatisticsDocument = new Document();
         rootElement = new Element("ReportStatistics");
         entities = new HashMap<>();
-        reportStatistics.setRootElement(rootElement);
+        reportStatisticsDocument.setRootElement(rootElement);
     }
 
     /**
@@ -54,22 +55,23 @@ public class ReportStatisticsDOM {
      * is currently necessary because Viskit has no notion of entities and therefore
      * they cannot organize output.
      *
-     * @param simEntities the names of the entities for the simulation
+     * @param simEntityNames the names of the entities for the simulation
      * @param properties the name of the properties in the same order as the entities
      */
-    public void initializeEntities(String[] simEntities, String[] properties) {
-
-        SimEntityRecord record;
-        this.entityNames = simEntities;
-        this.properties = properties;
+    public void initializeEntities(String[] simEntityNames, String[] properties) 
+    {
+        SimEntityRecord simEntityRecord;
+        this.entityNamesArray = simEntityNames;
+        this.propertiesArray = properties;
 
         // Create SimEntityRecords
-        for (int i = 0; i < simEntities.length; i++) {
-            if (!entities.containsKey(simEntities[i])) {
-                record = new SimEntityRecord(simEntities[i]);
-                entities.put(simEntities[i], record);
+        for (int i = 0; i < simEntityNames.length; i++) 
+        {
+            if (!entities.containsKey(simEntityNames[i])) {
+                simEntityRecord = new SimEntityRecord(simEntityNames[i]);
+                entities.put(simEntityNames[i], simEntityRecord);
             }
-            SimEntityRecord rec = entities.get(simEntities[i]);
+            SimEntityRecord rec = entities.get(simEntityNames[i]);
             rec.addDataPoint(properties[i]);
         }
     }
@@ -79,12 +81,12 @@ public class ReportStatisticsDOM {
      *
      * @param repData the replication information in jdom.Element form
      */
-    public void storeReplicationData(Element[] repData) {
-
+    public void storeReplicationData(Element[] repData) 
+    {
         SimEntityRecord temp;
         for (int i = 0; i < repData.length; i++) {
-            temp = entities.get(entityNames[i]);
-            temp.addReplicationRecord(properties[i], repData[i]);
+            temp = entities.get(entityNamesArray[i]);
+            temp.addReplicationRecord(propertiesArray[i], repData[i]);
         }
     }
 
@@ -93,11 +95,11 @@ public class ReportStatisticsDOM {
      *
      * @param summaryData the summary data for this simulation in jdom.Element form
      */
-    public void storeSummaryData(Element[] summaryData) {
-
+    public void storeSummaryData(Element[] summaryData)
+    {
         SimEntityRecord temp;
         for (int i = 0; i < summaryData.length; i++) {
-            temp = entities.get(entityNames[i]);
+            temp = entities.get(entityNamesArray[i]);
             temp.addSummaryRecord(summaryData[i]);
         }
     }
@@ -105,23 +107,24 @@ public class ReportStatisticsDOM {
     /**
      * Returns the statistics report object created by this class
      *
-     * @return reportStatistics the statistics from this simulation in jdom.Document
-     *        form
+     * @return reportStatisticsDocument the statistics from this simulation in jdom.Document
+        form
      */
-    public Document getReport() {
+    public Document getReport() 
+    {
         for (SimEntityRecord record : entities.values())
             rootElement.addContent(record.getEntityRecord());
         
-        reportStatistics.setRootElement(rootElement);
-        return reportStatistics;
+        reportStatisticsDocument.setRootElement(rootElement);
+        return reportStatisticsDocument;
     }
 
     /**
      * Protected inner class SimEntityRecord is used to create a single Entity
      * record which can contain multiple statistical data points
      */
-    protected class SimEntityRecord {
-
+    protected class SimEntityRecord 
+    {
         String entityName;
         Element simEntity, sumReport;
         Map<String, Element> dataPointMap = new HashMap<>();

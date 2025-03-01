@@ -97,7 +97,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     protected SimEntity[] simEntity;
     protected PropertyChangeListener[] propertyChangeListenerArray;
     protected boolean hookupsCalled;
-    protected boolean stopRun;
+    protected boolean stopSimulationRun;
     protected int startReplicationNumber = 0;
     protected Set<ReRunnable> runEntitiesSet;
     protected long seed;
@@ -150,7 +150,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     {
         decimalFormat1 = new DecimalFormat("0.0; -0.0");
         decimalFormat4 = new DecimalFormat("0.0000; -0.000");
-        setPrintReplicationReports(false);
+        setPrintReplicationReports(true); // TODO false
         setPrintSummaryReport(true);
         replicationDataSavedStatisticsList = new LinkedHashMap<>();
         simEntity = new SimEntity[0];
@@ -342,11 +342,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /** Causes simulation runs to halt
      *
-     * @param b if true, stops further simulation runs
+     * @param value if true, stops further simulation runs
      */
-    public void setStopSimulationRun(boolean b) {
-        stopRun = b;
-        if (stopRun)
+    public void setStopSimulationRun(boolean value) {
+        stopSimulationRun = value;
+        if (stopSimulationRun)
         {
             Schedule.stopSimulation();
         }
@@ -366,7 +366,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
  button, which may get called on startup.
      */
     public void stopSimulationRun() {
-        stopRun = true;
+        stopSimulationRun = true;
     }
 
     public void setEnableAnalystReports(boolean enable) {
@@ -637,7 +637,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     @Override
     public void run() 
     {
-        stopRun = false;
+        stopSimulationRun = false;
         if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
             LOG.error("Assemby already running.");
         }
@@ -677,7 +677,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         reportStatisticsConfiguration.reset();
         reportStatisticsConfiguration.setEntityIndex(entitiesWithStatisticsList);
         if (!hookupsCalled)
+        {
+            LOG.error("run() RuntimeException: performHookups() hasn't been called!");
             throw new RuntimeException("performHookups() hasn't been called!");
+        }
 
         LOG.info("Planned simulation stop time: " + getStopTime());
         Schedule.stopAtTime(getStopTime());
@@ -711,7 +714,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 try {
                     setNumberOfReplicationsMethod = scenarioManager.getClass().getMethod("setNumberOfReplications", int.class);
                     setNumberOfReplicationsMethod.invoke(scenarioManager, getNumberReplications());
-                } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
+                } 
+                catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
                     LOG.error("run() error during ScenarioManager checks: " + ex);
                 }
             }
@@ -747,9 +751,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //                }
 //                LOG.info();
             }
-            if (stopRun) 
+            if (stopSimulationRun) 
             {
-                LOG.info("Stopped in Replication # " + (replication + 1));
+                LOG.info("Simulation stopped in Replication # " + (replication + 1));
                 break;
             } 
             else // continue running replications
@@ -758,7 +762,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     LOG.info("Already running.");
                 
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
-                LOG.info("Starting Replication #" + (replication + 1) + " with RNG seed state = " + seed);
+                LOG.info("Simulation starting Replication #" + (replication + 1) + " with RNG seed state = " + seed);
                 try {
                     Schedule.reset();
                 } 
@@ -823,7 +827,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                                 fireIndexedPropertyChange(ix, sampleStatistics.getName() + typeStatistics, sampleStatistics.getMean());
 
                             ix++;
-                        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException ex) {
+                        } 
+                        catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException ex) {
                             LOG.error("run() error during PropertyChangeListenerNode checks: " + ex);
                         }
                     }
@@ -846,7 +851,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         {
             // Creates the temp file only when user required
             initializeTemporaryAnalystReportFile();
-            LOG.info("Temporary analyst report at " + analystReportFile.getAbsolutePath());
+            LOG.info("Temporary analyst report at " + analystReportFile.getAbsolutePath()); // debug
             isFileReady(analystReportFile);
             
 //            // TODO the following block appears to break ViskitGlobals singleton pattern!
@@ -863,6 +868,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                     // this should only occur for analyst reports, following (and outside of) the simulation thread
                     // TODO hacking wildly here...
                     setWorkingDirectory(new File("./build/classes")); // no longer looking for project classes
+                    if (!getWorkingDirectory().exists())
+                    {
+                        LOG.error("run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
+                    }
 //                  setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
                 }
                 if (false)  // debugging to replace reflection code
@@ -935,7 +944,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     /** This class loader is specific to Assembly running in that it is
      * pristine from the working class loader in use for normal Viskit operations
-     *
+     * @see ViskitGlobals.getWorkingClassLoader()
      * @return a pristine class loader for Assembly runs
      */
     public ClassLoader getRunSimulationClassLoader()
@@ -979,7 +988,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
     public void resetRunSimulationClassLoader() {
         runSimulationClassLoader = null;
-        LOG.debug("resetRunSimulationClassLoader() complete"); // TODO threading issue?
+        LOG.info("resetRunSimulationClassLoader() complete"); // TODO threading issue?
     }
 
     /**
@@ -994,6 +1003,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      */
     public void setWorkingDirectory(File workingDirectory) {
         this.workingDirectory = workingDirectory;
+        if (!workingDirectory.exists())
+        {
+            LOG.error("setWorkingDirectory() does not exist: " + workingDirectory.getAbsolutePath());
+        }
     }
 
     /**

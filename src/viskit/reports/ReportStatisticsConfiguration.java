@@ -70,12 +70,12 @@ public class ReportStatisticsConfiguration {
      * The DOM object this class uses to create an XML record of the simulation
      * statistics
      */
-    private ReportStatisticsDOM reportStats;
+    private ReportStatisticsDOM reportStatisticsDOM;
 
     /**
      * Report author (system username)
      */
-    private final String author = System.getProperty("user.name");
+    private final String author = System.getProperty("user.name"); // TODO need persistent viskt property
 
     /**
      * Assembly name
@@ -91,11 +91,11 @@ public class ReportStatisticsConfiguration {
         dfs.setInfinity("inf");  // xml chokes on default
         df1 = new DecimalFormat("0.", dfs);
         df3 = new DecimalFormat("0.000", dfs);
-        reportStats = new ReportStatisticsDOM();
+        reportStatisticsDOM = new ReportStatisticsDOM();
     }
 
     public void reset() {
-        reportStats = new ReportStatisticsDOM();
+        reportStatisticsDOM = new ReportStatisticsDOM();
     }
 
     /**
@@ -110,24 +110,24 @@ public class ReportStatisticsConfiguration {
         if (!keyValues.isEmpty()) {
             System.out.println("Replication Statistic(s) created"); // TODO send to console
             System.out.println("--------------------------------");
-            int seperator;
+            int separator;
             int idx = 0;
             for (String key : keyValues) {
-                seperator = findUnderscore(key);
+                separator = findUnderscore(key);
 
                 // TODO: verify this logic works with/without underscores present
-                entityIndex[idx] = key.substring(0, seperator);
+                entityIndex[idx] = key.substring(0, separator);
 
-                if (seperator > 0)
-                    propertyIndex[idx] = key.substring(seperator + 1, key.length());
+                if (separator > 0)
+                    propertyIndex[idx] = key.substring(separator + 1, key.length());
                 else
-                    propertyIndex[idx] = key.substring(seperator, key.length());
+                    propertyIndex[idx] = key.substring(separator, key.length());
 
                 System.out.println(entityIndex[idx] + " " + propertyIndex[idx]);
                 idx++;
             }
         }
-        reportStats.initializeEntities(entityIndex, propertyIndex);
+        reportStatisticsDOM.initializeEntities(entityIndex, propertyIndex);
     }
 
     /**
@@ -175,7 +175,7 @@ public class ReportStatisticsConfiguration {
 
             replicationUpdate[i] = replication;
         }
-        reportStats.storeReplicationData(replicationUpdate);
+        reportStatisticsDOM.storeReplicationData(replicationUpdate);
     }
 
     /**
@@ -203,14 +203,14 @@ public class ReportStatisticsConfiguration {
 
             summaryUpdate[i] = summary;
         }
-        reportStats.storeSummaryData(summaryUpdate);
+        reportStatisticsDOM.storeSummaryData(summaryUpdate);
     }
 
     /**
      * @return a stats report in jdom.Document format; Naw...filename
      */
     public String getReport() {
-        Document report = reportStats.getReport();
+        Document report = reportStatisticsDOM.getReport();
         return saveData(report);
     }
 

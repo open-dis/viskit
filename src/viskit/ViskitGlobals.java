@@ -986,9 +986,9 @@ public class ViskitGlobals
     private ClassLoader workingClassLoader;
 
     /**
-     * Retrieve the ViskitWorkingClassLoader, which may be reset from time to
+     * Retrieve the Viskit workingClassLoader, which may be reset from time to
      * time if extra classpaths are loaded.
-     *
+     * @see BasicAssembly.getRunSimulationClassLoader()
      * @return Viskit's working ClassLoader
      */
     public ClassLoader getWorkingClassLoader() 
@@ -1003,6 +1003,7 @@ public class ViskitGlobals
                 // Allow Assembly files in the ClassLoader
                 workingClassLoader = localBootLoader.initialize(true);
 
+                // TODO experimenting with context
                 Thread.currentThread().setContextClassLoader(workingClassLoader);
             }
         if (workingClassLoader == null)
