@@ -236,7 +236,7 @@ their descpritions.
         </tstamp>
         <echo message="${product.shortname} v${product.Version}"/>
         <echo message="Build started on ${TODAY_US}"/>
-        <echo message="Base directory: ${basedir}"/>
+        <echo message="Viskit application directory: ${basedir}"/> <!-- from ant build.xml root -->
         <echo message="JAVA_HOME: ${java.home}"/>
         <echo message="viskit.args=${viskit.args}"/>
         <echo message=".viskit.dir=${dot.viskit.dir}"/>
@@ -761,7 +761,7 @@ their descpritions.
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
     
-    <target name="clean.all" depends="clean.build,clean.DefaultProject,clean.logs"/>
+    <target name="clean.reset.all" depends="clean.build,clean.DefaultProject,clean.logs,reset.viskit"/>
 
     <!--  === TARGET: clean.build === -->
     <target name="clean.build"
@@ -809,7 +809,7 @@ their descpritions.
         <mkdir  dir="${dot.viskit.dir}"/>
         <copy todir="${dot.viskit.dir}" file="${c_app.xml}"/>
         <copy todir="${dot.viskit.dir}" file="${c_gui.xml}"/>
-        <copy todir="MyViskitProjects/DefaultProject" file="${proj.xml}" overwrite="true"/>
+        <copy todir="MyViskitProjects/DefaultProject" file="${viskitProject.xml}" overwrite="true"/>
     </target>
 
     <!-- These targets are useful for viewing in the console various
