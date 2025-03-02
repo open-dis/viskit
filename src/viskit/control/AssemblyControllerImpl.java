@@ -678,7 +678,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         {
             title = "Close Current Project?";
             message = "<html><p align='center'>Are you sure that you want to first close</p><br/>";
-            String projectName = ViskitGlobals.instance().getProjectName();
+            String projectName = ViskitGlobals.instance().getProjectWorkingDirectory().getAbsolutePath();
             if  (projectName.toLowerCase().contains("project"))
                  message += "<p align='center'><i>"         + projectName + "</i></p><br/><p align='center'> as the currently active project?</p><br/>";
             else message += "<p align='center'>Project <i>" + projectName + "</i></p><br/><p align='center'> as the currently active project?</p><br/>";

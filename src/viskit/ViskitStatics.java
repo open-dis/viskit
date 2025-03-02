@@ -464,8 +464,8 @@ public class ViskitStatics
      */
     static Class<?> tryUnqualifiedName(String name) {
 
-        String userDir = System.getProperty("user.dir");
-        String userHome = System.getProperty("user.home");
+        String systemUserDir  = System.getProperty("user.dir");
+        String systemUserHome = System.getProperty("user.home");
         String workDir = ViskitGlobals.instance().getProjectWorkingDirectory().getPath();
 
         FindFile finder;
@@ -495,10 +495,10 @@ public class ViskitStatics
                     clazz = finder.getPath().toString();
 
                     // Strip out unwanted prepaths
-                    if (clazz.contains(userHome))
-                        clazz = clazz.substring(userHome.length() + 1, clazz.length());
-                    else if (clazz.contains(userDir))
-                        clazz = clazz.substring(userDir.length() + 1, clazz.length());
+                    if (clazz.contains(systemUserHome))
+                        clazz = clazz.substring(systemUserHome.length() + 1, clazz.length());
+                    else if (clazz.contains(systemUserDir))
+                        clazz = clazz.substring(systemUserDir.length() + 1, clazz.length());
                     else if (clazz.contains(workDir))
                         clazz = clazz.substring(workDir.length() + 1, clazz.length());
 

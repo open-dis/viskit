@@ -114,7 +114,7 @@ public class ViskitGlobals
         // This should only occur once
         // Other initialization checks moved out of this constructor to avoid breaking singleton pattern
         // TODO does LOG interfere with singleton pattern?
-        LOG.info("created singleton, constructor initialization complete"); // TODO threading issue?
+        LOG.info("created singleton (if this message again, it is a problem)"); // TODO threading issue?
     }
     
     public static ViskitGlobals instance()
@@ -189,11 +189,14 @@ public class ViskitGlobals
     /** The current project File */
     private File projectFile;
 
+    /** The base directory for all projects */
+    private File allProjectsBaseDirectory;
+
     /** The current project working directory */
     private File projectWorkingDirectory;
-
-    /** The current project base directory */
-    private File projectsBaseDirectory;
+    
+    /** The current project working directory for build classes */
+    private File projectClassesDirectory;
 
     /** The main app JavaHelp set */
     private Help help;
@@ -614,9 +617,11 @@ public class ViskitGlobals
     public final void initializeProjectHome() 
     {
         File newProjectFile;
-        String projectHome = ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_PATH_KEY) +
-                "/" +
-                ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_NAME_KEY); 
+        String pathPrefix  = ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_PATH_KEY);
+        if (pathPrefix.startsWith("./"))
+            pathPrefix = System.getProperty("user.dir").replaceAll("\\\\", "/") + pathPrefix.substring(1);
+        String projectHome = pathPrefix + "/" +
+                             ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_NAME_KEY); 
 //      String projectHome = getProjectWorkingDirectory().getName();
 
 //////        viskitProject.setProjectRootDirectory( new File(projectHome));
@@ -685,7 +690,7 @@ public class ViskitGlobals
         }
         else 
         {
-            LOG.info("initializeProjectHome() found a previously existing project, now createProjectWorkingDirectory()"); // debug
+            LOG.info("initializeProjectHome() found a previously existing project.  Now createProjectWorkingDirectory()..."); // debug
             createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
         }
     }
@@ -944,6 +949,7 @@ public class ViskitGlobals
     /**
      * @return whether a viskitProject is currently loaded */
     public boolean hasViskitProject() {
+        // TODO further checks?
         return (viskitProject != null);
     }
 
@@ -974,19 +980,48 @@ public class ViskitGlobals
         }
         setProjectName(projectName);
         
-        // TODO not clear that the next lines are correct.  
-        // why isn't this returning if already complete?
-        // why is this invoked after a simulation run??
-        if (projectsBaseDirectory == null)
-            projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY); // projectName will be added next
-        LOG.info("projectsBaseDirectory=\n   " + projectsBaseDirectory.getAbsolutePath());
+// TODO not clear that the next lines are correct.  
+// why isn't this returning if already complete?
+// why is this invoked after a simulation run??
+        if (allProjectsBaseDirectory == null)
+        {
+            // TODO offer selection as user preference??
+            // preferred: use this line if default initializes to provided default project
+            allProjectsBaseDirectory = new File(System.getProperty("user.dir")); // full path is preferred to "."
+            
+            // use this line if default initializes to user store
+            // allProjectsBaseDirectory = ViskitConfigurationStore.VISKIT_CONFIGURATION_DIR;
+            // allProjectsBaseDirectory.mkdir();
+        }
+        if (!allProjectsBaseDirectory.isDirectory())
+        {
+             LOG.error("createProjectWorkingDirectory() allProjectsBaseDirectory is not a directory\n   " + allProjectsBaseDirectory.getAbsolutePath());
+        }
+        else LOG.info("createProjectWorkingDirectory() allProjectsBaseDirectory=\n   " + allProjectsBaseDirectory.getAbsolutePath());
+        
+        if (projectWorkingDirectory == null)
+        {
+            // two-step process, create each directory individually
+            projectWorkingDirectory = new File(allProjectsBaseDirectory,
+                                                ViskitProject.DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME );
+            projectWorkingDirectory.mkdir();
+            projectWorkingDirectory = new File(projectWorkingDirectory, 
+                                                projectName);
+            projectWorkingDirectory.mkdir();
+        }
+        if (!projectWorkingDirectory.isDirectory())
+        {
+            LOG.error("createProjectWorkingDirectory() projectWorkingDirectory is not a directory");
+        }
+        else LOG.info("createProjectWorkingDirectory() projectWorkingDirectory=\n   " + projectWorkingDirectory.getAbsolutePath());
 
         if (viskitProject == null)
-            viskitProject = new ViskitProject(new File(projectsBaseDirectory, projectName));
+            viskitProject = new ViskitProject(projectWorkingDirectory);
         else
         {
-            // (questionable) unexpected error condition
-            viskitProject.setProjectRootDirectory(new File(projectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
+//            // (TODO, questionable) unexpected error condition; looping?
+//            LOG.error("TODO questionable invocation follows...");
+//            viskitProject.setProjectRootDirectory(new File(allProjectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
         }
 
         if (viskitProject.initializeProject()) 
@@ -994,10 +1029,10 @@ public class ViskitGlobals
             ViskitUserPreferences.saveExtraClasspathEntries(viskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
         } 
         else {
-            LOG.error("Unable to create project directory for " + projectsBaseDirectory);
+            LOG.error("Unable to create project directory for " + allProjectsBaseDirectory);
             return;
         }
-        projectWorkingDirectory = viskitProject.getClassesDirectory();
+        setProjectClassesDirectory(viskitProject.getClassesDirectory()); // TODO is this parameter really needed?
     }
 
     private ClassLoader workingClassLoader;
@@ -1269,14 +1304,14 @@ public class ViskitGlobals
      * @param newProjectFile the base directory of a Viskit project
      */
 //  @SuppressWarnings("unchecked")
-    public void setProjectFile(File newProjectFile) 
+    public void setProjectFile(File newProjectFile) // TODO rename File -> Directory
     {
         if (newProjectFile == null)
         {
-            LOG.error("*** ViskitStatics setViskitProjectFile() received a null file, ignored...");
+            LOG.error("setProjectFile() received a null file, ignored...");
             return;
         }
-        // newProjectNamemust be a directory
+        // newProjectName must be a directory
         String newProjectName = newProjectFile.getName();
         if (newProjectFile.isDirectory())
             setProjectName(newProjectName);
@@ -1285,7 +1320,7 @@ public class ViskitGlobals
             newProjectName = newProjectFile.getParentFile().getName();
             setProjectName(newProjectName);
         }
-        ViskitProject.VISKIT_PROJECTS_DIRECTORY = newProjectFile.getParent().replaceAll("\\\\", "/"); // de-windows
+        ViskitProject.VISKIT_PROJECTS_DIRECTORY = newProjectFile.getParentFile().getAbsolutePath().replaceAll("\\\\", "/"); // de-windows
         ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
         ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.PROJECT_NAME_KEY, newProjectName);
     }
@@ -1408,6 +1443,20 @@ public class ViskitGlobals
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return the projectClassesDirectory
+     */
+    public File getProjectClassesDirectory() {
+        return projectClassesDirectory;
+    }
+
+    /**
+     * @param projectClassesDirectory the projectClassesDirectory to set
+     */
+    public void setProjectClassesDirectory(File projectClassesDirectory) {
+        this.projectClassesDirectory = projectClassesDirectory;
     }
 
 } // end class file ViskitGlobals.java

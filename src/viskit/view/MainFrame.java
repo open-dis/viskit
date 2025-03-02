@@ -153,6 +153,7 @@ public class MainFrame extends JFrame
         });
         ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/ViskitSplash2.png"));
         MainFrame.this.setIconImage(icon.getImage());
+        // MainFrame constructor complete
     }
 
     /** @return the quit action class for Viskit */
@@ -447,8 +448,8 @@ public class MainFrame extends JFrame
             combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getProjectMenu());
             combinedMenuBar.add(ViskitGlobals.instance().getEventGraphViewFrame().getEventGraphMenu());
             combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getAssemblyMenu());
-            combinedMenuBar.add(ViskitGlobals.instance().getInternalSimulationRunner().getMenus());
-            combinedMenuBar.add(ViskitGlobals.instance().getAnalystReportViewFrame().getMenus());
+            combinedMenuBar.add(ViskitGlobals.instance().getInternalSimulationRunner().getMenus()); // TODO getSimulationRunMenu() ?
+            combinedMenuBar.add(ViskitGlobals.instance().getAnalystReportViewFrame().getMenus());   // TODO getAnalystReportMenu() ?
             combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getHelpMenu());
             
             if  (hasModalMenus())

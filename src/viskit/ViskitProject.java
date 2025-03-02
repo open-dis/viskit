@@ -68,8 +68,9 @@ public class ViskitProject
      * to determine a project home space on the user's machine.  A default
      * home will be the user's working directory where Viskit is installed.
      */
-    public static final String DEFAULT_VISKIT_PROJECTS_DIRECTORY =
-            System.getProperty("user.home").replaceAll("\\\\", "/") + "/MyViskitProjects";
+    public static final String DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME = "MyViskitProjects";
+    public static final String DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH =
+            System.getProperty("user.home").replaceAll("\\\\", "/") + "/" + DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME;
     public static final String VISKIT_ROOT_NAME = "ViskitProject";
     public static final String PROJECT_FILE_NAME = "viskitProject.xml";
     public static final String ASSEMBLIES_DIRECTORY_NAME = "Assemblies";
@@ -94,7 +95,7 @@ public class ViskitProject
     static final Logger LOG = Log4jUtilities.getLogger(ViskitProject.class);
 
     /** This static variable will get updated at launch if user's home directory doesn't exist */
-    public static String VISKIT_PROJECTS_DIRECTORY = DEFAULT_VISKIT_PROJECTS_DIRECTORY;
+    public static String VISKIT_PROJECTS_DIRECTORY = DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH;
 
     /** TODO FIX: This static variable will be set by the user upon first Viskit startup
      * to determine a project location space on the user's machine. A default
@@ -689,7 +690,7 @@ public class ViskitProject
         if (!projectDirectory.exists())
         {
             // likely user has not created their own projects yet, fall back to Viskit's embedded MyViskitProjects
-            initialDirectoryPath = "MyViskitProjects/"; // allow user to choose DefaultProject or whatever else is there
+            initialDirectoryPath = DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME + "/"; // allow user to choose DefaultProject or whatever else is there
         }
         initializeProjectChooser(initialDirectoryPath);
 
