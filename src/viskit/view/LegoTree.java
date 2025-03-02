@@ -70,7 +70,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     String userHome = System.getProperty("user.home");
 
-    String projectPath;
+    String projectPath = new String();
 
     String name;
 
@@ -130,7 +130,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         dragSource.createDefaultDragGestureRecognizer(instance, // component where drag originates
                 DnDConstants.ACTION_COPY_OR_MOVE, instance);
 
-        projectPath = ViskitGlobals.instance().getViskitProject().getProjectRoot().getPath();
+        if ((ViskitGlobals.instance().getViskitProject()                  != null) &&
+            (ViskitGlobals.instance().getViskitProject().getProjectRoot() != null))
+            projectPath = ViskitGlobals.instance().getViskitProject().getProjectRoot().getPath();
     }
 
     // beginning of hack to hide the tree rootNode

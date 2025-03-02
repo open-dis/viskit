@@ -286,7 +286,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
 
             textAreaOutputStream = new viskit.assembly.TextAreaOutputStream(simulationRunPanel.outputStreamTA, 16*1024);
 
-            setOutputStreamMethod.invoke(simulationRunAssemblyInstance, textAreaOutputStream);
+            setOutputStreamMethod.invoke(simulationRunAssemblyInstance, textAreaOutputStream); // redirect output
             setNumberReplicationsMethod.invoke(simulationRunAssemblyInstance, Integer.valueOf(simulationRunPanel.numberReplicationsTF.getText().trim()));
             setPrintReplicationReportsMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.printReplicationReportsCB.isSelected());
             setPrintSummaryReportMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.printSummaryReportsCB.isSelected());

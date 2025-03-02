@@ -99,12 +99,18 @@ public class AnalystReportController extends MvcAbstractController {
         String outputFilename      = (assemblyName + "_AnalystReport"               + ".xml");
 
         File analystReportXmlFile = new File(analystReportDirectory, outputFilename);
+        
+        LOG.info("xmlSourceFile.getAbsolutePath()=\n   " + xmlSourceFile.getAbsolutePath());
+        isFileReady(xmlSourceFile);
         try {
             Files.copy(xmlSourceFile.toPath(), analystReportXmlFile.toPath());
         } 
-        catch (IOException ioe) {
+        catch (IOException ioe)
+        {
             LOG.warn(ioe);
         }
+        LOG.info("analystReportXmlFile.toPath()=\n   " + analystReportXmlFile.getAbsolutePath());
+        isFileReady(xmlSourceFile);
         if (analystReportModel == null)
             analystReportModel =  new AnalystReportModel(analystReportXmlFile);
 
@@ -271,7 +277,7 @@ public class AnalystReportController extends MvcAbstractController {
             analystReportViewFrame.setReportDirty(false);
         } 
         catch (Exception e) {
-            LOG.error("saveReport(" + reportFile.getPath() + ") exception: " + e);
+            LOG.error("saveReport(" + reportFile.getAbsolutePath() + ") exception: " + e);
         }
         ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
     }

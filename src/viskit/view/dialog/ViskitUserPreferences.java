@@ -650,9 +650,15 @@ public class ViskitUserPreferences extends JDialog
         // Always update the property configurations, since we may have changed projects
         getXMLConfigurations();
         String[] extraClassPathArray =  new String[0]; // safety first, initialize with a valid value
-        if (projectXMLConfiguration.getStringArray(ViskitConfigurationStore.X_CLASSPATHS_KEY) != null)
-            extraClassPathArray = projectXMLConfiguration.getStringArray(ViskitConfigurationStore.X_CLASSPATHS_KEY);
-        else LOG.debug("getExtraClassPathArray() recieved null value from ViskitConfigurationStore");
+        try {
+            if (projectXMLConfiguration.getStringArray(ViskitConfigurationStore.X_CLASSPATHS_KEY) != null)
+                extraClassPathArray = projectXMLConfiguration.getStringArray(ViskitConfigurationStore.X_CLASSPATHS_KEY);
+            else LOG.error("getExtraClassPathArray() recieved null value from ViskitConfigurationStore");
+        }
+        catch (Exception e)
+        {
+            LOG.error("getExtraClassPathArray() exception: " + e.getMessage());
+        }
         return extraClassPathArray;
     }
 
@@ -704,7 +710,7 @@ public class ViskitUserPreferences extends JDialog
         try // troubleshooting for threading issues, perhaps unneeded now
         {
             if ((ViskitConfigurationStore.instance() != null))
-                return ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.LOOK_AND_FEEL_KEY);
+                return ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.LOOK_AND_FEEL_KEY);
             else 
             {
                 LOG.error("getLookAndFeel() received null singleton ViskitConfigurationStore.instance()");
@@ -719,15 +725,27 @@ public class ViskitUserPreferences extends JDialog
     }
 
     /**
-     * Return the value for user preference enabling tab visibility
+     * Return the value for user preference enabling visibility of tab indicated by property
      * @param property the tab of interest
      * @return the value for tab visibility
      */
     public static boolean isUserPreferenceEnabled(String property)
     {
         if (!tabVisibilityUserPreferenceKeyList.contains(property))
-            LOG.error("isUserPreferenceEnabled(" + property + ") is not a legal user preferences  key" );
-        return appXMLConfiguration.getBoolean(property);
+        {
+            LOG.error("isUserPreferenceEnabled(" + property + ") is not a legal user preferences key" );
+            return false;
+        }
+        boolean isEnabled;
+        try {
+            isEnabled = appXMLConfiguration.getBoolean(property);
+            return isEnabled;
+        }
+        catch (Exception ex)
+        {
+            LOG.error("isUserPreferenceEnabled(" + property + ") exception: " + ex.getMessage());
+            return false;
+        }
     }
 
     /**

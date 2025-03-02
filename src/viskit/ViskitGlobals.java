@@ -81,7 +81,6 @@ import viskit.view.ViskitProjectSelectionPanel;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
 import viskit.view.dialog.ViskitUserPreferences;
 import edu.nps.util.SystemExitHandler;
-import java.lang.reflect.InvocationTargetException;
 import static viskit.ViskitProject.DEFAULT_PROJECT_NAME;
 
 /**
@@ -614,55 +613,59 @@ public class ViskitGlobals
      */
     public final void initializeProjectHome() 
     {
-        String projectHome = ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.PROJECT_PATH_KEY);
-//      String projectHome = ViskitGlobals.instance().getProjectWorkingDirectory().getName();
+        File newProjectFile;
+        String projectHome = ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_PATH_KEY) +
+                "/" +
+                ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_NAME_KEY); 
+//      String projectHome = getProjectWorkingDirectory().getName();
 
-        LOG.info("initializeProjectHome() projectHome=" + projectHome);
+//////        viskitProject.setProjectRootDirectory( new File(projectHome));
+
+        LOG.info("initializeProjectHome() projectHome=\n   " + projectHome);
         if (  projectHome.isEmpty() || 
             !(new File(projectHome).exists()) ||
              (hasViskitProject() && !isProjectOpen()))
         {
             LOG.info("initializeProjectHome() did not find a previously existing project");
-            // TODO use regular panel
-            File newProjectFile;
-
-            String popupTitle = "New Project or Open Project?";
-            String message =
-                    "<html><body>" +
-                    "<p align='center'>Create a new Viskit project, or</p><br />" +
-                    "<p align='center'>Open an existing Viskit project?</p><br />";
-            int returnValue = ViskitGlobals.instance().getMainFrame().genericAsk2Buttons(popupTitle, message, 
-                    "New Project", "Open Project");
+            if (ViskitGlobals.instance().hasMainFrameInitialized())
+            {
+                String popupTitle = "New Project or Open Project?";
+                String message =
+                        "<html><body>" +
+                        "<p align='center'>Create a new Viskit project, or</p><br />" +
+                        "<p align='center'>Open an existing Viskit project?</p><br />";
+                int returnValue = getMainFrame().genericAsk2Buttons(popupTitle, message, 
+                        "New Project", "Open Project");
         
-            if  (returnValue == 0) // new project
-            {    
+                if  (returnValue == 0) // new project
+                {    
 
-    // What we wish to do here is force the user to create a new project space
-    // before letting them move on, or, open and existing project, or the only
-    // other option is to exit
-    do {
-        ViskitProjectGenerationDialog3.showDialog();
-        if (ViskitProjectGenerationDialog3.cancelled)
-            return;
-        
-        String newProjectPath = ViskitProjectGenerationDialog3.projectPath;
-        newProjectFile = new File(newProjectPath);
-        if (newProjectFile.exists() && (newProjectFile.isFile() || newProjectFile.list().length > 0))
-            JOptionPane.showMessageDialog(ViskitGlobals.instance().getEventGraphViewFrame().getRootPane(), 
-                    "Chosen project name already exists, please create a new project name.");
-        else
-            break; // out of do-while
-        
-    } while (true); // until break
+                // What we wish to do here is force the user to create a new project space
+                // before letting them move on, or, open and existing project, or the only
+                // other option is to exit
+                do {
+                    ViskitProjectGenerationDialog3.showDialog();
+                    if (ViskitProjectGenerationDialog3.cancelled)
+                        return;
 
-    ViskitGlobals.instance().setProjectFile(newProjectFile);
+                    String newProjectPath = ViskitProjectGenerationDialog3.projectPath;
+                    newProjectFile = new File(newProjectPath);
+                    if (newProjectFile.exists() && (newProjectFile.isFile() || newProjectFile.list().length > 0))
+                        JOptionPane.showMessageDialog(getEventGraphViewFrame().getRootPane(), 
+                                "Chosen project name already exists, please create a new project name.");
+                    else
+                        break; // out of do-while
+
+                } while (true); // loop until break
 
 //                File projectDirectory = ViskitProject.openProjectDirectory(ViskitGlobals.instance().getEventGraphViewFrame().getRootPane(),".");
-            }
-            else // open project
-            {
-                File projectDirectory = ViskitProject.openProjectDirectory(ViskitGlobals.instance().getEventGraphViewFrame().getRootPane(),".");
-            }
+                }
+                else // open project
+                {
+                    File projectDirectory = ViskitProject.openProjectDirectory(getEventGraphViewFrame().getRootPane(),".");
+                    // TODO untested
+                    newProjectFile = new File (projectDirectory, ViskitProject.PROJECT_FILE_NAME);
+                }
             
 ////            // no project open, popup special dialog
 ////            if (viskitProjectSelectionPanel == null)
@@ -670,10 +673,20 @@ public class ViskitGlobals
 ////                viskitProjectSelectionPanel = new ViskitProjectSelectionPanel(); // should only occur once
 ////            }
 ////            viskitProjectSelectionPanel.showDialog(); // blocks
-        } 
-        else
+            }
+            else // previously existing project found
+            {
+                ViskitProject.VISKIT_PROJECTS_DIRECTORY = projectHome;
+                // TODO untested
+                newProjectFile = new File (projectHome + "/" + ViskitProject.PROJECT_FILE_NAME);
+            }
+            setProjectFile(newProjectFile);
+            LOG.info("initializeProjectHome() newProjectFile=\n    " + newProjectFile.getAbsolutePath());
+        }
+        else 
         {
-            ViskitProject.VISKIT_PROJECTS_DIRECTORY = projectHome;
+            LOG.info("initializeProjectHome() found a previously existing project, now createProjectWorkingDirectory()"); // debug
+            createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
         }
     }
 
@@ -954,15 +967,19 @@ public class ViskitGlobals
             return; // unexpected condition
 
         if ((projectName == null) || projectName.isBlank())
-             projectName = ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.PROJECT_NAME_KEY);
-        if ((projectName == null) || projectName.isBlank()) // double checking
-             projectName = DEFAULT_PROJECT_NAME;
+        {
+            if  (!ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_NAME_KEY).isBlank())
+                 projectName = ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_NAME_KEY);
+            else projectName = DEFAULT_PROJECT_NAME;
+        }
         setProjectName(projectName);
         
         // TODO not clear that the next lines are correct.  
         // why isn't this returning if already complete?
         // why is this invoked after a simulation run??
-        projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY);
+        if (projectsBaseDirectory == null)
+            projectsBaseDirectory = new File(ViskitProject.VISKIT_PROJECTS_DIRECTORY); // projectName will be added next
+        LOG.info("projectsBaseDirectory=\n   " + projectsBaseDirectory.getAbsolutePath());
 
         if (viskitProject == null)
             viskitProject = new ViskitProject(new File(projectsBaseDirectory, projectName));
@@ -1103,7 +1120,12 @@ public class ViskitGlobals
         }
     }
 
-    public MainFrame getMainFrame() 
+    public boolean hasMainFrameInitialized()
+    {
+        return (mainFrame != null);
+    }
+
+    public MainFrame getMainFrame()
     {
         return mainFrame;
     }
@@ -1254,11 +1276,18 @@ public class ViskitGlobals
             LOG.error("*** ViskitStatics setViskitProjectFile() received a null file, ignored...");
             return;
         }
+        // newProjectNamemust be a directory
         String newProjectName = newProjectFile.getName();
-        setProjectName(newProjectName);
+        if (newProjectFile.isDirectory())
+            setProjectName(newProjectName);
+        else
+        {
+            newProjectName = newProjectFile.getParentFile().getName();
+            setProjectName(newProjectName);
+        }
         ViskitProject.VISKIT_PROJECTS_DIRECTORY = newProjectFile.getParent().replaceAll("\\\\", "/"); // de-windows
-        ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
-        ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.PROJECT_NAME_KEY, newProjectName);
+        ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
+        ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.PROJECT_NAME_KEY, newProjectName);
     }
 
     /**
@@ -1288,6 +1317,8 @@ public class ViskitGlobals
      */
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+        if (projectName.endsWith(ViskitProject.PROJECT_FILE_NAME))
+            LOG.error("setProjectName(" + projectName + ") must be a directory name, not a file name");
     }
 
     /**
@@ -1322,7 +1353,9 @@ public class ViskitGlobals
     
     public boolean isProjectOpen()
     {
-        return getViskitProject().isProjectOpen();
+        if  (getViskitProject() == null)
+             return false;
+        else return getViskitProject().isProjectOpen();
     }
 
     /**
@@ -1366,12 +1399,12 @@ public class ViskitGlobals
         }
         else if (!file.exists())
         {
-            LOG.error("isFileReady() file does not exist: " + file.getPath());
+            LOG.error("isFileReady() file does not exist:\n   " + file.getAbsolutePath());
             return false;
         }
         else if (file.length() == 0)
         {
-            LOG.error("isFileReady() file is empty: " + file.getPath());
+            LOG.error("isFileReady() file is empty:\n   " + file.getAbsolutePath());
             return false;
         }
         return true;

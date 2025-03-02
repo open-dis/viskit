@@ -146,8 +146,8 @@ public class SimulationRunPanel extends JPanel
         npsLabel.setHorizontalTextPosition(JLabel.CENTER);
         npsLabel.setIconTextGap(20);
 
-        int w = Integer.parseInt(ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]"));
-        int h = Integer.parseInt(ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]"));
+        int w = Integer.parseInt(ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
         leftSideHorizontalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
         

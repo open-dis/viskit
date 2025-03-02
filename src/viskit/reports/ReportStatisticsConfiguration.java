@@ -54,12 +54,12 @@ public class ReportStatisticsConfiguration {
      * The ordered list of Entities in the simulation that have property change
      * listeners
      */
-    private String[] entityIndex;
+    private String[] entityIndexArray;
 
     /**
      * The name of the property, as typed in the assembly
      */
-    private String[] propertyIndex;
+    private String[] propertyIndexArray;
 
     /**
      * Used to truncate the precision of statistical results
@@ -103,31 +103,40 @@ public class ReportStatisticsConfiguration {
      * index of entities and properties
      * @param keyValues list of keyValues
      */
-    public void setEntityIndex(List<String> keyValues) {
-        entityIndex = new String[keyValues.size()];
-        propertyIndex = new String[keyValues.size()];
+    public void setEntityIndex(List<String> keyValues) 
+    {
+          entityIndexArray = new String[keyValues.size()];
+        propertyIndexArray = new String[keyValues.size()];
 
-        if (!keyValues.isEmpty()) {
-            System.out.println("Replication Statistic(s) created"); // TODO send to console
-            System.out.println("--------------------------------");
-            int separator;
-            int idx = 0;
-            for (String key : keyValues) {
-                separator = findUnderscore(key);
+        if (!keyValues.isEmpty()) 
+        {
+            LOG.info(      "Replication Statistics created");
+            System.out.println("Replication Statistics created"); // System output goes to console TextArea
+            System.out.println("------------------------------");
+            int separatorColumn;
+            int entityIndex = 0;
+            for (String currentKeyValue : keyValues) 
+            {
+                separatorColumn = findUnderscore(currentKeyValue);
 
                 // TODO: verify this logic works with/without underscores present
-                entityIndex[idx] = key.substring(0, separator);
-
-                if (separator > 0)
-                    propertyIndex[idx] = key.substring(separator + 1, key.length());
+                if (separatorColumn > 0)
+                {
+                      entityIndexArray[entityIndex] = currentKeyValue.substring(0, separatorColumn);
+                    propertyIndexArray[entityIndex] = currentKeyValue.substring(separatorColumn + 1, currentKeyValue.length());
+                }
                 else
-                    propertyIndex[idx] = key.substring(separator, key.length());
+                {
+                      entityIndexArray[entityIndex] = currentKeyValue.substring(0, separatorColumn);
+                    propertyIndexArray[entityIndex] = currentKeyValue.substring(separatorColumn, currentKeyValue.length());
+                }
 
-                System.out.println(entityIndex[idx] + " " + propertyIndex[idx]);
-                idx++;
+                System.out.println("entity='" + entityIndexArray[entityIndex] + "', property='" + propertyIndexArray[entityIndex] + "'");
+                entityIndex++;
             }
+            System.out.println();
         }
-        reportStatisticsDOM.initializeEntities(entityIndex, propertyIndex);
+        reportStatisticsDOM.initializeEntities(entityIndexArray, propertyIndexArray);
     }
 
     /**
@@ -193,7 +202,7 @@ public class ReportStatisticsConfiguration {
 
             summary = new Element("Summary");
 
-            summary.setAttribute("property", propertyIndex[i]);
+            summary.setAttribute("property", propertyIndexArray[i]);
             summary.setAttribute("numRuns", new DecimalFormat("0").format(sum[i].getCount()));
             summary.setAttribute("minObs", df1.format(sum[i].getMinObs()));
             summary.setAttribute("maxObs", df1.format(sum[i].getMaxObs()));

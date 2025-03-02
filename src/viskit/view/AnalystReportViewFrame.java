@@ -175,6 +175,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         getController().setModel(getModel()); // tell controller
     }
 
+    /** invokes _fillLayout() when Swing interface is ready */
     public void fillLayout() {
 
         // We don't always come in on the swing thread.
@@ -187,7 +188,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     {
         if (!ViskitGlobals.isFileReady(analystReportModel.getAnalystReportXmlFile()))
         {
-            LOG.error ("problem with _fillLayout(), file not ready");
+            LOG.error ("_fillLayout() problem, analystReportModel.getAnalystReportXmlFile() not ready");
             return;
         }
         try {

@@ -155,7 +155,7 @@ public class FileHandler
             new JobLauncher(true, file.getAbsolutePath(), title, mainFrame); // TODO broken
         } 
         catch (Exception e) {
-            LOG.error("runFile(" + file.getPath() + ", " + title + ") exception: " + e.getMessage());
+            LOG.error("runFile(" + file.getAbsolutePath() + ", " + title + ") exception: " + e.getMessage());
             e.printStackTrace(System.err);
         }
     }

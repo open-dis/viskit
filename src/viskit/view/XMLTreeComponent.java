@@ -376,7 +376,7 @@ class XmlTreePanel extends JPanel
             xmlTreeComponent = new XMLTreeComponent(xmlFile);
         } 
         catch (Exception e) {
-                LOG.error("XmlTreePanel(" + xmlFile.getPath()+ ") exception: " + e.getMessage());
+                LOG.error("XmlTreePanel(" + xmlFile.getAbsolutePath()+ ") exception: " + e.getMessage());
             xmlTreeComponent = null;
             throw (e);
         }

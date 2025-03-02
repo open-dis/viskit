@@ -124,13 +124,18 @@ public class ViskitProject
 
     public ViskitProject(File projectRootDirectory)
     {
-        if (projectRootDirectory.exists() && !projectRootDirectory.isDirectory()) {
-            LOG.warn("Project root must be directory, not: {}",projectRootDirectory);
+        if (projectRootDirectory.exists() && !projectRootDirectory.isDirectory()) 
+        {
+            LOG.warn("Project root must be directory, not\n   "+ projectRootDirectory.getAbsolutePath());
             return;
         }
         setProjectRootDirectory(projectRootDirectory);
     }
 
+    /** *
+     * Initialize current Viskit project
+     * @return whether project was successfully initialized
+     */
     public boolean initializeProject() 
     {
         if (projectRootDirectory == null)
@@ -411,7 +416,7 @@ public class ViskitProject
         }
         else if (!projectRoot.exists())
         {
-            LOG.error("ViskitProject setProjectRootDirectory received non-existent File projectRoot=" + projectRoot.getPath());
+            LOG.error("ViskitProject setProjectRootDirectory received non-existent File projectRoot=\n   " + projectRoot.getAbsolutePath());
             return;
         }
         this.projectRootDirectory = projectRoot;

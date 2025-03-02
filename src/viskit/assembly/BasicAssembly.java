@@ -656,9 +656,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 URL url = new URI("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
                         + "?subject=Assembly%20Run%20Error&body=log%20output:").toURL();
                 
-                String msg = "Assembly run aborted.  <br/>Please "
-                    + "navigate to " + ViskitConfigurationStore.VISKIT_ERROR_LOG.getPath() + " and "
-                    + "email the log to "
+                String msg = "Assembly run aborted.  <br/>"
+                    + "Please navigate to " + ViskitConfigurationStore.VISKIT_ERROR_LOG.getAbsolutePath() + " <br/>"
+                    + "and email the log to "
                     + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then attach the log. Would "
                     + "be good to have your project attached as well to replicate: File -> Zip/Mail Viskit Project";
@@ -849,11 +849,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         
         if (isEnableAnalystReports()) 
         {
-            // Creates the temp file only when user required
-            initializeTemporaryAnalystReportFile();
-            LOG.info("Temporary analyst report at " + analystReportFile.getAbsolutePath()); // debug
-            isFileReady(analystReportFile);
-            
 //            // TODO the following block appears to break ViskitGlobals singleton pattern!
 //            // Because there is no instantiated report builder in the current
 //            // thread context, we reflect here
@@ -863,17 +858,22 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             try 
             {
-                if (getWorkingDirectory() == null)
-                {
-                    // this should only occur for analyst reports, following (and outside of) the simulation thread
-                    // TODO hacking wildly here...
-                    setWorkingDirectory(new File("./build/classes")); // no longer looking for project classes
-                    if (!getWorkingDirectory().exists())
-                    {
-                        LOG.error("run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
-                    }
-//                  setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
-                }
+//////                if (getWorkingDirectory() == null)
+//////                {
+//////                    // this should only occur for analyst reports, following (and outside of) the simulation thread
+//////                    // TODO hacking wildly here...
+//////                    setWorkingDirectory(new File("./build/classes")); // no longer looking for project classes
+//////                    if (!getWorkingDirectory().exists())
+//////                    {
+//////                        LOG.error("run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
+//////                    }
+////////                  setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
+//////                }
+                // Creates the temp file only when user required?? TODO check
+                initializeTemporaryAnalystReportFile();
+                LOG.info("Temporary analyst report at\n   " + analystReportFile.getAbsolutePath()); // debug
+                isFileReady(analystReportFile);
+                
                 if (false)  // debugging to replace reflection code
                 {
                 analystReportModel = new AnalystReportModel(reportStatisticsConfiguration.getReport(), pclNodeCache);
@@ -914,7 +914,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * is used at the bottom of the run to write out the analyst report file. We report the path back to the caller
      * immediately, and it is the caller's responsibility to dispose of the file once they are done with it.
      */
-    private void initializeTemporaryAnalystReportFile() {
+    private void initializeTemporaryAnalystReportFile() 
+    {
         try {
             analystReportFile = TempFileManager.createTempFile("ViskitAnalystReport", ".xml");
         } 
@@ -972,7 +973,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 // state set from the Viskit WorkingClassLoader
                 Thread.currentThread().setContextClassLoader(runSimulationClassLoader);
                 // TODO threading and singleton issues while inside ViskitGlobals?
-                LOG.info("getRunSimulationClassLoader() created new ClassLoader for " + getWorkingDirectory());
+                LOG.info("getRunSimulationClassLoader() created new ClassLoader for\n   " + getWorkingDirectory().getAbsolutePath());
             }
         }
         catch (Exception e)
@@ -1035,12 +1036,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         }
         else if (!file.exists())
         {
-            LOG.error("isFileReady() file does not exist: " + file.getPath());
+            LOG.error("isFileReady() file does not exist:\n   " + file.getAbsolutePath());
             return false;
         }
         else if (file.length() == 0)
         {
-            LOG.error("isFileReady() file is empty: " + file.getPath());
+            LOG.error("isFileReady() file is empty:\n   " + file.getAbsolutePath());
             return false;
         }
         return true;

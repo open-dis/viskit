@@ -21,6 +21,7 @@ import org.apache.commons.configuration2.tree.UnionCombiner;
 import org.apache.logging.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
+import static viskit.ViskitGlobals.isFileReady;
 import viskit.doe.FileHandler;
 
 /**
@@ -169,6 +170,10 @@ public class ViskitConfigurationStore
             File cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
             if (!C_GUI_FILE.exists())
                 Files.copy(cGuiSrc.toPath(), C_GUI_FILE.toPath());
+            isFileReady(C_APP_FILE);
+            isFileReady(C_GUI_FILE);
+            LOG.info("VISKIT_CONFIGURATION_DIR=" + VISKIT_CONFIGURATION_DIR.getAbsolutePath() + " contains\n   " +
+                     C_APP_FILE.getAbsolutePath() + " and " + C_GUI_FILE.getAbsolutePath());
         } 
         catch (IOException ex) {
             LOG.error(ex);
@@ -225,22 +230,22 @@ public class ViskitConfigurationStore
  to do the saving, but it won't.
      *
      * @param key the ViskitConfigurationStore named key to set
-     * @param val the value of this key
+     * @param newValue the new value of this key
      */
-    public void setVal(String key, String val) {
-        String cfgKey = key.substring(0, key.indexOf('.'));
-        XMLConfiguration xc = xmlConfigurationsMap.get(cfgKey);
-        xc.setProperty(key, val);
+    public void setValue(String key, String newValue) {
+        String configurationKey = key.substring(0, key.indexOf('.'));
+        XMLConfiguration xmlConfiguration  = xmlConfigurationsMap.get(configurationKey);
+        xmlConfiguration .setProperty(key, newValue);
     }
 
-    public void setSessionVal(String key, String val) {
-        sessionHashMap.put(key, val);
+    public void setSessionValue(String key, String newValue) {
+        sessionHashMap.put(key, newValue);
     }
 
-    public String getVal(String key) {
-        String retS = sessionHashMap.get(key);
-        if (retS != null && retS.length() > 0) {
-            return retS;
+    public String getValue(String key) {
+        String returnString = sessionHashMap.get(key);
+        if (returnString != null && returnString.length() > 0) {
+            return returnString;
         }
         return projectCombinedConfiguration.getString(key);
     }
@@ -297,8 +302,8 @@ public class ViskitConfigurationStore
      * Viskit Project
      */
     public void clearViskitConfiguration() {
-        setVal(ViskitConfigurationStore.PROJECT_PATH_KEY, "");
-        setVal(ViskitConfigurationStore.PROJECT_NAME_KEY, "");
+        setValue(ViskitConfigurationStore.PROJECT_PATH_KEY, "");
+        setValue(ViskitConfigurationStore.PROJECT_NAME_KEY, "");
         getViskitAppConfiguration().clearTree(ViskitConfigurationStore.RECENT_EVENTGRAPH_CLEAR_KEY);
         getViskitAppConfiguration().clearTree(ViskitConfigurationStore.RECENT_ASSEMBLY_CLEAR_KEY);
 
@@ -329,7 +334,7 @@ public class ViskitConfigurationStore
             if      (projectFile == null)
                     LOG.error("cleanup() null projectFile ");
             else if (!projectFile.exists())
-                     LOG.error("cleanup() nonexistent projectFile " + projectFile.getPath());
+                     LOG.error("cleanup() nonexistent projectFile " + projectFile.getAbsolutePath());
             else
             {
                 document = FileHandler.unmarshallJdom(projectFile);

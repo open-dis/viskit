@@ -96,9 +96,9 @@ public class ViskitApplication
                 URL url = new URI("mailto:" + ViskitStatics.VISKIT_MAILING_LIST +
                         "?subject=Viskit%20startup%20error&body=log%20output:").toURL();
 
-                String msg = "Viskit has experienced a startup glitch.  <br/>Please "
-                        + "navigate to " + ViskitConfigurationStore.VISKIT_ERROR_LOG.getPath() + " and "
-                        + "email the log to "
+                String msg = "Viskit has experienced a startup glitch.  <br/>"
+                        + "Please navigate to " + ViskitConfigurationStore.VISKIT_ERROR_LOG.getAbsolutePath() + "<br/>"
+                        + "and email the log to "
                         + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                         + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
 
@@ -154,20 +154,23 @@ public class ViskitApplication
             ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
             toolTipManager.setDismissDelay(Integer.MAX_VALUE); // never remove automatically
 
-            // TODO checking that these are really needed right here
-            ViskitGlobals.instance().initializeProjectHome();  // needed for first time, but not if repeating...
-            ViskitGlobals.instance().createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
+            // these ViskitGlobal calls need to occur afterMainFrame initialization so that diagnostic popups are possible,
+            // but are needed beforehand for MainFrame to find globals, ouch... 
+            // resolution: use ViskitGlobals.instance().hasMainFrameInitialized() to avoid exceptions
+            ViskitGlobals.instance().initializeProjectHome();  // needed for first time, but not if repeating... 
+//////            ViskitGlobals.instance().createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
 
             MainFrame mainFrame = new MainFrame(initialAssemblyFile);
             if (isMac) {
-                setupMacUI();
+                setupMacUI(); // special handling
             }
             mainFrame.setVisible(true);
 
             MainFrame.runLater(1000L, () -> {
-                // give file loading a chance to finish before checking no models loaded...
+                // wait a second, give file loading a chance to finish before checking no models loaded...
                 MainFrame.displayWelcomeGuidance(); // if no event graph or assembly is open
             });
+            
         }
         catch (ExceptionInInitializerError exception)
         {

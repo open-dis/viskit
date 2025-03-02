@@ -137,8 +137,8 @@ public class MainFrame extends JFrame
         initializeMainFrame();
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        int w = Integer.parseInt(ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]"));
-        int h = Integer.parseInt(ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]"));
+        int w = Integer.parseInt(ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]"));
         MainFrame.this.setLocation((d.width - w) / 2, (d.height - h) / 2);
         MainFrame.this.setSize(w, h);
 
@@ -177,7 +177,8 @@ public class MainFrame extends JFrame
 
         // Tabbed event graph editor
         eventGraphFrame = ViskitGlobals.instance().buildEventGraphViewFrame();
-        if (ViskitUserPreferences.isEventGraphEditorVisible()) {
+        if (ViskitUserPreferences.isEventGraphEditorVisible()) 
+        {
             topTabbedPane.add(((EventGraphViewFrame) eventGraphFrame).getContent());
             assemblyPaneIndex = topTabbedPane.indexOfComponent(((EventGraphViewFrame) eventGraphFrame).getContent());
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Event Graph Editor");
@@ -396,21 +397,24 @@ public class MainFrame extends JFrame
     class myTabChangeListener implements ChangeListener {
 
         @Override
-        public void stateChanged(ChangeEvent e) {
+        public void stateChanged(ChangeEvent e)
+        {
+            if (topTabbedPane == null)
+                return; // nothing to do, yet
 
-            Model[] mods = ViskitGlobals.instance().getEventGraphViewFrame().getOpenModels();
-            Model dirtyMod = null;
+            Model[] modelArray = ViskitGlobals.instance().getEventGraphViewFrame().getOpenModels();
+            Model dirtyModel = null;
 
             // Make sure we save modified Event Graphs if we wander off to the Assembly tab
-            for (Model mod : mods) {
-                if (mod.isDirty()) {
-                    dirtyMod = mod;
-                    ViskitGlobals.instance().getEventGraphController().setModel((MvcModel) mod);
+            for (Model nextModel : modelArray) {
+                if (nextModel.isDirty()) {
+                    dirtyModel = nextModel;
+                    ViskitGlobals.instance().getEventGraphController().setModel((MvcModel) nextModel);
                     ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).save();
                 }
             }
 
-            if (dirtyMod != null && dirtyMod.isDirty()) {
+            if (dirtyModel != null && dirtyModel.isDirty()) {
 
                 // This will fire another call to stateChanged()
                 topTabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX]);
@@ -426,7 +430,7 @@ public class MainFrame extends JFrame
                 i = topTabbedPane.getTabCount() + getSimulationRunTabbedPane().getSelectedIndex();
                 topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], "Run replications of simulation defined by selected Assembly");
             }
-            else
+            else if ((topTabbedPane != null) && (topTabbedPane.getTabCount() >= TAB0_SIMULATIONRUN_INDEX)) // TODO why is this needed??
             {
                 topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], "First initialize Assembly for Simulation Run from Assembly tab");
             }
@@ -607,8 +611,8 @@ public class MainFrame extends JFrame
 
                 // Remember the size of this main frame set by the user
                 Rectangle bounds = getBounds();
-                ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
-                ViskitConfigurationStore.instance().setVal(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
+                ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
+                ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
 
                 // Pretty-fy all xml docs used for configuration
                 ViskitConfigurationStore.instance().cleanup();

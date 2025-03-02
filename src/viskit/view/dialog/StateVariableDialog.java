@@ -314,7 +314,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
                     String s = typ + " " + nam + " = new " + typ;
                     s = s.substring(0, s.lastIndexOf('[') + 1) + arsz + "]";          // stick in size
 
-                    if (ViskitConfigurationStore.instance().getVal(ViskitConfigurationStore.BEANSHELL_WARNING_KEY).equalsIgnoreCase("true")) {
+                    if (ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.BEANSHELL_WARNING_KEY).equalsIgnoreCase("true")) {
                         String result = ViskitGlobals.instance().parseCode(null, s);
                         if (result != null) {
                             boolean ret = BeanshellErrorDialog.showDialog(result, StateVariableDialog.this);

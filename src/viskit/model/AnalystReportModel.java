@@ -170,7 +170,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     {
         if (!isFileReady(newAnalystReportFileXml))
         {
-            LOG.error("Constructor error reading {}", newAnalystReportFileXml.getPath());
+            LOG.error("Constructor error reading\n   {}", newAnalystReportFileXml.getAbsolutePath());
             return;
         }
         try {
@@ -178,7 +178,7 @@ public final class AnalystReportModel extends MvcAbstractModel
             parseXML(newAnalystReportFileXml);
         } 
         catch (Exception ex) {
-            LOG.error("Constructor exception reading {}", newAnalystReportFileXml.getPath() + " : " + ex.getMessage());
+            LOG.error("Constructor exception reading {}", newAnalystReportFileXml.getAbsolutePath() + " : " + ex.getMessage());
         }
     }
 

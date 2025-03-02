@@ -1531,7 +1531,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (!xmlValidationTool.isValidXML())
         {
             // TODO: implement a Dialog pointing to the validationErrors.LOG
-            LOG.error("{} is not valid XML!\n", x2j.getEventGraphFile().getPath());
+            LOG.error("{} is not valid XML!\n", x2j.getEventGraphFile().getAbsolutePath());
             return eventGraphSource;
         } 
         else 

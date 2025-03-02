@@ -37,14 +37,23 @@ public class SimkitAssemblyXML2Java
     final private String sp4 = sp+sp+sp+sp;
     final private String sp8 = sp4+sp4;
     final private String sp12 = sp8+sp4;
+    /** opening brace */
     final private String ob  = SimkitXML2Java.OB;
+    /** closing brace */
     final private String cb  = SimkitXML2Java.CB;
+    /** semicolon */
     final private String sc  = SimkitXML2Java.SC;
+    /** comma */
     final private String cm  = SimkitXML2Java.CM;
+    /** left parenthesis */
     final private String lp  = SimkitXML2Java.LP;
+    /** right parenthesis */
     final private String rp  = SimkitXML2Java.RP;
+    /** equal sign */
     final private String eq  = SimkitXML2Java.EQ;
+    /** period */
     final private String pd  = SimkitXML2Java.PD;
+    /** quotation mark */
     final private String qu  = SimkitXML2Java.QU;
     final private String nw = "new";
 

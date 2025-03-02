@@ -28,6 +28,7 @@ public class SimkitXML2Java {
     static final Logger LOG = Log4jUtilities.getLogger(SimkitXML2Java.class);
 
     /* convenience Strings for formatting */
+    /** space character */
     public final static String SP = " ";
     public final static String SP_4 = SP + SP + SP + SP;
     public final static String SP_8 = SP_4 + SP_4;

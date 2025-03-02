@@ -89,7 +89,7 @@ public class LocalBootLoader extends URLClassLoader {
 
     private final static Logger LOG = Log4jUtilities.getLogger(LocalBootLoader.class);
     
-    String[] classPathArray;
+    String[] classPathArray = new String[0];
     LocalBootLoader localBootLoader; // formerly "stage1"
     File workingDirectory;
     URL[] externalUrlArray;
@@ -136,8 +136,8 @@ public class LocalBootLoader extends URLClassLoader {
         localBootLoader.allowAssembly = this.allowAssembly;
 
         // Now add any external classpaths
-        for (URL ext : externalUrlArray) {
-
+        for (URL ext : externalUrlArray) 
+        {
             // can happen if extraClassPaths.path[@value] is null or erroneous
             if (ext == null) {continue;}
 
@@ -147,7 +147,7 @@ public class LocalBootLoader extends URLClassLoader {
             try {
                 tempUrl = new File(ext.toURI());
                 tempClasspath[tempClasspath.length - 1] = tempUrl.getPath();
-                LOG.debug("Extra path: {}",tempUrl.getPath());
+                LOG.debug("Extra path: {}",tempUrl.getAbsolutePath());
                 classPathArray = tempClasspath;
             } catch (URISyntaxException ex) {
                 LOG.error(ex);
@@ -163,28 +163,30 @@ public class LocalBootLoader extends URLClassLoader {
         // to reopen this issue when we need strict design points for DOE.
 
         // Now add our project's working directory, i.e. build/classes
-        try {
-
-            localBootLoader.addURL(getWorkDirectory().toURI().toURL());
-            tempClasspath = new String[getClassPath().length + 1];
-            System.arraycopy(getClassPath(), 0, tempClasspath, 0, classPathArray.length);
-            try {
-                tempClasspath[tempClasspath.length - 1] = getWorkDirectory().getCanonicalPath();
-                classPathArray = tempClasspath;
-            } catch (IOException ex) {
+        if (getWorkingDirectory() != null) // can't add until project is initialized
+        {
+            try 
+            {
+                localBootLoader.addURL(getWorkingDirectory().toURI().toURL());
+                tempClasspath = new String[getClassPath().length + 1];
+                System.arraycopy(getClassPath(), 0, tempClasspath, 0, classPathArray.length);
+                try {
+                    tempClasspath[tempClasspath.length - 1] = getWorkingDirectory().getCanonicalPath();
+                    classPathArray = tempClasspath;
+                } catch (IOException ex) {
+                    LOG.error(ex);
+                }
+            } catch (MalformedURLException ex) {
                 LOG.error(ex);
             }
-        } catch (MalformedURLException ex) {
-            LOG.error(ex);
-        }
 
 //        jar = buildCleanWorkJar(); // See TODO note above
 
         // localBootLoader gets dirty during bring up of clean jar <-- Why?
         // reboot it with cleanWorkJar
-        LOG.debug("Stage1 reinit");
+//        LOG.debug("Stage1 reinit");
 //        initStage1();
-        LOG.debug("Adding cleaned jar "+jar);
+//        LOG.debug("Adding cleaned jar "+jar);
 
         // Now add our tmp jars containing compiled Event Graphs and Assemblies
 //        try {
@@ -206,15 +208,15 @@ public class LocalBootLoader extends URLClassLoader {
 //            LOG.error(ex);
 //        }
 
-        // Now normalize all the paths in the classpath variable[]
-        tempClasspath = new String[getClassPath().length];
-        int idx = 0;
-        for (String path : getClassPath()) {
-            tempClasspath[idx] = path;
-            idx++;
+            // Now normalize all the paths in the classpath variable[]
+            tempClasspath = new String[getClassPath().length];
+            int idx = 0;
+            for (String path : getClassPath()) {
+                tempClasspath[idx] = path;
+                idx++;
+            }
+            localBootLoader.classPathArray = tempClasspath;
         }
-
-        localBootLoader.classPathArray = tempClasspath;
         return localBootLoader;
     }
 
@@ -230,13 +232,13 @@ public class LocalBootLoader extends URLClassLoader {
      * Convenience method for the DOE local driver
      * @return a URL[] of External ClassPath paths
      */
-    public URL[] getExtUrls() {
+    public URL[] getExternalUrlArray() {
         return externalUrlArray;
     }
 
     /** @return a custom String[] with our classpath */
-    public String[] getClassPath() {
-
+    public String[] getClassPath()
+    {
         // very verbose when "debug" mode
         for (String path : classPathArray) {
             path = path.replaceAll("\\\\", "/");
@@ -247,7 +249,7 @@ public class LocalBootLoader extends URLClassLoader {
     }
 
     /** @return the working class directory for this project */
-    public File getWorkDirectory() {
+    public File getWorkingDirectory() {
         return workingDirectory;
     }
 
@@ -301,7 +303,7 @@ public class LocalBootLoader extends URLClassLoader {
 
         ClassLoader parentClassLoader = getParent();
 
-        localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
+        localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkingDirectory());
         boolean loop = !allowAssembly;
 
         // if each LocalBootLoader individually has to read from
@@ -318,7 +320,7 @@ public class LocalBootLoader extends URLClassLoader {
                 }
                 //LOG.info("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
-                localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkDirectory());
+                localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkingDirectory());
             } catch (ClassNotFoundException e) {
                 loop = false;
             }
@@ -343,15 +345,15 @@ public class LocalBootLoader extends URLClassLoader {
         try {
 
             // Don't jar up an empty build/classes directory
-            if (getWorkDirectory().listFiles().length == 0) {return null;}
+            if (getWorkingDirectory().listFiles().length == 0) {return null;}
 
             // this potentially "dirties" this instance of localBootLoader
             // meaning it could have Assembly classes in it
-            localBootLoader.addURL(getWorkDirectory().toURI().toURL());
+            localBootLoader.addURL(getWorkingDirectory().toURI().toURL());
 
             // make a clean version of the file in jar form
             // to be added to a newer localBootLoader (rebooted) instance.
-            newJar = makeJarFileFromDirectory(getWorkDirectory());
+            newJar = makeJarFileFromDirectory(getWorkingDirectory());
 
         } catch (MalformedURLException ex) {
             LOG.error(ex);

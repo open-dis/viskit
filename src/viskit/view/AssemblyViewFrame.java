@@ -322,7 +322,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 if (!file.exists())
                 {
                     // file not found as expected, something happened externally and so report it
-                    LOG.error("*** [AssemblyViewFrame listChanged] Event graph file not found: " + file.getPath());
+                    LOG.error("*** [AssemblyViewFrame listChanged] Event graph file not found: " + file.getAbsolutePath());
                     continue; // actual file not found, skip to next file in files loop
                 }
                 nameOnly = file.getName();
@@ -968,7 +968,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         // A RunSimulation (reset) LocalBootLoader will be instantiated
         // here when compiling EGs for the first time, or when the
         // SimkitXML2Java translator attempts to resolve a ParameterMap
-        addEventGraphsToLegoTree(viskitProject.getEventGraphsDirectory(), true);
+        if (viskitProject != null)
+            addEventGraphsToLegoTree(viskitProject.getEventGraphsDirectory(), true);
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
@@ -1120,7 +1121,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     @Override
     public void addEventGraphsToLegoTree(File f, boolean b) {
-        if (f.exists())
+        if ((f != null) && f.exists())
             legoEventGraphsTree.addContentRoot(f, b);
     }
 
@@ -1301,7 +1302,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             xmlTreeComponent = XMLTreeComponent.getTreeInPanel(xmlFile);
         } 
         catch (Exception e) {
-            LOG.error("displayXML(" + xmlFile.getPath() + ") exception " + e.getMessage());
+            LOG.error("displayXML(" + xmlFile.getAbsolutePath() + ") exception " + e.getMessage());
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "XML Display Error", e.getMessage());
             return;
         }
