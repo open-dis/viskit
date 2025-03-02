@@ -44,23 +44,23 @@ public class SimkitXML2Java {
     public final static String LP = "(";
     /** right parenthesis */
     public final static String RP = ")";
-    /**  */
+    /** equals sign */
     public final static String EQ = "=";
-    /**  */
+    /** period */
     public final static String PD = ".";
-    /**  */
+    /** quotation mark */
     public final static String QU = "\"";
-    /**  */
+    /** left bracket */
     public final static String LB = "[";
-    /**  */
+    /** right bracket */
     public final static String RB = "]";
-    /**  */
+    /** right angle-bracket &gt; */
     public final static String RA = ">";
-    /**  */
+    /** left angle-bracket &lt; */
     public final static String LA = "<";
-    /**  */
+    /** Javadoc opening comment */
     public final static String JDO = "/**";
-    /**  */
+    /**  Javadoc closing comment */
     public final static String JDC = "*/";
     public final static String PUBLIC = "public";
     public final static String PROTECTED = "protected";
