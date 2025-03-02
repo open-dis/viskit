@@ -32,20 +32,35 @@ public class SimkitXML2Java {
     public final static String SP_4 = SP + SP + SP + SP;
     public final static String SP_8 = SP_4 + SP_4;
     public final static String SP_12 = SP_8 + SP_4;
+    /** open brace */
     public final static String OB = "{";
+    /** close brace */
     public final static String CB = "}";
+    /** semicolon */
     public final static String SC = ";";
+    /** comma */
     public final static String CM = ",";
+    /** left parenthesis */
     public final static String LP = "(";
+    /** right parenthesis */
     public final static String RP = ")";
+    /**  */
     public final static String EQ = "=";
+    /**  */
     public final static String PD = ".";
+    /**  */
     public final static String QU = "\"";
+    /**  */
     public final static String LB = "[";
+    /**  */
     public final static String RB = "]";
+    /**  */
     public final static String RA = ">";
+    /**  */
     public final static String LA = "<";
+    /**  */
     public final static String JDO = "/**";
+    /**  */
     public final static String JDC = "*/";
     public final static String PUBLIC = "public";
     public final static String PROTECTED = "protected";
