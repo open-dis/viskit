@@ -74,7 +74,7 @@ public class Launcher extends Thread implements Runnable
         try {
             URL u;
 
-            cloader = ViskitGlobals.instance().getWorkingClassLoader();
+            cloader = ViskitGlobals.instance().getViskitApplicationClassLoader();
             InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);

@@ -268,7 +268,7 @@ public class ViskitStatics
      * @return an instantiated class given by s if available from the loader
      */
     public static Class<?> classForName(String s) {
-        Class<?> c = cForName(s, ViskitGlobals.instance().getWorkingClassLoader());
+        Class<?> c = cForName(s, ViskitGlobals.instance().getViskitApplicationClassLoader());
 
         if (c == null) {
             c = tryUnqualifiedName(s);
@@ -472,7 +472,7 @@ public class ViskitStatics
         Path startingDir;
         String pattern = name + "\\.class";
         Class<?> c = null;
-        LocalBootLoader loader = (LocalBootLoader) ViskitGlobals.instance().getWorkingClassLoader();
+        LocalBootLoader loader = (LocalBootLoader) ViskitGlobals.instance().getViskitApplicationClassLoader();
         String[] classpaths = loader.getClassPath();
         String clazz;
 

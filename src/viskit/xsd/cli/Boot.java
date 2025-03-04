@@ -41,7 +41,7 @@ public class Boot extends URLClassLoader implements Runnable {
     public URL baseJarURL;
 
     public Boot(URL[] urls) {
-        this(urls,ViskitGlobals.instance().getWorkingClassLoader());
+        this(urls,ViskitGlobals.instance().getViskitApplicationClassLoader());
     }
 
     public Boot(URL[] urls, ClassLoader cloader) {
@@ -217,7 +217,7 @@ public class Boot extends URLClassLoader implements Runnable {
     private String getJavaRev() { // TODO update
         String rev = "java15";
         try {
-            ClassLoader cloader = ViskitGlobals.instance().getWorkingClassLoader();
+            ClassLoader cloader = ViskitGlobals.instance().getViskitApplicationClassLoader();
             InputStream configIn = cloader.getResourceAsStream("config.properties");
             Properties p = new Properties();
             p.load(configIn);

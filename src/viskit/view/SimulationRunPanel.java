@@ -60,7 +60,9 @@ public class SimulationRunPanel extends JPanel
 {
     public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 30; // also defined twice in viskit.xsd schema
     
-    public final static String INITIAL_SIMULATIONRUN_HINT = "First initialize an Assembly before Simulation Run..."; // Local Run Simulation
+    public final static String INITIAL_SIMULATION_RUN_HINT = "First initialize an Assembly before Simulation Run..."; // Local Run Simulation
+
+    public static final String SIMULATION_RUN_PANEL_TITLE = "Simulation Run Console";
     
     public boolean dump = true;
     public boolean search;

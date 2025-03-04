@@ -973,7 +973,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
-        String[] classPath = ((LocalBootLoader) ViskitGlobals.instance().getWorkingClassLoader()).getClassPath();
+        String[] classPath = ((LocalBootLoader) ViskitGlobals.instance().getViskitApplicationClassLoader()).getClassPath();
         for (String path : classPath) {
             if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
                 addEventGraphsToLegoTree(new File(path), false);

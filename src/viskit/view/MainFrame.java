@@ -47,7 +47,7 @@ import viskit.ViskitGlobals;
 import viskit.ViskitConfigurationStore;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
-import viskit.control.TextAreaOutputStream;
+import viskit.control.InternalAssemblyRunner;
 import viskit.doe.DoeMain;
 import viskit.doe.JobLauncherTab2;
 import viskit.model.Model;
@@ -97,7 +97,7 @@ public class MainFrame extends JFrame
     EventGraphViewFrame  eventGraphFrame;
     AssemblyViewFrame    assemblyFrame;
     AnalystReportViewFrame analystReportPanel;
-    TextAreaOutputStream internalSimulationRunner;
+    InternalAssemblyRunner internalSimulationRunner;
     JobLauncherTab2 runGridComponent;
 
     private Action myQuitAction;
@@ -299,11 +299,11 @@ public class MainFrame extends JFrame
         }
 
         // Assembly Simulation Run
-        internalSimulationRunner = new TextAreaOutputStream(analystReportPanelVisible);
+        internalSimulationRunner = new InternalAssemblyRunner(analystReportPanelVisible);
         ViskitGlobals.instance().setInternalSimulationRunner(internalSimulationRunner);
         
         getSimulationRunTabbedPane().add(ViskitGlobals.instance().getSimulationRunPanel(), TAB1_LOCALRUN_INDEX);
-        getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, SimulationRunPanel.INITIAL_SIMULATIONRUN_HINT);
+        getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT);
         getSimulationRunTabbedPane().setToolTipTextAt(TAB1_LOCALRUN_INDEX, "Run replications of assembly simulation on local host");
         mainFrameMenuBar = internalSimulationRunner.getMenus();
         modalMenuBarList.add(mainFrameMenuBar);
@@ -669,7 +669,7 @@ public class MainFrame extends JFrame
             simulationRunPanel.printReplicationReportsCB.setSelected(false);
             simulationRunPanel.printSummaryReportsCB.setSelected(false);
 
-            internalSimulationRunner.vcrButtonPressDisplayUpdate(TextAreaOutputStream.Event.OFF); // initialize
+            internalSimulationRunner.vcrButtonPressDisplayUpdate(InternalAssemblyRunner.Event.OFF); // initialize
             internalSimulationRunner.doTitle(null);
             
             simulationRunPanel.nowRunningLabel.setText("");

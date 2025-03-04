@@ -62,6 +62,7 @@ import viskit.ViskitStatics;
 import viskit.assembly.BasicAssembly;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
+import static viskit.view.SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
 import viskit.view.dialog.ViskitUserPreferences;
 
 /** Controller for the Assembly Run panel
@@ -75,9 +76,9 @@ import viskit.view.dialog.ViskitUserPreferences;
  * @since 3:43:51 PM
  * @version $Id$
  */
-public class TextAreaOutputStream implements PropertyChangeListener 
+public class InternalAssemblyRunner implements PropertyChangeListener 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(TextAreaOutputStream.class);
+    static final Logger LOG = Log4jUtilities.getLogger(InternalAssemblyRunner.class);
 
     /** The name of the basicAssembly to run */
     private String simulationRunAssemblyClassName;
@@ -106,13 +107,11 @@ public class TextAreaOutputStream implements PropertyChangeListener
     private final StopListener assemblySimulationRunStopListener;
     
     private AnalystReportModel analystReportModel;
-
-    public static final String ASSEMBLY_SIMULATION_RUN_PANEL_TITLE = "Simulation Run Console";
     /**
      * The internal logic for the Assembly Runner panel
      * @param analystReportPanelVisible if true, the Analyst Report panel will be visible
      */
-    public TextAreaOutputStream(boolean analystReportPanelVisible) 
+    public InternalAssemblyRunner(boolean analystReportPanelVisible) 
     {
         saveListener = new SaveListener();
 
@@ -120,7 +119,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons. Currently, only start and stop work
 
-        simulationRunPanel = new SimulationRunPanel(ASSEMBLY_SIMULATION_RUN_PANEL_TITLE, false, analystReportPanelVisible);
+        simulationRunPanel = new SimulationRunPanel(SIMULATION_RUN_PANEL_TITLE, false, analystReportPanelVisible);
         buildMenus();
         simulationRunPanel.vcrStopButton.addActionListener(assemblySimulationRunStopListener = new StopListener());
         simulationRunPanel.vcrPlayButton.addActionListener(new StartResumeListener());
@@ -133,7 +132,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         simulationRunPanel.vcrStepButton.setEnabled(false);
 
         // Save Viskit's current working ClassLoader for later restoration
-        lastWorkingClassLoaderNoReset = ViskitGlobals.instance().getWorkingClassLoader();
+        lastWorkingClassLoaderNoReset = ViskitGlobals.instance().getViskitApplicationClassLoader();
 
         // Provide access to Enable Analyst Report checkbox
         ViskitGlobals.instance().setSimulationRunPanel(simulationRunPanel);
@@ -821,4 +820,4 @@ public class TextAreaOutputStream implements PropertyChangeListener
         return simulationRunMenu;
     }
 
-}  // end class file TextAreaOutputStream.java
+}  // end class file InternalAssemblyRunner.java

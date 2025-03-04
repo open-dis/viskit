@@ -852,7 +852,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //            // TODO the following block appears to break ViskitGlobals singleton pattern!
 //            // Because there is no instantiated report builder in the current
 //            // thread context, we reflect here
-//            ClassLoader localLoader = ViskitGlobals.instance().getWorkingClassLoader();
+//            ClassLoader localLoader = ViskitGlobals.instance().getViskitApplicationClassLoader();
 
 // TODO better future fix: move out of reflection land completely...
 

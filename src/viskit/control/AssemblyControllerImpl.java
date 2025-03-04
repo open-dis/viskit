@@ -70,6 +70,7 @@ import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
 import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
 import viskit.assembly.SimulationRunInterface;
+import viskit.view.SimulationRunPanel;
 
 /**
  * AssemblyController full implementation.
@@ -1786,7 +1787,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     save();
         
                     String assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetadata().name;
-                    String  consoleName = TextAreaOutputStream.ASSEMBLY_SIMULATION_RUN_PANEL_TITLE;
+                    String  consoleName = SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
                     if (!assemblyName.isBlank() && assemblyName.toLowerCase().contains("assembly"))
                          consoleName += " for " + assemblyName;
                     else if (!assemblyName.isBlank())

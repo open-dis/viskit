@@ -64,7 +64,7 @@ import org.apache.logging.log4j.Logger;
 import viskit.control.AnalystReportController;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphControllerImpl;
-import viskit.control.TextAreaOutputStream;
+import viskit.control.InternalAssemblyRunner;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
@@ -178,7 +178,7 @@ public class ViskitGlobals
     /** Need hold of the Enable Analyst Reports checkbox and number of replications, likely others too */
     private SimulationRunPanel simulationRunPanel;
     
-    private TextAreaOutputStream simulationTextAreaOutputStream;
+    private InternalAssemblyRunner internalAssemblyRunner;
 
     /** Flag to denote called systemExit only once */
     private boolean systemExitCalled = false;
@@ -1035,7 +1035,7 @@ public class ViskitGlobals
         setProjectClassesDirectory(viskitProject.getClassesDirectory()); // TODO is this parameter really needed?
     }
 
-    private ClassLoader workingClassLoader;
+    private ClassLoader viskitApplicationClassLoader;
 
     /**
      * Retrieve the primary Viskit workingClassLoader, which may be reset from time to
@@ -1045,9 +1045,9 @@ public class ViskitGlobals
      * @see BasicAssembly.getRunSimulationClassLoader()
      * @return Viskit's working ClassLoader
      */
-    public ClassLoader getWorkingClassLoader() // TODO getViskitApplicationClassLoader
+    public ClassLoader getViskitApplicationClassLoader() // TODO getViskitApplicationClassLoader
     {
-            if (workingClassLoader == null) // workingClassLoader should only get created once
+            if (viskitApplicationClassLoader == null) // workingClassLoader should only get created once
             {
                 URL[] urls = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
                 viskit.doe.LocalBootLoader localBootLoader = new LocalBootLoader(urls,
@@ -1055,20 +1055,20 @@ public class ViskitGlobals
                         getProjectWorkingDirectory());
 
                 // Allow Assembly files in the ClassLoader
-                workingClassLoader = localBootLoader.initialize(true);
+                viskitApplicationClassLoader = localBootLoader.initialize(true);
 
                 // TODO experimenting with context
-                Thread.currentThread().setContextClassLoader(workingClassLoader);
+                Thread.currentThread().setContextClassLoader(viskitApplicationClassLoader);
             }
-        if (workingClassLoader == null)
+        if (viskitApplicationClassLoader == null)
         {
             LOG.error("getWorkingClassLoader() ran without exception but returned null");
         }
-        return workingClassLoader;
+        return viskitApplicationClassLoader;
     }
 
     public void resetWorkingClassLoader() {
-        workingClassLoader = null;
+        viskitApplicationClassLoader = null;
         LOG.debug("resetWorkingClassLoader() complete"); // TODO threading issue?
     }
 
@@ -1289,15 +1289,15 @@ public class ViskitGlobals
     /**
      * @return the simulationTextAreaOutputStream
      */
-    public TextAreaOutputStream getInternalSimulationRunner() {
-        return simulationTextAreaOutputStream;
+    public InternalAssemblyRunner getInternalSimulationRunner() {
+        return internalAssemblyRunner;
     }
 
     /**
-     * @param newSimulationTextAreaOutputStream the simulationTextAreaOutputStream to set
+     * @param newInternalAssemblyRunner the simulationTextAreaOutputStream to set
      */
-    public void setInternalSimulationRunner(TextAreaOutputStream newSimulationTextAreaOutputStream) {
-        this.simulationTextAreaOutputStream = newSimulationTextAreaOutputStream;
+    public void setInternalSimulationRunner(InternalAssemblyRunner newInternalAssemblyRunner) {
+        this.internalAssemblyRunner = newInternalAssemblyRunner;
     }
 
     /** 

@@ -74,7 +74,7 @@ public class LocalTaskQueue extends ArrayList<Object>
                 return true;
             }
         } else if ((Boolean) o) {
-            Object parent = ViskitGlobals.instance().getWorkingClassLoader();
+            Object parent = ViskitGlobals.instance().getViskitApplicationClassLoader();
             Class<?> parentz = parent.getClass();
             try {
                 Method getExtUrls = parentz.getMethod("getExtUrls");

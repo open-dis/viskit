@@ -1274,7 +1274,7 @@ public class SimkitXML2Java {
         Class<?> aClass = null;
 
         try {
-            aClass = ViskitGlobals.instance().getWorkingClassLoader().loadClass(c);
+            aClass = ViskitGlobals.instance().getViskitApplicationClassLoader().loadClass(c);
         } catch (ClassNotFoundException cnfe) {
 //            LOG.error(cnfe);
         }

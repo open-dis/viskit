@@ -179,7 +179,7 @@ public class Gridlet extends Thread
                 // TODO: Fix generics
                 v = (Vector) xmlrpc.execute("gridkit.getJars",v);
                 Enumeration e = v.elements();
-                ClassLoader boot = ViskitGlobals.instance().getWorkingClassLoader();
+                ClassLoader boot = ViskitGlobals.instance().getViskitApplicationClassLoader();
                 if (boot instanceof Boot) {
                     while (e.hasMoreElements()) {
                         ((Boot) boot).addJar(new URI((String) e.nextElement()).toURL());
@@ -192,7 +192,7 @@ public class Gridlet extends Thread
 
             } else {
                 // check if LocalBootLoader mode, otherwise throw exception
-                Object loaderO = ViskitGlobals.instance().getWorkingClassLoader();
+                Object loaderO = ViskitGlobals.instance().getViskitApplicationClassLoader();
                 Class<?> loaderz = loaderO.getClass();
                 if ( !( loaderz.getName().equals(ViskitStatics.LOCAL_BOOT_LOADER) ) ) {
                     throw new RuntimeException("Not running as SGE job or local mode?");
@@ -213,7 +213,7 @@ public class Gridlet extends Thread
         this.filename = expFile.getName();
         try {
             //See comment in LocalTaskQueue, try commenting out the line, and uncommenting the printlns to see it up close
-            //LOG.info("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ ViskitGlobals.instance().getWorkingClassLoader());
+            //LOG.info("Gridlet.setExperimentFile, "+Thread.currentThread()+"'s loader is "+ ViskitGlobals.instance().getViskitApplicationClassLoader());
             //LOG.info("Gridlet.setExperimentFile, "+this+"'s loader is "+ getContextClassLoader());
             sax2j = new SimkitAssemblyXML2Java(experimentFile.toURI().toURL().openStream());
         } catch (IOException ex) {

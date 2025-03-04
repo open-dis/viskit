@@ -121,7 +121,7 @@ public class BshGridlet extends Thread
                 // TODO: fix generics
                 v = (Vector) xmlrpc.execute("gridkit.getJars", v);
                 Enumeration e = v.elements();
-                ClassLoader boot = ViskitGlobals.instance().getWorkingClassLoader();
+                ClassLoader boot = ViskitGlobals.instance().getViskitApplicationClassLoader();
                 if (boot instanceof Boot) {
                     while (e.hasMoreElements()) {
                         ((Boot) boot).addJar(new URI((String) e.nextElement()).toURL());

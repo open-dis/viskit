@@ -736,7 +736,7 @@ public class ViskitProject
 
         public ViskitProjectFileView() {
 
-            // Can't use VGlobals.instance().getWorkingClassLoader() b/c it will
+            // Can't use VGlobals.instance().getViskitApplicationClassLoader() b/c it will
             // hang if this is the first frest startup of Viskit
             viskitProjectIcon = new ImageIcon(Thread.currentThread().getContextClassLoader().getResource("viskit/images/ViskitIcon.gif"));
         }
