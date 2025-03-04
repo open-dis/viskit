@@ -1702,14 +1702,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void export2grid() {
         AssemblyModel model = (AssemblyModel) getModel();
-        File tFile;
+        File tempFile;
         try {
-            tFile = TempFileManager.createTempFile("ViskitAssembly", ".xml");
+            tempFile = TempFileManager.createTempFile("ViskitAssembly", ".xml");
         } catch (IOException e) {
             messageUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
             return;
         }
-        model.saveModel(tFile);
+        model.saveModel(tempFile);
     //todo switch to DOE
     }
     private String[] execStrings;

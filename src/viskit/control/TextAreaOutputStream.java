@@ -236,7 +236,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
         {
             // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
             // must occur prior to threading and new RunSimulationClassLoader
-            basicAssembly.resetRunSimulationClassLoader();
+////            basicAssembly.resetRunSimulationClassLoader(); // TODO wrong place for this, likely out of place
             basicAssembly.setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
             basicAssembly.setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
             lastRunSimulationClassLoader = basicAssembly.getRunSimulationClassLoader(); // TODO reset?
@@ -442,7 +442,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
             catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
 
                 // Some screwy stuff can happen here if a user jams around with
-                // the initialize Assembly run button and tabs back and forth
+                // the Prepare Assembly Run button and tabs back and forth
                 // between the Assembly editor and the Assembly runner panel, but it
                 // won't impede a correct Assembly run.  Catch the
                 // IllegalArgumentException and move on.
@@ -486,7 +486,7 @@ public class TextAreaOutputStream implements PropertyChangeListener
             catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
 
                 // Some screwy stuff can happen here if a user jams around with
-                // the initialize Assembly run button and tabs back and forth
+                // the Prepare Assembly Run button and tabs back and forth
                 // between the Assembly editor and the Assembly runner panel, but it
                 // won't impede a correct Assembly run.  Catch the
                 // IllegalArgumentException and move on.

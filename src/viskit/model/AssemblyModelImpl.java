@@ -188,21 +188,23 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         // Do the marshalling into a temporary file so as to avoid possible
         // deletion of existing file on a marshal error.
 
-        File tmpF;
-        FileWriter fw = null;
+        File tempFile;
+        FileWriter fileWriter = null;
         try {
-            tmpF = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
+            tempFile = TempFileManager.createTempFile("tmpAsymarshal", ".xml");
         } catch (IOException e) {
             assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "I/O Error",
                     "Exception creating temporary file, AssemblyModel.saveModel():" +
                     "\n" + e.getMessage()
                     );
+            LOG.error("Exception creating temporary file, AssemblyModel.saveModel():" +
+                    "\n" + e.getMessage());
             return;
         }
 
         try {
-            fw = new FileWriter(tmpF);
+            fileWriter = new FileWriter(tempFile);
             Marshaller m = jaxbContext.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
@@ -224,10 +226,10 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(ViskitGlobals.instance().getSimulationRunPanel().analystReportCB.isSelected()));
             jaxbRoot.getSchedule().setVerbose("" + graphMetadata.verbose);
 
-            m.marshal(jaxbRoot, fw);
+            m.marshal(jaxbRoot, fileWriter);
 
             // OK, made it through the marshal, overwrite the "real" file
-            Files.copy(tmpF.toPath(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(tempFile.toPath(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             modelDirty = false;
             currentFile = f;
@@ -246,8 +248,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                     "\n" + ex.getMessage());
         } finally {
             try {
-                if (fw != null)
-                    fw.close();
+                if (fileWriter != null)
+                    fileWriter.close();
             } catch (IOException ioe) {}
         }
     }

@@ -546,7 +546,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         
         assemblyMenu.addSeparator();
         // TODO add icon?
-        assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly for Simulation Run", KeyEvent.VK_I,
+        assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Prepare Assembly for Simulation Run", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         /*
@@ -749,7 +749,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getToolBar().addSeparator(new Dimension(24, 24));
 
         JLabel initializeAssemblyRunLabel = new JLabel ("  Initialize Assembly for Simulation Run: ");
-        initializeAssemblyRunLabel.setToolTipText("First initialize Assembly for Simulation Run from Assembly tab");
+        initializeAssemblyRunLabel.setToolTipText("first Prepare Assembly for Simulation Run from Assembly tab");
         getToolBar().add(initializeAssemblyRunLabel);
         getToolBar().add(initializeAssemblySimulationRunButton);
 

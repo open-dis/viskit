@@ -1038,12 +1038,14 @@ public class ViskitGlobals
     private ClassLoader workingClassLoader;
 
     /**
-     * Retrieve the Viskit workingClassLoader, which may be reset from time to
-     * time if extra classpaths are loaded.
+     * Retrieve the primary Viskit workingClassLoader, which may be reset from time to
+     * time if extra classpaths are loaded.  
+     * This is used prior to running an assembly in a simulation run, and again 
+     * becomes active after all replications are complete when progressing to the Analyst Report.
      * @see BasicAssembly.getRunSimulationClassLoader()
      * @return Viskit's working ClassLoader
      */
-    public ClassLoader getWorkingClassLoader() 
+    public ClassLoader getWorkingClassLoader() // TODO getViskitApplicationClassLoader
     {
             if (workingClassLoader == null) // workingClassLoader should only get created once
             {

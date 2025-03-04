@@ -73,8 +73,8 @@ public class DoeFileModel
     private final Map<String, Integer> nameSpace = new HashMap<>();
 
     public File marshallJaxb() throws Exception {
-        File f = TempFileManager.createTempFile("DOEtemp", ".xml");
-        return marshallJaxb(f);
+        File tempFile = TempFileManager.createTempFile("DOEtemp", ".xml");
+        return marshallJaxb(tempFile);
     }
 
     public File marshallJaxb(File f) throws Exception {

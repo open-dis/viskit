@@ -481,7 +481,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="initializeAssemblyForSimulationRunMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Initialize Assembly for Simulation Run"/>
+                <Property name="text" type="java.lang.String" value="Prepare Assembly for Simulation Run"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="xmlViewAssemblyMI">

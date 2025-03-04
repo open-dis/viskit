@@ -674,7 +674,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         imageSaveDiagramAssemblyMI.setText("Image Save Assembly Diagram");
         assemblyMenu.add(imageSaveDiagramAssemblyMI);
 
-        initializeAssemblyForSimulationRunMI.setText("Initialize Assembly for Simulation Run");
+        initializeAssemblyForSimulationRunMI.setText("Prepare Assembly for Simulation Run");
         assemblyMenu.add(initializeAssemblyForSimulationRunMI);
 
         xmlViewAssemblyMI.setText("XML View");

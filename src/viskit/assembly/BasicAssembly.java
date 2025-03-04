@@ -858,17 +858,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             try 
             {
-//////                if (getWorkingDirectory() == null)
-//////                {
-//////                    // this should only occur for analyst reports, following (and outside of) the simulation thread
-//////                    // TODO hacking wildly here...
-//////                    setWorkingDirectory(new File("./build/classes")); // no longer looking for project classes
-//////                    if (!getWorkingDirectory().exists())
-//////                    {
-//////                        LOG.error("run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
-//////                    }
-////////                  setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
-//////                }
+                if (getWorkingDirectory() == null)
+                {
+                    // this should only occur for analyst reports, following (and outside of) the simulation thread
+                    // TODO hacking wildly here...
+                    setWorkingDirectory(new File("./build/classes")); // no longer looking for project classes
+                    if (!getWorkingDirectory().exists())
+                    {
+                        LOG.error("run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
+                    }
+                  setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
+                }
                 // Creates the temp file only when user required?? TODO check
                 initializeTemporaryAnalystReportFile();
                 LOG.info("Temporary analyst report at\n   " + analystReportFile.getAbsolutePath()); // debug

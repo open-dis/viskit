@@ -195,9 +195,9 @@ public class ModelImpl extends MvcAbstractModel implements Model
         // Do the marshalling into a temporary file, so as to avoid possible
         // deletion of existing file on a marshal error.
 
-        File tmpF;
+        File tempFile;
         try {
-            tmpF = TempFileManager.createTempFile("tempEventGraphMarshal", ".xml");
+            tempFile = TempFileManager.createTempFile("tempEventGraphMarshal", ".xml");
         } catch (IOException e) {
             eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
                     "I/O Error",
@@ -209,7 +209,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         FileWriter fw = null;
         try {
-            fw = new FileWriter(tmpF);
+            fw = new FileWriter(tempFile);
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
@@ -230,7 +230,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             marshaller.marshal(jaxbRoot, fw);
 
             // OK, made it through the marshal, overwrite the "real" file
-            Files.copy(tmpF.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(tempFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             setDirty(false);
             retVal = true;

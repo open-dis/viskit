@@ -225,10 +225,10 @@ public class ReportStatisticsConfiguration {
 
     /**
      * File I/O that saves the report in XML format
-     * @param report a data report to save
+     * @param reportDocument a data report to save
      * @return the String representation of this report
      */
-    public String saveData(Document report) {
+    public String saveData(Document reportDocument) {
         SimpleDateFormat formatter;
         String dateFormat;
 
@@ -237,21 +237,22 @@ public class ReportStatisticsConfiguration {
         dateFormat = formatter.format(today);
 
         // Create a unique file name for each DTG/Location Pair
-        ViskitProject vkp = ViskitGlobals.instance().getViskitProject();
-        File anRptStatDir = vkp.getAnalystReportStatisticsDirectory();
+        ViskitProject viskitProject = ViskitGlobals.instance().getViskitProject();
+        File analystReportStatisticsDirectory = viskitProject.getAnalystReportStatisticsDirectory();
 
         String outputFile = (author + assemblyName + "_" + dateFormat + ".xml");
-        File f = new File(anRptStatDir, outputFile);
+        File analystReportStatisticsDirectoryFile = new File(analystReportStatisticsDirectory, outputFile);
 
         try {
-            FileHandler.marshallJdom(f, report, false);
+            FileHandler.marshallJdom(analystReportStatisticsDirectoryFile, reportDocument, false);
         } catch (JDOMException | IOException ex) {
             LOG.error( ex);
             ex.printStackTrace(System.err);
             return null;
         }
+        LOG.info("saveData(" + reportDocument.getRootElement().getName() + ") analystReportStatisticsDirectoryFile at\n   " + analystReportStatisticsDirectoryFile.getAbsolutePath());
 
-        return f.getAbsolutePath();
+        return analystReportStatisticsDirectoryFile.getAbsolutePath();
     }
 
 } // end class ReportStatisticsConfiguration
