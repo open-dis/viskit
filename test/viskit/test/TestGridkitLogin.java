@@ -148,7 +148,7 @@ public class TestGridkitLogin extends Thread {
 
             // now send a jar to newbies new session
 
-            URL u = ViskitGlobals.instance().getWorkingClassLoader().getResource("diskit/DISMover3D.class");
+            URL u = ViskitGlobals.instance().getViskitApplicationClassLoader().getResource("diskit/DISMover3D.class");
             
             LOG.info("Opening " + u);
             u = new URI((u.getFile().split("!"))[0].trim()).toURL();

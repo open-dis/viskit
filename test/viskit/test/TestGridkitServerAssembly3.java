@@ -59,7 +59,7 @@ public class TestGridkitServerAssembly3 extends Thread {
         // this of course only works in a development workspace
 
         // get the jarurl path to viskit.EventGraphAssemblyComboMain
-        URL url = ViskitGlobals.instance().getWorkingClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
+        URL url = ViskitGlobals.instance().getViskitApplicationClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
         // strip the injar path
         log.info(url);
 
