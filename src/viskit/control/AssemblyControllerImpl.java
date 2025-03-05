@@ -1717,7 +1717,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     // Known modelPath for Assembly compilation
     @Override
-    public void initializeAssemblySimulationRun() 
+    public void prepareAssemblySimulationRun() 
     {
         String src = produceJavaAssemblyClass(); // asks to save
 
@@ -1745,7 +1745,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // Prevent double clicking which will cause potential ClassLoader issues
         Runnable r = () -> {
-            (ViskitGlobals.instance().getAssemblyViewFrame()).initializeAssemblySimulationRunButton.setEnabled(false);
+            (ViskitGlobals.instance().getAssemblyViewFrame()).prepareAssemblyForSimulationRunButton.setEnabled(false);
         };
 
         try {
@@ -1761,7 +1761,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             public Void doInBackground()
             {
                 // Compile and prep the execStrings
-                initializeAssemblySimulationRun();
+                prepareAssemblySimulationRun();
 
                 if (execStrings == null)
                 {
@@ -1826,7 +1826,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     LOG.error(e);
 //                    e.printStackTrace();
                 } finally {
-                    (ViskitGlobals.instance().getAssemblyViewFrame()).initializeAssemblySimulationRunButton.setEnabled(true);
+                    (ViskitGlobals.instance().getAssemblyViewFrame()).prepareAssemblyForSimulationRunButton.setEnabled(true);
                     mutex--;
                 }
             }

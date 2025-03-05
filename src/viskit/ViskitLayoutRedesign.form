@@ -479,10 +479,13 @@
                 <Property name="text" type="java.lang.String" value="Image Save Assembly Diagram"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="initializeAssemblyForSimulationRunMI">
+            <MenuItem class="javax.swing.JMenuItem" name="prepareAssemblyForSimulationRunMI">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Prepare Assembly for Simulation Run"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prepareAssemblyForSimulationRunMIActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="xmlViewAssemblyMI">
               <Properties>

@@ -146,7 +146,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     public static final int PCL_MODE = 3;
 
     // The controller needs access to this
-    public JButton initializeAssemblySimulationRunButton;
+    public JButton prepareAssemblyForSimulationRunButton;
 
     JMenu openRecentAssemblyMenu, openRecentProjectMenu;
 
@@ -721,7 +721,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         );
 
         Action prepareSimulationRunnerAction = ActionIntrospector.getAction(getController(), "prepareSimulationRunner");
-        initializeAssemblySimulationRunButton = makeButton(prepareSimulationRunnerAction, "viskit/images/Play24.gif",
+        prepareAssemblyForSimulationRunButton = makeButton(prepareSimulationRunnerAction, "viskit/images/Play24.gif",
                 "Compile, initialize the assembly and prepare the Simulation Runner");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
@@ -748,10 +748,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
 
-        JLabel initializeAssemblyRunLabel = new JLabel ("  Initialize Assembly for Simulation Run: ");
-        initializeAssemblyRunLabel.setToolTipText("first Prepare Assembly for Simulation Run from Assembly tab");
-        getToolBar().add(initializeAssemblyRunLabel);
-        getToolBar().add(initializeAssemblySimulationRunButton);
+        JLabel prepareAssemblyForSimulationRunLabel = new JLabel ("  Prepare Assembly for Simulation Run: ");
+        prepareAssemblyForSimulationRunLabel.setToolTipText("first Prepare Assembly for Simulation Run");
+        getToolBar().add(prepareAssemblyForSimulationRunLabel);
+        getToolBar().add(prepareAssemblyForSimulationRunButton);
 
         // Let the opening of Assembliess make this visible
         getToolBar().setVisible(false);

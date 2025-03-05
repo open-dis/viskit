@@ -224,14 +224,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     viskit.assembly.TextAreaOutputStream textAreaOutputStream;
     Runnable assemblyRunnable;
 
-    protected void initializeAssemblySimulationRun() 
+    protected void prepareAssemblySimulationRun() 
     {
         // Prevent multiple pushes of the sim run button
         mutex++;
         if (mutex > 1)
             return;
 
-        try // initializeAssemblySimulationRun
+        try // prepareAssemblySimulationRun
         {
             // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
             // must occur prior to threading and new RunSimulationClassLoader
@@ -310,15 +310,15 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
             // Restore thread context to Viskit's WorkingClassLoader prior to returning control
             Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset);
-            LOG.info("initializeAssemblySimulationRun() complete");
+            LOG.info("prepareAssemblySimulationRun() complete");
         }
         catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException exception) 
         {
-            LOG.error("initializeAssemblySimulationRun() reflection exception: " + exception);
+            LOG.error("prepareAssemblySimulationRun() reflection exception: " + exception);
         }
         catch (Exception ue) // sometimes strange things happen with reflection and threading
         {
-            LOG.error("initializeAssemblySimulationRun() reflection uncaught exception: " + ue);
+            LOG.error("prepareAssemblySimulationRun() reflection uncaught exception: " + ue);
         }
     }
 
@@ -406,7 +406,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             simulationRunPanel.vcrStartTimeTF.setText("0.0");    // because no pausing
             vcrButtonPressDisplayUpdate(Event.START);
-            initializeAssemblySimulationRun();
+            prepareAssemblySimulationRun();
         }
     }
 

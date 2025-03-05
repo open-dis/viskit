@@ -222,14 +222,14 @@ public interface AssemblyController {
      */
     void generateJavaSource();
 
-    /** Prepare the Simulation Runner for simulation run. This is called from 
+    /** Prepare the Assembly for simulation run. This is called from 
      * the AssemblyView via reflection when the Prepare Assembly Run button 
      * is selected from the Assembly Editor panel.
      */
     void prepareSimulationRunner();
 
     /** Generating java source and compilation are taken care of here */
-    void initializeAssemblySimulationRun();
+    void prepareAssemblySimulationRun();
 
     void export2grid();
 

@@ -122,7 +122,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
         javaSourceAssemblyMI = new javax.swing.JMenuItem();
         imageSaveDiagramAssemblyMI = new javax.swing.JMenuItem();
-        initializeAssemblyForSimulationRunMI = new javax.swing.JMenuItem();
+        prepareAssemblyForSimulationRunMI = new javax.swing.JMenuItem();
         xmlViewAssemblyMI = new javax.swing.JMenuItem();
         exportToClusterFormatMI = new javax.swing.JMenuItem();
         assemblySimulationRunMenu = new javax.swing.JMenu();
@@ -674,8 +674,13 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         imageSaveDiagramAssemblyMI.setText("Image Save Assembly Diagram");
         assemblyMenu.add(imageSaveDiagramAssemblyMI);
 
-        initializeAssemblyForSimulationRunMI.setText("Prepare Assembly for Simulation Run");
-        assemblyMenu.add(initializeAssemblyForSimulationRunMI);
+        prepareAssemblyForSimulationRunMI.setText("Prepare Assembly for Simulation Run");
+        prepareAssemblyForSimulationRunMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                prepareAssemblyForSimulationRunMIActionPerformed(evt);
+            }
+        });
+        assemblyMenu.add(prepareAssemblyForSimulationRunMI);
 
         xmlViewAssemblyMI.setText("XML View");
         assemblyMenu.add(xmlViewAssemblyMI);
@@ -841,6 +846,10 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_addPropertyChangeListenerMIActionPerformed
 
+    private void prepareAssemblyForSimulationRunMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prepareAssemblyForSimulationRunMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_prepareAssemblyForSimulationRunMIActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -965,7 +974,6 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenuItem imageSaveDiagramAssemblyMI;
     private javax.swing.JMenuItem imageSaveDiagramEventGraphMI;
-    private javax.swing.JMenuItem initializeAssemblyForSimulationRunMI;
     private javax.swing.JPopupMenu.Separator jSeparator10;
     private javax.swing.JPopupMenu.Separator jSeparator11;
     private javax.swing.JPopupMenu.Separator jSeparator12;
@@ -993,6 +1001,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JMenuItem openViskitProjectMI;
     private javax.swing.JMenuItem pasteAssemblyEditMenuItem;
     private javax.swing.JMenuItem pasteEventEditMenuItem;
+    private javax.swing.JMenuItem prepareAssemblyForSimulationRunMI;
     private javax.swing.JMenu projectMenu;
     private javax.swing.JMenuItem redoAssemblyEditMenuItem;
     private javax.swing.JMenuItem redoEventEditMenuItem;

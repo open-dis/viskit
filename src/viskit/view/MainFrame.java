@@ -256,7 +256,7 @@ public class MainFrame extends JFrame
             topTabbedPane.add(runTabbedPanePanel);
             assemblyPaneIndex = topTabbedPane.indexOfComponent(runTabbedPanePanel);
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Simulation Run");
-            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "first Prepare Assembly for Simulation Run from Assembly tab");
+            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "first Prepare Assembly for Simulation Run");
             modalMenuBarList.add(null); // placeholder
             tabIndices[TAB0_SIMULATIONRUN_INDEX] = assemblyPaneIndex;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
@@ -433,7 +433,7 @@ public class MainFrame extends JFrame
             }
             else if ((topTabbedPane != null) && (topTabbedPane.getTabCount() >= TAB0_SIMULATIONRUN_INDEX)) // TODO why is this needed??
             {
-                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], "first Prepare Assembly for Simulation Run from Assembly tab");
+                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], "first Prepare Assembly for Simulation Run");
             }
 
             JMenuBar selectedMenuBar = new JMenuBar();
