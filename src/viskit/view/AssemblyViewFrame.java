@@ -722,7 +722,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         Action prepareSimulationRunnerAction = ActionIntrospector.getAction(getController(), "prepareSimulationRunner");
         prepareAssemblyForSimulationRunButton = makeButton(prepareSimulationRunnerAction, "viskit/images/Play24.gif",
-                "Compile, initialize the assembly and prepare the Simulation Runner");
+                "Compile and initialize the assembly, prepare for Simulation Run");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);
         modeButtonGroup.add(simEventListenerMode);
@@ -748,10 +748,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getToolBar().add(zoomOut);
         getToolBar().addSeparator(new Dimension(24, 24));
 
-        JLabel prepareAssemblyForSimulationRunLabel = new JLabel ("  Prepare Assembly for Simulation Run: ");
+        getToolBar().add(prepareAssemblyForSimulationRunButton);
+        JLabel prepareAssemblyForSimulationRunLabel = new JLabel ("  Prepare Assembly for Simulation Run");
         prepareAssemblyForSimulationRunLabel.setToolTipText("first Prepare Assembly for Simulation Run");
         getToolBar().add(prepareAssemblyForSimulationRunLabel);
-        getToolBar().add(prepareAssemblyForSimulationRunButton);
 
         // Let the opening of Assembliess make this visible
         getToolBar().setVisible(false);

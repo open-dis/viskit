@@ -139,62 +139,62 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         currentModelEvent = ev;
 
         switch (ev.getID()) {
-            case ModelEvent.NEWASSEMBLYMODEL:
+            case ModelEvent.NEW_ASSEMBLY_MODEL:
 
                 // Ensure we start fresh
                 viskitGraphAssemblyModel.deleteAll();
                 break;
-            case ModelEvent.EVENTGRAPHADDED:
+            case ModelEvent.EVENT_GRAPH_ADDED:
 
                 // Reclaimed from the viskitGraphAssemblyModel to here
                 insert((AssemblyNode) ev.getSource());
                 break;
-            case ModelEvent.EVENTGRAPHCHANGED:
+            case ModelEvent.EVENT_GRAPH_CHANGED:
                 viskitGraphAssemblyModel.changeEventGraphNode((AssemblyNode) ev.getSource());
                 break;
-            case ModelEvent.EVENTGRAPHDELETED:
+            case ModelEvent.EVENT_GRAPH_DELETED:
                 viskitGraphAssemblyModel.deleteEventGraphNode((AssemblyNode) ev.getSource());
                 break;
 
-            case ModelEvent.PCLADDED:
+            case ModelEvent.PCL_ADDED:
 
                 // Reclaimed from the viskitGraphAssemblyModel to here
                 insert((AssemblyNode) ev.getSource());
                 break;
-            case ModelEvent.PCLCHANGED:
+            case ModelEvent.PCL_CHANGED:
                 viskitGraphAssemblyModel.changePCLNode((AssemblyNode) ev.getSource());
                 break;
-            case ModelEvent.PCLDELETED:
+            case ModelEvent.PCL_DELETED:
                 viskitGraphAssemblyModel.deletePCLNode((AssemblyNode) ev.getSource());
                 break;
 
-            case ModelEvent.ADAPTEREDGEADDED:
+            case ModelEvent.ADAPTER_EDGE_ADDED:
                 viskitGraphAssemblyModel.addAdapterEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.ADAPTEREDGECHANGED:
+            case ModelEvent.ADAPTER_EDGE_CHANGED:
                 viskitGraphAssemblyModel.changeAdapterEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.ADAPTEREDGEDELETED:
+            case ModelEvent.ADAPTER_EDGE_DELETED:
                 viskitGraphAssemblyModel.deleteAdapterEdge((AssemblyEdge) ev.getSource());
                 break;
 
-            case ModelEvent.SIMEVLISTEDGEADDED:
+            case ModelEvent.SIM_EVENT_LISTENER_EDGE_ADDED:
                 viskitGraphAssemblyModel.addSimEvListEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.SIMEVLISTEDGECHANGED:
+            case ModelEvent.SIM_EVENT_LISTENER_EDGE_CHANGED:
                 viskitGraphAssemblyModel.changeSimEvListEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.SIMEVLISTEDGEDELETED:
+            case ModelEvent.SIM_EVENT_LISTENER_EDGE_DELETED:
                 viskitGraphAssemblyModel.deleteSimEvListEdge((AssemblyEdge) ev.getSource());
                 break;
 
-            case ModelEvent.PCLEDGEADDED:
+            case ModelEvent.PCL_EDGE_ADDED:
                 viskitGraphAssemblyModel.addPclEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.PCLEDGEDELETED:
+            case ModelEvent.PCL_EDGE_DELETED:
                 viskitGraphAssemblyModel.deletePclEdge((AssemblyEdge) ev.getSource());
                 break;
-            case ModelEvent.PCLEDGECHANGED:
+            case ModelEvent.PCL_EDGE_CHANGED:
                 viskitGraphAssemblyModel.changePclEdge((AssemblyEdge) ev.getSource());
                 break;
 
@@ -222,7 +222,7 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
     @SuppressWarnings("unchecked")
     @Override
     public void graphChanged(GraphModelEvent e) {
-        if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEWASSEMBLYMODEL) // bail if this came from outside
+        if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEW_ASSEMBLY_MODEL) // bail if this came from outside
         {
             return;
         } // this came in from outside, we don't have to inform anybody..prevent reentry

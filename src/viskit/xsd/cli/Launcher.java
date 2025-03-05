@@ -27,7 +27,7 @@ public class Launcher extends Thread implements Runnable
     String assembly = null;
     String assemblyName;
     Hashtable<String, String> eventGraphs = new Hashtable<>();
-    private static final boolean DEBUG = true; // TODO: tie to Vstatics.debug?
+    private static final boolean DEBUG = true; // TODO: tie to ViskitStatics.debug?
     private boolean compiled = true;
     private boolean inGridlet = false;
 

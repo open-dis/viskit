@@ -120,7 +120,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         if (f == null) {
             jaxbRoot = objectFactory.createSimEntity(); // to start with empty graph
-            notifyChanged(new ModelEvent(this, ModelEvent.NEWMODEL, "New empty model"));
+            notifyChanged(new ModelEvent(this, ModelEvent.NEW_MODEL, "New empty model"));
         } else {
             try {
                 currentFile = f;
@@ -288,7 +288,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             mangleName(en);
         }
         
-        notifyChanged(new ModelEvent(en, ModelEvent.EVENTADDED, "Event added"));
+        notifyChanged(new ModelEvent(en, ModelEvent.EVENT_ADDED, "Event added"));
         return en;
     }
 
@@ -510,7 +510,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         edgeCache.put(ed, se);
 
         setDirty(true);
-        this.notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Edge added"));
+        this.notifyChanged(new ModelEvent(se, ModelEvent.EDGE_ADDED, "Edge added"));
     }
 
     private void buildCancelEdgeFromJaxb(EventNode src, Cancel ed) {
@@ -540,7 +540,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         edgeCache.put(ed, ce);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(ce, ModelEvent.CANCELINGEDGEADDED, "Canceling edge added"));
+        notifyChanged(new ModelEvent(ce, ModelEvent.CANCELING_EDGE_ADDED, "Canceling edge added"));
     }
 
     private List<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
@@ -555,7 +555,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
     private void buildCodeBlockFromJaxb(String code) {
         code = (code == null) ? "" : code;
-        notifyChanged(new ModelEvent(code, ModelEvent.CODEBLOCKCHANGED, "Code block changed"));
+        notifyChanged(new ModelEvent(code, ModelEvent.CODEBLOCK_CHANGED, "Code block changed"));
     }
 
     private void buildStateVariablesFromJaxb(List<StateVariable> lis) {
@@ -577,7 +577,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             if (!stateVariableParameterNameCheck()) {
                 mangleName(v);
             }
-            notifyChanged(new ModelEvent(v, ModelEvent.STATEVARIABLEADDED, "New state variable"));
+            notifyChanged(new ModelEvent(v, ModelEvent.STATE_VARIABLE_ADDED, "New state variable"));
         }
     }
 
@@ -600,7 +600,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             if (!stateVariableParameterNameCheck()) {
                 mangleName(vp);
             }
-            notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERADDED, "vParameter added"));
+            notifyChanged(new ModelEvent(vp, ModelEvent.SIM_PARAMETER_ADDED, "vParameter added"));
         }
     }
 
@@ -642,7 +642,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         jaxbRoot.getParameter().add(parameter);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(viskitParameter, ModelEvent.SIMPARAMETERADDED, "new simulation parameter"));
+        notifyChanged(new ModelEvent(viskitParameter, ModelEvent.SIM_PARAMETER_ADDED, "new simulation parameter"));
     }
 
     @Override
@@ -658,7 +658,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         simulationParameters.remove(vp);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERDELETED, "vParameter deleted"));
+        notifyChanged(new ModelEvent(vp, ModelEvent.SIM_PARAMETER_DELETED, "vParameter deleted"));
     }
 
     @Override
@@ -683,7 +683,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         p.getComment().add(vp.getComment());
 
         setDirty(true);
-        notifyChanged(new ModelEvent(vp, ModelEvent.SIMPARAMETERCHANGED, "vParameter changed"));
+        notifyChanged(new ModelEvent(vp, ModelEvent.SIM_PARAMETER_CHANGED, "vParameter changed"));
         return retcode;
     }
 
@@ -708,7 +708,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         jaxbRoot.getStateVariable().add(s);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEADDED, "State variable added"));
+        notifyChanged(new ModelEvent(vsv, ModelEvent.STATE_VARIABLE_ADDED, "State variable added"));
     }
 
     @Override
@@ -724,7 +724,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         stateVariables.remove(vsv);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLEDELETED, "State variable deleted"));
+        notifyChanged(new ModelEvent(vsv, ModelEvent.STATE_VARIABLE_DELETED, "State variable deleted"));
     }
 
     @Override
@@ -742,7 +742,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         sv.getComment().add(vsv.getComment());
 
         setDirty(true);
-        notifyChanged(new ModelEvent(vsv, ModelEvent.STATEVARIABLECHANGED, "State variable changed"));
+        notifyChanged(new ModelEvent(vsv, ModelEvent.STATE_VARIABLE_CHANGED, "State variable changed"));
         return retcode;
     }
 
@@ -775,7 +775,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         jaxbRoot.getEvent().add(jaxbEv);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(node, ModelEvent.EVENTADDED, "Event added"));
+        notifyChanged(new ModelEvent(node, ModelEvent.EVENT_ADDED, "Event added"));
     }
 
     @Override
@@ -801,7 +801,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         setDirty(true);
         if (!eventGraphController.isUndo())
-            notifyChanged(new ModelEvent(node, ModelEvent.EVENTDELETED, "Event deleted"));
+            notifyChanged(new ModelEvent(node, ModelEvent.EVENT_DELETED, "Event deleted"));
         else
             notifyChanged(new ModelEvent(node, ModelEvent.UNDO_EVENT_NODE, "Event undone"));
     }
@@ -1017,7 +1017,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         jaxbEv.setCode(node.getCodeBlock());
 
         setDirty(true);
-        notifyChanged(new ModelEvent(node, ModelEvent.EVENTCHANGED, "Event changed"));
+        notifyChanged(new ModelEvent(node, ModelEvent.EVENT_CHANGED, "Event changed"));
         return retcode;
     }
 
@@ -1056,7 +1056,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         edgeCache.put(sch, se);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(se, ModelEvent.EDGEADDED, "Scheduling Edge added"));
+        notifyChanged(new ModelEvent(se, ModelEvent.EDGE_ADDED, "Scheduling Edge added"));
     }
 
     @Override
@@ -1109,7 +1109,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         edgeCache.put(can, ce);
 
         setDirty(true);
-        notifyChanged(new ModelEvent(ce, ModelEvent.CANCELINGEDGEADDED, "Canceling Edge added"));
+        notifyChanged(new ModelEvent(ce, ModelEvent.CANCELING_EDGE_ADDED, "Canceling Edge added"));
     }
 
     @Override
@@ -1137,7 +1137,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         _commonEdgeDelete(edge);
 
         if (!eventGraphController.isUndo())
-            notifyChanged(new ModelEvent(edge, ModelEvent.EDGEDELETED, "Edge deleted"));
+            notifyChanged(new ModelEvent(edge, ModelEvent.EDGE_DELETED, "Edge deleted"));
         else
             notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_SCHEDULING_EDGE, "Edge undone"));
     }
@@ -1147,7 +1147,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         _commonEdgeDelete(edge);
 
         if (!eventGraphController.isUndo())
-            notifyChanged(new ModelEvent(edge, ModelEvent.CANCELINGEDGEDELETED, "Canceling edge deleted"));
+            notifyChanged(new ModelEvent(edge, ModelEvent.CANCELING_EDGE_DELETED, "Canceling edge deleted"));
         else
             notifyChanged(new ModelEvent(edge, ModelEvent.UNDO_CANCELING_EDGE, "Canceling edge undone"));
     }
@@ -1187,7 +1187,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         }
 
         setDirty(true);
-        notifyChanged(new ModelEvent(e, ModelEvent.EDGECHANGED, "Edge changed"));
+        notifyChanged(new ModelEvent(e, ModelEvent.EDGE_CHANGED, "Edge changed"));
     }
 
     @Override
@@ -1207,7 +1207,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         }
 
         setDirty(true);
-        notifyChanged(new ModelEvent(e, ModelEvent.CANCELINGEDGECHANGED, "Canceling edge changed"));
+        notifyChanged(new ModelEvent(e, ModelEvent.CANCELING_EDGE_CHANGED, "Canceling edge changed"));
     }
 
     /**

@@ -943,8 +943,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      */
     protected void printInfo() {}
 
-    /** This class loader is specific to Assembly running in that it is
-     * pristine from the working class loader in use for normal Viskit operations
+    /** 
+     * The RunSimulationClassLoader is specific to Assembly running in that it is
+     * pristine from the ViskitApplicationClassLoader in use for normal Viskit operations.
+     * TODO out of place? Warning: note that this method also resets ContextClassLoader for the current thread.
      * @see ViskitGlobals.getWorkingClassLoader()
      * @return a pristine class loader for Assembly runs
      */
@@ -971,9 +973,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 runSimulationClassLoader = localBootLoader.initialize(true);
                 // Set a RunSimulation ClassLoader for this thread to be free of any static
                 // state set from the Viskit WorkingClassLoader
-                Thread.currentThread().setContextClassLoader(runSimulationClassLoader);
+                Thread.currentThread().setContextClassLoader(runSimulationClassLoader); // TODO out of place? 
                 // TODO threading and singleton issues while inside ViskitGlobals?
-                LOG.info("getRunSimulationClassLoader() created new ClassLoader for\n   " + getWorkingDirectory().getAbsolutePath());
+                LOG.info("getRunSimulationClassLoader() currentThread contextClassLoader=" + runSimulationClassLoader.getName() +
+                         " and created new ClassLoader for\n   " + getWorkingDirectory().getAbsolutePath());
             }
         }
         catch (Exception e)

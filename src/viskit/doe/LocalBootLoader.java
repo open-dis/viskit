@@ -24,7 +24,7 @@ import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 
-/** LocalBootLoader is similar to Viskit's Vstatics.classForName and implements
+/** LocalBootLoader is similar to Viskit's ViskitStatics.classForName and implements
  * class loading that can be used in "Local Grid" mode.
  *
  * In "Remote Grid" mode, Grid nodes can't have already loaded classes

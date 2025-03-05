@@ -1368,28 +1368,28 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         StateVariablesPanel vp = vgcw.varPan;
         switch (event.getID()) {
             // Changes the two side panels need to know about
-            case ModelEvent.SIMPARAMETERADDED:
+            case ModelEvent.SIM_PARAMETER_ADDED:
                 pp.addRow((ViskitElement) event.getSource());
                 break;
-            case ModelEvent.SIMPARAMETERDELETED:
+            case ModelEvent.SIM_PARAMETER_DELETED:
                 pp.removeRow((ViskitElement) event.getSource());
                 break;
-            case ModelEvent.SIMPARAMETERCHANGED:
+            case ModelEvent.SIM_PARAMETER_CHANGED:
                 pp.updateRow((ViskitElement) event.getSource());
                 break;
-            case ModelEvent.STATEVARIABLEADDED:
+            case ModelEvent.STATE_VARIABLE_ADDED:
                 vp.addRow((ViskitElement) event.getSource());
                 break;
-            case ModelEvent.STATEVARIABLEDELETED:
+            case ModelEvent.STATE_VARIABLE_DELETED:
                 vp.removeRow((ViskitElement) event.getSource());
                 break;
-            case ModelEvent.STATEVARIABLECHANGED:
+            case ModelEvent.STATE_VARIABLE_CHANGED:
                 vp.updateRow((ViskitElement) event.getSource());
                 break;
-            case ModelEvent.CODEBLOCKCHANGED:
+            case ModelEvent.CODEBLOCK_CHANGED:
                 vgcw.codeBlockPan.setData((String) event.getSource());
                 break;
-            case ModelEvent.NEWMODEL:
+            case ModelEvent.NEW_MODEL:
                 vp.setData(null);
                 pp.setData(null);
 

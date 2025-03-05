@@ -1045,7 +1045,7 @@ public class ViskitGlobals
      * @see BasicAssembly.getRunSimulationClassLoader()
      * @return Viskit's working ClassLoader
      */
-    public ClassLoader getViskitApplicationClassLoader() // TODO getViskitApplicationClassLoader
+    public ClassLoader getViskitApplicationClassLoader()
     {
             if (viskitApplicationClassLoader == null) // workingClassLoader should only get created once
             {
@@ -1059,6 +1059,7 @@ public class ViskitGlobals
 
                 // TODO experimenting with context
                 Thread.currentThread().setContextClassLoader(viskitApplicationClassLoader);
+                LOG.info("getViskitApplicationClassLoader() currentThread contextClassLoader=" + viskitApplicationClassLoader.getName());
             }
         if (viskitApplicationClassLoader == null)
         {
@@ -1122,9 +1123,10 @@ public class ViskitGlobals
          * state. Must interrupt it in order to cause the JVM to exit
          * @see docs/technotes/guides/concurrency/threadPrimitiveDeprecation.html
          */
-        Thread[] threads = new Thread[Thread.activeCount()];
-        Thread.enumerate(threads);
-        for (Thread thread : threads) {
+        Thread[] runningThreadArray = new Thread[Thread.activeCount()];
+        int runningThreadCount = runningThreadArray.length;
+        Thread.enumerate(runningThreadArray);
+        for (Thread thread : runningThreadArray) {
             LOG.debug("Thread before exit {}: ", thread);
 
             // Attempt to release the URLClassLoader's file lock on open JARs

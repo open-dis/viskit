@@ -262,7 +262,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 }
             }
         }
-        if (assemblyModel.newModel(file) && !isOpenAlready) 
+        if (assemblyModel.newAssemblyModel(file) && !isOpenAlready) 
         {
             assemblyViewFrame.setSelectedAssemblyName(assemblyModel.getMetadata().name);
             // TODO: Implement an Assembly description block set here
@@ -749,7 +749,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
         assemblyModel.initialize();
-        assemblyModel.newModel(null); // should create new assembly file
+        assemblyModel.newAssemblyModel(null); // should create new assembly file
 
         // No vAMod set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
@@ -946,13 +946,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void newPropertyChangeListenerNode(String name, Point p) {
         String shName = shortPropertyChangeListenerName(name);
-        ((AssemblyModel) getModel()).newPropChangeListener(shName, name, p);
+        ((AssemblyModel) getModel()).newPropertyChangeListener(shName, name, p);
     }
 
     @Override
     public void newFileBasedPropertyChangeListenerNode(FileBasedAssemblyNode xnode, Point p) {
         String shName = shortPropertyChangeListenerName(xnode.loadedClass);
-        ((AssemblyModel) getModel()).newPropChangeListenerFromXML(shName, xnode, p);
+        ((AssemblyModel) getModel()).newPropertyChangeListenerFromXML(shName, xnode, p);
     }
 
     /**
@@ -1027,7 +1027,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
-        ((AssemblyModel) getModel()).newSimEvLisEdge(oArr[0], oArr[1]);
+        ((AssemblyModel) getModel()).newSimEventListenerEdge(oArr[0], oArr[1]);
     }
 
     @Override
@@ -1274,7 +1274,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             } else if (o instanceof PropertyChangeListenerNode) {
                 nm = ((ViskitElement) o).getName();
                 typ = ((ViskitElement) o).getType();
-                ((AssemblyModel) getModel()).newPropChangeListener(nm + "-copy" + copyCount, typ, p);
+                ((AssemblyModel) getModel()).newPropertyChangeListener(nm + "-copy" + copyCount, typ, p);
             }
             copyCount++;
         }
@@ -1293,13 +1293,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 for (AssemblyEdge ed : en.getConnections()) {
                     removeEdge(ed);
                 }
-                ((AssemblyModel) getModel()).deleteEvGraphNode((EventGraphNode) en);
+                ((AssemblyModel) getModel()).deleteEventGraphNode((EventGraphNode) en);
             } else if (elem instanceof PropertyChangeListenerNode) {
                 en = (PropertyChangeListenerNode) elem;
                 for (AssemblyEdge ed : en.getConnections()) {
                     removeEdge(ed);
                 }
-                ((AssemblyModel) getModel()).deletePropChangeListener((PropertyChangeListenerNode) en);
+                ((AssemblyModel) getModel()).deletePropertyChangeListener((PropertyChangeListenerNode) en);
             }
         }
 
@@ -1314,7 +1314,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         } else if (e instanceof PropertyChangeEdge) {
             ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeEdge) e);
         } else if (e instanceof SimEventListenerEdge) {
-            ((AssemblyModel) getModel()).deleteSimEvLisEdge((SimEventListenerEdge) e);
+            ((AssemblyModel) getModel()).deleteSimEventListenerEdge((SimEventListenerEdge) e);
         }
     }
 
@@ -1387,7 +1387,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 ((AssemblyModel) getModel()).redoAdapterEdge(ed);
             } else if (redoGraphCell.getUserObject() instanceof PropertyChangeEdge) {
                 PropertyChangeEdge ed = (PropertyChangeEdge) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoPropChangeEdge(ed);
+                ((AssemblyModel) getModel()).redoPropertyChangeEdge(ed);
             } else {
                 SimEventListenerEdge ed = (SimEventListenerEdge) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoSimEvLisEdge(ed);
@@ -1396,7 +1396,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
             if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerNode) {
                 PropertyChangeListenerNode node = (PropertyChangeListenerNode) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoPropChangeListener(node);
+                ((AssemblyModel) getModel()).redoPropertyChangeListener(node);
             } else {
                 EventGraphNode node = (EventGraphNode) redoGraphCell.getUserObject();
                 ((AssemblyModel) getModel()).redoEventGraph(node);

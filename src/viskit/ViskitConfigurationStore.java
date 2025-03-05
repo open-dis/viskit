@@ -79,9 +79,10 @@ public class ViskitConfigurationStore
     public static final String VISKIT_WELCOME_MESSAGE = "Welcome to " + VISKIT_SHORT_APPLICATION_NAME;
 
     public static final File VISKIT_CONFIGURATION_DIR = new File(System.getProperty("user.home"), ".viskit");
-    public static final File C_APP_FILE = new File(VISKIT_CONFIGURATION_DIR, "c_app.xml");
-    public static final File C_GUI_FILE = new File(VISKIT_CONFIGURATION_DIR, "c_gui.xml");
-    public static final File VISKIT_LOGS_DIR = new File("logs");
+    public static final File C_APP_FILE        = new File(VISKIT_CONFIGURATION_DIR, "c_app.xml");
+    public static final File C_GUI_FILE        = new File(VISKIT_CONFIGURATION_DIR, "c_gui.xml");
+    public static final File DOT_VISKIT_README = new File(VISKIT_CONFIGURATION_DIR, "README.md");
+    public static final File VISKIT_LOGS_DIR   = new File("logs");
     public static final File VISKIT_ERROR_LOG = new File(VISKIT_LOGS_DIR, "error.log.0");
 
     public static final String GUI_BEANSHELL_ERROR_DIALOG_KEY = "gui.beanshellerrordialog";

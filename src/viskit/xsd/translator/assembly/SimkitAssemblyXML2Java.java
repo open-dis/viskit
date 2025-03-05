@@ -30,7 +30,7 @@ public class SimkitAssemblyXML2Java
     static final Logger LOG = Log4jUtilities.getLogger(SimkitAssemblyXML2Java.class);
 
     public static final String ASSEMBLY_BINDINGS = "viskit.xsd.bindings.assembly";
-    static final boolean DEBUG = false; // TODO: tie to Vstatics.debug?
+    static final boolean DEBUG = false; // TODO: tie to ViskitStatics.debug?
 
     /* convenience Strings for formatting */
     final private String sp  = SimkitXML2Java.SP;

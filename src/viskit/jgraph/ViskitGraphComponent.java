@@ -151,38 +151,38 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
         currentModelEvent = ev;
 
         switch (ev.getID()) {
-            case ModelEvent.NEWMODEL:
+            case ModelEvent.NEW_MODEL:
 
                 // Ensure we start fresh
                 vGModel.deleteAll();
                 break;
-            case ModelEvent.EVENTADDED:
+            case ModelEvent.EVENT_ADDED:
 
                 // Reclaimed from the vGModel to here
                 insert((EventNode) ev.getSource());
                 break;
-            case ModelEvent.EVENTCHANGED:
+            case ModelEvent.EVENT_CHANGED:
                 vGModel.changeEvent((EventNode) ev.getSource());
                 break;
-            case ModelEvent.EVENTDELETED:
+            case ModelEvent.EVENT_DELETED:
                 vGModel.deleteEventNode((EventNode) ev.getSource());
                 break;
-            case ModelEvent.EDGEADDED:
+            case ModelEvent.EDGE_ADDED:
                 vGModel.addEdge((Edge) ev.getSource());
                 break;
-            case ModelEvent.EDGECHANGED:
+            case ModelEvent.EDGE_CHANGED:
                 vGModel.changeEdge((Edge) ev.getSource());
                 break;
-            case ModelEvent.EDGEDELETED:
+            case ModelEvent.EDGE_DELETED:
                 vGModel.deleteEdge((Edge) ev.getSource());
                 break;
-            case ModelEvent.CANCELINGEDGEADDED:
+            case ModelEvent.CANCELING_EDGE_ADDED:
                 vGModel.addCancelEdge((Edge) ev.getSource());
                 break;
-            case ModelEvent.CANCELINGEDGECHANGED:
+            case ModelEvent.CANCELING_EDGE_CHANGED:
                 vGModel.changeCancelingEdge((Edge) ev.getSource());
                 break;
-            case ModelEvent.CANCELINGEDGEDELETED:
+            case ModelEvent.CANCELING_EDGE_DELETED:
                 vGModel.deleteCancelingEdge((Edge) ev.getSource());
                 break;
 
@@ -206,7 +206,7 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
     @SuppressWarnings("unchecked")
     @Override
     public void graphChanged(GraphModelEvent e) {
-        if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEWMODEL) {
+        if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEW_MODEL) {
             return;
         } // this came in from outside, we don't have to inform anybody..prevent reentry
 

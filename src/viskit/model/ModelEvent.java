@@ -19,73 +19,73 @@ import viskit.mvc.MvcModelEvent;
  */
 public class ModelEvent extends MvcModelEvent
 {
-  public static final int NEWMODEL = 0;
+  public static final int NEW_MODEL = 0;
 
-  public static final int SIMPARAMETERADDED = 1;
-  public static final int SIMPARAMETERDELETED = 2;
-  public static final int SIMPARAMETERCHANGED = 3;
+  public static final int SIM_PARAMETER_ADDED    = 1;
+  public static final int SIM_PARAMETER_DELETED  = 2;
+  public static final int SIM_PARAMETER_CHANGED  = 3;
 
-  public static final int STATEVARIABLEADDED = 4;
-  public static final int STATEVARIABLEDELETED = 5;
-  public static final int STATEVARIABLECHANGED = 6;
+  public static final int STATE_VARIABLE_ADDED   = 4;
+  public static final int STATE_VARIABLE_DELETED = 5;
+  public static final int STATE_VARIABLE_CHANGED = 6;
 
-  public static final int EVENTADDED = 7;
-  public static final int EVENTDELETED = 8;
-  public static final int EVENTCHANGED = 9;
+  public static final int EVENT_ADDED            = 7;
+  public static final int EVENT_DELETED          = 8;
+  public static final int EVENT_CHANGED          = 9;
+         
+  public static final int EDGE_ADDED             = 10;
+  public static final int EDGE_DELETED           = 11;
+  public static final int EDGE_CHANGED           = 12;
 
-  public static final int EDGEADDED = 10;
-  public static final int EDGEDELETED = 11;
-  public static final int EDGECHANGED = 12;
+  public static final int CANCELING_EDGE_ADDED   = 13;
+  public static final int CANCELING_EDGE_DELETED = 14;
+  public static final int CANCELING_EDGE_CHANGED = 15;
 
-  public static final int CANCELINGEDGEADDED = 13;
-  public static final int CANCELINGEDGEDELETED = 14;
-  public static final int CANCELINGEDGECHANGED = 15;
+  public static final int CODEBLOCK_CHANGED      = 16;
 
-  public static final int CODEBLOCKCHANGED = 16;
+  public static final int REDO_CANCELING_EDGE    = 34;
+  public static final int REDO_SCHEDULING_EDGE   = 35;
+  public static final int REDO_EVENT_NODE        = 36;
 
-  public static final int REDO_CANCELING_EDGE = 34;
-  public static final int REDO_SCHEDULING_EDGE = 35;
-  public static final int REDO_EVENT_NODE = 36;
-
-  public static final int UNDO_CANCELING_EDGE = 37;
-  public static final int UNDO_SCHEDULING_EDGE = 38;
-  public static final int UNDO_EVENT_NODE = 39;
+  public static final int UNDO_CANCELING_EDGE    = 37;
+  public static final int UNDO_SCHEDULING_EDGE   = 38;
+  public static final int UNDO_EVENT_NODE        = 39;
 
   // assembly editor:
-  public static final int NEWASSEMBLYMODEL = 17;
+  public static final int NEW_ASSEMBLY_MODEL     = 17;
+  
+  public static final int EVENT_GRAPH_ADDED      = 18;
+  public static final int EVENT_GRAPH_DELETED    = 19;
+  public static final int EVENT_GRAPH_CHANGED    = 20;
+  
+  public static final int PCL_ADDED              = 21;
+  public static final int PCL_DELETED            = 22;
+  public static final int PCL_CHANGED            = 23;
+  
+  public static final int ADAPTER_EDGE_ADDED     = 24;
+  public static final int ADAPTER_EDGE_DELETED   = 25;
+  public static final int ADAPTER_EDGE_CHANGED   = 26;
 
-  public static final int EVENTGRAPHADDED = 18;
-  public static final int EVENTGRAPHDELETED = 19;
-  public static final int EVENTGRAPHCHANGED = 20;
+  public static final int SIM_EVENT_LISTENER_EDGE_ADDED   = 27;
+  public static final int SIM_EVENT_LISTENER_EDGE_DELETED = 28;
+  public static final int SIM_EVENT_LISTENER_EDGE_CHANGED = 29;
 
-  public static final int PCLADDED = 21;
-  public static final int PCLDELETED = 22;
-  public static final int PCLCHANGED = 23;
+  public static final int PCL_EDGE_ADDED    = 30;
+  public static final int PCL_EDGE_DELETED  = 31;
+  public static final int PCL_EDGE_CHANGED  = 32;
 
-  public static final int ADAPTEREDGEADDED = 24;
-  public static final int ADAPTEREDGEDELETED = 25;
-  public static final int ADAPTEREDGECHANGED = 26;
+  public static final int METADATA_CHANGED  = 33;
 
-  public static final int SIMEVLISTEDGEADDED = 27;
-  public static final int SIMEVLISTEDGEDELETED = 28;
-  public static final int SIMEVLISTEDGECHANGED = 29;
-
-  public static final int PCLEDGEADDED = 30;
-  public static final int PCLEDGEDELETED = 31;
-  public static final int PCLEDGECHANGED = 32;
-
-  public static final int METADATA_CHANGED = 33;
-
-  public static final int UNDO_EVENT_GRAPH = 40;
-  public static final int REDO_EVENT_GRAPH = 41;
-  public static final int UNDO_PCL = 42;
-  public static final int REDO_PCL = 43;
+  public static final int UNDO_EVENT_GRAPH  = 40;
+  public static final int REDO_EVENT_GRAPH  = 41;
+  public static final int UNDO_PCL          = 42;
+  public static final int REDO_PCL          = 43;
   public static final int UNDO_ADAPTER_EDGE = 44;
   public static final int REDO_ADAPTER_EDGE = 45;
   public static final int UNDO_SIM_EVENT_LISTENER_EDGE = 46;
   public static final int REDO_SIM_EVENT_LISTENER_EDGE = 47;
-  public static final int UNDO_PCL_EDGE = 48;
-  public static final int REDO_PCL_EDGE = 49;
+  public static final int UNDO_PCL_EDGE     = 48;
+  public static final int REDO_PCL_EDGE     = 49;
 
   public ModelEvent(Object obj, int id, String message)
   {
