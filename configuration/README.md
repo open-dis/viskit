@@ -6,12 +6,12 @@ The **.viskit** directory contains a Viskit user's individual configuration info
 
 Open-source software for Discrete Event Simulation (DES) can be found at
 
-* [https://github.com/ahbuss/Simkit](https://github.com/ahbuss/Simkit){:target="_blank"}
+* <a href="https://github.com/ahbuss/Simkit" target="_blank">https://github.com/ahbuss/Simkit</a>
 
-* [https://gitlab.nps.edu/Savage/viskit](https://gitlab.nps.edu/Savage/viskit){:target="_blank"}
+* <a href="https://gitlab.nps.edu/Savage/viskit" target="_blank">https://gitlab.nps.edu/Savage/viskit</a>
 
 For more information please contact
 
-* [brutzman@nps.edu](mailto:brutzman%nps.edu?subject=viskit%20inquiry){:target="_blank"}
+* <a href="mailto:brutzman%nps.edu?subject=viskit%20inquiry" target="_blank">brutzman@nps.edu</a>
 
-* [tdnorbra@nps.edu](mailto:tdnorbra@nps.edu?subject=viskit%20inquiry){:target="_blank"}
+* <a href="mailto:tdnorbra@nps.edu?subject=viskit%20inquiry" target="_blank">tdnorbra@nps.edu</a>
