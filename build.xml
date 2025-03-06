@@ -761,7 +761,7 @@ their descpritions.
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
     
-    <target name="clean.reset.all" depends="clean.build,clean.DefaultProject,clean.logs,reset.viskit"/>
+    <target name="clean.all" depends="clean.build,clean.DefaultProject,clean.logs,reset.viskit"/>
 
     <!--  === TARGET: clean.build === -->
     <target name="clean.build"
@@ -774,13 +774,12 @@ their descpritions.
             <include name="*.jar"/>
         </delete>
         <delete file="viskit-editor.jar"/>
-        <delete dir="logs"/>
-        <delete dir="pduLog"/>
 
         <!-- This one is scary -->
         <delete dir=".">
             <include name="*.zip"/>
         </delete>
+        <!-- Use target clean.logs to clear logs -->
     </target>
     
     <target name="clean.DefaultProject">
@@ -805,6 +804,7 @@ their descpritions.
     </target>
 
     <target name="reset.viskit" description="Replace an out-of-synch configuration with known good defaults">
+        <echo>reset.viskit replaces the .viskit individual preferences for a user</echo>
         <delete includeemptydirs="yes" dir="${dot.viskit.dir}"/>
         <mkdir  dir="${dot.viskit.dir}"/>
         <copy todir="${dot.viskit.dir}" verbose="true" file="${c_app.xml}"/>
@@ -836,6 +836,11 @@ their descpritions.
         <delete verbose="true" failonerror="false">
             <fileset dir="logs">
                 <include name="*.log"/>
+            </fileset>
+        </delete>
+        <delete verbose="false" failonerror="false">
+            <fileset dir="pduLog">
+                <include name="*"/>
             </fileset>
         </delete>
     </target>
