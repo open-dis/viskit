@@ -82,7 +82,7 @@ public class LocalTaskQueue extends ArrayList<Object>
                 Method getWorkDir = parentz.getMethod("getWorkDir");
                 File workDir = (File) getWorkDir.invoke(parent);
                 // really doesn't matter which ClassLoader gets passed to LBL, that's the whole point, it "boots" up from the bottom
-                LocalBootLoader loader = new LocalBootLoader(extUrls, (ClassLoader) parent, workDir);
+                LocalBootLoader loader = new LocalBootLoader(extUrls, (ClassLoader) parent, workDir,"LocalTaskQueue.activate");
                 loader = loader.initialize();
                 Thread.currentThread().setContextClassLoader(loader); // this line is not kidding around!
                 Object task;

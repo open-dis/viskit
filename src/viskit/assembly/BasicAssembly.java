@@ -160,7 +160,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
         setNumberReplications(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
         hookupsCalled = false;
 
-//        analystReportFile = new File(ViskitGlobals.instance().getProjectRootDirectoryPath() + "/AnalystReports/", "AnalystReport.xml");
+        // TODO superfluous?  actual file will be timestamped, actual directory already exists
+//        analystReportFile = new File(ViskitGlobals.instance().getProjectRootDirectoryPath() +
+//                                     "/AnalystReports/", "AnalystReport.xml");
+//        LOG.info("BasicAssembly() constructor created new analystReportFile\n   " + analystReportFile.getAbsolutePath());
         
         // Creates a report statistics config object and names it based on the name of this Assembly.
         reportStatisticsConfiguration = new ReportStatisticsConfiguration(this.getName());
@@ -950,7 +953,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * @see ViskitGlobals.getWorkingClassLoader()
      * @return a pristine class loader for Assembly runs
      */
-    public ClassLoader getRunSimulationClassLoader()
+    public ClassLoader getRunSimulationClassLoader() // formerly "Fresh" boot loader
     {
         try
         {
@@ -967,8 +970,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 LocalBootLoader localBootLoader = new LocalBootLoader(classPathUrlArray, 
                     // the parent of the platform loader should be the internal boot loader
                     ClassLoader.getPlatformClassLoader(), 
-                    // do not use singleton referencing by ViskitGlobals here!
-                    workingDirectory); 
+                    workingDirectory, // do not use singleton referencing by ViskitGlobals here!
+                    "RunSimulationClassLoader"); 
                 // Allow Assembly files in the ClassLoader
                 runSimulationClassLoader = localBootLoader.initialize(true);
                 // Set a RunSimulation ClassLoader for this thread to be free of any static

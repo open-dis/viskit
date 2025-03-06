@@ -309,12 +309,17 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             // Simulation Run thread is now launched and will execute separately
 
             // Restore thread context to Viskit's WorkingClassLoader prior to returning control
-            Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset);
-            LOG.info("prepareAssemblySimulationRun() complete, currentThread contextClassLoader="+ lastWorkingClassLoaderNoReset.getName());
+            if  (lastWorkingClassLoaderNoReset != null)
+            {
+                Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset);
+                LOG.info("prepareAssemblySimulationRun() complete, currentThread contextClassLoader="+ 
+                          lastWorkingClassLoaderNoReset.getName());
+            }
+            else LOG.error("prepareAssemblySimulationRun() complete, but lastWorkingClassLoaderNoReset is null");
         }
         catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException exception) 
         {
-            LOG.error("prepareAssemblySimulationRun() reflection exception: " + exception);
+            LOG.error("prepareAssemblySimulationRun() reflection exception: " + exception.getMessage());
         }
         catch (Exception ue) // sometimes strange things happen with reflection and threading
         {

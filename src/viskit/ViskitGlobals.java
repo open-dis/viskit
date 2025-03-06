@@ -114,7 +114,7 @@ public class ViskitGlobals
         // This should only occur once
         // Other initialization checks moved out of this constructor to avoid breaking singleton pattern
         // TODO does LOG interfere with singleton pattern?
-        LOG.info("created singleton (if this message again, it is a problem)"); // TODO threading issue?
+        LOG.info("created singleton (if this message occurs again, it is a problem)"); // TODO threading issue?
     }
     
     public static ViskitGlobals instance()
@@ -690,7 +690,7 @@ public class ViskitGlobals
         }
         else 
         {
-            LOG.info("initializeProjectHome() found a previously existing project.  Now createProjectWorkingDirectory()..."); // debug
+            LOG.info("initializeProjectHome() found a previously existing project."); // Now createProjectWorkingDirectory()..."); // debug
             createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
         }
     }
@@ -1050,9 +1050,11 @@ public class ViskitGlobals
             if (viskitApplicationClassLoader == null) // workingClassLoader should only get created once
             {
                 URL[] urls = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
-                viskit.doe.LocalBootLoader localBootLoader = new LocalBootLoader(urls,
+                viskit.doe.LocalBootLoader localBootLoader = new LocalBootLoader(
+                        urls,
                         Thread.currentThread().getContextClassLoader(),
-                        getProjectWorkingDirectory());
+                        getProjectWorkingDirectory(),
+                        "ViskitApplicationBootLoader");
 
                 // Allow Assembly files in the ClassLoader
                 viskitApplicationClassLoader = localBootLoader.initialize(true);

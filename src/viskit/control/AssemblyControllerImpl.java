@@ -1794,7 +1794,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                          consoleName += " for Assembly " + assemblyName;
                     (ViskitGlobals.instance().getAssemblyViewFrame()).setTitle(assemblyName);
                     ViskitGlobals.instance().getSimulationRunPanel().setTitle(consoleName);
-                    ViskitGlobals.instance().getMainFrame().getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, "Simulation Run for " + assemblyName);
+                    ViskitGlobals.instance().getMainFrame().getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, 
+                            assemblyName); // "Simulation Run for " + 
                     
                     // Initializes a fresh class loader
                     runner.exec(execStrings);

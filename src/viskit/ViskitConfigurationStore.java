@@ -149,7 +149,7 @@ public class ViskitConfigurationStore
         if (!initalized)
             initialize(); // this should only occur once
         // TODO does LOG message interfere with threading?
-        LOG.info("created singleton (if this message again, it is a problem)");        
+        LOG.info("created singleton (if this message occurs aagain, it is a problem)");        
     }
     
     public final static void initialize()

@@ -101,12 +101,14 @@ public class LocalBootLoader extends URLClassLoader {
      * @param classesUrlArray external classpath urls
      * @param parentClassLoader the parent Classloader to this one
      * @param workingDirectory the current project working directory
+     * @param localBootLoaderName a descriptive nmae
      */
-    public LocalBootLoader(URL[] classesUrlArray, ClassLoader parentClassLoader, File workingDirectory) {
-        super(new URL[] {}, parentClassLoader);
-        externalUrlArray = classesUrlArray;
+    public LocalBootLoader(URL[] classesUrlArray, ClassLoader parentClassLoader, File workingDirectory, String localBootLoaderName) {
+        super(localBootLoaderName, new URL[] {}, parentClassLoader);
+        externalUrlArray      = classesUrlArray;
         this.workingDirectory = workingDirectory;
         LOG.debug(ViskitGlobals.instance().printCallerLog());
+//        LOG.info("localBootLoaderName=" + localBootLoaderName + ", actual name=" + getName());
     }
 
     /** Create a context with viskit's libs along with the generated
@@ -268,7 +270,7 @@ public class LocalBootLoader extends URLClassLoader {
         this.reloadSimkit = reload;
     }
 
-    /** Creates new instances of the localBootLoader LocalBootLoader */
+    /** Creates new instances of the LocalBootLoader */
     private void initializeStage1() {
 
         String classPathProp = System.getProperty("java.class.path");
@@ -303,7 +305,9 @@ public class LocalBootLoader extends URLClassLoader {
 
         ClassLoader parentClassLoader = getParent();
 
-        localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkingDirectory());
+        String currentName = getName(); // "initialize";
+        localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkingDirectory(), 
+                currentName);
         boolean loop = !allowAssembly;
 
         // if each LocalBootLoader individually has to read from
@@ -313,14 +317,19 @@ public class LocalBootLoader extends URLClassLoader {
         // another. See sample case StaticsTest
         while (loop) {
             try {
-                if (reloadSimkit) {
+                if (reloadSimkit)
+                {
                     localBootLoader.loadClass(ViskitStatics.RANDOM_VARIATE_CLASS);
-                } else {
+                    currentName = getName(); // "RANDOM_VARIATE_CLASS";
+                } 
+                else {
                     localBootLoader.loadClass(ViskitStatics.LOCAL_BOOT_LOADER);
+                    currentName = getName(); // "RANDOM_VARIATE_CLASS";
                 }
                 //LOG.info("still found existing viskit context, going up one more...");
                 parentClassLoader = parentClassLoader.getParent();
-                localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkingDirectory());
+                localBootLoader = new LocalBootLoader(new URL[] {}, parentClassLoader, getWorkingDirectory(), 
+                        currentName);
             } catch (ClassNotFoundException e) {
                 loop = false;
             }
