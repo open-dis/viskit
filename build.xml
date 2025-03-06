@@ -972,17 +972,21 @@ their descpritions.
         <!-- TODO implementation-independent approach if possible, but note that other Ant approaches usually have to be customized for each OS. -->
     </target>
 
+    <property name="gitlab.nps.edu.MV3302.lib" value="https://gitlab.nps.edu/abuss/MV3302ClassCode/-/tree/master/lib/Simkit"/>
+
     <target name="update.simkit.jar.from.gitlab" description="Update local opendis7 .jar files in project lib directory">
         <echo message="Update local simkit .jar files in project lib directory using"/>
-        <echo message="TODO not yet updating correctly..."/>
+        <echo message="TODO not yet updating correctly... having trouble with gitlab signin username/password"/>
         <echo message="  ${gitlab.nps.edu.MV3302.lib}"/>
         <nbbrowse url=  "${gitlab.nps.edu.MV3302.lib}"/>
         <get src="https://gitlab.nps.edu/abuss/mv3302classcode/-/raw/main/MV3302ClassCode/lib/Simkit/simkit.jar"
              dest="lib" verbose="true" usetimestamp="true"/>
+        <!--
         <get src="https://gitlab.nps.edu/abuss/mv3302classcode/-/raw/main/MV3302ClassCode/lib/Simkit/simkit-src.zip"
              dest="lib" verbose="true" usetimestamp="true"/>
         <get src="https://gitlab.nps.edu/abuss/mv3302classcode/-/raw/main/MV3302ClassCode/lib/Simkit/simkit-doc.zip"
              dest="lib" verbose="true" usetimestamp="true"/>
+        -->
     </target>
 
 </project>
