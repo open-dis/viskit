@@ -13,7 +13,7 @@ public class LegosEventGraphsPanel extends ViskitJarClassTreePanel
 {
   public LegosEventGraphsPanel(LegoTree legoTree) 
   {
-    super(legoTree,"Event Graph addition",
+    super(legoTree,"Event Graph availability",
                    "Select-drag-drop an Event Graph from tree list onto the canvas",
                        "Add another Event Graph class file, XML file or directory root to this list",
                        "Remove selected Event Graph class file, XML file or directory from this list");

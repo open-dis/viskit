@@ -13,7 +13,7 @@ public class PropertyChangeListenersPanel extends ViskitJarClassTreePanel
 {
   public PropertyChangeListenersPanel(LegoTree legoTree)
   {
-    super(legoTree,"Property Change Listener addition", 
+    super(legoTree,"Property Change Listener availability", 
                    "Select-drag-drop a Property Change Listener from tree list onto the canvas",
             "Add another Property Change Listener class to this list",
             "Remove selected Property Change Listener class from this list");
