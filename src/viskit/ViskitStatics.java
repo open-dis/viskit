@@ -879,5 +879,29 @@ public class ViskitStatics
 ////                "Singleton safety check error", message);
 //        }
 //    }
+    
+    /** Check whether file and contents exist, ready for further work, copied from ViskitGlobals to avoid threading/singleton issues
+     * @param file to check
+     * @return whether ready
+     */
+    public static boolean isFileReady (File file) // todo move to statics?
+    {
+        if (file == null)
+        {
+            LOG.error("isFileReady() file reference is null");
+            return false;
+        }
+        else if (!file.exists())
+        {
+            LOG.error("isFileReady() file does not exist:\n   " + file.getAbsolutePath());
+            return false;
+        }
+        else if (file.length() == 0)
+        {
+            LOG.error("isFileReady() file is empty:\n   " + file.getAbsolutePath());
+            return false;
+        }
+        return true;
+    }
 
 } // end class ViskitStatics

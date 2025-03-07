@@ -72,7 +72,7 @@ import simkit.stat.SimpleStatsTally;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitConfigurationStore;
-import viskit.doe.LocalBootLoader;
+// import static viskit.ViskitGlobals.isFileReady; // while in thread, do not invoke ViskitStatics!
 import viskit.model.AnalystReportModel;
 
 import viskit.model.AssemblyNode;
@@ -81,7 +81,9 @@ import viskit.reports.ReportStatisticsConfiguration;
 import viskit.view.SimulationRunPanel;
 
 /**
- * Base class for creating Simkit scenarios.
+ * Abstract base class for running assembly simulations, invoked in a thread by InternalAssemblyRunner.
+ * The corresponding concrete class is the newly compiled assembly being invoked to run simulation.
+ * Key characteristic: BasicAssembly is the only class running in a separate thread.
  * Modified to be BeanShellable and Viskit VCR aware - rmgoldbe, jmbailey
  *
  * @author ahbuss
@@ -126,12 +128,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     private List<String> entitiesWithStatisticsList;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
-    private static ClassLoader runSimulationClassLoader; // TODO move this out of ViskitGlobals due to thread-clobbering issues
-    private static ClassLoader workingClassLoader; // TODO move this out of ViskitGlobals due to thread-clobbering issues
     
-    /** must be saved prior to running in new thread */
-    private File  workingDirectory;
-    private URL[] classPathUrlArray = new URL[0]; // legal default, actual values are set externally
+    // unneeded?? TODO confirm
+    // private /*static*/ ClassLoader workingClassLoader;       // TODO moved this out of ViskitGlobals due to thread-clobbering issues
+    
 
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
@@ -861,40 +861,43 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
             try 
             {
-                if (getWorkingDirectory() == null)
-                {
-                    // this should only occur for analyst reports, following (and outside of) the simulation thread
-                    // TODO hacking wildly here...
-                    setWorkingDirectory(new File("./build/classes")); // no longer looking for project classes
-                    if (!getWorkingDirectory().exists())
-                    {
-                        LOG.error("run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
-                    }
-                  setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
-                }
+//////                if (getWorkingDirectory() == null)
+//////                {
+//////                    // this should only occur for analyst reports, following (and outside of) the simulation thread
+//////                    // TODO hacking wildly here...
+//////                    setWorkingDirectory(new File("./build/classes")); // no longer looking for project classes
+//////                    if (!getWorkingDirectory().exists())
+//////                    {
+//////                        LOG.error("run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
+//////                    }
+//////                  setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
+//////                }
                 // Creates the temp file only when user required?? TODO check
-                initializeTemporaryAnalystReportFile();
+                createTemporaryAnalystReportFile();
                 LOG.info("Temporary analyst report at\n   " + analystReportFile.getAbsolutePath()); // debug
-                isFileReady(analystReportFile);
+                
+                // while in thread, do not invoke ViskitStatics!
+                // isFileReady(analystReportFile);
                 
                 if (false)  // debugging to replace reflection code
                 {
                 analystReportModel = new AnalystReportModel(reportStatisticsConfiguration.getReport(), pclNodeCache);
                 analystReportModel.writeToXMLFile(analystReportFile);
-                if (!isFileReady(analystReportFile))
-                {
-                    LOG.error("analystReportFile not ready");
-                }
-                }
                 
-                if (workingClassLoader == null)
-                {
-                    LOG.error("run() error preparing for Analyst Report recovery: (workingClassLoader == null)");
-                    return;
+                // while in thread, do not invoke ViskitStatics!
+//                if (!isFileReady(analystReportFile))
+//                {
+//                    LOG.error("analystReportFile not ready");
+//                }
                 }
                 // TODO this line provokes the restart of singletons ViskitGlobals and ViskitConfigurationStore if used,
                 // can we employ local reference?
-                Class<?> clazz = workingClassLoader.loadClass("viskit.model.AnalystReportModel");
+                Class<?> clazz = ViskitGlobals.instance().getViskitApplicationClassLoader().loadClass("viskit.model.AnalystReportModel");// was workingClassLoader
+                if (clazz == null) // being extra careful...
+                {
+                    LOG.error("run() error preparing for Analyst Report recovery: (clazz == null)");
+                    return;
+                }
                 
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
                 
@@ -917,14 +920,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * is used at the bottom of the run to write out the analyst report file. We report the path back to the caller
      * immediately, and it is the caller's responsibility to dispose of the file once they are done with it.
      */
-    private void initializeTemporaryAnalystReportFile() 
+    private void createTemporaryAnalystReportFile()
     {
         try {
             analystReportFile = TempFileManager.createTempFile("ViskitAnalystReport", ".xml");
         } 
         catch (IOException ioe) {
             analystReportFile = null;
-            LOG.error("initializeAnalystReportFile() exception: " + ioe);
+            LOG.error("createTemporaryAnalystReportFile() exception: " + ioe);
         }
     }
 
@@ -945,112 +948,5 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * createObject() at run time.
      */
     protected void printInfo() {}
-
-    /** 
-     * The RunSimulationClassLoader is specific to Assembly running in that it is
-     * pristine from the ViskitApplicationClassLoader in use for normal Viskit operations.
-     * TODO out of place? Warning: note that this method also resets ContextClassLoader for the current thread.
-     * @see ViskitGlobals.getWorkingClassLoader()
-     * @return a pristine class loader for Assembly runs
-     */
-    public ClassLoader getRunSimulationClassLoader() // formerly "Fresh" boot loader
-    {
-        try
-        {
-            if (runSimulationClassLoader == null)
-            {
-                /* Not sure if this breaks the "RunSimulation" classloader for assembly
-                running, but in post JDK8 land, the Java Platform Module System
-                (JPMS) rules and as such we need to retain certain modules, i.e.
-                java.sql. With retaining the boot class loader, not sure if that
-                causes sibling classloader static variables to be retained. In
-                any case we must retain the original bootloader as it has
-                references to the loaded module system.
-                 */
-                LocalBootLoader localBootLoader = new LocalBootLoader(classPathUrlArray, 
-                    // the parent of the platform loader should be the internal boot loader
-                    ClassLoader.getPlatformClassLoader(), 
-                    workingDirectory, // do not use singleton referencing by ViskitGlobals here!
-                    "RunSimulationClassLoader"); 
-                // Allow Assembly files in the ClassLoader
-                runSimulationClassLoader = localBootLoader.initialize(true);
-                // Set a RunSimulation ClassLoader for this thread to be free of any static
-                // state set from the Viskit WorkingClassLoader
-                Thread.currentThread().setContextClassLoader(runSimulationClassLoader); // TODO out of place? 
-                // TODO threading and singleton issues while inside ViskitGlobals?
-                LOG.info("getRunSimulationClassLoader() currentThread contextClassLoader=" + runSimulationClassLoader.getName() +
-                         " and created new ClassLoader for\n   " + getWorkingDirectory().getAbsolutePath());
-            }
-        }
-        catch (Exception e)
-        {
-            LOG.error("getRunSimulationClassLoader() exception, returning null: " + e);
-        }
-        if (runSimulationClassLoader == null)
-        {
-            LOG.error("getRunSimulationClassLoader() ran without exception but returned null");
-        }
-        return runSimulationClassLoader;
-    }
-
-    public void resetRunSimulationClassLoader() {
-        runSimulationClassLoader = null;
-        LOG.info("resetRunSimulationClassLoader() complete"); // TODO threading issue?
-    }
-
-    /**
-     * @return the workingDirectory
-     */
-    private File getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    /**
-     * @param workingDirectory the workingDirectory to set
-     */
-    public void setWorkingDirectory(File workingDirectory) {
-        this.workingDirectory = workingDirectory;
-        if (!workingDirectory.exists())
-        {
-            LOG.error("setWorkingDirectory() does not exist: " + workingDirectory.getAbsolutePath());
-        }
-    }
-
-    /**
-     * @return the classPathUrlArray
-     */
-    private URL[] getClassPathUrlArray() {
-        return classPathUrlArray;
-    }
-
-    /**
-     * @param classPathUrlArray the classPathUrlArray to set
-     */
-    public void setClassPathUrlArray(URL[] classPathUrlArray) {
-        this.classPathUrlArray = classPathUrlArray;
-    }
-    /** Check whether file and contents exist, ready for further work, copied from ViskitGlobals to avoid threading/singleton issues
-     * @param file to check
-     * @return whether ready
-     */
-    public static boolean isFileReady (File file)
-    {
-        if (file == null)
-        {
-            LOG.error("isFileReady() file reference is null");
-            return false;
-        }
-        else if (!file.exists())
-        {
-            LOG.error("isFileReady() file does not exist:\n   " + file.getAbsolutePath());
-            return false;
-        }
-        else if (file.length() == 0)
-        {
-            LOG.error("isFileReady() file is empty:\n   " + file.getAbsolutePath());
-            return false;
-        }
-        return true;
-    }
 
 } // end class file BasicAssembly.java

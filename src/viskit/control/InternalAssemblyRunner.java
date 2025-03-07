@@ -49,6 +49,7 @@ import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.Map;
 import javax.swing.*;
 
@@ -60,12 +61,14 @@ import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.assembly.BasicAssembly;
+import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
 import static viskit.view.SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
 import viskit.view.dialog.ViskitUserPreferences;
 
-/** Controller for the Assembly Run panel
+/** Controller for the Assembly RunSimulation panel, which
+ * spawns the BasicAssembly thread
  *
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
@@ -100,7 +103,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     private static int mutex = 0;
     
     private final ClassLoader lastWorkingClassLoaderNoReset;
-    private       ClassLoader lastRunSimulationClassLoader;
+    private       ClassLoader priorRunSimulationClassLoader;
+    
+    private /*static*/ ClassLoader runSimulationClassLoader; // TODO moved this out of ViskitGlobals due to thread-clobbering issues,
+    
+    private URL[] classPathUrlArray = new URL[0]; // legal default, actual values are set externally
+    
+    /** must be saved prior to running in new thread */
+    private File  workingDirectory;
 
     /** Captures the original RNG seed state */
     private long[] seeds;
@@ -198,8 +208,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         // must occur prior to threading and new RunSimulationClassLoader
         basicAssembly = (BasicAssembly) simulationRunAssemblyInstance;
 
-        basicAssembly.setWorkingDirectory (ViskitGlobals.instance().getProjectWorkingDirectory());     
-        basicAssembly.setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
+        setWorkingDirectory (ViskitGlobals.instance().getProjectWorkingDirectory());     
+        setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
 
         Method getNumberReplicationsMethod = simulationRunAssemblyClass.getMethod("getNumberReplications");
         Method isSaveReplicationData = simulationRunAssemblyClass.getMethod("isSaveReplicationData"); // TODO hook this up
@@ -224,24 +234,26 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     viskit.assembly.TextAreaOutputStream textAreaOutputStream;
     Runnable assemblyRunnable;
 
-    protected void prepareAssemblySimulationRun() 
+    protected void prepareAssemblySimulationRun() // formerly initRun
     {
         // Prevent multiple pushes of the sim run button
         mutex++;
         if (mutex > 1)
             return;
 
-        try // prepareAssemblySimulationRun
+        try // prepareAssemblySimulationRun()
         {
             // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
             // must occur prior to threading and new RunSimulationClassLoader
 ////            basicAssembly.resetRunSimulationClassLoader(); // TODO wrong place for this, likely out of place
-            basicAssembly.setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
-            basicAssembly.setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
-            lastRunSimulationClassLoader = basicAssembly.getRunSimulationClassLoader(); // TODO reset?
+            setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
+            setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
+            
+            // originally VGlobals().instance().getFreshClassLoader(), then moved into this class
+            priorRunSimulationClassLoader = getRunSimulationClassLoader(); 
             
             // Now we are in the pure classloader realm where each basicAssembly run can be independent of any other
-            simulationRunAssemblyClass    = lastRunSimulationClassLoader.loadClass(simulationRunAssemblyClass.getName());
+            simulationRunAssemblyClass    = priorRunSimulationClassLoader.loadClass(simulationRunAssemblyClass.getName());
             // TODO the BasicAssembly instantiation and constuctor is now causing the singleton failure
             simulationRunAssemblyInstance = simulationRunAssemblyClass.getDeclaredConstructor().newInstance();
 
@@ -267,14 +279,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             // enabled nor visible
             if (simulationRunPanel.resetSeedStateCB.isSelected()) 
             {
-                Class<?> rVFactClass = lastRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
+                Class<?> rVFactClass = priorRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
                 Method getDefaultRandomNumberMethod = rVFactClass.getMethod("getDefaultRandomNumber");
                 Object rn = getDefaultRandomNumberMethod.invoke(null);
 
                 Method getSeedsMethod = rn.getClass().getMethod("getSeeds");
                 seeds = (long[]) getSeedsMethod.invoke(rn);
 
-                Class<?> rNClass = lastRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
+                Class<?> rNClass = priorRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
                 Method setSeedsMethod = rNClass.getMethod("setSeeds", long[].class);
                 setSeedsMethod.invoke(rn, seeds);
 
@@ -312,8 +324,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             if  (lastWorkingClassLoaderNoReset != null)
             {
                 Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset);
-                LOG.info("prepareAssemblySimulationRun() complete, currentThread contextClassLoader="+ 
-                          lastWorkingClassLoaderNoReset.getName());
+                LOG.info("prepareAssemblySimulationRun() complete, currentThread contextClassLoader='"+ 
+                          lastWorkingClassLoaderNoReset.getName() + "'");
             }
             else LOG.error("prepareAssemblySimulationRun() complete, but lastWorkingClassLoaderNoReset is null");
         }
@@ -395,13 +407,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener
      * @return the replication instance to output verbose on
      */
     public int getVerboseReplicationNumber() {
-        int ret = -1;
+        int replicationNumber = -1;
         try {
-            ret = Integer.parseInt(simulationRunPanel.verboseReplicationNumberTF.getText().trim());
+            replicationNumber = Integer.parseInt(simulationRunPanel.verboseReplicationNumberTF.getText().trim());
         } catch (NumberFormatException ex) {
-          //  ;
+          LOG.error("getVerboseReplicationNumber() exception: " + ex.getMessage());
         }
-        return ret;
+        return replicationNumber;
     }
 
     class StartResumeListener implements ActionListener {
@@ -424,8 +436,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             {
                 if (simulationRunAssemblyInstance != null) {
 
-                    Thread.currentThread().setContextClassLoader(lastRunSimulationClassLoader);
-                    LOG.info("StepListener actionPerformed() currentThread contextClassLoader=" + lastRunSimulationClassLoader.getName());
+                    Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
+                    LOG.info("StepListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
 
                     Method setStepRunMethod = simulationRunAssemblyClass.getMethod("setStepRun", boolean.class);
                     setStepRunMethod.invoke(simulationRunAssemblyInstance, true);
@@ -473,8 +485,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             {
                 if (simulationRunAssemblyInstance != null) {
 
-                    Thread.currentThread().setContextClassLoader(lastRunSimulationClassLoader);
-                    LOG.info("StopListener actionPerformed() currentThread contextClassLoader=" + lastRunSimulationClassLoader.getName());
+                    Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
+                    LOG.info("StopListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
 
                     Method setStopRunMethod = simulationRunAssemblyClass.getMethod("setStopRun", boolean.class);
                     setStopRunMethod.invoke(simulationRunAssemblyInstance, true);
@@ -831,6 +843,90 @@ public class InternalAssemblyRunner implements PropertyChangeListener
      */
     public JMenu getSimulationRunMenu() {
         return simulationRunMenu;
+    }
+
+    /** 
+     * The RunSimulationClassLoader is specific to Assembly running in that it is
+     * pristine from the ViskitApplicationClassLoader in use for normal Viskit operations.
+     * TODO out of place? Warning: note that this method also resets ContextClassLoader for the current thread.
+     * @see ViskitGlobals.getWorkingClassLoader()
+     * @return a pristine class loader for Assembly runs
+     */
+    public ClassLoader getRunSimulationClassLoader() // formerly "Fresh" boot loader
+    {
+        try
+        {
+            if (runSimulationClassLoader == null)
+            {
+                /* Not sure if this breaks the "RunSimulation" classloader for assembly
+                running, but in post JDK8 land, the Java Platform Module System
+                (JPMS) rules and as such we need to retain certain modules, i.e.
+                java.sql. With retaining the boot class loader, not sure if that
+                causes sibling classloader static variables to be retained. In
+                any case we must retain the original bootloader as it has
+                references to the loaded module system.
+                 */
+                LocalBootLoader localBootLoader = new LocalBootLoader(classPathUrlArray, 
+                    // the parent of the platform loader should be the internal boot loader
+                    ClassLoader.getPlatformClassLoader(), 
+                    workingDirectory, // do not use singleton referencing by ViskitGlobals here!
+                    "RunSimulationClassLoader"); 
+                // Allow Assembly files in the ClassLoader
+                runSimulationClassLoader = localBootLoader.initialize(true);
+                // Set a RunSimulation ClassLoader for this thread to be free of any static
+                // state set from the Viskit WorkingClassLoader
+                Thread.currentThread().setContextClassLoader(runSimulationClassLoader); // TODO out of place? 
+                // TODO threading and singleton issues while inside ViskitGlobals?
+                LOG.info("getRunSimulationClassLoader() currentThread contextClassLoader=" + runSimulationClassLoader.getName() +
+                         " and created new ClassLoader for\n   " + getWorkingDirectory().getAbsolutePath());
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.error("getRunSimulationClassLoader() exception, returning null: " + e);
+        }
+        if (runSimulationClassLoader == null)
+        {
+            LOG.error("getRunSimulationClassLoader() ran without exception but returned null");
+        }
+        return runSimulationClassLoader;
+    }
+    
+    public void resetRunSimulationClassLoader() {
+        runSimulationClassLoader = null;
+        LOG.info("resetRunSimulationClassLoader() complete"); // TODO threading issue?
+    }
+
+    /**
+     * @return the classPathUrlArray
+     */
+    private URL[] getClassPathUrlArray() {
+        return classPathUrlArray;
+    }
+
+    /**
+     * @param classPathUrlArray the classPathUrlArray to set
+     */
+    public void setClassPathUrlArray(URL[] classPathUrlArray) {
+        this.classPathUrlArray = classPathUrlArray;
+    }
+
+    /**
+     * @return the workingDirectory
+     */
+    private File getWorkingDirectory() {
+        return workingDirectory;
+    }
+
+    /**
+     * @param workingDirectory the workingDirectory to set
+     */
+    public void setWorkingDirectory(File workingDirectory) {
+        this.workingDirectory = workingDirectory;
+        if (!workingDirectory.exists())
+        {
+            LOG.error("setWorkingDirectory() does not exist: " + workingDirectory.getAbsolutePath());
+        }
     }
 
 }  // end class file InternalAssemblyRunner.java
