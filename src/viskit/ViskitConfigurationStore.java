@@ -164,14 +164,14 @@ public class ViskitConfigurationStore
                  LOG.info("Created dir: {}", VISKIT_CONFIGURATION_DIR);
             }
 
-            File cAppSrc = new File("configuration/" + C_APP_FILE.getName());
+            File c_appXmlSourceFile = new File("configuration/" + C_APP_FILE.getName());
             if (!C_APP_FILE.exists())
-                Files.copy(cAppSrc.toPath(), C_APP_FILE.toPath());
-
-            File cGuiSrc = new File("configuration/" + C_GUI_FILE.getName());
-            if (!C_GUI_FILE.exists())
-                Files.copy(cGuiSrc.toPath(), C_GUI_FILE.toPath());
+                Files.copy(c_appXmlSourceFile.toPath(), C_APP_FILE.toPath());
             isFileReady(C_APP_FILE);
+
+            File c_guiXmlSourceFile = new File("configuration/" + C_GUI_FILE.getName());
+            if (!C_GUI_FILE.exists())
+                Files.copy(c_guiXmlSourceFile.toPath(), C_GUI_FILE.toPath());
             isFileReady(C_GUI_FILE);
             LOG.info("VISKIT_CONFIGURATION_DIR=" + VISKIT_CONFIGURATION_DIR.getAbsolutePath() + " contains\n   " +
                      C_APP_FILE.getAbsolutePath() + " and " + C_GUI_FILE.getAbsolutePath());
