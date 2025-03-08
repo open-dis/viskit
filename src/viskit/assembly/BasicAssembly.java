@@ -133,25 +133,43 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     /** save local copies of these objects during setup, in order to avoid 
      * run-time queries while in a separate threaded context that clobbers
      * the singleton classes */
-    
     /** must be saved prior to running in new thread */
-    private static File          workingDirectory;
-    private static ClassLoader   localWorkingClassLoader;
-    private static ViskitProject localViskitProject;
-    private static ReportStatisticsConfiguration reportStatisticsConfiguration; // depends on ViskitProject
+    // stackoverflow
+    public File           workingDirectory;
+    private ClassLoader   localWorkingClassLoader;
+    private ViskitProject localViskitProject;
+    private ReportStatisticsConfiguration reportStatisticsConfiguration; // depends on ViskitProject
     
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
 
     /**
+     * Experimental: Constructor passes parameters to BasicAssembly when invoked as Runnable.
+     * Also uses default constructor to set parameters to their
+     * default values.
+     * @param workingDirectory
+     */
+    public BasicAssembly(File workingDirectory) 
+    {
+        this(); // invoke default constructor
+        // receiving parameters for use as Runnable
+        this.workingDirectory = workingDirectory;
+        
+
+        // TODO superfluous?  actual file will be timestamped, actual directory already exists
+//        analystReportFile = new File(ViskitGlobals.instance().getProjectRootDirectoryPath() +
+//                                     "/AnalystReports/", "AnalystReport.xml");
+//        LOG.info("BasicAssembly() constructor created new analystReportFile\n   " + analystReportFile.getAbsolutePath());
+    }
+    /**
      * Default constructor sets parameters of BasicAssembly to their
-     * default values.These are:<pre>
+     * default values.These are:
+     * <pre>
      * printReplicationReports = true
      * printSummaryReport = true
      * saveReplicationData = false
      * numberReplications = 1
      * </pre>
-     * @param viskitProject
      */
     public BasicAssembly() 
     {
@@ -166,11 +184,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         propertyChangeListenerArray = new PropertyChangeListener[0];
         setNumberReplications(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
         hookupsCalled = false;
-
-        // TODO superfluous?  actual file will be timestamped, actual directory already exists
-//        analystReportFile = new File(ViskitGlobals.instance().getProjectRootDirectoryPath() +
-//                                     "/AnalystReports/", "AnalystReport.xml");
-//        LOG.info("BasicAssembly() constructor created new analystReportFile\n   " + analystReportFile.getAbsolutePath());
     }
 
     /**
@@ -642,9 +655,32 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     // TODO: Simkit not generisized yet
     @SuppressWarnings("unchecked")
     @Override
-    public void run() 
+    public void run() // we are now in the thread
     {
         stopSimulationRun = false;
+        
+        if (getWorkingDirectory() == null)
+        {
+            // this should only occur inside the simulation thread
+            // TODO hacking wildly here...
+//            File findingClassesDirectory = new File("./build/classes"); // hoping to find we are in project...
+//            LOG.info("Experimental: findingClassesDirectory=\n   " + findingClassesDirectory.getAbsolutePath());
+//            setWorkingDirectory(findingClassesDirectory); // no good, we are not in project directory, darn
+
+            // reaching into globals even though it breaks singleton pattern, ouch.
+            // netbeans inspection is misleading when looking at ViskitGlobals while inside the thread
+            setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
+            if (getWorkingDirectory() == null)
+            {
+                LOG.error("BLOCKER: run() getWorkingDirectory() is null");
+            }
+            else if (!getWorkingDirectory().exists())
+            {
+                LOG.error("BLOCKER: run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
+            }
+            // BLOCKER TODO: how to find working directory while inside thread?
+        }
+                
         if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
             LOG.error("Assemby already running.");
         }
@@ -872,17 +908,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
             try 
             {
-//////                if (getWorkingDirectory() == null)
-//////                {
-//////                    // this should only occur for analyst reports, following (and outside of) the simulation thread
-//////                    // TODO hacking wildly here...
-//////                    setWorkingDirectory(new File("./build/classes")); // no longer looking for project classes
-//////                    if (!getWorkingDirectory().exists())
-//////                    {
-//////                        LOG.error("run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
-//////                    }
-//////                  setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
-//////                }
+                
                 // Creates the temp file only when user required?? TODO check
                 createTemporaryAnalystReportFile();
                 LOG.info("Temporary analyst report at\n   " + analystReportFile.getAbsolutePath()); // debug
@@ -1001,7 +1027,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      */
     public void setWorkingDirectory(File workingDirectory) {
         this.workingDirectory = workingDirectory;
-        if (!workingDirectory.exists())
+        if (workingDirectory == null)
+        {
+            LOG.error("setWorkingDirectory() received null value ");
+        }
+        else if (!workingDirectory.exists())
         {
             LOG.error("setWorkingDirectory() does not exist: " + workingDirectory.getAbsolutePath());
         }

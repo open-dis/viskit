@@ -2,6 +2,7 @@ package viskit.assembly;
 
 import edu.nps.util.GenericConversion;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,8 +33,20 @@ public class ViskitAssembly extends BasicAssembly
     protected Map<String, Adapter>                 adapterMap;
     private static final boolean DEBUG = false; // TODO: tie to ViskitStatics.debug?
 
-    /** Creates a new instance of ViskitAssembly */
-    public ViskitAssembly() {
+    /** Experimental: creates a new instance of ViskitAssembly with parameters set by Runnable invocation
+     * @param workingDirectory TODO 
+     */
+    public ViskitAssembly(File workingDirectory)
+    {
+        super(workingDirectory);
+        
+//      this(); // invoke default constructor; not needed or allowed
+    }
+
+    /** Creates a new instance of ViskitAssembly
+     */
+    public ViskitAssembly()
+    {        
         simEntitiesMap = new LinkedHashMap<>();
         replicationStatisticsMap = new LinkedHashMap<>();
         designPointStatisticsMap = new LinkedHashMap<>();

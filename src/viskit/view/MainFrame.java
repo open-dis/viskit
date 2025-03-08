@@ -650,7 +650,7 @@ public class MainFrame extends JFrame
                 getSimulationRunTabbedPane().setSelectedIndex(TAB1_LOCALRUN_INDEX);
 
                 // initializes a RunSimulation class loader
-                internalSimulationRunner.preInitRun(execStrings);
+                internalSimulationRunner.preRunInitialization(execStrings);
             }
         }
 

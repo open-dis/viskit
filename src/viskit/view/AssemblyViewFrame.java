@@ -506,6 +506,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
+        openRecentProjectMenu.setMnemonic('O');
+        openRecentProjectMenu.setEnabled(false); // inactive until needed, reset by listener
         
         assemblyMenu.add(buildMenuItem(this, "closeProject", "Close Project", KeyEvent.VK_C,
                 null));
@@ -587,6 +589,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         projectMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_O,
                 null));
         projectMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
+        openRecentProjectMenu.setMnemonic('O');
+        openRecentProjectMenu.setEnabled(false); // inactive until needed, reset by listener
 
         // The AssemblyViewFrame will get this listener for its menu item of the same name
         recentProjectFileSetListener = new RecentProjectFileSetListener();
@@ -600,7 +604,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 null));
 
         projectMenu.addSeparator();
-        projectMenu.add(buildMenuItem(assemblyController, "showViskitUserPreferences", "Viskit Preferences", null, null));
+        projectMenu.add(buildMenuItem(assemblyController, "showViskitUserPreferences", "Viskit Preferences", KeyEvent.VK_V, null));
 
         projectMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Quit", KeyEvent.VK_Q,
                 null));
