@@ -49,6 +49,8 @@ import viskit.doe.FileHandler;
 public class ReportStatisticsConfiguration {
 
     static final Logger LOG = Log4jUtilities.getLogger(ReportStatisticsConfiguration.class);
+    
+    static ViskitProject localViskitProject; // avoid ViskitGlobals while in separate thread context
 
     /**
      * The ordered list of Entities in the simulation that have property change
@@ -84,9 +86,12 @@ public class ReportStatisticsConfiguration {
 
     /** Creates a new instance of ReportStatisticsConfig
      * @param assemblyName name of assembly
+     * @param viskitProject must pass in viskitProject since ViskitGlobals not usable while in separate thread context
      */
-    public ReportStatisticsConfiguration(String assemblyName) {
-        this.assemblyName = assemblyName;
+    public ReportStatisticsConfiguration(String assemblyName, ViskitProject viskitProject) 
+    {
+        this.assemblyName  = assemblyName;
+        localViskitProject = viskitProject;
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
         dfs.setInfinity("inf");  // xml chokes on default
         df1 = new DecimalFormat("0.", dfs);
@@ -228,7 +233,8 @@ public class ReportStatisticsConfiguration {
      * @param reportDocument a data report to save
      * @return the String representation of this report
      */
-    public String saveData(Document reportDocument) {
+    public String saveData(Document reportDocument) 
+    {
         SimpleDateFormat formatter;
         String dateFormat;
 
@@ -237,11 +243,10 @@ public class ReportStatisticsConfiguration {
         dateFormat = formatter.format(today);
 
         // Create a unique file name for each DTG/Location Pair
-        ViskitProject viskitProject = ViskitGlobals.instance().getViskitProject();
-        File analystReportStatisticsDirectory = viskitProject.getAnalystReportStatisticsDirectory();
+        File analystReportStatisticsDirectory = localViskitProject.getAnalystReportStatisticsDirectory();
 
-        String outputFile = (author + assemblyName + "_" + dateFormat + ".xml");
-        File analystReportStatisticsDirectoryFile = new File(analystReportStatisticsDirectory, outputFile);
+        String statisticsOutputFileName = (author + assemblyName + "_" + dateFormat + ".xml");
+        File analystReportStatisticsDirectoryFile = new File(analystReportStatisticsDirectory, statisticsOutputFileName);
 
         try {
             FileHandler.marshallJdom(analystReportStatisticsDirectoryFile, reportDocument, false);

@@ -72,6 +72,7 @@ import simkit.stat.SimpleStatsTally;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitConfigurationStore;
+import viskit.ViskitProject;
 // import static viskit.ViskitGlobals.isFileReady; // while in thread, do not invoke ViskitStatics!
 import viskit.model.AnalystReportModel;
 
@@ -89,13 +90,13 @@ import viskit.view.SimulationRunPanel;
  * @author ahbuss
  * @version $Id$
  */
-public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
-
+public abstract class BasicAssembly extends BasicSimEntity implements Runnable 
+{
     static final Logger LOG = Log4jUtilities.getLogger(BasicAssembly.class);
     
     protected Map<Integer, List<SavedStats>> replicationDataSavedStatisticsList;
-    protected PropertyChangeListener[] replicationStatisticsPropertyChangeListenerArray;
-    protected SampleStatistics[] designPointSimpleStatisticsTally;
+    protected PropertyChangeListener[]       replicationStatisticsPropertyChangeListenerArray;
+    protected SampleStatistics[]             designPointSimpleStatisticsTally;
     protected SimEntity[] simEntity;
     protected PropertyChangeListener[] propertyChangeListenerArray;
     protected boolean hookupsCalled;
@@ -122,29 +123,35 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
     /** A checkbox is user enabled from the Analyst Report Panel */
     private boolean enableAnalystReports = true;
 
-    private final ReportStatisticsConfiguration reportStatisticsConfiguration;
     private int designPointID;
     private final DecimalFormat decimalFormat1, decimalFormat4;
     private List<String> entitiesWithStatisticsList;
     private PrintWriter printWriter;
     private int verboseReplicationNumber;
     
-    // unneeded?? TODO confirm
-    // private /*static*/ ClassLoader workingClassLoader;       // TODO moved this out of ViskitGlobals due to thread-clobbering issues
+    // private /*static*/ ClassLoader localWorkingClassLoader;       // TODO moved this out of ViskitGlobals due to thread-clobbering issues
+    /** save local copies of these objects during setup, in order to avoid 
+     * run-time queries while in a separate threaded context that clobbers
+     * the singleton classes */
     
-
+    /** must be saved prior to running in new thread */
+    private static File          workingDirectory;
+    private static ClassLoader   localWorkingClassLoader;
+    private static ViskitProject localViskitProject;
+    private static ReportStatisticsConfiguration reportStatisticsConfiguration; // depends on ViskitProject
+    
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
 
     /**
      * Default constructor sets parameters of BasicAssembly to their
-     * default values.  These are:
-     * <pre>
+     * default values.These are:<pre>
      * printReplicationReports = true
      * printSummaryReport = true
      * saveReplicationData = false
      * numberReplications = 1
      * </pre>
+     * @param viskitProject
      */
     public BasicAssembly() 
     {
@@ -164,9 +171,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //        analystReportFile = new File(ViskitGlobals.instance().getProjectRootDirectoryPath() +
 //                                     "/AnalystReports/", "AnalystReport.xml");
 //        LOG.info("BasicAssembly() constructor created new analystReportFile\n   " + analystReportFile.getAbsolutePath());
-        
-        // Creates a report statistics config object and names it based on the name of this Assembly.
-        reportStatisticsConfiguration = new ReportStatisticsConfiguration(this.getName());
     }
 
     /**
@@ -645,7 +649,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
             LOG.error("Assemby already running.");
         }
 
-        // Incase the user input bad parameters in the XML
+        // In case the user inputs bad parameters in the XML
         try {
             createObjects();
             performHookups();
@@ -676,6 +680,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 
         printInfo(); // subclasses may display what they wish at the top of the run.
 
+        if (reportStatisticsConfiguration == null) // time to initialize, using localViskitProject handed into thread
+        {
+            if (localViskitProject == null)
+                LOG.error("Incorrect initialization of BasicAssembly in thread context, localViskitProject is null");
+            // Creates a ReportStatisticsConfiguration instance and names it based on the name of this Assembly.
+            reportStatisticsConfiguration = new ReportStatisticsConfiguration(this.getName(), localViskitProject);
+        }
         // reset the document with existing parameters since it might have run before
         reportStatisticsConfiguration.reset();
         reportStatisticsConfiguration.setEntityIndex(entitiesWithStatisticsList);
@@ -879,9 +890,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 // while in thread, do not invoke ViskitStatics!
                 // isFileReady(analystReportFile);
                 
-                if (false)  // debugging to replace reflection code
-                {
                 analystReportModel = new AnalystReportModel(reportStatisticsConfiguration.getReport(), pclNodeCache);
+                
                 analystReportModel.writeToXMLFile(analystReportFile);
                 
                 // while in thread, do not invoke ViskitStatics!
@@ -889,15 +899,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
 //                {
 //                    LOG.error("analystReportFile not ready");
 //                }
-                }
                 // TODO this line provokes the restart of singletons ViskitGlobals and ViskitConfigurationStore if used,
-                // can we employ local reference?
-                Class<?> clazz = ViskitGlobals.instance().getViskitApplicationClassLoader().loadClass("viskit.model.AnalystReportModel");// was workingClassLoader
-                if (clazz == null) // being extra careful...
+                // can we employ local reference?  moved workingClassLoaderinitialization to InternalAssemblyRunner, outside the separate thread
+                // Class<?> clazz = ViskitGlobals.instance().getViskitApplicationClassLoader().loadClass("viskit.model.AnalystReportModel");// was localWorkingClassLoader
+                if (localWorkingClassLoader == null) // being extra careful to report an unexpected error condition...
                 {
                     LOG.error("run() error preparing for Analyst Report recovery: (clazz == null)");
                     return;
                 }
+                Class<?> clazz = localWorkingClassLoader.loadClass("viskit.model.AnalystReportModel");
                 
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
                 
@@ -906,7 +916,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
                 writeToXMLFileMethod.invoke(arbObject, analystReportFile);
             }
             catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException | NullPointerException ex) {
-                LOG.error("run() error during getWorkingClassLoader() and reflection checks: " + ex);
+                LOG.error("run() error during getWorkingClassLoader() and reflection checks: " + 
+                        ex);
             }
             catch (Exception ue)
             {
@@ -948,5 +959,52 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable {
      * createObject() at run time.
      */
     protected void printInfo() {}
+
+    /**
+     * @return the localWorkingClassLoader
+     */
+    public ClassLoader getWorkingClassLoader() {
+        return localWorkingClassLoader;
+    }
+
+    /**
+     * @param workingClassLoader the localWorkingClassLoader to set
+     */
+    public void setWorkingClassLoader(ClassLoader workingClassLoader) {
+        this.localWorkingClassLoader = workingClassLoader;
+    }
+
+    /**
+     * @return the localViskitProject
+     */
+    public final ViskitProject getViskitProject() {
+        return localViskitProject;
+    }
+
+    /**
+     * @param localViskitProject the localViskitProject to set
+     */
+    public void setViskitProject(ViskitProject localViskitProject)
+    {
+        this.localViskitProject = localViskitProject; // TODO does this value persist inside the thread context?
+    }
+
+    /**
+     * @return the workingDirectory
+     */
+    private File getWorkingDirectory() {
+        return workingDirectory;
+    }
+
+    /**
+     * @param workingDirectory the workingDirectory to set
+     */
+    public void setWorkingDirectory(File workingDirectory) {
+        this.workingDirectory = workingDirectory;
+        if (!workingDirectory.exists())
+        {
+            LOG.error("setWorkingDirectory() does not exist: " + workingDirectory.getAbsolutePath());
+        }
+    }
 
 } // end class file BasicAssembly.java

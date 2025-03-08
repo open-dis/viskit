@@ -65,6 +65,7 @@ import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
 import static viskit.view.SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
+import static viskit.view.SimulationRunPanel.VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT;
 import viskit.view.dialog.ViskitUserPreferences;
 
 /** Controller for the Assembly RunSimulation panel, which
@@ -102,19 +103,19 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     Object simulationRunAssemblyInstance;
     private static int mutex = 0;
     
-    private final ClassLoader lastWorkingClassLoaderNoReset;
-    private       ClassLoader priorRunSimulationClassLoader;
+    private final ClassLoader priorWorkingClassLoaderNoReset;
+    private       ClassLoader priorRunSimulationClassLoader;  // TODO needed?
     
     private /*static*/ ClassLoader runSimulationClassLoader; // TODO moved this out of ViskitGlobals due to thread-clobbering issues,
     
     private URL[] classPathUrlArray = new URL[0]; // legal default, actual values are set externally
-    
-    /** must be saved prior to running in new thread */
-    private File  workingDirectory;
 
     /** Captures the original RNG seed state */
-    private long[] seeds;
+    private long[] seedsArray;
     private final StopListener assemblySimulationRunStopListener;
+    
+    viskit.assembly.TextAreaOutputStream textAreaOutputStream;
+    Runnable assemblyRunnable;
     
     private AnalystReportModel analystReportModel;
     /**
@@ -142,7 +143,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         simulationRunPanel.vcrStepButton.setEnabled(false);
 
         // Save Viskit's current working ClassLoader for later restoration
-        lastWorkingClassLoaderNoReset = ViskitGlobals.instance().getViskitApplicationClassLoader();
+        priorWorkingClassLoaderNoReset = ViskitGlobals.instance().getViskitApplicationClassLoader();
 
         // Provide access to Enable Analyst Report checkbox
         ViskitGlobals.instance().setSimulationRunPanel(simulationRunPanel);
@@ -207,9 +208,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
         // must occur prior to threading and new RunSimulationClassLoader
         basicAssembly = (BasicAssembly) simulationRunAssemblyInstance;
+        basicAssembly.setWorkingClassLoader(priorWorkingClassLoaderNoReset);
 
-        setWorkingDirectory (ViskitGlobals.instance().getProjectWorkingDirectory());     
+        basicAssembly.setViskitProject(ViskitGlobals.instance().getViskitProject());
+
+        basicAssembly.setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory()); // TODO duplicate invocation?
         setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
+        // basicAssembly.getWorkingDirectory();
 
         Method getNumberReplicationsMethod = simulationRunAssemblyClass.getMethod("getNumberReplications");
         Method isSaveReplicationData = simulationRunAssemblyClass.getMethod("isSaveReplicationData"); // TODO hook this up
@@ -231,22 +236,20 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         setStopTimeMethod.invoke(simulationRunAssemblyInstance, stopTime);
         simulationRunPanel.vcrStopTimeTF.setText("" + getStopTimeMethod.invoke(simulationRunAssemblyInstance));
     }
-    viskit.assembly.TextAreaOutputStream textAreaOutputStream;
-    Runnable assemblyRunnable;
 
-    protected void prepareAssemblySimulationRun() // formerly initRun
+    protected void prepareAndStartAssemblySimulationRun() // formerly initRun
     {
         // Prevent multiple pushes of the sim run button
         mutex++;
         if (mutex > 1)
             return;
 
-        try // prepareAssemblySimulationRun()
+        try // prepareAndStartAssemblySimulationRun()
         {
             // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
             // must occur prior to threading and new RunSimulationClassLoader
 ////            basicAssembly.resetRunSimulationClassLoader(); // TODO wrong place for this, likely out of place
-            setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
+            basicAssembly.setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory()); // TODO duplicate invocation?
             setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
             
             // originally VGlobals().instance().getFreshClassLoader(), then moved into this class
@@ -254,7 +257,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             
             // Now we are in the pure classloader realm where each basicAssembly run can be independent of any other
             simulationRunAssemblyClass    = priorRunSimulationClassLoader.loadClass(simulationRunAssemblyClass.getName());
-            // TODO the BasicAssembly instantiation and constuctor is now causing the singleton failure
+
             simulationRunAssemblyInstance = simulationRunAssemblyClass.getDeclaredConstructor().newInstance();
 
             Method setOutputStreamMethod            = simulationRunAssemblyClass.getMethod("setOutputStream", OutputStream.class);
@@ -279,16 +282,16 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             // enabled nor visible
             if (simulationRunPanel.resetSeedStateCB.isSelected()) 
             {
-                Class<?> rVFactClass = priorRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
-                Method getDefaultRandomNumberMethod = rVFactClass.getMethod("getDefaultRandomNumber");
-                Object rn = getDefaultRandomNumberMethod.invoke(null);
+                Class<?> randomVariateFactoryClass  = priorRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
+                Method getDefaultRandomNumberMethod = randomVariateFactoryClass.getMethod("");
+                Object defaultRandomNumberMethod = getDefaultRandomNumberMethod.invoke(null);
 
-                Method getSeedsMethod = rn.getClass().getMethod("getSeeds");
-                seeds = (long[]) getSeedsMethod.invoke(rn);
+                Method getSeedsMethod = defaultRandomNumberMethod.getClass().getMethod("getSeeds");
+                seedsArray = (long[]) getSeedsMethod.invoke(defaultRandomNumberMethod);
 
-                Class<?> rNClass = priorRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
-                Method setSeedsMethod = rNClass.getMethod("setSeeds", long[].class);
-                setSeedsMethod.invoke(rn, seeds);
+                Class<?> randomNumberClass = priorRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
+                Method setSeedsMethod = randomNumberClass.getMethod("setSeeds", long[].class);
+                setSeedsMethod.invoke(defaultRandomNumberMethod, seedsArray);
 
                 // TODO: We can also call RNG.resetSeed() which recreates the
                 // seed state (array) from the original seed
@@ -304,7 +307,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
             setSaveReplicationDataMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.saveReplicationDataCB.isSelected());
             setEnableAnalystReports.invoke(simulationRunAssemblyInstance, simulationRunPanel.analystReportCB.isSelected());
-            /* End DIFF between OA3302 branch and trunk */
 
             // Allow panel values to override XML set values
             setStopTimeMethod.invoke(simulationRunAssemblyInstance, getStopTime());
@@ -320,14 +322,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             new SimulationRunMonitor(simulationRunThread).execute();
             // Simulation Run thread is now launched and will execute separately
 
-            // Restore thread context to Viskit's WorkingClassLoader prior to returning control
-            if  (lastWorkingClassLoaderNoReset != null)
+            // Restore current thread context to Viskit's WorkingClassLoader prior to returning control
+            if  (priorWorkingClassLoaderNoReset != null)
             {
-                Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset);
-                LOG.info("prepareAssemblySimulationRun() complete, currentThread contextClassLoader='"+ 
-                          lastWorkingClassLoaderNoReset.getName() + "'");
+                Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
+                LOG.info("prepareAndStartAssemblySimulationRun() complete,  restored currentThread contextClassLoader='"+ 
+                          priorWorkingClassLoaderNoReset.getName() + "'");
             }
-            else LOG.error("prepareAssemblySimulationRun() complete, but lastWorkingClassLoaderNoReset is null");
+            else LOG.error("prepareAssemblySimulationRun() complete, but priorWorkingClassLoaderNoReset is unexpectedly null");
         }
         catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | InstantiationException | ClassNotFoundException exception) 
         {
@@ -410,8 +412,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         int replicationNumber = -1;
         try {
             replicationNumber = Integer.parseInt(simulationRunPanel.verboseReplicationNumberTF.getText().trim());
-        } catch (NumberFormatException ex) {
-          LOG.error("getVerboseReplicationNumber() exception: " + ex.getMessage());
+        } 
+        catch (NumberFormatException ex) 
+        {
+            // don't report problem with default TF value
+            if (!ex.getMessage().contains(VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT))
+                LOG.error("getVerboseReplicationNumber() exception: " + ex.getMessage());
         }
         return replicationNumber;
     }
@@ -423,7 +429,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             simulationRunPanel.vcrStartTimeTF.setText("0.0");    // because no pausing
             vcrButtonPressDisplayUpdate(Event.START);
-            prepareAssemblySimulationRun();
+            prepareAndStartAssemblySimulationRun();
         }
     }
 
@@ -451,10 +457,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 Schedule.coldReset();
 
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-                if ((classLoader != null) && !classLoader.equals(lastWorkingClassLoaderNoReset))
+                if ((classLoader != null) && !classLoader.equals(priorWorkingClassLoaderNoReset))
                 {
-                    Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset);
-                    LOG.info("StepListener actionPerformed(), rejoin regular thread, currentThread contextClassLoader=" + lastWorkingClassLoaderNoReset.getName());
+                    Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
+                    LOG.info("StepListener actionPerformed(), rejoin regular thread, currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
                 } // rejoin regular thread
 
                 // TODO should prior thread be removed?
@@ -500,10 +506,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 Schedule.coldReset();
 
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-                if ((classLoader != null) && !classLoader.equals(lastWorkingClassLoaderNoReset))
+                if ((classLoader != null) && !classLoader.equals(priorWorkingClassLoaderNoReset))
                 {
-                    Thread.currentThread().setContextClassLoader(lastWorkingClassLoaderNoReset);
-                    LOG.info("StopListener actionPerformed(), rejoin regular thread, currentThread contextClassLoader=" + lastWorkingClassLoaderNoReset.getName());
+                    Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
+                    LOG.info("StopListener actionPerformed(), rejoin regular thread, currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
                 } // rejoin regular thread
 
             } 
@@ -869,16 +875,16 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 LocalBootLoader localBootLoader = new LocalBootLoader(classPathUrlArray, 
                     // the parent of the platform loader should be the internal boot loader
                     ClassLoader.getPlatformClassLoader(), 
-                    workingDirectory, // do not use singleton referencing by ViskitGlobals here!
+                    ViskitGlobals.instance().getProjectWorkingDirectory(), // workingDirectory, // do not use singleton ?? referencing by ViskitGlobals here!
                     "RunSimulationClassLoader"); 
                 // Allow Assembly files in the ClassLoader
                 runSimulationClassLoader = localBootLoader.initialize(true);
                 // Set a RunSimulation ClassLoader for this thread to be free of any static
                 // state set from the Viskit WorkingClassLoader
-                Thread.currentThread().setContextClassLoader(runSimulationClassLoader); // TODO out of place? 
-                // TODO threading and singleton issues while inside ViskitGlobals?
+                Thread.currentThread().setContextClassLoader(runSimulationClassLoader);
+                // TODO ensure no threading and singleton issues while inside ViskitGlobals?
                 LOG.info("getRunSimulationClassLoader() currentThread contextClassLoader=" + runSimulationClassLoader.getName() +
-                         " and created new ClassLoader for\n   " + getWorkingDirectory().getAbsolutePath());
+                         " and created new ClassLoader for\n   " + ViskitGlobals.instance().getProjectRootDirectoryPath());
             }
         }
         catch (Exception e)
@@ -909,24 +915,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener
      */
     public void setClassPathUrlArray(URL[] classPathUrlArray) {
         this.classPathUrlArray = classPathUrlArray;
-    }
-
-    /**
-     * @return the workingDirectory
-     */
-    private File getWorkingDirectory() {
-        return workingDirectory;
-    }
-
-    /**
-     * @param workingDirectory the workingDirectory to set
-     */
-    public void setWorkingDirectory(File workingDirectory) {
-        this.workingDirectory = workingDirectory;
-        if (!workingDirectory.exists())
-        {
-            LOG.error("setWorkingDirectory() does not exist: " + workingDirectory.getAbsolutePath());
-        }
     }
 
 }  // end class file InternalAssemblyRunner.java

@@ -540,13 +540,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.addSeparator();
         assemblyMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Java Source Generation for Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "captureWindow", "Image Save Assembly Diagram", KeyEvent.VK_I,
+        assemblyMenu.add(buildMenuItem(assemblyController, "captureWindow", "Image Save for Assembly Diagram", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         
         assemblyMenu.addSeparator();
         // TODO add icon?
-        assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Prepare Assembly for Simulation Run", KeyEvent.VK_I,
+        assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Prepare Assembly for Simulation Run", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         /*

@@ -122,8 +122,9 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
         javaSourceAssemblyMI = new javax.swing.JMenuItem();
         imageSaveDiagramAssemblyMI = new javax.swing.JMenuItem();
-        prepareAssemblyForSimulationRunMI = new javax.swing.JMenuItem();
         xmlViewAssemblyMI = new javax.swing.JMenuItem();
+        jSeparator14 = new javax.swing.JPopupMenu.Separator();
+        prepareAssemblyForSimulationRunMI = new javax.swing.JMenuItem();
         exportToClusterFormatMI = new javax.swing.JMenuItem();
         assemblySimulationRunMenu = new javax.swing.JMenu();
         copySelectedConsoleTextMI = new javax.swing.JMenuItem();
@@ -545,10 +546,10 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         eventGraphMenu.add(saveEventGraphAsMI);
         eventGraphMenu.add(jSeparator7);
 
-        javaSourceEventGraphMI.setText("Java Source Generation");
+        javaSourceEventGraphMI.setText("Java Source Generation of saved Event Graph");
         eventGraphMenu.add(javaSourceEventGraphMI);
 
-        imageSaveDiagramEventGraphMI.setText("Image Save, Event Graph Diagram");
+        imageSaveDiagramEventGraphMI.setText("Image Save for Event Graph Diagram");
         imageSaveDiagramEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 imageSaveDiagramEventGraphMIActionPerformed(evt);
@@ -556,7 +557,12 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         });
         eventGraphMenu.add(imageSaveDiagramEventGraphMI);
 
-        xmlViewEventGraphMI.setText("XML View");
+        xmlViewEventGraphMI.setText("XML View of Saved Event Graph");
+        xmlViewEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                xmlViewEventGraphMIActionPerformed(evt);
+            }
+        });
         eventGraphMenu.add(xmlViewEventGraphMI);
 
         viskitMenuBar.add(eventGraphMenu);
@@ -671,9 +677,20 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         });
         assemblyMenu.add(javaSourceAssemblyMI);
 
-        imageSaveDiagramAssemblyMI.setText("Image Save Assembly Diagram");
+        imageSaveDiagramAssemblyMI.setText("Image Save for Assembly Diagram");
+        imageSaveDiagramAssemblyMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                imageSaveDiagramAssemblyMIActionPerformed(evt);
+            }
+        });
         assemblyMenu.add(imageSaveDiagramAssemblyMI);
 
+        xmlViewAssemblyMI.setText("XML View of Saved Assembly");
+        xmlViewAssemblyMI.setToolTipText("");
+        assemblyMenu.add(xmlViewAssemblyMI);
+        assemblyMenu.add(jSeparator14);
+
+        prepareAssemblyForSimulationRunMI.setMnemonic('P');
         prepareAssemblyForSimulationRunMI.setText("Prepare Assembly for Simulation Run");
         prepareAssemblyForSimulationRunMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -681,9 +698,6 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
             }
         });
         assemblyMenu.add(prepareAssemblyForSimulationRunMI);
-
-        xmlViewAssemblyMI.setText("XML View");
-        assemblyMenu.add(xmlViewAssemblyMI);
 
         exportToClusterFormatMI.setText("Export to Cluster Format");
         exportToClusterFormatMI.setEnabled(false);
@@ -723,7 +737,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         analystReportMenu.setText("Analyst Report   ");
 
         displayAnalystReportHtmlMI.setMnemonic(KeyEvent.VK_D);
-        displayAnalystReportHtmlMI.setText("HTML Analyst Report Display");
+        displayAnalystReportHtmlMI.setText("Display HTML Analyst Report");
         displayAnalystReportHtmlMI.setToolTipText("Display Analyst Report in Web browser");
         analystReportMenu.add(displayAnalystReportHtmlMI);
 
@@ -736,7 +750,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         analystReportMenu.add(saveAnalystReportXml);
 
         viewAnalystReportXmlMI.setMnemonic(KeyEvent.VK_V);
-        viewAnalystReportXmlMI.setText("XML View of saved Analyst Report");
+        viewAnalystReportXmlMI.setText("XML View of Saved Analyst Report");
         analystReportMenu.add(viewAnalystReportXmlMI);
 
         viskitMenuBar.add(analystReportMenu);
@@ -788,7 +802,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(viskitTabbedPane)
+            .addComponent(viskitTabbedPane, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         pack();
@@ -849,6 +863,14 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private void prepareAssemblyForSimulationRunMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prepareAssemblyForSimulationRunMIActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_prepareAssemblyForSimulationRunMIActionPerformed
+
+    private void xmlViewEventGraphMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xmlViewEventGraphMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_xmlViewEventGraphMIActionPerformed
+
+    private void imageSaveDiagramAssemblyMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imageSaveDiagramAssemblyMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_imageSaveDiagramAssemblyMIActionPerformed
 
     /**
      * @param args the command line arguments
@@ -978,6 +1000,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator11;
     private javax.swing.JPopupMenu.Separator jSeparator12;
     private javax.swing.JPopupMenu.Separator jSeparator13;
+    private javax.swing.JPopupMenu.Separator jSeparator14;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator4;

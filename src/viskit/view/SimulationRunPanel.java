@@ -83,6 +83,7 @@ public class SimulationRunPanel extends JPanel
     public JTextField numberReplicationsTF;
     public JScrollBar scrollBar;
     public JTextField verboseReplicationNumberTF;
+    public static final String VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT = "[replication #]";
     public JLabel nowRunningLabel;
     public JLabel  viskitRunnerBannerLabel;
     private String viskitRunnerBannerString;
@@ -93,6 +94,7 @@ public class SimulationRunPanel extends JPanel
     private final int STEPSIZE = 100; // adjusts speed of top/bottom scroll arrows
     private JLabel titleLabel;
     private final boolean analystReportPanelVisible;
+
 
     /**
      * Create an Assembly Runner panel
@@ -162,8 +164,6 @@ public class SimulationRunPanel extends JPanel
 
         add(leftRightSplit, BorderLayout.CENTER);
     }
-
-    private final String VERBOSE_REPLICATION_DEFAULT_HINT = "[replication #]";
     
     private JPanel makeReplicationSettingsVCRPanel()
     {
@@ -275,7 +275,7 @@ public class SimulationRunPanel extends JPanel
         verboseReplicationNumberTF.addActionListener(replicationListener);
         verboseReplicationNumberTF.addCaretListener(replicationListener);
         ViskitStatics.clampComponentSize(verboseReplicationNumberTF);
-        verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_DEFAULT_HINT);
+        verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT);
         verboseReplicationNumberTF.setToolTipText("Which replication run (1..n) will be verbose?");
         upperLeftFlowPanel.add(verboseReplicationNumberTF);
 
@@ -400,7 +400,7 @@ public class SimulationRunPanel extends JPanel
         {
             if (verboseReplicationNumberTF.getText().isBlank())
             {
-                verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_DEFAULT_HINT);
+                verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT);
             }
         }
     }
@@ -410,7 +410,7 @@ public class SimulationRunPanel extends JPanel
         @Override
         public void caretUpdate(CaretEvent event) {
             if (!verboseReplicationNumberTF.getText().isEmpty() || 
-                 verboseReplicationNumberTF.getText().equals(VERBOSE_REPLICATION_DEFAULT_HINT)) 
+                 verboseReplicationNumberTF.getText().equals(VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT)) 
             {
                 // probably no response needed, keep user in control of panel settings
                 // vcrVerboseCB.setSelected(false);

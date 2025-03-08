@@ -897,7 +897,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
                 "generateHtmlReport",
-                "HTML Analyst Report display",
+                "Display HTML Analyst Report",
                 KeyEvent.VK_H,
                 KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
@@ -915,7 +915,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController, 
                 "viewXML", 
-                "XML view of saved Analyst Report",
+                "XML View of Saved Analyst Report",
                 KeyEvent.VK_X, 
                 null));
 

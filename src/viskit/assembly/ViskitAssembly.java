@@ -19,17 +19,17 @@ import simkit.stat.SampleStatistics;
  * @author Rick Goldberg
  * @since September 25, 2005, 1:44 PM
  */
-public class ViskitAssembly extends BasicAssembly {
-
+public class ViskitAssembly extends BasicAssembly
+{
     protected Map<String, SimEntity> simEntitiesMap;
-    protected Map<String, PropertyChangeListener> replicationStatisticsMap;
-    protected Map<String, PropertyChangeListener> designPointStatisticsMap;
-    protected Map<String, PropertyChangeListener> propertyChangeListenersMap;
+    protected Map<String, PropertyChangeListener>  replicationStatisticsMap;
+    protected Map<String, PropertyChangeListener>  designPointStatisticsMap;
+    protected Map<String, PropertyChangeListener>  propertyChangeListenersMap;
     protected Map<String, List<PropertyConnector>> propertyChangeListenerConnectionsMap;
     protected Map<String, List<PropertyConnector>> designPointStatisticsListenerConnectionsMap;
     protected Map<String, List<PropertyConnector>> replicationStatisticsListenerConnectionsMap;
-    protected Map<String, List<String>> simEventListenerConnectionsMap;
-    protected Map<String, Adapter> adapterMap;
+    protected Map<String, List<String>>            simEventListenerConnectionsMap;
+    protected Map<String, Adapter>                 adapterMap;
     private static final boolean DEBUG = false; // TODO: tie to ViskitStatics.debug?
 
     /** Creates a new instance of ViskitAssembly */
