@@ -65,12 +65,18 @@ public class ViskitApplication
 {
     static final Logger LOG = Log4jUtilities.getLogger(ViskitApplication.class);
     
+    public static final String VISKIT_SHORT_APPLICATION_NAME = "Viskit";
+    public static final String VISKIT_WELCOME_MESSAGE        = "Welcome to " + VISKIT_SHORT_APPLICATION_NAME;
+    public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Modeling Tool for Discrete Event Simulation (DES) Analysis";
+    
     /**
      * Viskit entry point from the command line, or introspection
      * @param args command line arguments if any
      */
     public static void main(final String[] args)
     {
+        LOG.info(VISKIT_WELCOME_MESSAGE);
+        ViskitUserConfiguration.logDotViskitConfigurationDirectoryStatus();
         
         // Launch all GUI stuff on, or within the EDT
         try {
@@ -91,7 +97,6 @@ public class ViskitApplication
 //                nukeDotViskit();
                 e.printStackTrace(System.err);
             }
-
             try {
                 URL url = new URI("mailto:" + ViskitStatics.VISKIT_MAILING_LIST +
                         "?subject=Viskit%20startup%20error&body=log%20output:").toURL();

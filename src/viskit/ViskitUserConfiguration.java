@@ -73,11 +73,6 @@ public class ViskitUserConfiguration
 //        }
     }
     
-    public static final String VISKIT_SHORT_APPLICATION_NAME = "Viskit";
-    public static final String VISKIT_FULL_APPLICATION_NAME  = "Visual Simkit (Viskit) Modeling Tool for Discrete Event Simulation (DES) Analysis";
-    
-    public static final String VISKIT_WELCOME_MESSAGE = "Welcome to " + VISKIT_SHORT_APPLICATION_NAME;
-
     public static final File VISKIT_CONFIGURATION_DIR = new File(System.getProperty("user.home"), ".viskit");
     public static final File C_APP_FILE        = new File(VISKIT_CONFIGURATION_DIR, "c_app.xml");
     public static final File C_GUI_FILE        = new File(VISKIT_CONFIGURATION_DIR, "c_gui.xml");
@@ -155,7 +150,6 @@ public class ViskitUserConfiguration
     public final static void initialize()
     {
         try {
-            LOG.info(VISKIT_WELCOME_MESSAGE);
             LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
         
             if (!VISKIT_CONFIGURATION_DIR.exists())
@@ -171,8 +165,6 @@ public class ViskitUserConfiguration
             File c_guiXmlSourceFile = new File("configuration/" + C_GUI_FILE.getName());
             if (!C_GUI_FILE.exists())
                 Files.copy(c_guiXmlSourceFile.toPath(), C_GUI_FILE.toPath());
-            
-            logDotViskitConfigurationDirectoryStatus();
         } 
         catch (IOException ex) {
             LOG.error(ex);
@@ -182,8 +174,8 @@ public class ViskitUserConfiguration
     }
     public static void logDotViskitConfigurationDirectoryStatus()
     {
-        LOG.info("VISKIT_CONFIGURATION_DIR=\n   " + VISKIT_CONFIGURATION_DIR.getAbsolutePath() + " which contains\n   " +
-                 C_APP_FILE.getAbsolutePath() + " (C_APP_FILE) and " + C_GUI_FILE.getAbsolutePath() + " (C_GUI_FILE)");
+        LOG.info("VISKIT_CONFIGURATION_DIR=\n   " + VISKIT_CONFIGURATION_DIR.getAbsolutePath() + " which contains user configuration files\n   " +
+                 C_APP_FILE.getAbsolutePath() + " (C_APP_FILE) and " + C_GUI_FILE.getAbsolutePath() + " (C_GUI_FILE)" + "\n");
         isFileReady(C_APP_FILE);
         isFileReady(C_GUI_FILE);
     }

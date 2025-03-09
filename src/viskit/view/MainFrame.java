@@ -56,6 +56,7 @@ import viskit.mvc.MvcModel;
 import edu.nps.util.SystemExitHandler;
 import java.util.TimerTask;
 import org.apache.logging.log4j.Logger;
+import viskit.ViskitApplication;
 import viskit.assembly.SimulationRunInterface;
 import viskit.control.AnalystReportController;
 import viskit.control.EventGraphControllerImpl;
@@ -86,7 +87,7 @@ public class MainFrame extends JFrame
     public EventGraphControllerImpl getEventGraphController() {
         return eventGraphController;
     }
-    public final String VISKIT_APPLICATION_TITLE = ViskitUserConfiguration.VISKIT_FULL_APPLICATION_NAME;
+    public final String VISKIT_APPLICATION_TITLE = ViskitApplication.VISKIT_FULL_APPLICATION_NAME;
 
     /** modalMenus: true means choice from traditional modalMenuBarList, false means new combinedMenuBar */
     private boolean modalMenus = false; 
@@ -128,7 +129,7 @@ public class MainFrame extends JFrame
 
     public MainFrame(String initialAssemblyFile) 
     {
-        super(ViskitUserConfiguration.VISKIT_FULL_APPLICATION_NAME);
+        super(ViskitApplication.VISKIT_FULL_APPLICATION_NAME);
         
         ViskitGlobals.instance().setMainFrame(MainFrame.this);
         
