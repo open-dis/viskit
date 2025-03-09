@@ -687,11 +687,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         
         if (projectWorkingDirectory == null) // don't test getWorkingDirectory() which likely produces NPE
         {
-            LOG.error("BLOCKER: run() following initial configuration, getWorkingDirectory() is null");
+            LOG.debug("BLOCKER: run() following initial configuration, getWorkingDirectory() is null");
         }
         else if (!getWorkingDirectory().exists())
         {
-            LOG.error("BLOCKER: run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
+            LOG.debug("BLOCKER: run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
         }
         
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -704,6 +704,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Approach 3a.  recreate Apache Commons Configuration code
         
+        /*
         File VISKIT_CONFIGURATION_DIR = new File(System.getProperty("user.home"), ".viskit");
         if (!VISKIT_CONFIGURATION_DIR.exists())
             LOG.error("BLOCKER: run() VISKIT_CONFIGURATION_DIR does not exist");
@@ -733,7 +734,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         {
             LOG.error("(incomplete implementation) run() commons configuration excerpt unable to read C_APP_FILE: " + ce.getMessage());
         }
-                
+        */
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Approach 3b.  re-use ViskitConfiguration for Apache Commons Configuration code
 
@@ -1014,7 +1015,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             {
                 // Creates the temp file only when user required?? TODO check
                 createTemporaryAnalystReportFile();
-                LOG.info("Temporary analyst report at\n   " + analystReportFile.getAbsolutePath()); // debug
+                LOG.info("Temporary analyst report at\n   " + analystReportFile.getAbsolutePath() + "\n"); // debug
                 
                 // while in thread, do not invoke ViskitStatics!
                 // isFileReady(analystReportFile);

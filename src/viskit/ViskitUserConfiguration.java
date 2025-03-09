@@ -142,22 +142,23 @@ public class ViskitUserConfiguration
     private ViskitUserConfiguration() 
     {
         if (!initalized)
+        {     
+            LOG.info("initializing ViskitUserConfiguration");        
             initialize(); // this should only occur once
-        // TODO does LOG message interfere with threading?
-        LOG.info("created ViskitUserConfiguration singleton (if this message occurs again, it is a problem)");        
+        }
+        // LOG.info("created ViskitUserConfiguration singleton (if this message occurs again, it is a problem)");   
     }
     
     public final static void initialize()
     {
         try {
-            LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
-        
             if (!VISKIT_CONFIGURATION_DIR.exists())
             {
                  VISKIT_CONFIGURATION_DIR.mkdirs();
                  LOG.info("Created directory: \n   " + VISKIT_CONFIGURATION_DIR.getAbsolutePath());
             }
-
+            else LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
+            
             File c_appXmlSourceFile = new File("configuration/" + C_APP_FILE.getName());
             if (!C_APP_FILE.exists())
                 Files.copy(c_appXmlSourceFile.toPath(), C_APP_FILE.toPath());

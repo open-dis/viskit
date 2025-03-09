@@ -351,8 +351,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             if  (priorWorkingClassLoaderNoReset != null)
             {
                 Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
-                LOG.info("prepareAndStartAssemblySimulationRun() complete,  restored currentThread contextClassLoader='"+ 
-                          priorWorkingClassLoaderNoReset.getName() + "'");
+                LOG.info ("prepareAndStartAssemblySimulationRun() complete");
+                LOG.debug("restored currentThread contextClassLoader='" + priorWorkingClassLoaderNoReset.getName() + "'");
             }
             else LOG.error("prepareAssemblySimulationRun() complete, but priorWorkingClassLoaderNoReset is unexpectedly null");
         }
