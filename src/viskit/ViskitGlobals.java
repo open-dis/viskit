@@ -114,7 +114,7 @@ public class ViskitGlobals
         // This should only occur once
         // Other initialization checks moved out of this constructor to avoid breaking singleton pattern
         // TODO does LOG interfere with singleton pattern?
-        LOG.info("created singleton (if this message occurs again, it is a problem)"); // TODO threading issue?
+        LOG.info("created ViskitGlobals singleton (if this message occurs again, it is a problem)"); // TODO threading issue?
     }
     
     public static ViskitGlobals instance()
@@ -992,12 +992,14 @@ public class ViskitGlobals
             // use this line if default initializes to user store
             // allProjectsBaseDirectory = ViskitConfigurationStore.VISKIT_CONFIGURATION_DIR;
             // allProjectsBaseDirectory.mkdir();
+            
+            // trust but verify
+            if (!allProjectsBaseDirectory.isDirectory())
+            {
+                 LOG.error("createProjectWorkingDirectory() check: allProjectsBaseDirectory is not a directory\n   " + allProjectsBaseDirectory.getAbsolutePath());
+            }
+            else LOG.info("createProjectWorkingDirectory() check: allProjectsBaseDirectory=\n   " + allProjectsBaseDirectory.getAbsolutePath());
         }
-        if (!allProjectsBaseDirectory.isDirectory())
-        {
-             LOG.error("createProjectWorkingDirectory() allProjectsBaseDirectory is not a directory\n   " + allProjectsBaseDirectory.getAbsolutePath());
-        }
-        else LOG.info("createProjectWorkingDirectory() allProjectsBaseDirectory=\n   " + allProjectsBaseDirectory.getAbsolutePath());
         
         if (projectWorkingDirectory == null)
         {
@@ -1008,12 +1010,13 @@ public class ViskitGlobals
             projectWorkingDirectory = new File(projectWorkingDirectory, 
                                                 projectName);
             projectWorkingDirectory.mkdir();
+            // trust but verify
+            if (!projectWorkingDirectory.isDirectory())
+            {
+                LOG.error("createProjectWorkingDirectory() projectWorkingDirectory is not a directory");
+            }
+            else LOG.info("createProjectWorkingDirectory() projectWorkingDirectory=\n   " + projectWorkingDirectory.getAbsolutePath());
         }
-        if (!projectWorkingDirectory.isDirectory())
-        {
-            LOG.error("createProjectWorkingDirectory() projectWorkingDirectory is not a directory");
-        }
-        else LOG.info("createProjectWorkingDirectory() projectWorkingDirectory=\n   " + projectWorkingDirectory.getAbsolutePath());
 
         if (viskitProject == null)
             viskitProject = new ViskitProject(projectWorkingDirectory);
@@ -1061,7 +1064,7 @@ public class ViskitGlobals
 
                 // TODO experimenting with context
                 Thread.currentThread().setContextClassLoader(viskitApplicationClassLoader);
-                LOG.info("getViskitApplicationClassLoader() currentThread contextClassLoader='" + viskitApplicationClassLoader.getName() + "'");
+                LOG.info("getViskitApplicationClassLoader() currentThread contextClassLoader='" + viskitApplicationClassLoader.getName() + "'" + "\n");
             }
         if (viskitApplicationClassLoader == null)
         {

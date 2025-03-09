@@ -55,6 +55,10 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import javax.swing.JOptionPane;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 
 import org.apache.logging.log4j.Logger;
 
@@ -133,12 +137,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     /** save local copies of these objects during setup, in order to avoid 
      * run-time queries while in a separate threaded context that clobbers
      * the singleton classes */
-    /** must be saved prior to running in new thread */
-    // stackoverflow
-    public File           workingDirectory;
-    private ClassLoader   localWorkingClassLoader;
-    private ViskitProject localViskitProject;
+    /** must be saved prior to running in new thread (several approached did not work), or else
+     * retrieved once thread has started in run() method */
+    public File           projectWorkingDirectory;
+    private ViskitProject viskitProject;
     private ReportStatisticsConfiguration reportStatisticsConfiguration; // depends on ViskitProject
+    private ClassLoader   localWorkingClassLoader;
     
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
@@ -153,7 +157,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     {
         this(); // invoke default constructor
         // receiving parameters for use as Runnable
-        this.workingDirectory = workingDirectory;
+        this.projectWorkingDirectory = workingDirectory;
         
 
         // TODO superfluous?  actual file will be timestamped, actual directory already exists
@@ -651,34 +655,134 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         System.setOut(outputPrintStream);
     }
 
+    /** This method should only occur wile BasicAssembly is running inside an independent thread. */
+    public void findProjectWorkingDirectoryFromWithinThread()
+    {
+        String projectDirectoryPath = new String();
+        String projectName          = new String();
+        
+        // this should only occur inside the simulation thread
+        // TODO hacking wildly here...
+//            File findingClassesDirectory = new File("./build/classes"); // hoping to find we are in project...
+//            LOG.info("Experimental: findingClassesDirectory=\n   " + findingClassesDirectory.getAbsolutePath());
+//            setWorkingDirectory(findingClassesDirectory); // no good, we are not in project directory, darn
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Approach 1: 
+        // First reaching into ViskitGlobals even though it breaks singleton pattern, ouch.
+        // Note that Netbeans object inspection can be misleading when looking at ViskitGlobals while inside the thread.
+        // In any case, the directory is no longer there.
+        
+        /*
+        // the following test provokes a singleton-reset problem message
+        if (ViskitGlobals.instance().getProjectWorkingDirectory() == null)
+            LOG.error("BLOCKER: run() ViskitGlobals.instance().getProjectWorkingDirectory() is null");
+        else 
+            setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
+        */
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Approach 2: default class initialization
+        
+        if (projectWorkingDirectory == null) // don't test getWorkingDirectory() which likely produces NPE
+        {
+            LOG.error("BLOCKER: run() following initial configuration, getWorkingDirectory() is null");
+        }
+        else if (!getWorkingDirectory().exists())
+        {
+            LOG.error("BLOCKER: run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
+        }
+        
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Approach 3.  Look in ViskitConfigurationStore (and TODO possibly relaxing singleton status)
+        
+        // can look in user/.viskit/c_app.xml:  yes the project home directory and name are included there in 
+        // ViskitConfig/app/projectHome/path@dir and name@value
+        // exemplar code found in singleton ViskitConfigurationStore()
+                
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Approach 3a.  recreate Apache Commons Configuration code
+        
+        File VISKIT_CONFIGURATION_DIR = new File(System.getProperty("user.home"), ".viskit");
+        if (!VISKIT_CONFIGURATION_DIR.exists())
+            LOG.error("BLOCKER: run() VISKIT_CONFIGURATION_DIR does not exist");
+        else if (!VISKIT_CONFIGURATION_DIR.isDirectory())
+            LOG.error("BLOCKER: run() VISKIT_CONFIGURATION_DIR is not a directory");
+        
+        File C_APP_FILE               = new File(VISKIT_CONFIGURATION_DIR, "c_app.xml");
+        if (!C_APP_FILE.exists())
+             LOG.error("BLOCKER: run() C_APP_FILE does not exist");
+        else if (C_APP_FILE.isDirectory())
+             LOG.error("BLOCKER: run() C_APP_FILE is a directory, not a file as expected");
+        else LOG.info  ("run() C_APP_FILE found:\n   " + C_APP_FILE.getAbsolutePath());
+        // simple accessor, everything there should be good
+        // https://commons.apache.org/proper/commons-configuration/userguide/quick_start.html
+        Configurations configurations = new Configurations();
+        
+        String PROJECT_HOME_CLEAR_KEY = "app.projecthome";
+        String PROJECT_PATH_KEY = PROJECT_HOME_CLEAR_KEY + ".path[@dir]";
+        String PROJECT_NAME_KEY = PROJECT_HOME_CLEAR_KEY + ".name[@value]";
+        try
+        {
+            Configuration config = configurations.properties(C_APP_FILE);
+            projectDirectoryPath = config.getString( PROJECT_PATH_KEY); // workingDirectoryKey);
+            projectName          = config.getString(PROJECT_NAME_KEY);
+        }
+        catch (ConfigurationException ce)
+        {
+            LOG.error("(incomplete implementation) run() commons configuration excerpt unable to read C_APP_FILE: " + ce.getMessage());
+        }
+                
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Approach 3b.  re-use ViskitConfiguration for Apache Commons Configuration code
+
+        if (projectWorkingDirectory == null)
+        {
+            projectDirectoryPath    = ViskitConfigurationStore.instance().getViskitProjectDirectoryPath();
+            projectWorkingDirectory = new File (projectDirectoryPath);
+            projectName             = ViskitConfigurationStore.instance().getViskitProjectName();
+        }
+        
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Approach 4.  BLOCKER TODO: 
+        // how to find working directory while inside thread, perhaps via ClassLoader context?
+        
+        // not yet tried
+        
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Approach 4.  "Hardwire" local MyProjects/DefaultProject
+        
+        if (projectWorkingDirectory == null)
+        {
+            projectWorkingDirectory = new File("MyViskitProjects/DefaultProject");
+            LOG.info("run() findProjectWorkingDirectoryFromWithinThread() hard-wired directory:\n  " + getWorkingDirectory().getAbsolutePath());
+        }
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // all done searching around, report outcome
+        if ((projectWorkingDirectory != null) && projectWorkingDirectory.isDirectory())
+        {
+             // found it!
+             LOG.info("run() findProjectWorkingDirectoryFromWithinThread() found working directory!\n  " + getWorkingDirectory().getAbsolutePath());
+             viskitProject = new ViskitProject(projectWorkingDirectory);
+        }
+        else LOG.error("BLOCKER: run() findProjectWorkingDirectoryFromWithinThread() not successful, analyst reports will fail");
+    }
+
     /** Execute the simulation for the desired number of replications */
     // TODO: Simkit not generisized yet
     @SuppressWarnings("unchecked")
     @Override
     public void run() // we are now in the thread
     {
+        LOG.info("Now running inside BasicAssembly run() thread...");
+        
         stopSimulationRun = false;
         
-        if (getWorkingDirectory() == null)
+        if (projectWorkingDirectory == null) // don't test getWorkingDirectory() which likely produces NPE
         {
-            // this should only occur inside the simulation thread
-            // TODO hacking wildly here...
-//            File findingClassesDirectory = new File("./build/classes"); // hoping to find we are in project...
-//            LOG.info("Experimental: findingClassesDirectory=\n   " + findingClassesDirectory.getAbsolutePath());
-//            setWorkingDirectory(findingClassesDirectory); // no good, we are not in project directory, darn
-
-            // reaching into globals even though it breaks singleton pattern, ouch.
-            // netbeans inspection is misleading when looking at ViskitGlobals while inside the thread
-            setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory());
-            if (getWorkingDirectory() == null)
-            {
-                LOG.error("BLOCKER: run() getWorkingDirectory() is null");
-            }
-            else if (!getWorkingDirectory().exists())
-            {
-                LOG.error("BLOCKER: run() " + getWorkingDirectory().getAbsolutePath() + " does not exist!");
-            }
-            // BLOCKER TODO: how to find working directory while inside thread?
+            findProjectWorkingDirectoryFromWithinThread(); // the great mouse hunt
         }
                 
         if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
@@ -718,10 +822,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
         if (reportStatisticsConfiguration == null) // time to initialize, using localViskitProject handed into thread
         {
-            if (localViskitProject == null)
+            if (viskitProject == null)
                 LOG.error("Incorrect initialization of BasicAssembly in thread context, localViskitProject is null");
             // Creates a ReportStatisticsConfiguration instance and names it based on the name of this Assembly.
-            reportStatisticsConfiguration = new ReportStatisticsConfiguration(this.getName(), localViskitProject);
+            reportStatisticsConfiguration = new ReportStatisticsConfiguration(this.getName(), viskitProject);
         }
         // reset the document with existing parameters since it might have run before
         reportStatisticsConfiguration.reset();
@@ -904,11 +1008,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 //            // thread context, we reflect here
 //            ClassLoader localLoader = ViskitGlobals.instance().getViskitApplicationClassLoader();
 
-// TODO better future fix: move out of reflection land completely...
+// TODO better future fix, if possible?  move out of reflection land completely...
 
             try 
             {
-                
                 // Creates the temp file only when user required?? TODO check
                 createTemporaryAnalystReportFile();
                 LOG.info("Temporary analyst report at\n   " + analystReportFile.getAbsolutePath()); // debug
@@ -953,18 +1056,20 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     }
 
     /**
-     * This gets called at the top of every run. It builds a tempFile and saves the path. That path is what
-     * is used at the bottom of the run to write out the analyst report file. We report the path back to the caller
-     * immediately, and it is the caller's responsibility to dispose of the file once they are done with it.
+     * This method gets called at the beginning of every simulation run,
+     * building a tempFile that is saved on the path. That path is what
+     * is used at the bottom of the run to write out the analyst report file. 
+     * We report the path back to the caller immediately, and it is the 
+     * caller's responsibility to dispose of the file once done with it.
      */
     private void createTemporaryAnalystReportFile()
     {
         try {
-            analystReportFile = TempFileManager.createTempFile("ViskitAnalystReport", ".xml");
+            analystReportFile = TempFileManager.createTempFile("ViskitAnalystReport", ".xml"); // TODO fix filename
         } 
         catch (IOException ioe) {
             analystReportFile = null;
-            LOG.error("createTemporaryAnalystReportFile() exception: " + ioe);
+            LOG.error("createTemporaryAnalystReportFile() exception: " + ioe); // TODO fix filename
         }
     }
 
@@ -1004,7 +1109,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * @return the localViskitProject
      */
     public final ViskitProject getViskitProject() {
-        return localViskitProject;
+        return viskitProject;
     }
 
     /**
@@ -1012,21 +1117,21 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      */
     public void setViskitProject(ViskitProject localViskitProject)
     {
-        this.localViskitProject = localViskitProject; // TODO does this value persist inside the thread context?
+        this.viskitProject = localViskitProject; // TODO does this value persist inside the thread context?
     }
 
     /**
-     * @return the workingDirectory
+     * @return the projectWorkingDirectory
      */
     private File getWorkingDirectory() {
-        return workingDirectory;
+        return projectWorkingDirectory;
     }
 
     /**
-     * @param workingDirectory the workingDirectory to set
+     * @param workingDirectory the projectWorkingDirectory to set
      */
     public void setWorkingDirectory(File workingDirectory) {
-        this.workingDirectory = workingDirectory;
+        this.projectWorkingDirectory = workingDirectory;
         if (workingDirectory == null)
         {
             LOG.error("setWorkingDirectory() received null value ");

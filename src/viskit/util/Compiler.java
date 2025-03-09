@@ -32,7 +32,7 @@ public class Compiler
     static final Logger LOG = Log4jUtilities.getLogger(Compiler.class);
 
     /** Diagnostic message when we have a successful compilation */
-    public static final String COMPILE_SUCCESS_MESSAGE = "compile successful!";
+    public static final String COMPILE_SUCCESS_MESSAGE = "compile success!";
 
     /** Stream for writing text to an output device */
     private static OutputStream baosOut;

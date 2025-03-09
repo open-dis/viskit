@@ -149,7 +149,7 @@ public class ViskitConfigurationStore
         if (!initalized)
             initialize(); // this should only occur once
         // TODO does LOG message interfere with threading?
-        LOG.info("created singleton (if this message occurs aagain, it is a problem)");        
+        LOG.info("created ViskitConfigurationStore singleton (if this message occurs again, it is a problem)");        
     }
     
     public final static void initialize()
@@ -161,26 +161,31 @@ public class ViskitConfigurationStore
             if (!VISKIT_CONFIGURATION_DIR.exists())
             {
                  VISKIT_CONFIGURATION_DIR.mkdirs();
-                 LOG.info("Created dir: {}", VISKIT_CONFIGURATION_DIR);
+                 LOG.info("Created directory: \n   " + VISKIT_CONFIGURATION_DIR.getAbsolutePath());
             }
 
             File c_appXmlSourceFile = new File("configuration/" + C_APP_FILE.getName());
             if (!C_APP_FILE.exists())
                 Files.copy(c_appXmlSourceFile.toPath(), C_APP_FILE.toPath());
-            isFileReady(C_APP_FILE);
 
             File c_guiXmlSourceFile = new File("configuration/" + C_GUI_FILE.getName());
             if (!C_GUI_FILE.exists())
                 Files.copy(c_guiXmlSourceFile.toPath(), C_GUI_FILE.toPath());
-            isFileReady(C_GUI_FILE);
-            LOG.info("VISKIT_CONFIGURATION_DIR=" + VISKIT_CONFIGURATION_DIR.getAbsolutePath() + " contains\n   " +
-                     C_APP_FILE.getAbsolutePath() + " and " + C_GUI_FILE.getAbsolutePath());
+            
+            logDotViskitConfigurationDirectoryStatus();
         } 
         catch (IOException ex) {
             LOG.error(ex);
         }
         setDefaultConfiguration();
         initalized = true;
+    }
+    public static void logDotViskitConfigurationDirectoryStatus()
+    {
+        LOG.info("VISKIT_CONFIGURATION_DIR=\n   " + VISKIT_CONFIGURATION_DIR.getAbsolutePath() + " which contains\n   " +
+                 C_APP_FILE.getAbsolutePath() + " (C_APP_FILE) and " + C_GUI_FILE.getAbsolutePath() + " (C_GUI_FILE)");
+        isFileReady(C_APP_FILE);
+        isFileReady(C_GUI_FILE);
     }
 
     /** Builds, or rebuilds a default configuration */
@@ -297,6 +302,16 @@ public class ViskitConfigurationStore
     /** @return the XMLConfiguration for Viskit gui */
     public XMLConfiguration getViskitGuiConfiguration() {
         return (XMLConfiguration) projectCombinedConfiguration.getConfiguration("gui");
+    }
+
+    /** @return project path for Viskit project directory from user's dot_viskit c_app xml configuration file */
+    public String getViskitProjectDirectoryPath() {
+        return getValue(ViskitConfigurationStore.PROJECT_PATH_KEY);
+    }
+
+    /** @return project name from user's dot_viskit c_app xml configuration file */
+    public String getViskitProjectName() {
+        return getValue(ViskitConfigurationStore.PROJECT_NAME_KEY);
     }
 
     /** Used to clear all Viskit Configuration information to create a new

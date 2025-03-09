@@ -973,14 +973,20 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         // here when compiling EGs for the first time, or when the
         // SimkitXML2Java translator attempts to resolve a ParameterMap
         if (viskitProject != null)
+        {
+            if ((legoEventGraphsTree != null) && (legoEventGraphsTree.getRowCount() > 0))
+            {
+                LOG.info("buildTreePanels() now checking project's prior event graphs...");
+            }
             addEventGraphsToLegoTree(viskitProject.getEventGraphsDirectory(), true);
+        }
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
         String[] classPath = ((LocalBootLoader) ViskitGlobals.instance().getViskitApplicationClassLoader()).getClassPath();
         for (String path : classPath) {
             if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
-                addEventGraphsToLegoTree(new File(path), false);
+                            addEventGraphsToLegoTree(new File(path), false);
                 addPropertyChangeListenersToLegoTree(new File(path), false);
             }
         }

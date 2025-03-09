@@ -124,7 +124,7 @@ public class ViskitApplication
             }
             if (dotViskit.delete())
                 LOG.info("{} was found and deleted from your system.", dotViskit.getName());
-
+            ViskitConfigurationStore.logDotViskitConfigurationDirectoryStatus();
             LOG.info("Please restart Viskit");
         }
     }

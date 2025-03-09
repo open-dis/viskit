@@ -131,13 +131,16 @@ public class ViskitProject
             return;
         }
         setProjectRootDirectory(projectRootDirectory);
+        
+        boolean projectInitializationSuccess = initializeProject();
+        LOG.info("ViskitProject " + projectRootDirectory.getName() + " projectInitializationSuccessful=" + projectInitializationSuccess);
     }
 
     /** *
      * Initialize current Viskit project
      * @return whether project was successfully initialized
      */
-    public boolean initializeProject() 
+    public final boolean initializeProject() 
     {
         if (projectRootDirectory == null)
             return false;

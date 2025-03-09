@@ -41,7 +41,8 @@ public class HistogramChart
      * @param data an array of doubles that are to be plotted
      * @return the path url of the created object
      */
-    public String createChart(String title, String label, double[] data) {
+    public String createChart(String title, String label, double[] data) 
+    {
         ViskitProject vkp = ViskitGlobals.instance().getViskitProject();
         File fileLocation = new File(vkp.getAnalystReportChartsDirectory(), label + "Histogram.png");
         IntervalXYDataset dataset = createDataset(label, data);

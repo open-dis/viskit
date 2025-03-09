@@ -1493,11 +1493,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (!xmlValidationTool.isValidXML()) 
         {
             // TODO: implement a Dialog pointing to the validationErrors.LOG
-            LOG.error("{} is not valid XML!\n", f);
+            LOG.error("buildJavaAssemblySource{} found invalid XML!\n   " + f.getAbsolutePath());
             return assemblySource;
         } 
         else {
-            LOG.info("{} is valid XML\n", f);
+            LOG.info("buildJavaAssemblySource{} found valid XML\n   " + f.getAbsolutePath());
         }
 
         SimkitAssemblyXML2Java x2j;
@@ -1522,7 +1522,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param x2j the Event Graph initialized translator to produce source with
      * @return a string of Event Graph source code
      */
-    public String buildJavaEventGraphSource(SimkitXML2Java x2j) {
+    public String buildJavaEventGraphSource(SimkitXML2Java x2j)
+    {
         String eventGraphSource = null;
 
         // Must validate XML first and handle any errors before compiling
@@ -1537,7 +1538,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         } 
         else 
         {
-            LOG.info("{} is valid XML", x2j.getEventGraphFile());
+            LOG.info("buildJavaEventGraphSource() found valid XML:\n   " + x2j.getEventGraphFile().getAbsolutePath());
         }
 
         try {
@@ -1610,27 +1611,30 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
             File classesDir = viskitProject.getClassesDirectory();
 
-            LOG.info("compile " + javaFile.getCanonicalPath());
+            LOG.info("compileJavaClassFromString() compiling file:\n   " + javaFile.getCanonicalPath());
 
             // This will create a class/package to place the .class file
             String diagnostic = Compiler.invoke(pkg, baseName, src);
             compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
             if (compileSuccess) {
-                LOG.info(diagnostic + "\n");
+                LOG.info("compileJavaClassFromString() " + diagnostic + "\n");
                 return new File(classesDir, packagePath + baseName + ".class");
-            } else {
-                LOG.error(diagnostic + "\n");
+            } 
+            else {
+                LOG.error("compileJavaClassFromString() " + diagnostic);
                 if (!baosOut.toString().isEmpty())
-                    LOG.error(baosOut.toString() + "\n");
+                    LOG.error("compileJavaClassFromString() " + baosOut.toString());
             }
 
         } catch (IOException ioe) {
-            LOG.error(ioe);
-        } finally {
+            LOG.error("compileJavaClassFromString() exception" + ioe);
+        } 
+        finally {
             try {
                 if (fw != null)
                     fw.close();
-            } catch (IOException e) {}
+            } 
+            catch (IOException e) {}
         }
         return null;
     }
