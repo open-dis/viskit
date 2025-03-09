@@ -97,7 +97,7 @@ public class ViskitApplication
                         "?subject=Viskit%20startup%20error&body=log%20output:").toURL();
 
                 String msg = "Viskit has experienced a startup glitch.  <br/>"
-                        + "Please navigate to " + ViskitConfigurationStore.VISKIT_ERROR_LOG.getAbsolutePath() + "<br/>"
+                        + "Please navigate to " + ViskitUserConfiguration.VISKIT_ERROR_LOG.getAbsolutePath() + "<br/>"
                         + "and email the log to "
                         + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                         + "<br/><br/>Click the link to open up an email form, then copy and paste the log's contents";
@@ -114,7 +114,7 @@ public class ViskitApplication
      * .viskit config directory in the user's profile space
      */
     public static void nukeDotViskit() {
-        File dotViskit = ViskitConfigurationStore.VISKIT_CONFIGURATION_DIR;
+        File dotViskit = ViskitUserConfiguration.VISKIT_CONFIGURATION_DIR;
         if (dotViskit.exists()) {
 
             // Can't delete .viskit dir unless it's empty
@@ -124,7 +124,7 @@ public class ViskitApplication
             }
             if (dotViskit.delete())
                 LOG.info("{} was found and deleted from your system.", dotViskit.getName());
-            ViskitConfigurationStore.logDotViskitConfigurationDirectoryStatus();
+            ViskitUserConfiguration.logDotViskitConfigurationDirectoryStatus();
             LOG.info("Please restart Viskit");
         }
     }

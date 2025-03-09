@@ -44,7 +44,7 @@ import javax.swing.event.ChangeListener;
 
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
-import viskit.ViskitConfigurationStore;
+import viskit.ViskitUserConfiguration;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.control.InternalAssemblyRunner;
@@ -86,7 +86,7 @@ public class MainFrame extends JFrame
     public EventGraphControllerImpl getEventGraphController() {
         return eventGraphController;
     }
-    public final String VISKIT_APPLICATION_TITLE = ViskitConfigurationStore.VISKIT_FULL_APPLICATION_NAME;
+    public final String VISKIT_APPLICATION_TITLE = ViskitUserConfiguration.VISKIT_FULL_APPLICATION_NAME;
 
     /** modalMenus: true means choice from traditional modalMenuBarList, false means new combinedMenuBar */
     private boolean modalMenus = false; 
@@ -128,7 +128,7 @@ public class MainFrame extends JFrame
 
     public MainFrame(String initialAssemblyFile) 
     {
-        super(ViskitConfigurationStore.VISKIT_FULL_APPLICATION_NAME);
+        super(ViskitUserConfiguration.VISKIT_FULL_APPLICATION_NAME);
         
         ViskitGlobals.instance().setMainFrame(MainFrame.this);
         
@@ -137,8 +137,8 @@ public class MainFrame extends JFrame
         initializeMainFrame();
 
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        int w = Integer.parseInt(ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]"));
-        int h = Integer.parseInt(ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]"));
+        int w = Integer.parseInt(ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
         MainFrame.this.setLocation((d.width - w) / 2, (d.height - h) / 2);
         MainFrame.this.setSize(w, h);
 
@@ -612,11 +612,11 @@ public class MainFrame extends JFrame
 
                 // Remember the size of this main frame set by the user
                 Rectangle bounds = getBounds();
-                ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
-                ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
+                ViskitUserConfiguration.instance().setValue(ViskitUserConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]", "" + bounds.width);
+                ViskitUserConfiguration.instance().setValue(ViskitUserConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]", "" + bounds.height);
 
                 // Pretty-fy all xml docs used for configuration
-                ViskitConfigurationStore.instance().cleanup();
+                ViskitUserConfiguration.instance().cleanup();
 
                 // All other "Frames" were setVisible(false) above
                 setVisible(false);

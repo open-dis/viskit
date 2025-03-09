@@ -41,7 +41,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
-import viskit.ViskitConfigurationStore;
+import viskit.ViskitUserConfiguration;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 
@@ -150,8 +150,8 @@ public class SimulationRunPanel extends JPanel
         npsLabel.setHorizontalTextPosition(JLabel.CENTER);
         npsLabel.setIconTextGap(20);
 
-        int w = Integer.parseInt(ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@w]"));
-        int h = Integer.parseInt(ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.APP_MAIN_BOUNDS_KEY + "[@h]"));
+        int w = Integer.parseInt(ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
+        int h = Integer.parseInt(ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
         leftSideHorizontalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
         

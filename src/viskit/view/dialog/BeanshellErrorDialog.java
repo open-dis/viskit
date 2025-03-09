@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import viskit.ViskitGlobals;
-import viskit.ViskitConfigurationStore;
+import viskit.ViskitUserConfiguration;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM)  2004 Projects
@@ -40,9 +40,9 @@ public class BeanshellErrorDialog extends JDialog {
     }
 
     private BeanshellErrorDialog() {
-        ViskitConfigurationStore cfg = ViskitConfigurationStore.instance();
+        ViskitUserConfiguration cfg = ViskitUserConfiguration.instance();
 
-        setTitle(cfg.getValue(ViskitConfigurationStore.BEANSHELL_ERROR_DIALOG_TITLE_KEY)); //"Warning"
+        setTitle(cfg.getValue(ViskitUserConfiguration.BEANSHELL_ERROR_DIALOG_TITLE_KEY)); //"Warning"
         setModal(true);
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
@@ -57,7 +57,7 @@ public class BeanshellErrorDialog extends JDialog {
         leftPan.setLayout(new BoxLayout(leftPan, BoxLayout.Y_AXIS));
 
         Icon ic = UIManager.getIcon("OptionPane.warningIcon");
-        JLabel lab = new JLabel(cfg.getValue(ViskitConfigurationStore.BEANSHELL_ERROR_DIALOG_LABEL_KEY), ic, JLabel.LEFT);//"Java language error:"
+        JLabel lab = new JLabel(cfg.getValue(ViskitUserConfiguration.BEANSHELL_ERROR_DIALOG_LABEL_KEY), ic, JLabel.LEFT);//"Java language error:"
         lab.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         leftPan.add(lab);
         errorMsg = new JTextArea(4, 40);
@@ -70,7 +70,7 @@ public class BeanshellErrorDialog extends JDialog {
         jsp.setAlignmentX(JTextArea.LEFT_ALIGNMENT);
         leftPan.add(jsp);
         leftPan.add(Box.createVerticalStrut(3));
-        lab = new JLabel(cfg.getValue(ViskitConfigurationStore.BEANSHELL_ERROR_DIALOG_QUESTION_KEY)); //"Ignore and continue?"
+        lab = new JLabel(cfg.getValue(ViskitUserConfiguration.BEANSHELL_ERROR_DIALOG_QUESTION_KEY)); //"Ignore and continue?"
         lab.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         leftPan.add(lab);
         topPan.add(leftPan);
@@ -79,8 +79,8 @@ public class BeanshellErrorDialog extends JDialog {
 
         p.add(Box.createVerticalStrut(10));
 
-        current = new JCheckBox(cfg.getValue(ViskitConfigurationStore.BEANSHELL_ERROR_DIALOG_SESSIONCHECKBOX_KEY)); //"Hide warnings for current session"
-        permanent = new JCheckBox(cfg.getValue(ViskitConfigurationStore.BEANSHELL_ERROR_DIALOG_PREFERENCESCHECKBOX_KEY)); //"Hide warnings permanently"
+        current = new JCheckBox(cfg.getValue(ViskitUserConfiguration.BEANSHELL_ERROR_DIALOG_SESSIONCHECKBOX_KEY)); //"Hide warnings for current session"
+        permanent = new JCheckBox(cfg.getValue(ViskitUserConfiguration.BEANSHELL_ERROR_DIALOG_PREFERENCESCHECKBOX_KEY)); //"Hide warnings permanently"
         nullCB = new JCheckBox("hidden");
         current.setSelected(false);
         permanent.setSelected(false);
@@ -91,7 +91,7 @@ public class BeanshellErrorDialog extends JDialog {
         bg.add(permanent);
         bg.add(nullCB);
 
-        permanent.setToolTipText(cfg.getValue(ViskitConfigurationStore.BEANSHELL_ERROR_DIALOG_PREFERENCESTOOLTIP_KEY)); //"Set permanent options in File->Preferences"
+        permanent.setToolTipText(cfg.getValue(ViskitUserConfiguration.BEANSHELL_ERROR_DIALOG_PREFERENCESTOOLTIP_KEY)); //"Set permanent options in File->Preferences"
 
         current.addActionListener(new cbTweeker(current));
         permanent.addActionListener(new cbTweeker(permanent));
@@ -130,9 +130,9 @@ public class BeanshellErrorDialog extends JDialog {
 
         yesButton.addActionListener((ActionEvent e) -> {
             if (current.isSelected()) {
-                ViskitConfigurationStore.instance().setSessionValue(ViskitConfigurationStore.BEANSHELL_WARNING_KEY, "false");
+                ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.BEANSHELL_WARNING_KEY, "false");
             } else if (permanent.isSelected()) {
-                ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.BEANSHELL_WARNING_KEY, "false");
+                ViskitUserConfiguration.instance().setValue(ViskitUserConfiguration.BEANSHELL_WARNING_KEY, "false");
             }
             returnBool = true;
             dispose();

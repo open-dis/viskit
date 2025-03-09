@@ -75,7 +75,7 @@ import simkit.stat.SimpleStatsTally;
 
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import viskit.ViskitConfigurationStore;
+import viskit.ViskitUserConfiguration;
 import viskit.ViskitProject;
 // import static viskit.ViskitGlobals.isFileReady; // while in thread, do not invoke ViskitStatics!
 import viskit.model.AnalystReportModel;
@@ -695,11 +695,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         }
         
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Approach 3.  Look in ViskitConfigurationStore (and TODO possibly relaxing singleton status)
+        // Approach 3.  Look in ViskitUserConfiguration (and TODO possibly relaxing singleton status)
         
         // can look in user/.viskit/c_app.xml:  yes the project home directory and name are included there in 
         // ViskitConfig/app/projectHome/path@dir and name@value
-        // exemplar code found in singleton ViskitConfigurationStore()
+        // exemplar code found in singleton ViskitUserConfiguration()
                 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Approach 3a.  recreate Apache Commons Configuration code
@@ -739,9 +739,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
         if (projectWorkingDirectory == null)
         {
-            projectDirectoryPath    = ViskitConfigurationStore.instance().getViskitProjectDirectoryPath();
+            projectDirectoryPath    = ViskitUserConfiguration.instance().getViskitProjectDirectoryPath();
             projectWorkingDirectory = new File (projectDirectoryPath);
-            projectName             = ViskitConfigurationStore.instance().getViskitProjectName();
+            projectName             = ViskitUserConfiguration.instance().getViskitProjectName();
         }
         
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -804,7 +804,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                         + "?subject=Assembly%20Run%20Error&body=log%20output:").toURL();
                 
                 String msg = "Assembly run aborted.  <br/>"
-                    + "Please navigate to " + ViskitConfigurationStore.VISKIT_ERROR_LOG.getAbsolutePath() + " <br/>"
+                    + "Please navigate to " + ViskitUserConfiguration.VISKIT_ERROR_LOG.getAbsolutePath() + " <br/>"
                     + "and email the log to "
                     + "<b><a href=\"" + url.toString() + "\">" + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
                     + "<br/><br/>Click the link to open up an email form, then attach the log. Would "
@@ -1028,7 +1028,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 //                {
 //                    LOG.error("analystReportFile not ready");
 //                }
-                // TODO this line provokes the restart of singletons ViskitGlobals and ViskitConfigurationStore if used,
+                // TODO this line provokes the restart of singletons ViskitGlobals and ViskitUserConfiguration if used,
                 // can we employ local reference?  moved workingClassLoaderinitialization to InternalAssemblyRunner, outside the separate thread
                 // Class<?> clazz = ViskitGlobals.instance().getViskitApplicationClassLoader().loadClass("viskit.model.AnalystReportModel");// was localWorkingClassLoader
                 if (localWorkingClassLoader == null) // being extra careful to report an unexpected error condition...

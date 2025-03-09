@@ -103,10 +103,10 @@ public class ViskitStatics
         // avoiding potential interference by other threads, and  initializing
         // counts for singleton safety checks below
         // ViskitGlobals            temp1 = ViskitGlobals.instance();
-        // ViskitConfigurationStore temp2 = ViskitConfigurationStore.instance();
+        // ViskitUserConfiguration temp2 = ViskitUserConfiguration.instance();
     }
         // private static int            viskitGlobalsCreationCount = 0; // singleton safety check
-        // private static int viskitConfigurationStoreCreationCount = 0; // singleton safety check
+        // private static int ViskitUserConfigurationCreationCount = 0; // singleton safety check
     
     /* Commonly used class names */
     public static final String RANDOM_NUMBER_CLASS                   = "simkit.random.RandomNumber";
@@ -818,7 +818,7 @@ public class ViskitStatics
                     Desktop.getDesktop().mail(url.toURI());
 
                     if (showLog)
-                        Desktop.getDesktop().browse(ViskitConfigurationStore.VISKIT_ERROR_LOG.toURI());
+                        Desktop.getDesktop().browse(ViskitUserConfiguration.VISKIT_ERROR_LOG.toURI());
                 }
             } catch (IOException | URISyntaxException ex) {
                 LOG.error(ex);
@@ -858,22 +858,22 @@ public class ViskitStatics
 //    /**
 //     * @return the viskitConfigurationStorCreationCount singleton safety check
 //     */
-//    public static synchronized int getViskitConfigurationStoreCreationCount() {
-//        return viskitConfigurationStoreCreationCount;
+//    public static synchronized int getViskitUserConfigurationCreationCount() {
+//        return ViskitUserConfigurationCreationCount;
 //    }
 //
 //    /**
 //     * Trust but verify: increment the singleton safety check value with each
 //     * instantiation, warn if more than one occurs
 //     */
-//    public static synchronized void incrementViskitConfigurationStoreCreationCount() {
-//        viskitConfigurationStoreCreationCount++;
-//        if (viskitConfigurationStoreCreationCount > 1) // unexpected failure
+//    public static synchronized void incrementViskitUserConfigurationCreationCount() {
+//        ViskitUserConfigurationCreationCount++;
+//        if (ViskitUserConfigurationCreationCount > 1) // unexpected failure
 //        {
-//            LOG.error("Singleton safety check failed, viskitConfigurationStoreCreationCount=" + 
-//                                                      viskitConfigurationStoreCreationCount);
-//            String message = "<html><body><p align='center'>ViskitConfigurationStore singleton safety check failure!</p><br />";
-//            message +=       "<p align='center'>viskitConfigurationStoreCreationCount=" + viskitConfigurationStoreCreationCount + "</p><br />";
+//            LOG.error("Singleton safety check failed, ViskitUserConfigurationCreationCount=" + 
+//                                                      ViskitUserConfigurationCreationCount);
+//            String message = "<html><body><p align='center'>ViskitUserConfiguration singleton safety check failure!</p><br />";
+//            message +=       "<p align='center'>ViskitUserConfigurationCreationCount=" + ViskitUserConfigurationCreationCount + "</p><br />";
 //            // watch out for dueling creation problems
 ////            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE,
 ////                "Singleton safety check error", message);

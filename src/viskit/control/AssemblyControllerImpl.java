@@ -51,7 +51,7 @@ import viskit.util.EventGraphCache;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.util.OpenAssembly;
 import viskit.ViskitGlobals;
-import viskit.ViskitConfigurationStore;
+import viskit.ViskitUserConfiguration;
 import viskit.ViskitProject;
 import viskit.ViskitStatics;
 import viskit.jgraph.ViskitGraphUndoManager;
@@ -624,7 +624,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 try {
 
                     // First, copy the error.log to the project dir
-                    Files.copy(ViskitConfigurationStore.VISKIT_ERROR_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(ViskitUserConfiguration.VISKIT_ERROR_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     ZipUtils.zipFolder(projectDirectory, projectZipFile);
                 } catch (IOException e) {
                     LOG.error(e);
@@ -709,7 +709,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         closeAll();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
-        ViskitConfigurationStore.instance().clearViskitConfiguration();
+        ViskitUserConfiguration.instance().clearViskitConfiguration();
         clearRecentAssemblyFileList();
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
         ViskitGlobals.instance().getViskitProject().closeProject();
@@ -870,7 +870,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         int idx = 0;
         for (String key : recentAssemblyFileSet) {
             if (key.contains(f.getName()))
-                historyConfiguration.setProperty(ViskitConfigurationStore.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyConfiguration.setProperty(ViskitUserConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "false");
 
             idx++;
         }
@@ -882,7 +882,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         int idx = 0;
         for (String key : recentAssemblyFileSet) {
             if (key.contains(f.getName()))
-                historyConfiguration.setProperty(ViskitConfigurationStore.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                historyConfiguration.setProperty(ViskitUserConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]", "true");
 
             idx++;
         }
@@ -2072,7 +2072,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @SuppressWarnings("unchecked")
     private void recordAssemblyFiles() {
         openAssembliesList = new ArrayList<>(4);
-        List<Object> valueList = historyConfiguration.getList(ViskitConfigurationStore.ASSEMBLY_HISTORY_KEY + "[@value]");
+        List<Object> valueList = historyConfiguration.getList(ViskitUserConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
         LOG.debug("recordAssemblyFiles() valueAr size is: {}", valueList.size());
         int idx = 0;
         String op;
@@ -2080,7 +2080,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         for (Object s : valueList) {
             assemblyFile = (String) s;
             if (recentAssemblyFileSet.add(assemblyFile)) {
-                op = historyConfiguration.getString(ViskitConfigurationStore.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]");
+                op = historyConfiguration.getString(ViskitUserConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true")))
                     openAssembliesList.add(assemblyFile);
@@ -2093,19 +2093,19 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     @SuppressWarnings("unchecked")
     private void recordProjectFiles() {
-        List<Object> valueAr = historyConfiguration.getList(ViskitConfigurationStore.PROJECT_HISTORY_KEY + "[@value]");
+        List<Object> valueAr = historyConfiguration.getList(ViskitUserConfiguration.PROJECT_HISTORY_KEY + "[@value]");
         LOG.debug("recordProjectFiles valueAr size is: {}", valueAr.size());
         for (Object value : valueAr)
             adjustRecentProjectSet(new File((String) value));
     }
 
     private void saveAssemblyHistoryXML(Set<String> recentFiles) {
-        historyConfiguration.clearTree(ViskitConfigurationStore.RECENT_ASSEMBLY_CLEAR_KEY);
+        historyConfiguration.clearTree(ViskitUserConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
         int idx = 0;
 
         // The value's path is already delimited with "/"
         for (String value : recentFiles) {
-            historyConfiguration.setProperty(ViskitConfigurationStore.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
+            historyConfiguration.setProperty(ViskitUserConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfiguration.getDocument().normalize();
@@ -2118,7 +2118,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private void saveProjectHistoryXML(Set<String> recentFiles) {
         int idx = 0;
         for (String value : recentFiles) {
-            historyConfiguration.setProperty(ViskitConfigurationStore.PROJECT_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
+            historyConfiguration.setProperty(ViskitUserConfiguration.PROJECT_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
         historyConfiguration.getDocument().normalize();
@@ -2166,7 +2166,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     private void initializeConfiguration() {
         try {
-            historyConfiguration = ViskitConfigurationStore.instance().getViskitAppConfiguration();
+            historyConfiguration = ViskitUserConfiguration.instance().getViskitAppConfiguration();
         } 
         catch (Exception e) {
             LOG.error("Error loading history file: {}", e.getMessage());

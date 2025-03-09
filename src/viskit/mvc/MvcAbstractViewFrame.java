@@ -1,7 +1,7 @@
 package viskit.mvc;
 
 import javax.swing.JFrame;
-import viskit.ViskitConfigurationStore;
+import viskit.ViskitUserConfiguration;
 import viskit.util.TitleListener;
 
 /**

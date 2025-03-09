@@ -232,10 +232,10 @@ public class ViskitProject
         else {
             loadProjectFromFile(getProjectFile());
         }
-        ViskitConfigurationStore.instance().setProjectXMLConfiguration(getProjectFile().getPath());
+        ViskitUserConfiguration.instance().setProjectXMLConfiguration(getProjectFile().getPath());
 
-        XMLConfiguration config = ViskitConfigurationStore.instance().getProjectXMLConfiguration();
-        config.setProperty(ViskitConfigurationStore.VISKIT_PROJECT_NAME, getProjectRoot().getName());
+        XMLConfiguration config = ViskitUserConfiguration.instance().getProjectXMLConfiguration();
+        config.setProperty(ViskitUserConfiguration.VISKIT_PROJECT_NAME, getProjectRoot().getName());
 
         setProjectOpen(projectFileExists);
         return projectFileExists;
@@ -398,10 +398,10 @@ public class ViskitProject
 
     public void closeProject() 
     {
-        ViskitConfigurationStore viskitConfigurationStore = ViskitConfigurationStore.instance();
-        viskitConfigurationStore.getViskitGuiConfiguration().setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME_KEY, "");
-        viskitConfigurationStore.cleanup();
-        viskitConfigurationStore.removeProjectXMLConfiguration(viskitConfigurationStore.getProjectXMLConfiguration());
+        ViskitUserConfiguration viskitUserConfiguration = ViskitUserConfiguration.instance();
+        viskitUserConfiguration.getViskitGuiConfiguration().setProperty(ViskitUserConfiguration.PROJECT_TITLE_NAME_KEY, "");
+        viskitUserConfiguration.cleanup();
+        viskitUserConfiguration.removeProjectXMLConfiguration(viskitUserConfiguration.getProjectXMLConfiguration());
         setProjectOpen(false);
         ViskitGlobals.instance().setTitleProjectName("");
     }
@@ -424,8 +424,8 @@ public class ViskitProject
             return;
         }
         this.projectRootDirectory = projectRoot;
-        XMLConfiguration guiConfig = ViskitConfigurationStore.instance().getViskitGuiConfiguration();
-        guiConfig.setProperty(ViskitConfigurationStore.PROJECT_TITLE_NAME_KEY, projectRoot.getName()); // TODO check
+        XMLConfiguration guiConfig = ViskitUserConfiguration.instance().getViskitGuiConfiguration();
+        guiConfig.setProperty(ViskitUserConfiguration.PROJECT_TITLE_NAME_KEY, projectRoot.getName()); // TODO check
     }
     
     public String getProjectRootDirectoryPath()

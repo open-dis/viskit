@@ -35,28 +35,28 @@ import viskit.doe.FileHandler;
  * @since 11:09:07 AM
  * @version $Id$
  */
-public class ViskitConfigurationStore 
+public class ViskitUserConfiguration 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitConfigurationStore.class);
+    static final Logger LOG = Log4jUtilities.getLogger(ViskitUserConfiguration.class);
     
     /** Singleton pattern, with final version applied by NetBeans
      * @see https://stackoverflow.com/questions/2832297/java-singleton-pattern
      * @see https://stackoverflow.com/questions/70689/what-is-an-efficient-way-to-implement-a-singleton-pattern-in-java
      */
     // lazy loading, not immediate loading which can fail
-    private static volatile ViskitConfigurationStore INSTANCE = null; 
+    private static volatile ViskitUserConfiguration INSTANCE = null; 
     
     /** singleton pattern
      * @return singleton instance
      */
-    public static ViskitConfigurationStore instance()
+    public static ViskitUserConfiguration instance()
     {
-        ViskitConfigurationStore INSTANCE = ViskitConfigurationStore.INSTANCE;
+        ViskitUserConfiguration INSTANCE = ViskitUserConfiguration.INSTANCE;
         if (INSTANCE == null) { // Check 1
-            synchronized (ViskitConfigurationStore.class) {
-                INSTANCE = ViskitConfigurationStore.INSTANCE;
+            synchronized (ViskitUserConfiguration.class) {
+                INSTANCE = ViskitUserConfiguration.INSTANCE;
                 if (INSTANCE == null) { // Check 2
-                    ViskitConfigurationStore.INSTANCE = INSTANCE = new ViskitConfigurationStore();
+                    ViskitUserConfiguration.INSTANCE = INSTANCE = new ViskitUserConfiguration();
                 }
             }
         }
@@ -65,9 +65,9 @@ public class ViskitConfigurationStore
         return INSTANCE;
         
 //        if (INSTANCE == null) { // Check 1
-//            synchronized (ViskitConfigurationStore.class) {
+//            synchronized (ViskitUserConfiguration.class) {
 //                if (INSTANCE == null) { // Check 2
-//                    INSTANCE = new ViskitConfigurationStore();
+//                    INSTANCE = new ViskitUserConfiguration();
 //                }
 //            }
 //        }
@@ -144,12 +144,12 @@ public class ViskitConfigurationStore
     private static boolean initalized = false;
 
     /** Private constructor cannot be invoked externally */
-    private ViskitConfigurationStore() 
+    private ViskitUserConfiguration() 
     {
         if (!initalized)
             initialize(); // this should only occur once
         // TODO does LOG message interfere with threading?
-        LOG.info("created ViskitConfigurationStore singleton (if this message occurs again, it is a problem)");        
+        LOG.info("created ViskitUserConfiguration singleton (if this message occurs again, it is a problem)");        
     }
     
     public final static void initialize()
@@ -231,11 +231,9 @@ public class ViskitConfigurationStore
     }
 
     /**
-     * Sets key=value pair in the persistent ViskitConfigurationStore.
-     * Rather screwy - a decent design would allow the CombinedConfiguration object
- to do the saving, but it won't.
+     * Sets key=value pair in the persistent ViskitUserConfiguration.
      *
-     * @param key the ViskitConfigurationStore named key to set
+     * @param key the ViskitUserConfiguration named key to set
      * @param newValue the new value of this key
      */
     public void setValue(String key, String newValue) {
@@ -306,22 +304,22 @@ public class ViskitConfigurationStore
 
     /** @return project path for Viskit project directory from user's dot_viskit c_app xml configuration file */
     public String getViskitProjectDirectoryPath() {
-        return getValue(ViskitConfigurationStore.PROJECT_PATH_KEY);
+        return getValue(ViskitUserConfiguration.PROJECT_PATH_KEY);
     }
 
     /** @return project name from user's dot_viskit c_app xml configuration file */
     public String getViskitProjectName() {
-        return getValue(ViskitConfigurationStore.PROJECT_NAME_KEY);
+        return getValue(ViskitUserConfiguration.PROJECT_NAME_KEY);
     }
 
     /** Used to clear all Viskit Configuration information to create a new
      * Viskit Project
      */
     public void clearViskitConfiguration() {
-        setValue(ViskitConfigurationStore.PROJECT_PATH_KEY, "");
-        setValue(ViskitConfigurationStore.PROJECT_NAME_KEY, "");
-        getViskitAppConfiguration().clearTree(ViskitConfigurationStore.RECENT_EVENTGRAPH_CLEAR_KEY);
-        getViskitAppConfiguration().clearTree(ViskitConfigurationStore.RECENT_ASSEMBLY_CLEAR_KEY);
+        setValue(ViskitUserConfiguration.PROJECT_PATH_KEY, "");
+        setValue(ViskitUserConfiguration.PROJECT_NAME_KEY, "");
+        getViskitAppConfiguration().clearTree(ViskitUserConfiguration.RECENT_EVENTGRAPH_CLEAR_KEY);
+        getViskitAppConfiguration().clearTree(ViskitUserConfiguration.RECENT_ASSEMBLY_CLEAR_KEY);
 
         // Retain the recent projects list
     }

@@ -617,11 +617,11 @@ public class ViskitGlobals
     public final void initializeProjectHome() 
     {
         File newProjectFile;
-        String pathPrefix  = ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_PATH_KEY);
+        String pathPrefix  = ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.PROJECT_PATH_KEY);
         if (pathPrefix.startsWith("./"))
             pathPrefix = System.getProperty("user.dir").replaceAll("\\\\", "/") + pathPrefix.substring(1);
         String projectHome = pathPrefix + "/" +
-                             ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_NAME_KEY); 
+                             ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.PROJECT_NAME_KEY); 
 //      String projectHome = getProjectWorkingDirectory().getName();
 
 //////        viskitProject.setProjectRootDirectory( new File(projectHome));
@@ -969,13 +969,13 @@ public class ViskitGlobals
      */
     public final void createProjectWorkingDirectory()
     {
-        if (ViskitConfigurationStore.instance().getViskitAppConfiguration() == null)
+        if (ViskitUserConfiguration.instance().getViskitAppConfiguration() == null)
             return; // unexpected condition
 
         if ((projectName == null) || projectName.isBlank())
         {
-            if  (!ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_NAME_KEY).isBlank())
-                 projectName = ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.PROJECT_NAME_KEY);
+            if  (!ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.PROJECT_NAME_KEY).isBlank())
+                 projectName = ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.PROJECT_NAME_KEY);
             else projectName = DEFAULT_PROJECT_NAME;
         }
         setProjectName(projectName);
@@ -990,7 +990,7 @@ public class ViskitGlobals
             allProjectsBaseDirectory = new File(System.getProperty("user.dir")); // full path is preferred to "."
             
             // use this line if default initializes to user store
-            // allProjectsBaseDirectory = ViskitConfigurationStore.VISKIT_CONFIGURATION_DIR;
+            // allProjectsBaseDirectory = ViskitUserConfiguration.VISKIT_CONFIGURATION_DIR;
             // allProjectsBaseDirectory.mkdir();
             
             // trust but verify
@@ -1330,8 +1330,8 @@ public class ViskitGlobals
             setProjectName(newProjectName);
         }
         ViskitProject.VISKIT_PROJECTS_DIRECTORY = newProjectFile.getParentFile().getAbsolutePath().replaceAll("\\\\", "/"); // de-windows
-        ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
-        ViskitConfigurationStore.instance().setValue(ViskitConfigurationStore.PROJECT_NAME_KEY, newProjectName);
+        ViskitUserConfiguration.instance().setValue(ViskitUserConfiguration.PROJECT_PATH_KEY, ViskitProject.VISKIT_PROJECTS_DIRECTORY);
+        ViskitUserConfiguration.instance().setValue(ViskitUserConfiguration.PROJECT_NAME_KEY, newProjectName);
     }
 
     /**

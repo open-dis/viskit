@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import viskit.ViskitGlobals;
-import viskit.ViskitConfigurationStore;
+import viskit.ViskitUserConfiguration;
 import viskit.control.EventGraphController;
 import viskit.model.Model;
 import viskit.model.ViskitStateVariable;
@@ -314,7 +314,7 @@ public class StateVariableDialog extends ViskitSmallDialog {
                     String s = typ + " " + nam + " = new " + typ;
                     s = s.substring(0, s.lastIndexOf('[') + 1) + arsz + "]";          // stick in size
 
-                    if (ViskitConfigurationStore.instance().getValue(ViskitConfigurationStore.BEANSHELL_WARNING_KEY).equalsIgnoreCase("true")) {
+                    if (ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.BEANSHELL_WARNING_KEY).equalsIgnoreCase("true")) {
                         String result = ViskitGlobals.instance().parseCode(null, s);
                         if (result != null) {
                             boolean ret = BeanshellErrorDialog.showDialog(result, StateVariableDialog.this);
