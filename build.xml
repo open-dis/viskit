@@ -761,7 +761,7 @@ their descpritions.
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
     
-    <target name="clean.all" depends="clean.build,clean.DefaultProject,clean.logs,reset.viskit"/>
+    <target name="clean.all" depends="clean.build,clean.javadoc,clean.DefaultProject,clean.logs,reset.viskit"/>
 
     <!--  === TARGET: clean.build === -->
     <target name="clean.build"
@@ -780,6 +780,13 @@ their descpritions.
             <include name="*.zip"/>
         </delete>
         <!-- Use target clean.logs to clear logs -->
+    </target>
+    
+    <target name="clean.javadoc"
+            description="Deletes javadoc files">
+        <delete dir="javadoc" failonerror="false" verbose="true" includeemptydirs="true">
+            <include name="**/*"/>
+        </delete>
     </target>
     
     <target name="clean.DefaultProject">
@@ -811,6 +818,8 @@ their descpritions.
         <copy todir="${dot.viskit.dir}" verbose="true" file="${c_gui.xml}"/>
         <copy todir="${dot.viskit.dir}" verbose="true" file="${c_README.md}"/>
         <copy todir="MyViskitProjects/DefaultProject" file="${viskitProject.xml}" overwrite="true"/>
+        <antcall target="show.user.c_app.xml"/>
+        <antcall target="show.user.c_gui.xml"/>
     </target>
 
     <!-- These targets are useful for viewing in the console various
@@ -845,13 +854,13 @@ their descpritions.
         </delete>
     </target>
 
-    <target name="show.app.xml" depends="init">
+    <target name="show.user.c_app.xml" depends="init">
         <concat>
             <fileset dir="${dot.viskit.dir}" includes="c_app.xml"/>
         </concat>
     </target>
 
-    <target name="show.gui.xml" depends="init">
+    <target name="show.user.c_gui.xml" depends="init">
         <concat>
             <fileset dir="${dot.viskit.dir}" includes="c_gui.xml"/>
         </concat>
