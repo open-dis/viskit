@@ -77,7 +77,7 @@ import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitProject;
-// import static viskit.ViskitGlobals.isFileReady; // while in thread, do not invoke ViskitStatics!
+// import static viskit.ViskitGlobals.isFileReady; // while in thread, do not invoke ViskitGlobals!
 import viskit.model.AnalystReportModel;
 
 import viskit.model.AssemblyNode;
@@ -109,9 +109,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     protected Set<ReRunnable> runEntitiesSet;
     protected long seed;
 
-    private double stopTime;
+    private double  stopTime;
     private boolean singleStep;
-    private int numberReplications;
+    private int     numberReplications;
     private boolean printReplicationReports;
     private boolean printSummaryReport;
     private boolean saveReplicationData;
@@ -119,7 +119,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     /** Ordering is essential for this collection */
     private Map<String, AssemblyNode> pclNodeCache;
 
-    /** where file gets written */
+    /** where AnalystReport file gets written */
     private File analystReportFile;
     
     private AnalystReportModel analystReportModel;
@@ -139,10 +139,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * the singleton classes */
     /** must be saved prior to running in new thread (several approached did not work), or else
      * retrieved once thread has started in run() method */
-    public File           projectWorkingDirectory;
+    private File          projectDirectory;
     private ViskitProject viskitProject;
-    private ReportStatisticsConfiguration reportStatisticsConfiguration; // depends on ViskitProject
     private ClassLoader   localWorkingClassLoader;
+    private ReportStatisticsConfiguration reportStatisticsConfiguration; // depends on ViskitProject
     
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
@@ -157,11 +157,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     {
         this(); // invoke default constructor
         // receiving parameters for use as Runnable
-        this.projectWorkingDirectory = workingDirectory;
+        this.projectDirectory = workingDirectory;
         
 
         // TODO superfluous?  actual file will be timestamped, actual directory already exists
-//        analystReportFile = new File(ViskitGlobals.instance().getProjectRootDirectoryPath() +
+//        analystReportFile = new File(ViskitGlobals.instance().getProjectDirectoryPath() +
 //                                     "/AnalystReports/", "AnalystReport.xml");
 //        LOG.info("BasicAssembly() constructor created new analystReportFile\n   " + analystReportFile.getAbsolutePath());
     }
@@ -432,7 +432,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     /** @return the absolute path to the temporary analyst report if user enabled */
     public String getAnalystReport() {
-        return (analystReportFile == null) ? null : analystReportFile.getAbsolutePath();
+        
+        return (analystReportFile == null) ? "" : analystReportFile.getAbsolutePath();
     }
 
     public void setDesignPointID(int id) {
@@ -685,7 +686,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Approach 2: default class initialization
         
-        if (projectWorkingDirectory == null) // don't test getWorkingDirectory() which likely produces NPE
+        if (projectDirectory == null) // don't test getWorkingDirectory() which likely produces NPE
         {
             LOG.debug("BLOCKER: run() following initial configuration, getWorkingDirectory() is null");
         }
@@ -738,11 +739,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Approach 3b.  re-use ViskitConfiguration for Apache Commons Configuration code
 
-        if (projectWorkingDirectory == null)
+        if (projectDirectory == null)
         {
-            projectDirectoryPath    = ViskitUserConfiguration.instance().getViskitProjectDirectoryPath();
-            projectWorkingDirectory = new File (projectDirectoryPath);
-            projectName             = ViskitUserConfiguration.instance().getViskitProjectName();
+            projectDirectoryPath = ViskitUserConfiguration.instance().getViskitProjectDirectoryPath();
+            projectName          = ViskitUserConfiguration.instance().getViskitProjectName();
+            projectDirectory     = ViskitUserConfiguration.instance().getViskitProjectDirectory();
         }
         
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -754,19 +755,20 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Approach 4.  "Hardwire" local MyProjects/DefaultProject
         
-        if (projectWorkingDirectory == null)
+        if (projectDirectory == null)
         {
-            projectWorkingDirectory = new File("MyViskitProjects/DefaultProject");
+            projectDirectory = new File("MyViskitProjects/DefaultProject");
+            projectName      = "DefaultProject";
             LOG.info("run() findProjectWorkingDirectoryFromWithinThread() hard-wired directory:\n  " + getWorkingDirectory().getAbsolutePath());
         }
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // all done searching around, report outcome
-        if ((projectWorkingDirectory != null) && projectWorkingDirectory.isDirectory())
+        if ((projectDirectory != null) && projectDirectory.isDirectory())
         {
              // found it!
              LOG.info("run() findProjectWorkingDirectoryFromWithinThread() found working directory!\n  " + getWorkingDirectory().getAbsolutePath());
-             viskitProject = new ViskitProject(projectWorkingDirectory);
+             viskitProject = new ViskitProject(projectDirectory);
         }
         else LOG.error("BLOCKER: run() findProjectWorkingDirectoryFromWithinThread() not successful, analyst reports will fail");
     }
@@ -781,7 +783,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         
         stopSimulationRun = false;
         
-        if (projectWorkingDirectory == null) // don't test getWorkingDirectory() which likely produces NPE
+        if (projectDirectory == null) // don't test getWorkingDirectory() which likely produces NPE
         {
             findProjectWorkingDirectoryFromWithinThread(); // the great mouse hunt
         }
@@ -917,7 +919,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                     LOG.info("Already running.");
                 
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
-                LOG.info("Simulation starting Replication #" + (replication + 1) + " with RNG seed state = " + seed);
+                String spacing = new String();
+                if (seed > 0)
+                    spacing = " ";
+                LOG.info("Simulation starting Replication #" + (replication + 1) + " with RNG seed state = " + spacing + seed);
                 try {
                     Schedule.reset();
                 } 
@@ -1013,9 +1018,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
             try 
             {
-                // Creates the temp file only when user required?? TODO check
-                createTemporaryAnalystReportFile();
-                LOG.info("Temporary analyst report at\n   " + analystReportFile.getAbsolutePath() + "\n"); // debug
+                createAnalystReportFile();
+                LOG.info("createAnalystReportFile() analystReportFile:\n   " + analystReportFile.getAbsolutePath()); // debug
                 
                 // while in thread, do not invoke ViskitStatics!
                 // isFileReady(analystReportFile);
@@ -1063,15 +1067,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * We report the path back to the caller immediately, and it is the 
      * caller's responsibility to dispose of the file once done with it.
      */
-    private void createTemporaryAnalystReportFile()
+    private void createAnalystReportFile()
     {
-        try {
-            analystReportFile = TempFileManager.createTempFile("ViskitAnalystReport", ".xml"); // TODO fix filename
-        } 
-        catch (IOException ioe) {
-            analystReportFile = null;
-            LOG.error("createTemporaryAnalystReportFile() exception: " + ioe); // TODO fix filename
-        }
+        analystReportFile = new File(viskitProject.getAnalystReportsDirectory(), "ViskitAnalystReport" + ".xml");
     }
 
     public void setVerboseReplication(int i) {
@@ -1122,17 +1120,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     }
 
     /**
-     * @return the projectWorkingDirectory
+     * @return the projectDirectory
      */
     private File getWorkingDirectory() {
-        return projectWorkingDirectory;
+        return projectDirectory;
     }
 
     /**
-     * @param workingDirectory the projectWorkingDirectory to set
+     * @param workingDirectory the projectDirectory to set
      */
     public void setWorkingDirectory(File workingDirectory) {
-        this.projectWorkingDirectory = workingDirectory;
+        this.projectDirectory = workingDirectory;
         if (workingDirectory == null)
         {
             LOG.error("setWorkingDirectory() received null value ");

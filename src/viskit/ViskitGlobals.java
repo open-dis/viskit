@@ -943,7 +943,7 @@ public class ViskitGlobals
      * @return current viskitProject root directory path */
     public String getProjectRootDirectoryPath()
     {
-        return viskitProject.getProjectRootDirectoryPath();
+        return viskitProject.getProjectDirectoryPath();
     }
 
     /**
@@ -1024,7 +1024,7 @@ public class ViskitGlobals
         {
 //            // (TODO, questionable) unexpected error condition; looping?
 //            LOG.error("TODO questionable invocation follows...");
-//            viskitProject.setProjectRootDirectory(new File(allProjectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
+//            viskitProject.setProjectDirectory(new File(allProjectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
         }
 
         if (viskitProject.initializeProject()) 

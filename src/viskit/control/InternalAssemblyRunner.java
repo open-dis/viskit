@@ -579,7 +579,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
             if (saveChooser == null) {
-                saveChooser = new JFileChooser(ViskitGlobals.instance().getViskitProject().getProjectRoot());
+                saveChooser = new JFileChooser(ViskitGlobals.instance().getViskitProject().getProjectDirectory());
             }
             File consoleFile = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName("SimulationRunOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(consoleFile);

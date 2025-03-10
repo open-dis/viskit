@@ -104,7 +104,7 @@ public class ViskitProject
     public static final String DEFAULT_PROJECT_NAME = "DefaultProject";
     public static final String NEW_PROJECT_NAME     = "MyNewProject";
 
-    private File projectRootDirectory;
+    private File projectDirectory;
     private File projectFile;
     private File analystReportsDirectory;
     private File analystReportChartsDirectory;
@@ -123,17 +123,22 @@ public class ViskitProject
     private boolean projectOpen = false;
     private Document projectDocument;
 
-    public ViskitProject(File projectRootDirectory)
+    public ViskitProject(File projectDirectory)
     {
-        if (projectRootDirectory.exists() && !projectRootDirectory.isDirectory()) 
+        if (projectDirectory.exists() && !projectDirectory.isDirectory()) 
         {
-            LOG.warn("Project root must be directory, not\n   "+ projectRootDirectory.getAbsolutePath());
+            LOG.error("Project root must be directory, not\n   "+ projectDirectory.getAbsolutePath());
             return;
         }
-        setProjectRootDirectory(projectRootDirectory);
+        else if (!isProject(projectDirectory))
+        {
+            LOG.error("Project directory does not contain a '" + PROJECT_FILE_NAME + "' file\n   "+ projectDirectory.getAbsolutePath());
+            return;
+        }
+        setProjectDirectory(projectDirectory);
         
         boolean projectInitializationSuccess = initializeProject();
-        LOG.info("ViskitProject " + projectRootDirectory.getName() + " projectInitializationSuccessful=" + projectInitializationSuccess);
+        LOG.info("ViskitProject " + projectDirectory.getName() + " projectInitializationSuccessful=" + projectInitializationSuccess);
     }
 
     /** *
@@ -142,15 +147,17 @@ public class ViskitProject
      */
     public final boolean initializeProject() 
     {
-        if (projectRootDirectory == null)
+        if (projectDirectory == null)
             return false;
-        else if (!projectRootDirectory.exists()) {
-             projectRootDirectory.mkdir();
+        else if (!projectDirectory.exists()) {
+             projectDirectory.mkdir();
         }
-        setAnalystReportsDirectory(new File(projectRootDirectory, ANALYST_REPORTS_DIRECTORY_NAME));
+        setAnalystReportsDirectory(new File(projectDirectory, ANALYST_REPORTS_DIRECTORY_NAME));
+        LOG.info("initializeProject() analystReportsDirectory=\n  " + getAnalystReportsDirectory());
         if (!analystReportsDirectory.exists()) {
             getAnalystReportsDirectory().mkdirs();
             try {
+                // copy icon file to AnalystsReport directory to support html report
                 Files.copy(new File(VISKIT_ICON_SOURCE).toPath(), new File(getAnalystReportsDirectory(), VISKIT_ICON_FILE_NAME).toPath());
             } catch (IOException ex) {
                 LOG.error(ex);
@@ -179,17 +186,17 @@ public class ViskitProject
             getAnalystReportStatisticsDirectory().mkdirs();
         }
 
-        setAssembliesDirectory(new File(projectRootDirectory, ASSEMBLIES_DIRECTORY_NAME));
+        setAssembliesDirectory(new File(projectDirectory, ASSEMBLIES_DIRECTORY_NAME));
         if (!assembliesDirectory.exists()) {
             getAssembliesDirectory().mkdir();
         }
 
-        setEventGraphsDirectory(new File(projectRootDirectory, EVENT_GRAPHS_DIRECTORY_NAME));
+        setEventGraphsDirectory(new File(projectDirectory, EVENT_GRAPHS_DIRECTORY_NAME));
         if (!eventGraphsDirectory.exists()) {
             getEventGraphsDirectory().mkdir();
         }
 
-        setBuildDirectory(new File(projectRootDirectory, BUILD_DIRECTORY_NAME));
+        setBuildDirectory(new File(projectDirectory, BUILD_DIRECTORY_NAME));
 
         // Start with a fresh build directory
 //        if (getBuildDirectory().exists()) {
@@ -211,13 +218,13 @@ public class ViskitProject
             getClassesDirectory().mkdirs();
         }
 
-        setLibDirectory(new File(projectRootDirectory, LIB_DIRECTORY_NAME));
+        setLibDirectory(new File(projectDirectory, LIB_DIRECTORY_NAME));
         if (!libDirectory.exists()) {
             getLibDirectory().mkdir();
         }
 
         // If we already have a project file, then load it.  If not, create it
-        setProjectFile(new File(projectRootDirectory, PROJECT_FILE_NAME)); // sets projectFile
+        setProjectFile(new File(projectDirectory, PROJECT_FILE_NAME)); // sets projectFile
         if (!projectFile.exists()) 
         {
             try {
@@ -235,7 +242,7 @@ public class ViskitProject
         ViskitUserConfiguration.instance().setProjectXMLConfiguration(getProjectFile().getPath());
 
         XMLConfiguration config = ViskitUserConfiguration.instance().getProjectXMLConfiguration();
-        config.setProperty(ViskitUserConfiguration.VISKIT_PROJECT_NAME, getProjectRoot().getName());
+        config.setProperty(ViskitUserConfiguration.VISKIT_PROJECT_NAME, getProjectDirectory().getName());
 
         setProjectOpen(projectFileExists);
         return projectFileExists;
@@ -245,7 +252,7 @@ public class ViskitProject
         Document document = new Document();
 
         Element root = new Element(VISKIT_ROOT_NAME);
-        root.setAttribute("name", projectRootDirectory.getName());
+        root.setAttribute("name", projectDirectory.getName());
         document.setRootElement(root);
 
         Element element = new Element(ANALYST_REPORTS_DIRECTORY_NAME);
@@ -393,7 +400,7 @@ public class ViskitProject
     }
 
     public void deleteProject() {
-        deleteDirectoryContents(projectRootDirectory);
+        deleteDirectoryContents(projectDirectory);
     }
 
     public void closeProject() 
@@ -407,30 +414,30 @@ public class ViskitProject
     }
 
     /** @return the root directory of this ViskitProject */
-    public File getProjectRoot() {
-        return projectRootDirectory;
+    public File getProjectDirectory() {
+        return projectDirectory;
     }
 
-    public final void setProjectRootDirectory(File projectRoot)
+    public final void setProjectDirectory(File projectDirectory)
     {
-        if (projectRoot == null)
+        if (projectDirectory == null)
         {
-            LOG.error("ViskitProject setProjectRootDirectory received null File projectRoot");
+            LOG.error("ViskitProject setProjectDirectory received null File projectDirectory");
             return;
         }
-        else if (!projectRoot.exists())
+        else if (!projectDirectory.exists())
         {
-            LOG.error("ViskitProject setProjectRootDirectory received non-existent File projectRoot=\n   " + projectRoot.getAbsolutePath());
+            LOG.error("ViskitProject setProjectDirectory received non-existent File projectDirectory=\n   " + projectDirectory.getAbsolutePath());
             return;
         }
-        this.projectRootDirectory = projectRoot;
+        this.projectDirectory = projectDirectory;
         XMLConfiguration guiConfig = ViskitUserConfiguration.instance().getViskitGuiConfiguration();
-        guiConfig.setProperty(ViskitUserConfiguration.PROJECT_TITLE_NAME_KEY, projectRoot.getName()); // TODO check
+        guiConfig.setProperty(ViskitUserConfiguration.PROJECT_TITLE_NAME_KEY, projectDirectory.getName()); // TODO check
     }
     
-    public String getProjectRootDirectoryPath()
+    public String getProjectDirectoryPath()
     {
-        return projectRootDirectory.getAbsolutePath();
+        return projectDirectory.getAbsolutePath();
     }
 
     public boolean isDirty() {
@@ -450,6 +457,17 @@ public class ViskitProject
      */
     public void setBuildDirectory(File buildDir) {
         this.buildDirectory = buildDir;
+    }
+
+    /**
+     * @param candidateProjectDirectory potential project directory of interest
+     * @return whether a directory contains a Viskit project file
+     */
+    public static boolean isProject(File candidateProjectDirectory) {
+        if (candidateProjectDirectory == null)
+            return false;
+        File   viskitProjectFile = new File(candidateProjectDirectory, PROJECT_FILE_NAME);
+        return viskitProjectFile.isFile();
     }
 
     /**

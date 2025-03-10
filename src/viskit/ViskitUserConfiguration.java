@@ -39,12 +39,8 @@ public class ViskitUserConfiguration
 {
     static final Logger LOG = Log4jUtilities.getLogger(ViskitUserConfiguration.class);
     
-    /** Singleton pattern, with final version applied by NetBeans
-     * @see https://stackoverflow.com/questions/2832297/java-singleton-pattern
-     * @see https://stackoverflow.com/questions/70689/what-is-an-efficient-way-to-implement-a-singleton-pattern-in-java
-     */
     // lazy loading, not immediate loading which can fail
-    private static volatile ViskitUserConfiguration INSTANCE = null; 
+    private static volatile ViskitUserConfiguration INSTANCE = null;
     
     /** singleton pattern
      * @return singleton instance
@@ -63,14 +59,6 @@ public class ViskitUserConfiguration
         if (INSTANCE == null)
             LOG.warn ("initial instance creation failed! check logs afterwards for synchronized singleton safety check");
         return INSTANCE;
-        
-//        if (INSTANCE == null) { // Check 1
-//            synchronized (ViskitUserConfiguration.class) {
-//                if (INSTANCE == null) { // Check 2
-//                    INSTANCE = new ViskitUserConfiguration();
-//                }
-//            }
-//        }
     }
     
     public static final File VISKIT_CONFIGURATION_DIR = new File(System.getProperty("user.home"), ".viskit");
@@ -298,6 +286,11 @@ public class ViskitUserConfiguration
     /** @return project path for Viskit project directory from user's dot_viskit c_app xml configuration file */
     public String getViskitProjectDirectoryPath() {
         return getValue(ViskitUserConfiguration.PROJECT_PATH_KEY);
+    }
+
+    /** @return project path for Viskit project directory from user's dot_viskit c_app xml configuration file */
+    public File getViskitProjectDirectory() {
+        return new File (getViskitProjectDirectoryPath(), getViskitProjectName());
     }
 
     /** @return project name from user's dot_viskit c_app xml configuration file */

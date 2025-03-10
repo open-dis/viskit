@@ -130,7 +130,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void begin() 
     {
-        File projectPath = ViskitGlobals.instance().getViskitProject().getProjectRoot();
+        File projectPath = ViskitGlobals.instance().getViskitProject().getProjectDirectory();
 
         // The initialAssemblyFile is set if we have stated a file "arg" upon startup from the command line
 
@@ -611,7 +611,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             @Override
             public Void doInBackground() {
 
-                projectDirectory = ViskitGlobals.instance().getViskitProject().getProjectRoot();
+                projectDirectory = ViskitGlobals.instance().getViskitProject().getProjectDirectory();
                 projectZipFile = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
                 logFile = new File(projectDirectory, "debug.log");
 
@@ -723,7 +723,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().createProjectWorkingDirectory();
 
         // Add our currently opened project to the recently opened projects list
-        adjustRecentProjectSet(ViskitGlobals.instance().getViskitProject().getProjectRoot());
+        adjustRecentProjectSet(ViskitGlobals.instance().getViskitProject().getProjectDirectory());
         
         ViskitGlobals.instance().setTitleProjectName(ViskitGlobals.instance().getProjectName());
         

@@ -15,8 +15,10 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.IntervalXYDataset;
-import viskit.ViskitGlobals;
-import viskit.ViskitProject;
+import static viskit.ViskitProject.ANALYST_REPORTS_DIRECTORY_NAME;
+import static viskit.ViskitProject.ANALYST_REPORT_CHARTS_DIRECTORY_NAME;
+import static viskit.ViskitProject.ANALYST_REPORT_IMAGES_DIRECTORY_NAME;
+import viskit.ViskitUserConfiguration;
 
 /**
  *
@@ -37,19 +39,21 @@ public class HistogramChart
      * Creates a histogram image in PNG format based on the parameters provided
      *
      * @param title the title of the Histogram
-     * @param label the name of the Histogram
-     * @param data an array of doubles that are to be plotted
+     * @param plotLabel the label for the Histogram
+     * @param dataArray an array of doubles that are to be plotted
      * @return the path url of the created object
      */
-    public String createChart(String title, String label, double[] data) 
+    public String createChart(String title, String plotLabel, double[] dataArray) 
     {
-        ViskitProject vkp = ViskitGlobals.instance().getViskitProject();
-        File fileLocation = new File(vkp.getAnalystReportChartsDirectory(), label + "Histogram.png");
-        IntervalXYDataset dataset = createDataset(label, data);
+        File imagesDirectory = new File(ViskitUserConfiguration.instance().getViskitProjectDirectory(),
+                ANALYST_REPORTS_DIRECTORY_NAME + "/" + ANALYST_REPORT_IMAGES_DIRECTORY_NAME);
+        File fileLocation = new File(imagesDirectory, plotLabel + "Histogram.png");
+//      File fileLocation = new File(viskitProject.getAnalystReportChartsDirectory(), plotLabel + "Histogram.png");
+        IntervalXYDataset dataset = createDataset(plotLabel, dataArray);
         saveChart(createChart(dataset, title, "Value"), fileLocation);
 
-        // Set relative path only
-        return "charts/" + fileLocation.getName();
+        // Return relative path only
+        return ANALYST_REPORT_CHARTS_DIRECTORY_NAME + "/" + fileLocation.getName();
     }
 
     /**
