@@ -145,7 +145,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     private ReportStatisticsConfiguration reportStatisticsConfiguration; // depends on ViskitProject
     private       String projectDirectoryPath = new String();
     private       String projectName          = new String();
-    private final String assemblyName         = this.getName();
+    private final String assemblyName         = this.getName(); // TODO fix, filename might not equal assembly name
         
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
@@ -434,9 +434,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     }
 
     /** @return the absolute path to the temporary analyst report if user enabled */
-    public String getAnalystReport() {
-        
-        return (analystReportFile == null) ? "" : analystReportFile.getAbsolutePath();
+    public String getAnalystReport() 
+    {
+        if (analystReportFile == null)
+        {
+            LOG.error("getAnalystReport() found (analystReportFile == null)"); // unexpected condition
+            return "";
+        }
+        else return analystReportFile.getAbsolutePath();
     }
 
     public void setDesignPointID(int id) {
@@ -779,7 +784,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     @Override
     public void run() // we are now in the thread
     {
-        LOG.info("Now running inside BasicAssembly run() thread...");
+        LOG.info("Now running inside BasicAssembly run() Simulation Run thread...");
         
         stopSimulationRun = false;
         

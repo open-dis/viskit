@@ -21,7 +21,7 @@ import org.apache.commons.configuration2.tree.UnionCombiner;
 import org.apache.logging.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
-import static viskit.ViskitGlobals.isFileReady;
+import static viskit.ViskitStatics.isFileReady;
 import viskit.doe.FileHandler;
 
 /**

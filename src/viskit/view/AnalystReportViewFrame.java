@@ -65,6 +65,7 @@ import javax.swing.table.TableColumn;
 
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
+import static viskit.ViskitStatics.isFileReady;
 
 import viskit.util.OpenAssembly;
 import viskit.control.AnalystReportController;
@@ -186,7 +187,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
     private void _fillLayout() 
     {
-        if (!ViskitGlobals.isFileReady(analystReportModel.getAnalystReportXmlFile()))
+        if (!isFileReady(analystReportModel.getAnalystReportXmlFile()))
         {
             LOG.error ("_fillLayout() problem, analystReportModel.getAnalystReportXmlFile() not ready");
             return;
@@ -257,9 +258,9 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         headerPanel.add(new JLabel("Document Label"));
         headerPanel.add(documentLabelTF);
         Dimension d = new Dimension(Integer.MAX_VALUE, titleTF.getPreferredSize().height);
-        titleTF.setMaximumSize(new Dimension(d));
-        analystNameTF.setMaximumSize(new Dimension(d));
-        dateTF.setMaximumSize(new Dimension(d));
+                titleTF.setMaximumSize(new Dimension(d));
+          analystNameTF.setMaximumSize(new Dimension(d));
+                 dateTF.setMaximumSize(new Dimension(d));
         documentLabelTF.setMaximumSize(new Dimension(d));
         SpringUtilities.makeCompactGrid(headerPanel, 4, 2, 10, 10, 5, 5);
 

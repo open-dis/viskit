@@ -86,11 +86,11 @@ public class ViskitProject
     public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENT_GRAPHS_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_STATISTICS_DIRECTORY_NAME = "statistics";
 
-    public static final String BUILD_DIRECTORY_NAME = "build";
+    public static final String BUILD_DIRECTORY_NAME   = "build";
     public static final String CLASSES_DIRECTORY_NAME = "classes";
-    public static final String SOURCE_DIRECTORY_NAME = "src";
-    public static final String DIST_DIRECTORY_NAME = "dist";
-    public static final String LIB_DIRECTORY_NAME = "lib";
+    public static final String SOURCE_DIRECTORY_NAME  = "src";
+    public static final String DIST_DIRECTORY_NAME    = "dist";
+    public static final String LIB_DIRECTORY_NAME     = "lib";
 
     static final Logger LOG = Log4jUtilities.getLogger(ViskitProject.class);
 
@@ -213,9 +213,10 @@ public class ViskitProject
             getSrcDirectory().mkdirs();
         }
 
+        // packageName "examples" set elsewhere
         setClassesDirectory(new File(getBuildDirectory(), CLASSES_DIRECTORY_NAME));
         if (!classesDirectory.exists()) {
-            getClassesDirectory().mkdirs();
+            getClassesDirectory().mkdirs(); // create directory and intermediate subdirectories
         }
 
         setLibDirectory(new File(projectDirectory, LIB_DIRECTORY_NAME));
@@ -346,7 +347,7 @@ public class ViskitProject
                     classPathSet.add(additionalJarZipFilePath);
                 }
             }
-            LOG.debug(getEventGraphsDirectory().getCanonicalPath());
+            LOG.debug(getEventGraphsDirectory().getAbsolutePath());
 
             // Now list any paths inside/outside of the project space, i.e. ${other path}/build/classes
             String[] extraClassPathsArray = ViskitUserPreferences.getExtraClassPathArray();

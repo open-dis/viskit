@@ -54,7 +54,7 @@ import org.jdom.filter.ElementFilter;
 
 import viskit.util.EventGraphCache;
 import viskit.ViskitGlobals;
-import static viskit.ViskitGlobals.isFileReady;
+import static viskit.ViskitStatics.isFileReady;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.doe.FileHandler;
@@ -1145,19 +1145,14 @@ public final class AnalystReportModel extends MvcAbstractModel
         if  (returnValue == 0) // yes, build and show report
         {
             String htmlFilePath = new String();
-        
-            try
-            {                
-                htmlFilePath = getAnalystReportXmlFile().getCanonicalPath();
-            }
-            catch (IOException ioe)
-            {
-                LOG.error("Trying to view HTML report from XML upon first arrival", ioe);
-            }
+                  
+            htmlFilePath = getAnalystReportXmlFile().getAbsolutePath();
             // change file extension. remove timestamp for HTML file path
             htmlFilePath = htmlFilePath.substring(0,htmlFilePath.indexOf("_AnalystReport")) + "_AnalystReport.html";
             if (htmlFilePath.startsWith("."))
-                htmlFilePath = htmlFilePath.substring(2); // possible problem
+                htmlFilePath = htmlFilePath.substring(2); // no "hidden" files; possible problem?
+            LOG.info("announceAnalystReportReadyToView() htmlFilePath=\n   ", htmlFilePath);
+            
             XsltUtility.runXslt(getAnalystReportXmlFile().getAbsolutePath(),
                 htmlFilePath, "config/AnalystReportXMLtoHTML.xslt");
             ViskitGlobals.instance().getAnalystReportController().showHtmlViewer(htmlFilePath); // TODO show HTML, need filename

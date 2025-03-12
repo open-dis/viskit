@@ -52,8 +52,8 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.*;
 
 import viskit.ViskitGlobals;
-import static viskit.ViskitGlobals.isFileReady;
 import viskit.ViskitStatics;
+import static viskit.ViskitStatics.isFileReady;
 import viskit.doe.FileHandler;
 
 /**

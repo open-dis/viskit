@@ -114,7 +114,8 @@ public class LinearRegressionChart
      * @param data an array of doubles that are to be plotted
      * @return the path url of the created object
      */
-    public String createChart(String title, String plotLabel, double[] data) {
+    public String createChart(String title, String plotLabel, double[] data) 
+    {
         File chartsDirectory = new File(ViskitUserConfiguration.instance().getViskitProjectDirectory(),
                 ANALYST_REPORTS_DIRECTORY_NAME + "/" + ANALYST_REPORT_CHARTS_DIRECTORY_NAME);
         File fileLocation = new File(chartsDirectory, plotLabel + "LinearRegression.png");

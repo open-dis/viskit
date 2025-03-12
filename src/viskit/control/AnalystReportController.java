@@ -52,7 +52,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
-import static viskit.ViskitGlobals.isFileReady;
+import static viskit.ViskitStatics.isFileReady;
 import viskit.mvc.MvcAbstractController;
 import viskit.model.AnalystReportModel;
 import viskit.util.XsltUtility;
@@ -98,7 +98,7 @@ public class AnalystReportController extends MvcAbstractController {
         String outputFilenameDated = (assemblyName + "_AnalystReport_" + dateOutput + ".xml");
         String outputFilename      = (assemblyName + "_AnalystReport"               + ".xml");
 
-        File analystReportXmlFile = new File(analystReportDirectory, outputFilename);
+        File analystReportXmlFile = new File(analystReportDirectory, outputFilenameDated);
         
         LOG.info("xmlSourceFile.getAbsolutePath()=\n   " + xmlSourceFile.getAbsolutePath());
         isFileReady(xmlSourceFile);

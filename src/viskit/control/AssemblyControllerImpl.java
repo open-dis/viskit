@@ -92,6 +92,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     /** The path to an assembly file if given from the command line */
     private String initialAssemblyFile;
+    
+    private static ViskitProject viskitProject;
 
     /** The handler to run an assembly */
     private SimulationRunInterface runner;
@@ -130,7 +132,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void begin() 
     {
-        File projectPath = ViskitGlobals.instance().getViskitProject().getProjectDirectory();
+        if (viskitProject == null)
+            viskitProject = ViskitGlobals.instance().getViskitProject();
+        File projectPath =  viskitProject.getProjectDirectory();
 
         // The initialAssemblyFile is set if we have stated a file "arg" upon startup from the command line
 
@@ -1434,14 +1438,16 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
-        if (!checkSaveForSourceCompile() || assemblyModel.getCurrentFile() == null) {
-            return;
+        if (!checkSaveForSourceCompile() || (assemblyModel == null) || (assemblyModel.getCurrentFile() == null)) 
+        {
+            LOG.error("viewXML() unable to retrieve assemblyModel");
+                    return;
         }
-
         ViskitGlobals.instance().getAssemblyViewFrame().displayXML(assemblyModel.getCurrentFile());
     }
 
-    private boolean checkSaveForSourceCompile() {
+    private boolean checkSaveForSourceCompile()
+    {
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
 
         // Perhaps a cached file is no longer present in the path
@@ -1552,87 +1558,97 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     /** Create and test compile our EventGraphs and Assemblies from XML
      *
-     * @param src the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
+     * @param sourceCode the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
      * @return a reference to a successfully compiled *.class file or null if
      * a compile failure occurred
      */
-    public static File compileJavaClassFromString(String src) {
+    public static File compileJavaClassFromString(String sourceCode) 
+    {
         String baseName;
 
         // Find the package subdirectory
-        Pattern pat = Pattern.compile("package.+;");
-        Matcher mat = pat.matcher(src);
-        boolean fnd = mat.find();
+        Pattern patttern = Pattern.compile("package.+;");
+        Matcher matcher = patttern.matcher(sourceCode);
+        boolean fnd = matcher.find();
 
         String packagePath = "";
-        String pkg = "";
+        String packageName = "";
         if (fnd) {
-            int st = mat.start();
-            int end = mat.end();
-            String s = src.substring(st, end);
-            pkg = src.substring(st, end - 1);
-            pkg = pkg.substring("package".length(), pkg.length()).trim();
+            int startIndex = matcher.start();
+            int   endIndex = matcher.end();
+            String s = sourceCode.substring(startIndex, endIndex);
+            packageName = sourceCode.substring(startIndex, endIndex - 1);
+            packageName = packageName.substring("package".length(), packageName.length()).trim();
             s = s.replace(';', File.separatorChar);
             String[] sa = s.split("\\s");
             sa[1] = sa[1].replace('.', File.separatorChar);
             packagePath = sa[1].trim();
         }
 
-        pat = Pattern.compile("public\\s+class\\s+");
-        mat = pat.matcher(src);
-        mat.find();
+        patttern = Pattern.compile("public\\s+class\\s+");
+        matcher = patttern.matcher(sourceCode);
+        matcher.find();
 
-        int end = mat.end();
-        String s = src.substring(end, src.length()).trim();
+        int end = matcher.end();
+        String s = sourceCode.substring(end, sourceCode.length()).trim();
         String[] sa = s.split("\\s+");
 
         baseName = sa[0];
 
-        FileWriter fw = null;
+        FileWriter sourceCodeFileWriter = null;
         boolean compileSuccess;
         try {
-
-            // Should always have a live ViskitProject
-            ViskitProject viskitProject = ViskitGlobals.instance().getViskitProject();
+            // expecting to always have a active ViskitProject
+            if (viskitProject == null)
+                viskitProject = ViskitGlobals.instance().getViskitProject(); // TODO breaks singleton pattern?
 
             // Create, or find the project's java source and package
-            File srcPkg = new File(viskitProject.getSrcDirectory(), packagePath);
-            if (!srcPkg.isDirectory())
-                srcPkg.mkdirs();
-            File javaFile = new File(srcPkg, baseName + ".java");
-            javaFile.createNewFile();
+            File sourcePackagePath = new File(viskitProject.getSrcDirectory(), packagePath);
+            if (!sourcePackagePath.isDirectory())
+                 sourcePackagePath.mkdirs(); // include intermediate subdirectories
+            File javaSourceFile = new File(sourcePackagePath, baseName + ".java");
+            javaSourceFile.createNewFile();
 
-            fw = new FileWriter(javaFile);
-            fw.write(src);
+            sourceCodeFileWriter = new FileWriter(javaSourceFile);
+            sourceCodeFileWriter.write(sourceCode);
 
             // An error stream to write additional error info out to
-            OutputStream baosOut = new ByteArrayOutputStream();
-            Compiler.setOutPutStream(baosOut);
+            OutputStream baosOutputStream = new ByteArrayOutputStream();
+            Compiler.setOutPutStream(baosOutputStream);
 
-            File classesDir = viskitProject.getClassesDirectory();
+            File classesDirectory = viskitProject.getClassesDirectory();
+            
+            String relativePathToCompiledClass = packagePath + baseName + ".class";
+            File compiledClassFile = new File(classesDirectory.getAbsolutePath() + "/" + relativePathToCompiledClass);
 
-            LOG.info("compileJavaClassFromString() compiling file:\n   " + javaFile.getCanonicalPath());
+            LOG.info("compileJavaClassFromString() compiling file:\n   " + javaSourceFile.getAbsolutePath() + " to\n   " +
+                         compiledClassFile.getAbsolutePath());
 
             // This will create a class/package to place the .class file
-            String diagnostic = Compiler.invoke(pkg, baseName, src);
-            compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
-            if (compileSuccess) {
+            String diagnostic = Compiler.invoke(packageName, baseName, sourceCode);
+            compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);            
+
+            LOG.debug("compileJavaClassFromString() compiledClassFile=\n   " + compiledClassFile.getAbsolutePath());
+            if (compileSuccess) 
+            {
                 LOG.info("compileJavaClassFromString() " + diagnostic + "\n");
-                return new File(classesDir, packagePath + baseName + ".class");
+                return compiledClassFile;
             } 
-            else {
+            else
+            {
                 LOG.error("compileJavaClassFromString() " + diagnostic);
-                if (!baosOut.toString().isEmpty())
-                    LOG.error("compileJavaClassFromString() " + baosOut.toString());
+                if (!baosOutputStream.toString().isEmpty())
+                    LOG.error("compileJavaClassFromString() " + baosOutputStream.toString());
             }
 
-        } catch (IOException ioe) {
+        } 
+        catch (IOException ioe) {
             LOG.error("compileJavaClassFromString() exception" + ioe);
         } 
         finally {
             try {
-                if (fw != null)
-                    fw.close();
+                if (sourceCodeFileWriter != null)
+                    sourceCodeFileWriter.close();
             } 
             catch (IOException e) {}
         }

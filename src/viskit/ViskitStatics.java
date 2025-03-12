@@ -457,37 +457,37 @@ public class ViskitStatics
         }
     }
 
-    /** Attempt to resolve an unqualified to a qualified class name.  This only
-     * works for classes that are on the classpath that are not contained in a
-     * jar file
+    /** Attempt to resolve an unqualified class name to a qualified class name. 
+     * This only works for classes that are on the classpath that are
+     * not contained in a jar file.
      *
      * @param name the unqualified class name to resolve
      * @return a fully resolved class on the classpath
      */
-    static Class<?> tryUnqualifiedName(String name) {
-
+    static Class<?> tryUnqualifiedName(String name) 
+    {
         String systemUserDir  = System.getProperty("user.dir");
         String systemUserHome = System.getProperty("user.home");
-        String workDir = ViskitGlobals.instance().getProjectWorkingDirectory().getPath();
+        String workingDirectory = ViskitGlobals.instance().getProjectWorkingDirectory().getPath();
 
         FindFile finder;
-        Path startingDir;
+        Path startingDirectory;
         String pattern = name + "\\.class";
-        Class<?> c = null;
+        Class<?> classOfInterest = null;
         LocalBootLoader loader = (LocalBootLoader) ViskitGlobals.instance().getViskitApplicationClassLoader();
         String[] classpaths = loader.getClassPath();
         String clazz;
 
-        for (String cpath : classpaths) {
-
+        for (String classpathEntry : classpaths) 
+        {
             // We can deal with jars w/the SimpleDirectoriesAndJarsClassLoader
-            if (cpath.contains(".jar")) {continue;}
+            if (classpathEntry.contains(".jar")) {continue;}
 
-            startingDir = Paths.get(cpath);
+            startingDirectory = Paths.get(classpathEntry);
             finder = new FindFile(pattern);
 
             try {
-                Files.walkFileTree(startingDir, finder);
+                Files.walkFileTree(startingDirectory, finder);
             } catch (IOException e) {
                 LOG.error(e);
             }
@@ -501,21 +501,23 @@ public class ViskitStatics
                         clazz = clazz.substring(systemUserHome.length() + 1, clazz.length());
                     else if (clazz.contains(systemUserDir))
                         clazz = clazz.substring(systemUserDir.length() + 1, clazz.length());
-                    else if (clazz.contains(workDir))
-                        clazz = clazz.substring(workDir.length() + 1, clazz.length());
+                    else if (clazz.contains(workingDirectory))
+                        clazz = clazz.substring(workingDirectory.length() + 1, clazz.length());
 
-                    // Strip off .class and replace File.separatorChar w/ a "."
+                    // Strip off .class and replace File.separatorChar with a "."
                     clazz = clazz.substring(0, clazz.lastIndexOf(".class"));
                     clazz = clazz.replace(File.separatorChar, '.');
 
-                    c = Class.forName(clazz, false, loader);
+                    classOfInterest = Class.forName(clazz, false, loader);
                     break;
                 }
-            } catch (ClassNotFoundException e) {}
-
+            } 
+            catch (ClassNotFoundException e) 
+            {
+                // unexpected condition
+            }
         }
-
-        return c;
+        return classOfInterest;
     }
 
     public static String getPathSeparator() {

@@ -263,9 +263,12 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return currentAssemblyModelFile;
     }
     
-    public String getName() {
-        if  (currentAssemblyModelFile != null)
-             return currentAssemblyModelFile.getName().substring(0, currentAssemblyModelFile.getName().indexOf(".xml"));
+    public String getName() 
+    {
+        if  (      (currentAssemblyModelFile != null) && (currentAssemblyModelFile.getName().contains(".")))
+             return currentAssemblyModelFile.getName().substring(0, currentAssemblyModelFile.getName().lastIndexOf(".")); // followed by file suffix xml
+        else if    (currentAssemblyModelFile != null)
+             return currentAssemblyModelFile.getName();
         else return ""; // unexpected, a name should be present
     }
 
