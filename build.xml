@@ -800,6 +800,7 @@ their descpritions.
                 <include name="**/*.png"/>
                 <include name="**/*.html"/>
                 <include name="**/*.xml"/>
+                <exclude name="archive/**/*"/>
             </fileset>
         </delete>
         <delete verbose="true">
