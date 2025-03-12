@@ -158,7 +158,7 @@
         </xsl:choose>
         <p align="center">Analysis date:
             <b>
-                <xsl:value-of select="@date"/>
+                <xsl:value-of select="@date"/><!-- TODO problem with stray character when displaying date -->
             </b>
         </p>
     </xsl:template>
