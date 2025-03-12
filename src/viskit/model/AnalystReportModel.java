@@ -124,7 +124,10 @@ public final class AnalystReportModel extends MvcAbstractModel
             LOG.error("Constructor exception reading {}", statisticsReportPath + " : " + e.getMessage());
         }
         if (newDocument == null)
+        {
+            LOG.error("Constructor error, found null document\n  " +  statisticsReportPath);
             return; // statistics XML was not written to, not selected for recording
+        }
 
         setStatisticsReportDocument(newDocument);
         setPclNodeCache(map);
@@ -182,7 +185,8 @@ public final class AnalystReportModel extends MvcAbstractModel
         }
     }
 
-    private void initializeDocument() {
+    private void initializeDocument()
+    {
         reportJdomDocument = new Document();
         rootElement = new Element("AnalystReport");
         reportJdomDocument.setRootElement(rootElement);
@@ -191,7 +195,8 @@ public final class AnalystReportModel extends MvcAbstractModel
         setDefaultValues();
     }
 
-    private void fillDocument() {
+    private void fillDocument()
+    {
         createHeader();
         createExecutiveSummary();
         createSimulationLocation();
@@ -208,7 +213,8 @@ public final class AnalystReportModel extends MvcAbstractModel
      * @return the initial temp file to saved for further post-processing
      * @throws java.lang.Exception general catchall
      */
-    public File writeToXMLFile(File file) throws Exception {
+    public File writeToXMLFile(File file) throws Exception
+    {
         if (file == null)
             file = writeToXMLFile();
         _writeCommon(file);
@@ -222,11 +228,13 @@ public final class AnalystReportModel extends MvcAbstractModel
         return TempFileManager.createTempFile("AnalystReport", ".xml");
     }
 
-    private void _writeCommon(File fil) {
+    private void _writeCommon(File file) 
+    {
         try {
-            FileHandler.marshallJdom(fil, reportJdomDocument, false);
-        } catch (IOException | JDOMException e) {
-            LOG.error("Bad JDOM op {}: ", e);
+            FileHandler.marshallJdom(file, reportJdomDocument, false);
+        } 
+        catch (IOException | JDOMException e) {
+            LOG.error("_writeCommon(" + file.getName() + ") Bad JDOM operation: {}: ", e);
         }
     }
 
@@ -251,41 +259,46 @@ public final class AnalystReportModel extends MvcAbstractModel
     /**
      * Creates the root element for the analyst report
      */
-    public void createHeader() {
-        rootElement.setAttribute("name", "");
+    public void createHeader() 
+    {
+        // keeping filename out of files seemslike a good idea, but might be userful on the display as an uneditable value
+        rootElement.setAttribute("name",   "");
         rootElement.setAttribute("access", "");
         rootElement.setAttribute("author", "");
-        rootElement.setAttribute("date", "");
+        rootElement.setAttribute("date",   "");
     }
 
     /**
      * Populates the executive summary portion of the AnalystReport XML
      */
-    public void createExecutiveSummary() {
+    public void createExecutiveSummary()
+    {
         exececutiveSummaryElement = new Element("ExecutiveSummary");
         exececutiveSummaryElement.setAttribute("comments", "true"); // TODO description
         rootElement.addContent(exececutiveSummaryElement);
     }
 
     /** Creates the SimulationLocation portion of the analyst report XML */
-    public void createSimulationLocation() {
+    public void createSimulationLocation()
+    {
         simulationLocationElement = new Element("Location");
         simulationLocationElement.setAttribute("comments", "true"); // TODO description
-        simulationLocationElement.setAttribute("images", "true");
-        makeComments(simulationLocationElement, "SL", "");
-        makeProductionNotes(simulationLocationElement, "SL", "");
-        makeConclusions(simulationLocationElement, "SL", "");
+        simulationLocationElement.setAttribute("images",   "true");
+        makeComments(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
+        makeProductionNotes(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
+        makeConclusions(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
         rootElement.addContent(simulationLocationElement);
     }
 
     /** Creates the simulation configuration portion of the Analyst report XML */
-    private void createSimulationConfiguration() {
+    private void createSimulationConfiguration() 
+    {
         simulationConfigurationElement = new Element("SimulationConfiguration");
         simulationConfigurationElement.setAttribute("comments", "true"); // TODO description
         simulationConfigurationElement.setAttribute("image", "true");
         simulationConfigurationElement.setAttribute("entityTable", "true");
         makeComments(simulationConfigurationElement, "SC", ""); // TODO description
-        makeProductionNotes(simulationConfigurationElement, "SC", "");
+        makeProductionNotes(simulationConfigurationElement, "SC", ""); // TODO SC -> SimulationConfiguration
         makeConclusions(simulationConfigurationElement, "SC", "");
         if (assemblyFile != null) {
             simulationConfigurationElement.addContent(EventGraphCache.instance().getEntityTable());
@@ -1176,7 +1189,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                                               { this.analystReportFileXml     = newAnalystReportFile; }
     public void setStatisticsReportDocument   (Document newStatisticsReportDocument)      
                                               { this.statisticsReportDocument = newStatisticsReportDocument; }
-    public void setStatisticsReportPath       (String filename)           { this.statisticsReportPath = filename; }
+    public void setStatisticsReportPath       (String filePath)           { this.statisticsReportPath = filePath; }
     public void setAuthor                     (String s) { rootElement.setAttribute("author", s); };
     public void setAccessLabel                (String s) { rootElement.setAttribute("access", s);}
     public void setDateOfReport               (String s) { rootElement.setAttribute("date", s);}

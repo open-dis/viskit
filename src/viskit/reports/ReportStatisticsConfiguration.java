@@ -23,8 +23,8 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 
 import simkit.stat.SampleStatistics;
-import viskit.ViskitGlobals;
 import viskit.ViskitProject;
+import viskit.ViskitStatics;
 import viskit.doe.FileHandler;
 
 /**
@@ -221,11 +221,12 @@ public class ReportStatisticsConfiguration {
     }
 
     /**
-     * @return a stats report in jdom.Document format; Naw...filename
+     * Save statistics, provide path to report
+     * @return path to statistics XML file
      */
-    public String getReport() {
-        Document report = reportStatisticsDOM.getReport();
-        return saveData(report);
+    public String saveStatisticsGetReportPath() {
+        Document reportDocument = reportStatisticsDOM.getReport();
+        return saveStatisticsData(reportDocument);
     }
 
     /**
@@ -233,26 +234,25 @@ public class ReportStatisticsConfiguration {
      * @param reportDocument a data report to save
      * @return the String representation of this report
      */
-    public String saveData(Document reportDocument) 
+    public String saveStatisticsData(Document reportDocument) 
     {
-        SimpleDateFormat formatter;
-        String dateFormat;
-
-        formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
-        Date today = new Date();
-        dateFormat = formatter.format(today);
-
         // Create a unique file name for each DTG/Location Pair
         File analystReportStatisticsDirectory = localViskitProject.getAnalystReportStatisticsDirectory();
 
-        String statisticsOutputFileName = (author + assemblyName + "_" + dateFormat + ".xml");
+        String statisticsOutputFileName = (assemblyName + "_" + "Statistics" + "_" + ViskitStatics.todaysDate() + ".xml"); // superfluous: author + "_" + 
         File analystReportStatisticsDirectoryFile = new File(analystReportStatisticsDirectory, statisticsOutputFileName);
 
         try {
             FileHandler.marshallJdom(analystReportStatisticsDirectoryFile, reportDocument, false);
-        } catch (JDOMException | IOException ex) {
-            LOG.error( ex);
-            ex.printStackTrace(System.err);
+        } 
+        catch (JDOMException | IOException ex) {
+            if (reportDocument == null)
+                LOG.error( "saveData(" + null + "} reportDocument is null, exception: "    + ex.getMessage());
+            else 
+            {
+                LOG.error( "saveData(" + reportDocument.getRootElement() + "} exception: " + ex.getMessage());
+                ex.printStackTrace(System.err);
+            }
             return null;
         }
         LOG.info("saveData(" + reportDocument.getRootElement().getName() + ") analystReportStatisticsDirectoryFile at\n   " + analystReportStatisticsDirectoryFile.getAbsolutePath());

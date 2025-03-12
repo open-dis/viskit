@@ -51,8 +51,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -903,5 +905,16 @@ public class ViskitStatics
         }
         return true;
     }
+    
+    public static String todaysDate()
+    {
+        SimpleDateFormat formatter;
+        String todaysDate;
+        
+        formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
+        Date today = new Date();
+        todaysDate = formatter.format(today);
+        return todaysDate;
+    }
 
-} // end class ViskitStatics
+} // end class ViskitStatics.

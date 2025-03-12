@@ -796,7 +796,7 @@ public class ViskitProject
                     return false;
                 }
 
-                // Be brutally specific to reduce looking for any *.xml
+                // Be strictly specific to reduce looking for any *.xml
                 return name.equalsIgnoreCase(PROJECT_FILE_NAME);
             });
 

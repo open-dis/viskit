@@ -78,10 +78,8 @@ import org.jfree.data.statistics.Regression;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import viskit.ViskitGlobals;
-import viskit.ViskitProject;
 import static viskit.ViskitProject.ANALYST_REPORTS_DIRECTORY_NAME;
-import static viskit.ViskitProject.ANALYST_REPORT_IMAGES_DIRECTORY_NAME;
+import static viskit.ViskitProject.ANALYST_REPORT_CHARTS_DIRECTORY_NAME;
 import viskit.ViskitUserConfiguration;
 
 /**
@@ -117,14 +115,14 @@ public class LinearRegressionChart
      * @return the path url of the created object
      */
     public String createChart(String title, String plotLabel, double[] data) {
-        File imagesDirectory = new File(ViskitUserConfiguration.instance().getViskitProjectDirectory(),
-                ANALYST_REPORTS_DIRECTORY_NAME + "/" + ANALYST_REPORT_IMAGES_DIRECTORY_NAME);
-        File fileLocation = new File(imagesDirectory, plotLabel + "LinearRegression.png");
+        File chartsDirectory = new File(ViskitUserConfiguration.instance().getViskitProjectDirectory(),
+                ANALYST_REPORTS_DIRECTORY_NAME + "/" + ANALYST_REPORT_CHARTS_DIRECTORY_NAME);
+        File fileLocation = new File(chartsDirectory, plotLabel + "LinearRegression.png");
         XYDataset dataset = createDataset(plotLabel, data);
         saveChart(createChart(dataset, title, "Value"), fileLocation);
 
         // Set relative path only
-        return "charts/" + fileLocation.getName();
+        return ANALYST_REPORT_CHARTS_DIRECTORY_NAME + "/" + fileLocation.getName();
     }
 
     /**

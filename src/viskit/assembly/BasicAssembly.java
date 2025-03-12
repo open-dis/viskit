@@ -143,7 +143,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     private ViskitProject viskitProject;
     private ClassLoader   localWorkingClassLoader;
     private ReportStatisticsConfiguration reportStatisticsConfiguration; // depends on ViskitProject
-    
+    private       String projectDirectoryPath = new String();
+    private       String projectName          = new String();
+    private final String assemblyName         = this.getName();
+        
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
 
@@ -659,9 +662,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     /** This method should only occur wile BasicAssembly is running inside an independent thread. */
     public void findProjectWorkingDirectoryFromWithinThread()
     {
-        String projectDirectoryPath = new String();
-        String projectName          = new String();
-        
         // this should only occur inside the simulation thread
         // TODO hacking wildly here...
 //            File findingClassesDirectory = new File("./build/classes"); // hoping to find we are in project...
@@ -828,7 +828,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             if (viskitProject == null)
                 LOG.error("Incorrect initialization of BasicAssembly in thread context, localViskitProject is null");
             // Creates a ReportStatisticsConfiguration instance and names it based on the name of this Assembly.
-            reportStatisticsConfiguration = new ReportStatisticsConfiguration(this.getName(), viskitProject);
+            reportStatisticsConfiguration = new ReportStatisticsConfiguration(assemblyName, viskitProject);
         }
         // reset the document with existing parameters since it might have run before
         reportStatisticsConfiguration.reset();
@@ -1007,8 +1007,21 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             printWriter.flush();
         }
         
-        if (isEnableAnalystReports()) 
+       if (isEnableAnalystReports()) 
         {
+            createAnalystReportFile();
+            LOG.info("createAnalystReportFile() analystReportFile:\n   " + analystReportFile.getAbsolutePath()); // debug TODO duplicative?
+                
+            analystReportModel = new AnalystReportModel(reportStatisticsConfiguration.saveStatisticsGetReportPath(), pclNodeCache);
+                
+            try {
+                analystReportModel.writeToXMLFile(analystReportFile);
+            }
+            catch (Exception e)
+            {
+                
+            }
+            
 //            // TODO the following block appears to break ViskitGlobals singleton pattern!
 //            // Because there is no instantiated report builder in the current
 //            // thread context, we reflect here
@@ -1016,17 +1029,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
 // TODO better future fix, if possible?  move out of reflection land completely...
 
+/*
             try 
             {
-                createAnalystReportFile();
-                LOG.info("createAnalystReportFile() analystReportFile:\n   " + analystReportFile.getAbsolutePath()); // debug
                 
                 // while in thread, do not invoke ViskitStatics!
                 // isFileReady(analystReportFile);
-                
-                analystReportModel = new AnalystReportModel(reportStatisticsConfiguration.getReport(), pclNodeCache);
-                
-                analystReportModel.writeToXMLFile(analystReportFile);
                 
                 // while in thread, do not invoke ViskitStatics!
 //                if (!isFileReady(analystReportFile))
@@ -1045,7 +1053,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
                 
-                Object arbObject = arbConstructor.newInstance(reportStatisticsConfiguration.getReport(), pclNodeCache);
+                Object arbObject = arbConstructor.newInstance(reportStatisticsConfiguration.saveStatisticsGetReportPath(), pclNodeCache);
                 Method writeToXMLFileMethod = clazz.getMethod("writeToXMLFile", File.class);
                 writeToXMLFileMethod.invoke(arbObject, analystReportFile);
             }
@@ -1057,6 +1065,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             {
                 LOG.error("run() uncaught exception during getWorkingClassLoader() and reflection checks: " + ue);
             }
+*/
         }
     }
 
@@ -1067,9 +1076,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * We report the path back to the caller immediately, and it is the 
      * caller's responsibility to dispose of the file once done with it.
      */
-    private void createAnalystReportFile()
+    private void createAnalystReportFile() //  TODO duplicative?
     {
-        analystReportFile = new File(viskitProject.getAnalystReportsDirectory(), "ViskitAnalystReport" + ".xml");
+        // TODO needs to match statistics file naming convention:
+        analystReportFile = new File(viskitProject.getAnalystReportsDirectory(), 
+                assemblyName + "_" + "AnalystReport" + "_" + ViskitStatics.todaysDate() + ".xml"); // 
+        LOG.info("createAnalystReportFile() new analyst report (duplicative?):\n  " + analystReportFile.getAbsolutePath());
     }
 
     public void setVerboseReplication(int i) {

@@ -45,9 +45,9 @@ public class HistogramChart
      */
     public String createChart(String title, String plotLabel, double[] dataArray) 
     {
-        File imagesDirectory = new File(ViskitUserConfiguration.instance().getViskitProjectDirectory(),
-                ANALYST_REPORTS_DIRECTORY_NAME + "/" + ANALYST_REPORT_IMAGES_DIRECTORY_NAME);
-        File fileLocation = new File(imagesDirectory, plotLabel + "Histogram.png");
+        File chartsDirectory = new File(ViskitUserConfiguration.instance().getViskitProjectDirectory(),
+                ANALYST_REPORTS_DIRECTORY_NAME + "/" + ANALYST_REPORT_CHARTS_DIRECTORY_NAME);
+        File fileLocation = new File(chartsDirectory, plotLabel + "Histogram.png");
 //      File fileLocation = new File(viskitProject.getAnalystReportChartsDirectory(), plotLabel + "Histogram.png");
         IntervalXYDataset dataset = createDataset(plotLabel, dataArray);
         saveChart(createChart(dataset, title, "Value"), fileLocation);
@@ -57,13 +57,13 @@ public class HistogramChart
     }
 
     /**
-     * Creates a data set that is used for making a relative frequency histogram
+     * Creates a data set that is used for making a relative-frequency histogram.
      * @param label
      * @param data
      * @return
      */
-    private IntervalXYDataset createDataset(String label, double[] data) {
-
+    private IntervalXYDataset createDataset(String label, double[] data)
+    {
         HistogramDataset dataset = new HistogramDataset();
         dataset.setType(HistogramType.RELATIVE_FREQUENCY);
 
@@ -74,7 +74,7 @@ public class HistogramChart
 
         // From: http://www.isixsigma.com/library/forum/c031022_number_bins_histogram.asp
         double result = 1 + (3.3 * Math.log(dataCopy.length));
-        int binNum = (int) Math.rint(result);
+        int binNum = (int) Math.rint(result); // Math.rint will roundoff double to nearest integer
 
         dataset.addSeries(label, data, binNum, min, max);
 
