@@ -226,10 +226,10 @@ public class EventGraphCache {
         String eventGraph_image_directory =
             ViskitGlobals.instance().getViskitProject().getAnalystReportEventGraphImagesDirectory().getPath();
 
-        File imgFile = new File(eventGraph_image_directory + "/" + packageName + "/" + eventGraphName + ".xml.png");
-        LOG.debug("Event Graph Image location: {}", imgFile);
+        File eventGraphImageFile = new File(eventGraph_image_directory + "/" + packageName + "/" + eventGraphName + ".xml.png");
+        LOG.info("Event Graph Image location:\n   {}", eventGraphImageFile.getAbsolutePath());
 
-        eventGraphImageFilesList.add(imgFile);
+        eventGraphImageFilesList.add(eventGraphImageFile);
     }
 
     /** Use recursion to find EventGraph XML files
@@ -272,9 +272,9 @@ public class EventGraphCache {
     /** @return a JDOM document (Assembly XML file) */
     public Document getAssemblyDocument() {return assemblyDocument;}
 
-    public List<String> getEventGraphNamesList() {return eventGraphNamesList;}
-    public List<File> getEventGraphFilesList() {return eventGraphFilesList;}
-    public List<File> getEventGraphImageFilesList() {return eventGraphImageFilesList;}
+    public List<String> getEventGraphNamesList()      {return eventGraphNamesList;}
+    public List<File>   getEventGraphFilesList()      {return eventGraphFilesList;}
+    public List<File>   getEventGraphImageFilesList() {return eventGraphImageFilesList;}
 
     /**
      * @return the entityTable

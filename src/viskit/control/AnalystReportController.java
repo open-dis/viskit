@@ -294,7 +294,7 @@ public class AnalystReportController extends MvcAbstractController {
 
     private void buildAnalystReport(File targetFile)
     {
-        LOG.debug("TargetFile is: {}", targetFile);
+        LOG.debug("buildAnalystReport() targetFile is:\n   {}", targetFile);
         AnalystReportModel analystReportModelLocal;
         try {
             analystReportModelLocal = new AnalystReportModel(analystReportViewFrame, targetFile, currentAssemblyFile);

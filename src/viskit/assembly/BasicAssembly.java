@@ -35,13 +35,11 @@ package viskit.assembly;
 
 import edu.nps.util.GenericConversion;
 import edu.nps.util.Log4jUtilities;
-import edu.nps.util.TempFileManager;
 
 import java.beans.PropertyChangeListener;
 
 import java.io.*;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -55,10 +53,6 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import javax.swing.JOptionPane;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.XMLConfiguration;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 
 import org.apache.logging.log4j.Logger;
 
@@ -145,7 +139,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     private ReportStatisticsConfiguration reportStatisticsConfiguration; // depends on ViskitProject
     private       String projectDirectoryPath = new String();
     private       String projectName          = new String();
-    private final String assemblyName         = this.getName(); // TODO fix, filename might not equal assembly name
+    private final String assemblyName         = this.getName(); // TODO can't use this.getName(), since filename might not equal assembly name
         
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here

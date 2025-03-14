@@ -17,7 +17,6 @@ import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.IntervalXYDataset;
 import static viskit.ViskitProject.ANALYST_REPORTS_DIRECTORY_NAME;
 import static viskit.ViskitProject.ANALYST_REPORT_CHARTS_DIRECTORY_NAME;
-import static viskit.ViskitProject.ANALYST_REPORT_IMAGES_DIRECTORY_NAME;
 import viskit.ViskitUserConfiguration;
 
 /**

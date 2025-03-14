@@ -48,6 +48,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -179,9 +180,16 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     /** invokes _fillLayout() when Swing interface is ready */
     public void fillLayout() {
 
-        // We don't always come in on the swing thread.
+        // We don't always come in on the swing thread.thread
+        // TODO need to ensure that panel update occurs before Analyst Report is generated
+        // Use invokeLater() , cannot call invokeAndWait from the event dispatcher 
+        // https://stackoverflow.com/questions/5499921/invokeandwait-method-in-swingutilities
+        // "Basically, everything that affects the GUI in any way musthappen on a single thread,
+        //  This is because experience shows that a multi-threaded GUI is impossible to get rignt."
+        
         SwingUtilities.invokeLater(() -> {
             _fillLayout();
+            analystReportModel.announceAnalystReportReadyToView();
         });
     }
 

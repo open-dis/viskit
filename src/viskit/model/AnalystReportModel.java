@@ -160,6 +160,9 @@ public final class AnalystReportModel extends MvcAbstractModel
             LOG.debug("Successful setting of assembly file");
             postProcessing();
             LOG.debug("Successful post processing of Analyst Report");
+//
+//            announceAnalystReportReadyToView();
+            reportReady = true;
         }
     }
 
@@ -1055,11 +1058,11 @@ public final class AnalystReportModel extends MvcAbstractModel
         return reportReady;
     }
 
-    public void setReportReady(boolean b) {
-        reportReady = b;
+    public void setReportReady(boolean value) {
+        reportReady = value;
     }
 
-    /** Post Analyst Report processing steps to take */
+    /** Post-processing steps to take for Analyst Report preparation */
     private void postProcessing() 
     {
         progressBar.setIndeterminate(true);
@@ -1077,42 +1080,42 @@ public final class AnalystReportModel extends MvcAbstractModel
 
         progressBar.setIndeterminate(false);
         progressBar.setStringPainted(false);
-
-        announceAnalystReportReadyToView();
-        reportReady = true;
     }
 
     /** Utility method used here to invoke the capability to capture all Event
      * Graph images of which are situated in a particular Assembly File.  These
      * PNGs will be dropped into ${viskitProject}/AnalystReports/images/EventGraphs </p>
      */
-    private void captureEventGraphImages() {
-        EventGraphCache evc = EventGraphCache.instance();
+    private void captureEventGraphImages() 
+    {
+        EventGraphCache eventGraphCache = EventGraphCache.instance();
         ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).captureEventGraphImages(
-                evc.getEventGraphFilesList(),
-                evc.getEventGraphImageFilesList());
+                    eventGraphCache.getEventGraphFilesList(),
+                eventGraphCache.getEventGraphImageFilesList());
     }
 
     /** Utility method used here to invoke the capability to capture the
      * Assembly image of the loaded Assembly File.  This PNG will be dropped
      * into ${viskitProject}/AnalystReports/images/Assemblies </p>
      */
-    private void captureAssemblyImage() {
+    private void captureAssemblyImage() 
+    {
         String assemblyFilePath = assemblyFile.getPath();
         assemblyFilePath = assemblyFilePath.substring(assemblyFilePath.indexOf("Assemblies"), assemblyFilePath.length());
-        File assemblyImage = new File(
+        File assemblyImageFile = new File(
                 ViskitGlobals.instance().getViskitProject().getAnalystReportImagesDirectory(),
                 assemblyFilePath + ".png");
 
-        if (!assemblyImage.getParentFile().exists())
-             assemblyImage.mkdirs();
+        if (!assemblyImageFile.getParentFile().exists())
+             assemblyImageFile.mkdirs();
 
-        setAssemblyImageLocation(assemblyImage.getPath());
+        setAssemblyImageLocation(assemblyImageFile.getPath());
         ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).captureAssemblyImage(
-                assemblyImage);
+                assemblyImageFile);
+        LOG.info("Assembly graph image saved at\n   " + assemblyImageFile.getAbsolutePath());
     }
 
-    private void announceAnalystReportReadyToView()
+    public void announceAnalystReportReadyToView()
     {
         // TODO consider inserting loaded assembly filename into message above as a user confirmation
         
@@ -1132,21 +1135,20 @@ public final class AnalystReportModel extends MvcAbstractModel
         ViskitGlobals.instance().selectSimulationRunTab();
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 popupTitle, message);
+        // user: OK
         
         ViskitGlobals.instance().selectAnalystReportTab();
         popupTitle = "View HTML Analyst Report?";
         message =
                 "<html><body>" +
-                "<p align='center'>View HTML Analyst Report</p><br />" +
+                "<p align='center'>Do you want to view HTML Analyst Report</p><br />" +
                 "<p align='center'>or simply continue your analysis?</p><br />";
         int returnValue = ViskitGlobals.instance().getMainFrame().genericAsk2Buttons(popupTitle, message, 
                 "View HTML", "Continue Analysis");
         
         if  (returnValue == 0) // yes, build and show report
         {
-            String htmlFilePath = new String();
-                  
-            htmlFilePath = getAnalystReportXmlFile().getAbsolutePath();
+            String htmlFilePath = getAnalystReportXmlFile().getAbsolutePath();
             // change file extension. remove timestamp for HTML file path
             htmlFilePath = htmlFilePath.substring(0,htmlFilePath.indexOf("_AnalystReport")) + "_AnalystReport.html";
             if (htmlFilePath.startsWith("."))

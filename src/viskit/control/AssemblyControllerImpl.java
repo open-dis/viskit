@@ -517,6 +517,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 //        Model model = (Model) getModel();
         if (assemblyModel == null) 
         {
+            LOG.error("editGraphMetadata() failed, (assemblyModel == null)");
             return; // not expected
         }
         GraphMetadata graphMetadata = assemblyModel.getMetadata();
@@ -1744,10 +1745,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         PackageAndFile paf = compileJavaClassAndSetPackage(src);
         if (paf != null) {
             File f = paf.file;
-            String clNam = f.getName().substring(0, f.getName().indexOf('.'));
-            clNam = paf.packageName + "." + clNam;
+            String className = f.getName().substring(0, f.getName().indexOf('.'));
+            className = paf.packageName + "." + className;
 
-            execStrings = buildExecStrings(clNam);
+            execStrings = buildExecStrings(className);
         } 
         else {
             execStrings = null;

@@ -969,9 +969,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void generateJavaSource()
     {
         ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
-        Model mod = (Model) getModel();
-        if (mod == null) {return;}
-        File localLastFile = mod.getLastFile();
+        Model model = (Model) getModel();
+        if (model == null) {return;}
+        File localLastFile = model.getLastFile();
         if (!checkSave() || localLastFile == null) {
             return;
         }
@@ -987,8 +987,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         String source = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(x2j);
         LOG.debug(source);
         if (source != null && source.length() > 0) {
-            String className = mod.getMetadata().packageName + "." +
-                    mod.getMetadata().name;
+            String className = model.getMetadata().packageName + "." + model.getMetadata().name;
             ViskitGlobals.instance().getAssemblyViewFrame().showAndSaveSource(className, source, localLastFile.getName());
         }
     }

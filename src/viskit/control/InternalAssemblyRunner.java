@@ -850,13 +850,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     StringBuilder nowRunningsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
 
     @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        LOG.debug(evt.getPropertyName());
+    public void propertyChange(PropertyChangeEvent event)
+    {
+        LOG.debug(event.getPropertyName());
 
-        if (evt.getPropertyName().equals("replicationNumber")) {
+        if (event.getPropertyName().equals("replicationNumber")) {
             int beginLength = nowRunningsString.length();
-            nowRunningsString.append(evt.getNewValue());
-            simulationRunPanel.setNumberOfReplications(Integer.parseInt(evt.getNewValue().toString()));
+            nowRunningsString.append(event.getNewValue());
+            simulationRunPanel.setNumberOfReplications(Integer.parseInt(event.getNewValue().toString()));
             nowRunningsString.append(" of ");
             nowRunningsString.append(Integer.parseInt(simulationRunPanel.numberReplicationsTF.getText()));
             nowRunningsString.append("</b>\n");
@@ -907,8 +908,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 // state set from the Viskit WorkingClassLoader
                 Thread.currentThread().setContextClassLoader(runSimulationClassLoader);
                 // TODO ensure no threading and singleton issues while inside ViskitGlobals?
-                LOG.info("getRunSimulationClassLoader() currentThread contextClassLoader=" + runSimulationClassLoader.getName() +
-                         " and created new ClassLoader for\n   " + ViskitGlobals.instance().getProjectRootDirectoryPath());
+                LOG.info("getRunSimulationClassLoader() currentThread contextClassLoader=\n   " + 
+                         runSimulationClassLoader.getName() + " and created new ClassLoader for\n   " +
+                         ViskitGlobals.instance().getProjectRootDirectoryPath());
             }
         }
         catch (Exception e)
