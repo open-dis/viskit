@@ -162,7 +162,7 @@ public final class AnalystReportModel extends MvcAbstractModel
             LOG.debug("Successful post processing of Analyst Report");
 //
 //            announceAnalystReportReadyToView();
-            reportReady = true;
+//            reportReady = true;
         }
     }
 
@@ -1138,7 +1138,15 @@ public final class AnalystReportModel extends MvcAbstractModel
         // user: OK
         
         ViskitGlobals.instance().selectAnalystReportTab();
-        popupTitle = "View HTML Analyst Report?";
+        popupTitle = "Ready to Display HTML Analyst Report";
+        
+        message =
+                "<html><body>" +
+                "<p align='center'>Edit fields as needed, then select</p><br />" +
+                "<p align='center'><b>Display HTML Analyst Report</b></p><br />" +
+                "<p align='center'>to see analysis report results</p><br />";
+        ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE, popupTitle, message);
+        /*
         message =
                 "<html><body>" +
                 "<p align='center'>Do you want to view HTML Analyst Report</p><br />" +
@@ -1161,6 +1169,7 @@ public final class AnalystReportModel extends MvcAbstractModel
 //             ViskitGlobals.instance().getAnalystReportController().generateHtmlReport(); // too far back in workflow
         }
         // TODO fix other conversion HTML filenames to match this abbrieviated form
+        */
     }
 
     /** If a 2D top town image was generated from SavageStudio, then point to

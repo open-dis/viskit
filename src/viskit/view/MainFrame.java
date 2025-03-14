@@ -820,14 +820,25 @@ public class MainFrame extends JFrame
         return JOptionPane.showOptionDialog(this, message, title, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{buttonLabel1, buttonLabel2}, buttonLabel1);
     }
 
-    public void genericReport(int messageType, String title, String message) {
-        if (messageType == JOptionPane.ERROR_MESSAGE) {
+    /** Report a popup
+     * @param messageType JOptionPane message type (PLAIN_MESSAGE, ERROR_MESSAGE, etc.)
+     * @param title shown at top of panel 
+     * @param message notification to user
+     */
+    public void genericReport(int messageType, String title, String message)
+    {
+        if (messageType == JOptionPane.ERROR_MESSAGE) { // log errors
             AssemblyViewFrame.LOG.error(message);
             LOG.error("***" + message);
         }
         JOptionPane.showMessageDialog(ViskitGlobals.instance().getMainFrame(), message, title, messageType);
     }
 
+    /** 
+     * Handle asking a question with 2 responses offered
+     * @param title shown at top of panel
+     * @param message body in display
+     * @return returns YES_NO_CANCEL_OPTION response; -1 if closed, 0 for first button, 1 for second button */
     public int genericAsk(String title, String message) {
         return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_CANCEL_OPTION);
     }

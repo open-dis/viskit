@@ -307,6 +307,7 @@ public class AnalystReportController extends MvcAbstractController {
         setContent(analystReportModelLocal);
         analystReportModel.setAnalystReportFile(targetFile);
         analystReportViewFrame.setReportDirty(false);
+        analystReportModelLocal.setReportReady(true);
     }
 
     private void setContent(AnalystReportModel analystReportModelLocal) {

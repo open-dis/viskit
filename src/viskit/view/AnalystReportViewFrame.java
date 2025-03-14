@@ -189,6 +189,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         
         SwingUtilities.invokeLater(() -> {
             _fillLayout();
+            repaint();    // making sure
+            revalidate();
             analystReportModel.announceAnalystReportReadyToView();
         });
     }
