@@ -1146,7 +1146,8 @@ public final class AnalystReportModel extends MvcAbstractModel
                 "<p align='center'><b>Display HTML Analyst Report</b></p><br />" +
                 "<p align='center'>to see analysis report results</p><br />";
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE, popupTitle, message);
-        /*
+        
+        /* better not to present another decision, had thread-completion issues anyway
         message =
                 "<html><body>" +
                 "<p align='center'>Do you want to view HTML Analyst Report</p><br />" +
