@@ -176,7 +176,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     {
         if (!isFileReady(newAnalystReportFileXml))
         {
-            LOG.error("Constructor error reading\n   {}", newAnalystReportFileXml.getAbsolutePath());
+            LOG.error("Constructor error reading\n      {}", newAnalystReportFileXml.getAbsolutePath());
             return;
         }
         try {
@@ -1112,7 +1112,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         setAssemblyImageLocation(assemblyImageFile.getPath());
         ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).captureAssemblyImage(
                 assemblyImageFile);
-        LOG.info("Assembly graph image saved at\n   " + assemblyImageFile.getAbsolutePath());
+        LOG.info("Assembly graph image saved at\n      " + assemblyImageFile.getAbsolutePath());
     }
 
     public void announceAnalystReportReadyToView()
@@ -1162,7 +1162,7 @@ public final class AnalystReportModel extends MvcAbstractModel
             htmlFilePath = htmlFilePath.substring(0,htmlFilePath.indexOf("_AnalystReport")) + "_AnalystReport.html";
             if (htmlFilePath.startsWith("."))
                 htmlFilePath = htmlFilePath.substring(2); // no "hidden" files; possible problem?
-            LOG.info("announceAnalystReportReadyToView() htmlFilePath=\n   ", htmlFilePath);
+            LOG.info("announceAnalystReportReadyToView() htmlFilePath=\n      ", htmlFilePath);
             
             XsltUtility.runXslt(getAnalystReportXmlFile().getAbsolutePath(),
                 htmlFilePath, "config/AnalystReportXMLtoHTML.xslt");

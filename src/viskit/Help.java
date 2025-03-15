@@ -137,11 +137,11 @@ public class Help
                 "viskit/images/ViskitLogo.png")
         );
 
-        BrowserLauncher bl = new BrowserLauncher(null);
+        BrowserLauncher browserLauncher = new BrowserLauncher(null);
         SwingHelpUtilities.setContentViewerUI("viskit.util.BrowserLauncher");
 
         aboutViskitEditorPane = new JEditorPane();
-        aboutViskitEditorPane.addHyperlinkListener(bl);
+        aboutViskitEditorPane.addHyperlinkListener(browserLauncher);
         aboutViskitEditorPane.setContentType("text/html");
         aboutViskitEditorPane.setEditable(false);
         aboutViskitEditorPane.setText(ABOUT_EVENTGRAPH_STRING

@@ -1500,11 +1500,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (!xmlValidationTool.isValidXML()) 
         {
             // TODO: implement a Dialog pointing to the validationErrors.LOG
-            LOG.error("buildJavaAssemblySource{} found invalid XML!\n   " + f.getAbsolutePath());
+            LOG.error("buildJavaAssemblySource{} found invalid XML!\n      " + f.getAbsolutePath());
             return assemblySource;
         } 
         else {
-            LOG.info("buildJavaAssemblySource{} found valid XML\n   " + f.getAbsolutePath());
+            LOG.info("buildJavaAssemblySource{} found valid XML\n      " + f.getAbsolutePath());
         }
 
         SimkitAssemblyXML2Java x2j;
@@ -1545,7 +1545,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         } 
         else 
         {
-            LOG.info("buildJavaEventGraphSource() found valid XML:\n   " + x2j.getEventGraphFile().getAbsolutePath());
+            LOG.info("buildJavaEventGraphSource() found valid XML:\n      " + x2j.getEventGraphFile().getAbsolutePath());
         }
 
         try {
@@ -1622,14 +1622,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             String relativePathToCompiledClass = packagePath + baseName + ".class";
             File compiledClassFile = new File(classesDirectory.getAbsolutePath() + "/" + relativePathToCompiledClass);
 
-            LOG.info("compileJavaClassFromString() compiling file:\n   " + javaSourceFile.getAbsolutePath() + " to\n   " +
+            LOG.info("compileJavaClassFromString() compiling file:\n      " + javaSourceFile.getAbsolutePath() + " to\n      " +
                          compiledClassFile.getAbsolutePath());
 
             // This will create a class/package to place the .class file
             String diagnostic = Compiler.invoke(packageName, baseName, sourceCode);
             compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);            
 
-            LOG.debug("compileJavaClassFromString() compiledClassFile=\n   " + compiledClassFile.getAbsolutePath());
+            LOG.debug("compileJavaClassFromString() compiledClassFile=\n      " + compiledClassFile.getAbsolutePath());
             if (compileSuccess) 
             {
                 LOG.info("compileJavaClassFromString() " + diagnostic + "\n");
@@ -1800,7 +1800,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                         String message2 = "then correct the assembly XML for correct proper compilation";
                         messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation error",
                                 "<html><p align-'center'>" + message1 + "</p> <p align-'center'>" + message2 + "</p>");
-                        LOG.error("doInBackground() " + message1 + "\n   " + message2);
+                        LOG.error("doInBackground() " + message1 + "\n      " + message2);
                     }
                 }
                 else

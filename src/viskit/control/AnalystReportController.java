@@ -100,7 +100,7 @@ public class AnalystReportController extends MvcAbstractController {
 
         File analystReportXmlFile = new File(analystReportDirectory, outputFilenameDated);
         
-        LOG.info("xmlSourceFile.getAbsolutePath()=\n   " + xmlSourceFile.getAbsolutePath());
+        LOG.info("xmlSourceFile.getAbsolutePath()=\n      " + xmlSourceFile.getAbsolutePath());
         isFileReady(xmlSourceFile);
         try {
             Files.copy(xmlSourceFile.toPath(), analystReportXmlFile.toPath());
@@ -109,10 +109,17 @@ public class AnalystReportController extends MvcAbstractController {
         {
             LOG.warn(ioe);
         }
-        LOG.info("analystReportXmlFile.toPath()=\n   " + analystReportXmlFile.getAbsolutePath());
+        LOG.info("analystReportXmlFile.toPath()=\n      " + analystReportXmlFile.getAbsolutePath());
         isFileReady(xmlSourceFile);
         if (analystReportModel == null)
+        {
+            analystReportModel =  ViskitGlobals.instance().getAnalystReportModel();
+        }
+        if (analystReportModel == null)
+        {
+            LOG.error("setReportXML() problem getting analystReportModel");
             analystReportModel =  new AnalystReportModel(analystReportXmlFile);
+        }
 
         if (analystReportViewFrame == null) {
             analystReportViewFrame = ViskitGlobals.instance().getAnalystReportViewFrame();
@@ -294,7 +301,7 @@ public class AnalystReportController extends MvcAbstractController {
 
     private void buildAnalystReport(File targetFile)
     {
-        LOG.debug("buildAnalystReport() targetFile is:\n   {}", targetFile);
+        LOG.debug("buildAnalystReport() targetFile is:\n      {}", targetFile);
         AnalystReportModel analystReportModelLocal;
         try {
             analystReportModelLocal = new AnalystReportModel(analystReportViewFrame, targetFile, currentAssemblyFile);

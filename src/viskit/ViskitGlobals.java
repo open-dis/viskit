@@ -626,7 +626,7 @@ public class ViskitGlobals
 
 //////        viskitProject.setProjectRootDirectory( new File(projectHome));
 
-        LOG.info("initializeProjectHome() projectHome=\n   " + projectHome);
+        LOG.info("initializeProjectHome() projectHome=\n      " + projectHome);
         if (  projectHome.isEmpty() || 
             !(new File(projectHome).exists()) ||
              (hasViskitProject() && !isProjectOpen()))
@@ -686,7 +686,7 @@ public class ViskitGlobals
                 newProjectFile = new File (projectHome + "/" + ViskitProject.PROJECT_FILE_NAME);
             }
             setProjectFile(newProjectFile);
-            LOG.info("initializeProjectHome() newProjectFile=\n    " + newProjectFile.getAbsolutePath());
+            LOG.info("initializeProjectHome() newProjectFile=\n      " + newProjectFile.getAbsolutePath());
         }
         else 
         {
@@ -996,9 +996,9 @@ public class ViskitGlobals
             // trust but verify
             if (!allProjectsBaseDirectory.isDirectory())
             {
-                 LOG.error("createProjectWorkingDirectory() check: allProjectsBaseDirectory is not a directory\n   " + allProjectsBaseDirectory.getAbsolutePath());
+                 LOG.error("createProjectWorkingDirectory() check: allProjectsBaseDirectory is not a directory\n      " + allProjectsBaseDirectory.getAbsolutePath());
             }
-            else LOG.info("createProjectWorkingDirectory() check: allProjectsBaseDirectory=\n   " + allProjectsBaseDirectory.getAbsolutePath());
+            else LOG.info("createProjectWorkingDirectory() check: allProjectsBaseDirectory=\n      " + allProjectsBaseDirectory.getAbsolutePath());
         }
         
         if (projectWorkingDirectory == null)
@@ -1015,7 +1015,7 @@ public class ViskitGlobals
             {
                 LOG.error("createProjectWorkingDirectory() projectWorkingDirectory is not a directory");
             }
-            else LOG.info("createProjectWorkingDirectory() projectWorkingDirectory=\n   " + projectWorkingDirectory.getAbsolutePath());
+            else LOG.info("createProjectWorkingDirectory() projectWorkingDirectory=\n      " + projectWorkingDirectory.getAbsolutePath());
         }
 
         if (viskitProject == null)
@@ -1444,12 +1444,12 @@ public class ViskitGlobals
 //////        }
 //////        else if (!file.exists())
 //////        {
-//////            LOG.error("isFileReady() file does not exist:\n   " + file.getAbsolutePath());
+//////            LOG.error("isFileReady() file does not exist:\n      " + file.getAbsolutePath());
 //////            return false;
 //////        }
 //////        else if (file.length() == 0)
 //////        {
-//////            LOG.error("isFileReady() file is empty:\n   " + file.getAbsolutePath());
+//////            LOG.error("isFileReady() file is empty:\n      " + file.getAbsolutePath());
 //////            return false;
 //////        }
 //////        return true;

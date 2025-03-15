@@ -143,7 +143,7 @@ public class ViskitUserConfiguration
             if (!VISKIT_CONFIGURATION_DIR.exists())
             {
                  VISKIT_CONFIGURATION_DIR.mkdirs();
-                 LOG.info("Created directory: \n   " + VISKIT_CONFIGURATION_DIR.getAbsolutePath());
+                 LOG.info("Created directory: \n      " + VISKIT_CONFIGURATION_DIR.getAbsolutePath());
             }
             else LOG.debug("VISKIT_CONFIGURATION_DIR: " + VISKIT_CONFIGURATION_DIR + " " + VISKIT_CONFIGURATION_DIR.exists() + "\n");
             
@@ -163,7 +163,7 @@ public class ViskitUserConfiguration
     }
     public static void logDotViskitConfigurationDirectoryStatus()
     {
-        LOG.info("VISKIT_CONFIGURATION_DIR=\n   " + VISKIT_CONFIGURATION_DIR.getAbsolutePath() + " which contains user configuration files\n   " +
+        LOG.info("VISKIT_CONFIGURATION_DIR=\n      " + VISKIT_CONFIGURATION_DIR.getAbsolutePath() + " which contains user configuration files\n      " +
                  C_APP_FILE.getAbsolutePath() + " (C_APP_FILE) and " + C_GUI_FILE.getAbsolutePath() + " (C_GUI_FILE)" + "\n");
         isFileReady(C_APP_FILE);
         isFileReady(C_GUI_FILE);

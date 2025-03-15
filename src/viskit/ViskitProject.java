@@ -127,12 +127,12 @@ public class ViskitProject
     {
         if (projectDirectory.exists() && !projectDirectory.isDirectory()) 
         {
-            LOG.error("Project root must be directory, not\n   "+ projectDirectory.getAbsolutePath());
+            LOG.error("Project root must be directory, not\n      "+ projectDirectory.getAbsolutePath());
             return;
         }
         else if (!isProject(projectDirectory))
         {
-            LOG.error("Project directory does not contain a '" + PROJECT_FILE_NAME + "' file\n   "+ projectDirectory.getAbsolutePath());
+            LOG.error("Project directory does not contain a '" + PROJECT_FILE_NAME + "' file\n      "+ projectDirectory.getAbsolutePath());
             return;
         }
         setProjectDirectory(projectDirectory);
@@ -153,7 +153,7 @@ public class ViskitProject
              projectDirectory.mkdir();
         }
         setAnalystReportsDirectory(new File(projectDirectory, ANALYST_REPORTS_DIRECTORY_NAME));
-        LOG.info("initializeProject() analystReportsDirectory=\n  " + getAnalystReportsDirectory());
+        LOG.info("initializeProject() analystReportsDirectory=\n      " + getAnalystReportsDirectory());
         if (!analystReportsDirectory.exists()) {
             getAnalystReportsDirectory().mkdirs();
             try {
@@ -428,7 +428,7 @@ public class ViskitProject
         }
         else if (!projectDirectory.exists())
         {
-            LOG.error("ViskitProject setProjectDirectory received non-existent File projectDirectory=\n   " + projectDirectory.getAbsolutePath());
+            LOG.error("ViskitProject setProjectDirectory received non-existent File projectDirectory=\n      " + projectDirectory.getAbsolutePath());
             return;
         }
         this.projectDirectory = projectDirectory;

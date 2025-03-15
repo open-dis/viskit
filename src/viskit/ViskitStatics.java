@@ -897,12 +897,12 @@ public class ViskitStatics
         }
         else if (!file.exists())
         {
-            LOG.error("isFileReady() file does not exist:\n   " + file.getAbsolutePath());
+            LOG.error("isFileReady() file does not exist:\n      " + file.getAbsolutePath());
             return false;
         }
         else if (file.length() == 0)
         {
-            LOG.error("isFileReady() file is empty:\n   " + file.getAbsolutePath());
+            LOG.error("isFileReady() file is empty:\n      " + file.getAbsolutePath());
             return false;
         }
         return true;

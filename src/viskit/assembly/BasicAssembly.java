@@ -160,7 +160,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         // TODO superfluous?  actual file will be timestamped, actual directory already exists
 //        analystReportFile = new File(ViskitGlobals.instance().getProjectDirectoryPath() +
 //                                     "/AnalystReports/", "AnalystReport.xml");
-//        LOG.info("BasicAssembly() constructor created new analystReportFile\n   " + analystReportFile.getAbsolutePath());
+//        LOG.info("BasicAssembly() constructor created new analystReportFile\n      " + analystReportFile.getAbsolutePath());
     }
     /**
      * Default constructor sets parameters of BasicAssembly to their
@@ -664,7 +664,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         // this should only occur inside the simulation thread
         // TODO hacking wildly here...
 //            File findingClassesDirectory = new File("./build/classes"); // hoping to find we are in project...
-//            LOG.info("Experimental: findingClassesDirectory=\n   " + findingClassesDirectory.getAbsolutePath());
+//            LOG.info("Experimental: findingClassesDirectory=\n      " + findingClassesDirectory.getAbsolutePath());
 //            setWorkingDirectory(findingClassesDirectory); // no good, we are not in project directory, darn
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -716,7 +716,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
              LOG.error("BLOCKER: run() C_APP_FILE does not exist");
         else if (C_APP_FILE.isDirectory())
              LOG.error("BLOCKER: run() C_APP_FILE is a directory, not a file as expected");
-        else LOG.info  ("run() C_APP_FILE found:\n   " + C_APP_FILE.getAbsolutePath());
+        else LOG.info  ("run() C_APP_FILE found:\n      " + C_APP_FILE.getAbsolutePath());
         // simple accessor, everything there should be good
         // https://commons.apache.org/proper/commons-configuration/userguide/quick_start.html
         Configurations configurations = new Configurations();
@@ -766,7 +766,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         if ((projectDirectory != null) && projectDirectory.isDirectory())
         {
              // found it!
-             LOG.info("run() findProjectWorkingDirectoryFromWithinThread() found working directory!\n  " + getWorkingDirectory().getAbsolutePath());
+             LOG.info("run() findProjectWorkingDirectoryFromWithinThread() found working directory!\n      " + getWorkingDirectory().getAbsolutePath());
              viskitProject = new ViskitProject(projectDirectory);
         }
         else LOG.error("BLOCKER: run() findProjectWorkingDirectoryFromWithinThread() not successful, analyst reports will fail");
@@ -1006,10 +1006,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             printWriter.flush();
         }
         
-       if (isEnableAnalystReports()) 
+          if (isEnableAnalystReports()) 
         {
             createAnalystReportFile();
-            LOG.info("createAnalystReportFile() analystReportFile:\n   " + analystReportFile.getAbsolutePath()); // debug TODO duplicative?
+            LOG.info("createAnalystReportFile() analystReportFile:\n      " + analystReportFile.getAbsolutePath()); // debug TODO duplicative?
                 
             analystReportModel = new AnalystReportModel(reportStatisticsConfiguration.saveStatisticsGetReportPath(), pclNodeCache);
                 

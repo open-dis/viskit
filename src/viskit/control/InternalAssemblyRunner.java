@@ -60,6 +60,7 @@ import simkit.Schedule;
 import viskit.util.TitleListener;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import viskit.ViskitUserConfiguration;
 import viskit.assembly.BasicAssembly;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
@@ -715,21 +716,26 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         JMenuItem clearAllMI = new JMenuItem("Clear all console text");
         clearAllMI.setMnemonic('C');
         clearAllMI.setToolTipText("Clear the console text area");
-        JMenuItem viewMI = new JMenuItem("View console output in text editor");
-        viewMI.setMnemonic('V');
-        viewMI.setToolTipText("Directly launch console output to text editor");
+        JMenuItem viewConsoleOutputMI = new JMenuItem("View console output in text editor");
+        viewConsoleOutputMI.setMnemonic('V');
+        viewConsoleOutputMI.setToolTipText("Directly launch console output to text editor");
+        JMenuItem viewLogsDirectoryMI = new JMenuItem("View simulation logs directory");
+        viewLogsDirectoryMI.setMnemonic('V');
+        viewLogsDirectoryMI.setToolTipText("View simulation logs directory in system");
 
         copyMI.addActionListener(new CopyListener());
         saveMI.addActionListener(saveListener);
         selectAllMI.addActionListener(new SelectAllListener());
         clearAllMI.addActionListener(new ClearListener());
-        viewMI.addActionListener(new ViewListener());
+        viewConsoleOutputMI.addActionListener(new ViewConsoleListener());
+        viewLogsDirectoryMI.addActionListener(new ViewLogsDirectoryListener());
 
         simulationRunMenu.add(copyMI);
         simulationRunMenu.add(saveMI);
         simulationRunMenu.add(selectAllMI);
         simulationRunMenu.add(clearAllMI);
-        simulationRunMenu.add(viewMI);
+        simulationRunMenu.add(viewConsoleOutputMI);
+        simulationRunMenu.add(viewLogsDirectoryMI);
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
@@ -780,7 +786,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         }
     }
 
-    class ViewListener implements ActionListener
+    class ViewConsoleListener implements ActionListener
     {
         @Override
         public void actionPerformed(ActionEvent e)
@@ -818,6 +824,22 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                   LOG.error(ex1);
 //                  ex1.printStackTrace();
               }
+            }
+        }
+    }
+
+    class ViewLogsDirectoryListener implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent)
+        {
+            File logsDirectory =ViskitUserConfiguration.VISKIT_LOGS_DIR;
+            try {
+                Desktop.getDesktop().open(logsDirectory);
+            }
+            catch (IOException ioe)
+            {
+                LOG.error("error opening logs directory\n      {}", logsDirectory);
             }
         }
     }
@@ -908,8 +930,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 // state set from the Viskit WorkingClassLoader
                 Thread.currentThread().setContextClassLoader(runSimulationClassLoader);
                 // TODO ensure no threading and singleton issues while inside ViskitGlobals?
-                LOG.info("getRunSimulationClassLoader() currentThread contextClassLoader=\n   " + 
-                         runSimulationClassLoader.getName() + " and created new ClassLoader for\n   " +
+                LOG.info("getRunSimulationClassLoader() currentThread contextClassLoader=\n      " + 
+                         runSimulationClassLoader.getName() + " and created new ClassLoader for\n      " +
                          ViskitGlobals.instance().getProjectRootDirectoryPath());
             }
         }

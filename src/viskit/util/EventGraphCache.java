@@ -227,7 +227,7 @@ public class EventGraphCache {
             ViskitGlobals.instance().getViskitProject().getAnalystReportEventGraphImagesDirectory().getPath();
 
         File eventGraphImageFile = new File(eventGraph_image_directory + "/" + packageName + "/" + eventGraphName + ".xml.png");
-        LOG.info("Event Graph Image location:\n   {}", eventGraphImageFile.getAbsolutePath());
+        LOG.info("Event Graph Image location:\n      {}", eventGraphImageFile.getAbsolutePath());
 
         eventGraphImageFilesList.add(eventGraphImageFile);
     }

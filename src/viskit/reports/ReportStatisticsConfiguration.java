@@ -255,7 +255,7 @@ public class ReportStatisticsConfiguration {
             }
             return null;
         }
-        LOG.info("saveData(" + reportDocument.getRootElement().getName() + ") analystReportStatisticsDirectoryFile at\n   " + analystReportStatisticsDirectoryFile.getAbsolutePath());
+        LOG.info("saveData(" + reportDocument.getRootElement().getName() + ") analystReportStatisticsDirectoryFile at\n      " + analystReportStatisticsDirectoryFile.getAbsolutePath());
 
         return analystReportStatisticsDirectoryFile.getAbsolutePath();
     }
