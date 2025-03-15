@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.apache.logging.log4j.Logger;
 
 /** Class that zips a directory that is pointed to.  The  processFolder method
  * reads from the input stream and writes onto the output stream until the input
@@ -35,35 +36,69 @@ import java.util.zip.ZipOutputStream;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.ZipUtils">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public final class ZipUtils {
+public final class ZipUtils
+{
+    static final Logger LOG = Log4jUtilities.getLogger(ZipUtils.class);
+    
+    private static int      fileCount = 0;
+    private static int directoryCount = 0;
+    
+    /** Initialize file and directory counts */
+    public static void initializeCounts ()
+    {
+             fileCount = 0;
+        directoryCount = 0;
+    }
 
     public static void zipFolder(final File folder, final File zipFile) throws IOException {
         zipFolder(folder, new FileOutputStream(zipFile));
     }
 
-    public static void zipFolder(final File folder, final OutputStream outputStream) throws IOException {
-        try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) {
+    public static void zipFolder(final File folder, final OutputStream outputStream) throws IOException
+    {
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream)) 
+        {
             processFolder(folder, zipOutputStream, folder.getPath().length() + 1);
         }
     }
 
     private static void processFolder(final File folder, final ZipOutputStream zipOutputStream, final int prefixLength)
-            throws IOException {
+            throws IOException 
+    {
         for (final File file : folder.listFiles()) {
             if (file.isFile()) {
                 final ZipEntry zipEntry = new ZipEntry(file.getPath().substring(prefixLength));
                 zipOutputStream.putNextEntry(zipEntry);
                 Files.copy(file.toPath(), zipOutputStream);
                 zipOutputStream.closeEntry();
-            } else if (file.isDirectory()) {
+                fileCount++;
+            } 
+            else if (file.isDirectory()) {
 
                 // hard code hack here, but so far, this utility is only being
                 // used to zip Viskit Projects, so, don't include the project's
                 // /build directory, or a NetBeans project private directory
                 if (!file.getName().equals("build") && !file.getName().equals("private"))
+                {
                     processFolder(file, zipOutputStream, prefixLength);
+                    directoryCount++;
+                }
             }
         }
+    }
+
+    /**
+     * @return the fileCount
+     */
+    public static int getFileCount() {
+        return fileCount;
+    }
+
+    /**
+     * @return the directoryCount
+     */
+    public static int getDirectoryCount() {
+        return directoryCount;
     }
 
 } // end class file ZipUtils.java

@@ -66,7 +66,7 @@ public class ViskitUserConfiguration
     public static final File C_GUI_FILE        = new File(VISKIT_CONFIGURATION_DIR, "c_gui.xml");
     public static final File DOT_VISKIT_README = new File(VISKIT_CONFIGURATION_DIR, "README.md");
     public static final File VISKIT_LOGS_DIR   = new File("logs");
-    public static final File VISKIT_ERROR_LOG = new File(VISKIT_LOGS_DIR, "error.log.0");
+    public static final File VISKIT_ERROR_LOG = new File(VISKIT_LOGS_DIR, "error.0.log");
 
     public static final String GUI_BEANSHELL_ERROR_DIALOG_KEY = "gui.beanshellerrordialog";
     public static final String BEANSHELL_ERROR_DIALOG_TITLE_KEY = GUI_BEANSHELL_ERROR_DIALOG_KEY + ".title";
@@ -334,7 +334,7 @@ public class ViskitUserConfiguration
             if      (projectFile == null)
                     LOG.error("cleanup() null projectFile ");
             else if (!projectFile.exists())
-                     LOG.error("cleanup() nonexistent projectFile " + projectFile.getAbsolutePath());
+                     LOG.error("cleanup() failed for nonexistent projectFile\n      {}", projectFile.getAbsolutePath());
             else
             {
                 document = FileHandler.unmarshallJdom(projectFile);

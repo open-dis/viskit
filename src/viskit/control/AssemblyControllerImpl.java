@@ -6,6 +6,8 @@ import edu.nps.util.DirectoryWatch;
 import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import edu.nps.util.ZipUtils;
+import static edu.nps.util.ZipUtils.getDirectoryCount;
+import static edu.nps.util.ZipUtils.getFileCount;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -54,6 +56,7 @@ import viskit.ViskitGlobals;
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitProject;
 import viskit.ViskitStatics;
+import static viskit.ViskitUserConfiguration.VISKIT_ERROR_LOG;
 import viskit.jgraph.ViskitGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.MvcAbstractController;
@@ -611,60 +614,76 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
             File projectDirectory;
             File projectZipFile;
-            File logFile;
+            File projectZipLogFile;
 
             @Override
-            public Void doInBackground() {
-
-                projectDirectory = ViskitGlobals.instance().getViskitProject().getProjectDirectory();
-                projectZipFile = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
-                logFile = new File(projectDirectory, "debug.log");
+            public Void doInBackground() 
+            {
+                projectDirectory  = ViskitGlobals.instance().getViskitProject().getProjectDirectory();
+                projectZipFile    = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
+                projectZipLogFile = new File(projectDirectory, "projectZipDebug.log");
 
                 if (projectZipFile.exists())
                     projectZipFile.delete();
 
-                if (logFile.exists())
-                    logFile.delete();
+                if (projectZipLogFile.exists())
+                    projectZipLogFile.delete();
 
                 try {
 
                     // First, copy the error.log to the project dir
-                    Files.copy(ViskitUserConfiguration.VISKIT_ERROR_LOG.toPath(), logFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    if ((VISKIT_ERROR_LOG != null) && VISKIT_ERROR_LOG.exists())
+                    {
+                        // TODO look at including other log files
+                        Files.copy(VISKIT_ERROR_LOG.toPath(), projectZipLogFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    
+                    ZipUtils.initializeCounts();
                     ZipUtils.zipFolder(projectDirectory, projectZipFile);
-                } catch (IOException e) {
+                    LOG.info("ZipUtils processFolder() found " + ZipUtils.getDirectoryCount() + " directories and " + 
+                                                        ZipUtils.getFileCount()      + " files");
+                    LOG.info("zipAndMailProject() projectZipFile\n      {}", projectZipFile);   
+                } 
+                catch (IOException e) {
                     LOG.error(e);
                 }
-
                 return null;
             }
 
             @Override
             public void done() {
                 try {
-
                     // Waits for the zip process to finish
                     get();
-
-                    try {
-                        URL url = new URI("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
-                                + "?subject=Viskit%20Project%20Submission%20for%20"
-                                + projectDirectory.getName() + "&body=see%20attachment").toURL();
-                        String msg = "Please navigate to<br/>"
-                                + projectZipFile.getParent()
-                                + "<br/>and email the " + projectZipFile.getName()
-                                + " file to "
-                                + "<b><a href=\"" + url.toString() + "\">"
-                                + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
-                                + "<br/><br/>Click the link to open up an email "
-                                + "form, then attach the zip file";
-                        ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projectDirectory.getName(), url, msg, false);
-                    } catch (MalformedURLException | URISyntaxException e) {
-                        LOG.error(e);
-                    }
+                    
+                    String message = "<html><p align='center'>Viskit project zip file is now ready:</p><br />" + 
+                                           "<p align='center'>" + projectZipFile.getAbsolutePath()+ "</p></html>";
+                    ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                        "Project zip complete", message);
 
                     Desktop.getDesktop().open(projectZipFile.getParentFile());
+                    
+                    // possibly useful for students in class
+//                    try {
+//                        URL mailtoURL = new URI("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
+//                                + "?subject=Viskit%20Project%20Submission%20for%20"
+//                                + projectDirectory.getName() + "&body=see%20attachment").toURL();
+//                        
+//                        String message = "Please navigate to<br/>"
+//                                + projectZipFile.getParent()
+//                                + "<br/>and email the " + projectZipFile.getName()
+//                                + " file to "
+//                                + "<b><a href=\"" + mailtoURL.toString() + "\">"
+//                                + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
+//                                + "<br/><br/>Click the link to open up an email "
+//                                + "form, then attach the zip file";
+//                        ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projectDirectory.getName(), mailtoURL, message, false);
+//                    } catch (MalformedURLException | URISyntaxException e) {
+//                        LOG.error(e);
+//                    }
 
-                } catch (InterruptedException | ExecutionException | IOException e) {
+                } 
+                catch (InterruptedException | ExecutionException | IOException e) {
                     LOG.error(e);
                 }
             }
