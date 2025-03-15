@@ -1138,7 +1138,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         // user: OK
         
         ViskitGlobals.instance().selectAnalystReportTab();
-        popupTitle = "Ready to Display HTML Analyst Report";
+        popupTitle = "Ready to Edit, Display HTML Analyst Report";
         
         message =
                 "<html><body>" +

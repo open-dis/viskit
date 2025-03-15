@@ -1008,8 +1008,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         
           if (isEnableAnalystReports()) 
         {
-            createAnalystReportFile();
-            LOG.info("createAnalystReportFile() analystReportFile:\n      " + analystReportFile.getAbsolutePath()); // debug TODO duplicative?
+            // debug TODO duplicative?
+            createAnalystReportFile(); // ServerAssembly3.1
+            LOG.info("createAnalystReportFile() analystReportFile:\n      " + analystReportFile.getAbsolutePath()); 
                 
             analystReportModel = new AnalystReportModel(reportStatisticsConfiguration.saveStatisticsGetReportPath(), pclNodeCache);
                 

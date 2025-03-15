@@ -254,7 +254,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
     protected void prepareAndStartAssemblySimulationRun() // formerly initRun
     {
-        // Prevent multiple pushes of the sim run button
+        // Ignore multiple pushes of the sim run button
         mutex++;
         if (mutex > 1)
             return;

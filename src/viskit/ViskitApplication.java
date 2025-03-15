@@ -178,7 +178,7 @@ public class ViskitApplication
         }
         catch (ExceptionInInitializerError exception)
         {
-            LOG.error ("createGUI(" + args + ") " + exception);
+            LOG.error ("createGUI(" + String.join(",", args) + ") " + exception);
         }
     }
 

@@ -148,7 +148,7 @@ public class ViskitProject
     public final boolean initializeProject() 
     {
         if (projectDirectory == null)
-            return false;
+            return false; // possible during startup
         else if (!projectDirectory.exists()) {
              projectDirectory.mkdir();
         }

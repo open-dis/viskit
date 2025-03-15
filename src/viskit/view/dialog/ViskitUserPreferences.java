@@ -413,7 +413,8 @@ public class ViskitUserPreferences extends JDialog
     /** Method to facilitate putting project/lib entries on the classpath
      * @param extraClassPathEntries a list of (jar/.class) entries to include in extraClassPaths.path[@value]
      */
-    public static void saveExtraClasspathEntries(String[] extraClassPathEntries) {
+    public static void saveExtraClasspathEntries(String[] extraClassPathEntries)
+    {
         String[] extraClassPathArray = getExtraClassPathArray();
         if (Arrays.equals(extraClassPathEntries, extraClassPathArray))
             return; // no need to rebuild the LEGO tree
@@ -440,12 +441,13 @@ public class ViskitUserPreferences extends JDialog
             // Incase we have custom jars, need to add these to the ClassLoader
             ViskitGlobals.instance().resetWorkingClassLoader();
 
-            Runnable r = () -> {
+            Runnable runnable = () -> {
                 ViskitGlobals.instance().rebuildLEGOTreePanels();
             };
             try {
-                SwingUtilities.invokeAndWait(r);
-            } catch (InterruptedException | InvocationTargetException ex) {
+                SwingUtilities.invokeAndWait(runnable);
+            } 
+            catch (InterruptedException | InvocationTargetException ex) {
                 LOG.error(ex);
             }
             return null;

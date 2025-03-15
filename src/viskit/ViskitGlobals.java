@@ -1035,7 +1035,7 @@ public class ViskitGlobals
             LOG.error("Unable to create project directory for " + allProjectsBaseDirectory);
             return;
         }
-        setProjectClassesDirectory(viskitProject.getClassesDirectory()); // TODO is this parameter really needed?
+        setProjectClassesDirectory(viskitProject.getClassesDirectory());
     }
 
     private ClassLoader viskitApplicationClassLoader;
