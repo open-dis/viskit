@@ -97,7 +97,7 @@ public class ViskitUserPreferences extends JDialog
     private JRadioButton defaultLafRB;
     private JRadioButton platformLafRB;
     private JRadioButton otherLafRB;
-    private JTextField otherTF;
+    private JTextField otherLafTF;
 
     /** 
      * Display preferences panel
@@ -243,31 +243,33 @@ public class ViskitUserPreferences extends JDialog
         JPanel lookAndFeelInnerPanel = new JPanel();
         lookAndFeelInnerPanel.setLayout(new BoxLayout(lookAndFeelInnerPanel, BoxLayout.Y_AXIS));
         lookAndFeelInnerPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        defaultLafRB = new JRadioButton("Default Look and Feel (LAF)");
-        defaultLafRB.setToolTipText("Best for WIN to render Event Graph editor status color");
+        defaultLafRB = new JRadioButton("Default Look and Feel &nbsp; (best LAF for Windows)");
+        defaultLafRB.setToolTipText("Best for Windows");
         defaultLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         lookAndFeelInnerPanel.add(defaultLafRB);
-        platformLafRB = new JRadioButton("Platform Look and Feel (LAF)");
-        platformLafRB.setToolTipText("Best for macOS to render Event Graph editor status color");
+        platformLafRB = new JRadioButton("Platform Look and Feel (best LAF for macOS)");
+        platformLafRB.setToolTipText("Best for macOS");
         platformLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         lookAndFeelInnerPanel.add(platformLafRB);
         otherLafRB = new JRadioButton("Other");
         otherLafRB.setToolTipText("Set to a supported Look and Feel for your platform");
-        JPanel otherPan = new JPanel();
-        otherPan.setLayout(new BoxLayout(otherPan,BoxLayout.X_AXIS));
-        otherPan.add(otherLafRB);
-        otherPan.add(Box.createHorizontalStrut(5));
-        otherTF = new JTextField();
-        ViskitStatics.clampHeight(otherTF);
-        otherPan.add(otherTF);
-        otherPan.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        lookAndFeelInnerPanel.add(otherPan);
+        JPanel otherLafPanel = new JPanel();
+        otherLafPanel.setLayout(new BoxLayout(otherLafPanel,BoxLayout.X_AXIS));
+        otherLafPanel.add(otherLafRB);
+        otherLafPanel.add(Box.createHorizontalStrut(5));
+        otherLafTF = new JTextField();
+        ViskitStatics.clampHeight(otherLafTF);
+        otherLafPanel.add(otherLafTF);
+        otherLafPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        // no need to show an inoperative feature
+        // lookAndFeelInnerPanel.add(otherLafPanel);
+        
         lookAndFeelInnerPanel.setBorder(new CompoundBorder(new LineBorder(Color.black), new EmptyBorder(3,3,3,3)));
         ViskitStatics.clampHeight(lookAndFeelInnerPanel);
         lookAndFeelPanel.add(lookAndFeelInnerPanel);
         lookAndFeelPanel.add(Box.createVerticalStrut(3));
         
-        // TODO fix:
+        // TODO fix, make changes immediate
         JLabel whiningLabel = new JLabel("Changes are in effect at next Viskit launch.", JLabel.CENTER);
         whiningLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         lookAndFeelPanel.add(whiningLabel);
@@ -310,7 +312,7 @@ public class ViskitUserPreferences extends JDialog
 
         ButtonGroup bg = new ButtonGroup();
         defaultLafRB.setSelected(true);
-        otherTF.setEnabled(false);
+        otherLafTF.setEnabled(false);
         bg.add(defaultLafRB);
         bg.add(platformLafRB);
         bg.add(otherLafRB);
@@ -318,7 +320,7 @@ public class ViskitUserPreferences extends JDialog
         platformLafRB.addActionListener(lis);
         defaultLafRB.addActionListener(lis);
         otherLafRB.addActionListener(lis);
-        otherTF.addActionListener(lis);
+        otherLafTF.addActionListener(lis);
         
         // TODO when implemented, prefer author pane if not yet filled out
         tabbedPane.setSelectedIndex(3); // Tab visibility pane
@@ -328,19 +330,19 @@ public class ViskitUserPreferences extends JDialog
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == otherTF) {
-                guiXMLConfiguration.setProperty(ViskitUserConfiguration.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
+            if (e.getSource() == otherLafTF) {
+                guiXMLConfiguration.setProperty(ViskitUserConfiguration.LOOK_AND_FEEL_KEY, otherLafTF.getText().trim());
             } 
             else {
                 if (defaultLafRB.isSelected()) {
                     guiXMLConfiguration.setProperty(ViskitUserConfiguration.LOOK_AND_FEEL_KEY, ViskitUserConfiguration.LOOK_AND_FEEL_DEFAULT);
-                    otherTF.setEnabled(false);
+                    otherLafTF.setEnabled(false);
                 } else if (platformLafRB.isSelected()) {
                     guiXMLConfiguration.setProperty(ViskitUserConfiguration.LOOK_AND_FEEL_KEY, ViskitUserConfiguration.LOOK_AND_FEEL_PLATFORM);
-                    otherTF.setEnabled(false);
+                    otherLafTF.setEnabled(false);
                 } else if (otherLafRB.isSelected()) {
-                    guiXMLConfiguration.setProperty(ViskitUserConfiguration.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
-                    otherTF.setEnabled(true);
+                    guiXMLConfiguration.setProperty(ViskitUserConfiguration.LOOK_AND_FEEL_KEY, otherLafTF.getText().trim());
+                    otherLafTF.setEnabled(true);
                 }
             }
         }
@@ -491,8 +493,8 @@ public class ViskitUserPreferences extends JDialog
                 break;
             default:
                 otherLafRB.setSelected(true);
-                otherTF.setEnabled(true);
-                otherTF.setText(laf);
+                otherLafTF.setEnabled(true);
+                otherLafTF.setText(laf);
                 break;
         }
     }
@@ -500,7 +502,7 @@ public class ViskitUserPreferences extends JDialog
     private void unloadWidgets() {
       // most everything gets instantly updated;  check for pending text entry
       if(otherLafRB.isSelected()) {
-          guiXMLConfiguration.setProperty(ViskitUserConfiguration.LOOK_AND_FEEL_KEY, otherTF.getText().trim());
+          guiXMLConfiguration.setProperty(ViskitUserConfiguration.LOOK_AND_FEEL_KEY, otherLafTF.getText().trim());
       }
     }
 
