@@ -624,9 +624,12 @@ their descpritions.
     <target name="quick.run"
             depends="init"
             description="Run Viskit, don't check dependencies, don't rebuild">
+        
         <splash imageurl="file:${basedir}/${splash.image}"
                 useproxy="true"
-                showduration="0"/>
+            showduration="1000"
+             displayText=" Visual Simkit for Discrete Event Simulation (DES) "/>
+        
         <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
