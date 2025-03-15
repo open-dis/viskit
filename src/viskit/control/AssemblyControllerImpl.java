@@ -5,9 +5,9 @@ import actions.ActionIntrospector;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
-import edu.nps.util.ZipUtils;
-import static edu.nps.util.ZipUtils.getDirectoryCount;
-import static edu.nps.util.ZipUtils.getFileCount;
+import edu.nps.util.ZipUtilities;
+import static edu.nps.util.ZipUtilities.getDirectoryCount;
+import static edu.nps.util.ZipUtilities.getFileCount;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -608,7 +608,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void zipAndMailProject() {
+    public void zipProject() {
 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
@@ -638,11 +638,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                         Files.copy(VISKIT_ERROR_LOG.toPath(), projectZipLogFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     }
                     
-                    ZipUtils.initializeCounts();
-                    ZipUtils.zipFolder(projectDirectory, projectZipFile);
-                    LOG.info("ZipUtils processFolder() found " + ZipUtils.getDirectoryCount() + " directories and " + 
-                                                        ZipUtils.getFileCount()      + " files");
-                    LOG.info("zipAndMailProject() projectZipFile\n      {}", projectZipFile);   
+                    ZipUtilities.initializeCounts();
+                    ZipUtilities.zipFolder(projectDirectory, projectZipFile);
+                    LOG.info("ZipUtils processFolder() found " + ZipUtilities.getDirectoryCount() + " directories and " + 
+                                                        ZipUtilities.getFileCount()      + " files");
+                    LOG.info("zipProject() projectZipFile\n      {}", projectZipFile);   
                 } 
                 catch (IOException e) {
                     LOG.error(e);

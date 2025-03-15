@@ -4,7 +4,7 @@
  *
  * Created on:  16 APR 2015
  *
- * File:        ZipUtils.java
+ * File:        ZipUtilities.java
  *
  * Compiler:    JDK1.8
  * O/S:         Mac OS X Yosimite (10.10.3)
@@ -28,17 +28,17 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.logging.log4j.Logger;
 
-/** Class that zips a directory that is pointed to.  The  processFolder method
- * reads from the input stream and writes onto the output stream until the input
- * stream is exhausted.
+/** Class that zips a directory that is pointed to.The  processFolder method
+ reads from the input stream and writes onto the output stream until the input
+ stream is exhausted.
  *
  * @author Tony BenBrahim
- * @author <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.ZipUtils">Terry Norbraten, NPS MOVES</a>
+ * @author <a href="mailto:tdnorbra@nps.edu?subject=edu.nps.util.ZipUtilities">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public final class ZipUtils
+public final class ZipUtilities
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ZipUtils.class);
+    static final Logger LOG = Log4jUtilities.getLogger(ZipUtilities.class);
     
     private static int      fileCount = 0;
     private static int directoryCount = 0;
@@ -101,4 +101,4 @@ public final class ZipUtils
         return directoryCount;
     }
 
-} // end class file ZipUtils.java
+} // end class file ZipUtilities.java
