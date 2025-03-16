@@ -1,6 +1,8 @@
 package viskit.control;
 
+import edu.nps.util.Log4jUtilities;
 import java.io.File;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class to hold java source package and file names
@@ -8,6 +10,8 @@ import java.io.File;
  * @version $Id:$
  */
 public class PackageAndFile { // TODO consider moving this small class into FileBasedClassManager
+    
+    static final Logger LOG = Log4jUtilities.getLogger(PackageAndFile.class);
 
     public String packageName;
     public File file;

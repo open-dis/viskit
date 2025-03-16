@@ -212,6 +212,16 @@ public class AnalystReportController extends MvcAbstractController {
 
     public void generateHtmlReport() throws IOException 
     {
+        if (analystReportViewFrame == null)
+        {
+            String message1 = "Analyst Report results must first be available in order to generateHtmlReport()";
+            String message2 = "<html><p align='center'>Analyst Report results must first be available</p><br />" +
+                                    "<p align='center'>in order to generate the HTML Analyst Report</p><br />";
+            LOG.error(message1);
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                "Unable to show Analyst Report", message2);
+            return;
+        }
         if (!ViskitGlobals.instance().getSimulationRunPanel().analystReportCB.isSelected()) {
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Enable Analyst Reports not selected",

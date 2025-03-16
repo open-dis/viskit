@@ -697,14 +697,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         }
     }
 
-    private void buildMenus()
+    private void buildMenus() // Simulation Run
     {
         myMenuBar = new JMenuBar();
 //      JMenu fileMenu = new JMenu("File");
         simulationRunMenu = new JMenu("Simulation Run");
         simulationRunMenu.setToolTipText("Simulation Run performs multiple replications of a compiled Assembly model");
         simulationRunMenu.setMnemonic('S');
-        JMenuItem copyMI = new JMenuItem("Copy selected console text");
+        JMenuItem copyMI = new JMenuItem("Copy console text selection");
         copyMI.setMnemonic('C');
         copyMI.setToolTipText("Copy simulation run console output");
         JMenuItem saveMI = new JMenuItem("Save console text to file");

@@ -600,7 +600,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         projectMenu.add(buildMenuItem(this, "closeProject", "Close Project", KeyEvent.VK_C,
                 null));
         
-        projectMenu.add(buildMenuItem(assemblyController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z,
+        projectMenu.add(buildMenuItem(assemblyController, "zipProject", "Zip Viskit Project", KeyEvent.VK_Z,
                 null));
 
         projectMenu.addSeparator();

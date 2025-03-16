@@ -111,7 +111,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     @Override
     public void zipAndMailProject() {
-        ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).zipAndMailProject();
+        ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).zipProject();
     }
 
     @Override
