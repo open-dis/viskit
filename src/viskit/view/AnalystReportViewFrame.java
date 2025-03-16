@@ -42,13 +42,14 @@ import edu.nps.util.SpringUtilities;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -104,7 +106,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JTextField analystNameTF = new JTextField();
     // , "CONFIDENTIAL", "SECRET", "TOP SECRET"
     JComboBox<String> documentLabelTF = new JComboBox<>(new String[] {"","Informational", "CONTROLLED UNCLASSIFIED INFORMATION (CUI)"});
-    JTextField dateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
+    JTextField analysisDateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssemblyFile;
 
     public AnalystReportViewFrame()
@@ -235,9 +237,9 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         analystNameTF.setText(analystReportModel.getAuthor());
         String date = analystReportModel.getDateOfReport();
         if (date != null && date.length() > 0) {
-            dateTF.setText(date);
+            analysisDateTF.setText(date);
         } else {
-            dateTF.setText(DateFormat.getDateInstance().format(new Date()));
+            analysisDateTF.setText(DateFormat.getDateInstance().format(new Date()));
         } //now
         documentLabelTF.setSelectedItem(analystReportModel.getAccess());
     }
@@ -246,7 +248,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     {
         analystReportModel.setReportName(titleTF.getText());
         analystReportModel.setAuthor(analystNameTF.getText());
-        analystReportModel.setDateOfReport(dateTF.getText());
+        analystReportModel.setDateOfReport(analysisDateTF.getText());
         analystReportModel.setAccessLabel((String) documentLabelTF.getSelectedItem());
     }
 
@@ -263,16 +265,44 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         headerPanel.add(titleTF);
         headerPanel.add(new JLabel("Author"));
         headerPanel.add(analystNameTF);
-        headerPanel.add(new JLabel("Analysis Date"));
-        headerPanel.add(dateTF);
-        headerPanel.add(new JLabel("Document Label"));
+        JLabel analysisDateLabel = new JLabel("Analysis Date");
+        analysisDateLabel.setToolTipText("Analysis Date");
+        headerPanel.add(analysisDateLabel);
+        headerPanel.add(analysisDateTF);
+        JLabel documentLabel = new JLabel("Document Label ");
+        documentLabel.setToolTipText("Document Label");
+        headerPanel.add(documentLabel);
         headerPanel.add(documentLabelTF);
+        
         Dimension d = new Dimension(Integer.MAX_VALUE, titleTF.getPreferredSize().height);
                 titleTF.setMaximumSize(new Dimension(d));
           analystNameTF.setMaximumSize(new Dimension(d));
-                 dateTF.setMaximumSize(new Dimension(d));
+         analysisDateTF.setMaximumSize(new Dimension(d));
         documentLabelTF.setMaximumSize(new Dimension(d));
         SpringUtilities.makeCompactGrid(headerPanel, 4, 2, 10, 10, 5, 5);
+        
+        /* TODO not yet working, overlapping :(
+        // add help image to blank space on pane
+        String  menuImageURL        = "doc/images/AnalystReportDisplayHtmlMenu.png"; // 985x376
+        File    menuImageFile       = new File(menuImageURL);
+        boolean menuImageFileExists = menuImageFile.exists(); // being careful
+        if (menuImageFileExists)
+        {
+            // woof, an awful lot of work just to show an image
+            // https://stackoverflow.com/questions/6714045/how-to-resize-jlabel-imageicon
+            ImageIcon   menuImageIcon    = new ImageIcon(menuImageURL);
+            Image           menuImage    = menuImageIcon.getImage();
+            Image     scaledMenuImage    = menuImage.getScaledInstance(492, 188, java.awt.Image.SCALE_SMOOTH);
+            ImageIcon scaledenuImageIcon = new ImageIcon(scaledMenuImage);
+            JLabel menuImageLabel     = new JLabel(scaledenuImageIcon);
+            menuImageLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+            menuImageLabel.setAlignmentY(JComponent.CENTER_ALIGNMENT);
+            JPanel menuImagePanel = new JPanel();
+            menuImagePanel.add(menuImageLabel);
+            headerPanel.add(Box.createVerticalStrut(10));
+            headerPanel.add(menuImagePanel);
+        }
+        */
 
         headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         headerPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
