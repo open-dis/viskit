@@ -321,7 +321,7 @@
             </font>
         </p>
         <p align="center">
-            <b>Summary of SMAL Defined Simulation Entities</b>
+            <b>Summary of Simulation Entities</b>
         </p>
         <div align="center">
             <table border="1">
@@ -363,6 +363,7 @@
             <!-- add an index to the array -->
             <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>
             <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Simulation Assembly Combining all Simulation Entities for this Scenario Experiment</p>
+            <!-- TODO add Assembly name to XML, add linked name to figure caption -->
         </div>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
@@ -633,6 +634,7 @@
                 <!-- add an index to the array -->
                 <xsl:variable name="addIndex" select="java:add($javaCounter, '1')"/>
                 <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Event Graph for <xsl:value-of select="$behavior"/></p>
+            <!-- TODO add Event Graph name from XML, rename Behavior element, add linked name to figure caption -->
             </div>
         </xsl:for-each>
         <div align="center">
