@@ -87,7 +87,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
     <!-- Compile time classpaths -->
     <path id="jaxb.compile.path"> <!-- On WIN machines, javax.activation-api.jar has to be up here -->
-        <fileset dir="${dir.lib.xml}" includes="codemodel.jar istack-commons-runtime.jar istack-commons-tools.jar javax.activation-api.jar jaxb-api.jar jaxb-runtime.jar jaxb-xjc.jar relaxng-datatype.jar rngom.jar xsom.jar"/>
+        <fileset dir="${dir.lib.xml}" includes="*.jar"/>
     </path>
 
     <path id="compile.classpath">
@@ -624,12 +624,12 @@ their descpritions.
     <target name="quick.run"
             depends="init"
             description="Run Viskit, don't check dependencies, don't rebuild">
-        
+
         <splash imageurl="file:${basedir}/${splash.image}"
                 useproxy="true"
             showduration="1000"
              displayText=" Visual Simkit for Discrete Event Simulation (DES) "/>
-        
+
         <java classname="${main.class}"
               classpathref="runtime.classpath"
               fork="true">
@@ -763,7 +763,7 @@ their descpritions.
             description="Run Design-Of-Experiments">
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
-    
+
     <target name="clean.all" depends="clean.build,clean.javadoc,clean.DefaultProject,clean.logs,reset.viskit"/>
 
     <!--  === TARGET: clean.build === -->
@@ -784,14 +784,14 @@ their descpritions.
         </delete>
         <!-- Use target clean.logs to clear logs -->
     </target>
-    
+
     <target name="clean.javadoc"
             description="Deletes javadoc files">
         <delete dir="javadoc" failonerror="false" verbose="true" includeemptydirs="true">
             <include name="**/*"/>
         </delete>
     </target>
-    
+
     <target name="clean.DefaultProject">
         <delete verbose="true">
             <fileset dir="MyViskitProjects/DefaultProject">
@@ -844,7 +844,7 @@ their descpritions.
             <fileset dir="logs" includes="validationErrors.log"/>
         </concat>
     </target>
-    
+
     <target name="clean.logs">
         <delete verbose="true" failonerror="false">
             <fileset dir="logs">
@@ -881,12 +881,12 @@ their descpritions.
             <fileset dir="${dot.viskit.dir}" includes="*"/>
         </concat>
     </target>
-        
-    
+
+
     <!-- ensure backwards compatibility of produced jar to specified version of Java, though project itself is JDK 17+ -->
     <property name="java.source"                 value="17"/>
     <property name="java.target"                 value="17"/>
-    
+
     <property name="javadoc.additionalparam" value=""/>
     <property name="javadoc.author"          value="Don Brutzman brutzman@nps.edu"/>
     <property name="javadoc.dir"             value="javadoc"/>
@@ -926,7 +926,7 @@ their descpritions.
                      Private="${javadoc.private}"
                      source="${java.source}"
                      Splitindex="${javadoc.splitindex}"
-                     Use="${javadoc.use}" 
+                     Use="${javadoc.use}"
                      useexternalfile="yes"
                      verbose="false"
                      version="${javadoc.version}"
@@ -943,7 +943,7 @@ their descpritions.
         </javadoc>
         <antcall target="view.javadoc.local"/>
     </target>
-    
+
     <target name="versions" description="show tool versions and environment values">
         <echo>ant -version</echo>
         <exec executable="ant"  dir="." vmlauncher="false" osfamily="windows">
@@ -971,19 +971,19 @@ their descpritions.
         <echoproperties/> -->
         <echo message="==========================================="/>
     </target>
-    
+
     <target name="view.issues.online" description="view online issues in web browser (Netbeans only)">
         <echo message="https://gitlab.nps.edu/Savage/viskit/-/issues" />
         <nbbrowse url="https://gitlab.nps.edu/Savage/viskit/-/issues" />
         <!-- TODO implementation-independent approach if possible, but note that other Ant approaches usually have to be customized for each OS. -->
     </target>
-    
+
     <target name="view.javadoc.local" description="view local package javadoc in web browser (Netbeans only)">
         <echo message="view local javadoc in ${javadoc.dir} subdirectory"/>
         <nbbrowse file="${javadoc.dir}/index.html" />
         <!-- TODO implementation-independent approach if possible, but note that other Ant approaches usually have to be customized for each OS. -->
     </target>
-    
+
     <target name="view.javadoc.online" description="view online package javadoc in web browser (Netbeans only)">
         <echo message="TODO view online javadoc in dist/javadoc subdirectory"/>
         <nbbrowse url="TODO" />
