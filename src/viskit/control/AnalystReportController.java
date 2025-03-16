@@ -107,7 +107,7 @@ public class AnalystReportController extends MvcAbstractController {
         } 
         catch (IOException ioe)
         {
-            LOG.warn(ioe);
+            LOG.warn(ioe);  // TODO file already exists
         }
         LOG.info("analystReportXmlFile.toPath()=\n      " + analystReportXmlFile.getAbsolutePath());
         isFileReady(xmlSourceFile);

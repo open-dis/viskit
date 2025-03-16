@@ -590,39 +590,39 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         int varCW    = 16;
 
         // Report header
-        StringBuilder buf = new StringBuilder("\nOutput Report for Replication #");
-        buf.append(replicationNumber + 1);
-        buf.append(System.getProperty("line.separator"));
-        buf.append(String.format("%-" + nameCW + "s%" + countCW + "s%" 
+        StringBuilder outputReportStringBuilder = new StringBuilder("\nOutput Report for Replication #");
+        outputReportStringBuilder.append(replicationNumber + 1);
+        outputReportStringBuilder.append(System.getProperty("line.separator"));
+        outputReportStringBuilder.append(String.format("%-" + nameCW + "s%" + countCW + "s%" 
                 + minCW + "s%" + maxCW + "s%" + meanCW + "s%" + stdDevCW 
                 + "s%" + varCW + "s", 
                 "Name", "Count", "Minimum", 
                 "Maximum", "Mean", "Standard Deviation", "Variance"));
-        buf.append(System.getProperty("line.separator"));
-        buf.append("-".repeat(nameCW+countCW+minCW+maxCW+meanCW+stdDevCW+varCW));
+        outputReportStringBuilder.append(System.getProperty("line.separator"));
+        outputReportStringBuilder.append("-".repeat(nameCW+countCW+minCW+maxCW+meanCW+stdDevCW+varCW));
 
         SampleStatistics sampleStatistics;
 
         // Report data (statistics) in aligned columns
         for (PropertyChangeListener pcl : clonedReplicationStatistics) {
             sampleStatistics = (SampleStatistics) pcl;
-            buf.append(System.getProperty("line.separator"));
-            buf.append(String.format("%-" + nameCW   + "s",sampleStatistics.getName()));
-            buf.append(String.format("%"  + countCW  + "d",sampleStatistics.getCount()));
-            buf.append(String.format("%"  + minCW    + "s",decimalFormat1.format(sampleStatistics.getMinObs())));
-            buf.append(String.format("%"  + maxCW    + "s",decimalFormat1.format(sampleStatistics.getMaxObs())));
-            buf.append(String.format("%"  + meanCW   + "s",decimalFormat4.format(sampleStatistics.getMean())));
-            buf.append(String.format("%"  + stdDevCW + "s",decimalFormat4.format(sampleStatistics.getStandardDeviation())));
-            buf.append(String.format("%"  + varCW    + "s",decimalFormat4.format(sampleStatistics.getVariance())));
+            outputReportStringBuilder.append(System.getProperty("line.separator"));
+            outputReportStringBuilder.append(String.format("%-" + nameCW   + "s",sampleStatistics.getName()));
+            outputReportStringBuilder.append(String.format("%"  + countCW  + "d",sampleStatistics.getCount()));
+            outputReportStringBuilder.append(String.format("%"  + minCW    + "s",decimalFormat1.format(sampleStatistics.getMinObs())));
+            outputReportStringBuilder.append(String.format("%"  + maxCW    + "s",decimalFormat1.format(sampleStatistics.getMaxObs())));
+            outputReportStringBuilder.append(String.format("%"  + meanCW   + "s",decimalFormat4.format(sampleStatistics.getMean())));
+            outputReportStringBuilder.append(String.format("%"  + stdDevCW + "s",decimalFormat4.format(sampleStatistics.getStandardDeviation())));
+            outputReportStringBuilder.append(String.format("%"  + varCW    + "s",decimalFormat4.format(sampleStatistics.getVariance())));
 
             ((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i++]).reset();
         }
-        buf.append(System.getProperty("line.separator"));
-        return buf.toString();
+        outputReportStringBuilder.append(System.getProperty("line.separator"));
+        return outputReportStringBuilder.toString();
     }
 
     /**
-     * For each outer statistics, print to console output name, count, min, max,
+     * For each of the outer statistics, print to console output name, count, min, max,
      * mean, standard deviation and variance. This can be done generically.
      * @return the summary report section of the analyst report
      */
@@ -632,17 +632,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         if (isSaveReplicationData())
             reportStatisticsConfiguration.processSummaryReport(getDesignPointSampleStatistics());
 
-        StringBuilder buf = new StringBuilder("Summary Output Report:");
-        buf.append(System.getProperty("line.separator"));
-        buf.append(super.toString());
-        buf.append(System.getProperty("line.separator"));
+        StringBuilder summaryReportStringBuilder = new StringBuilder("Summary Output Report:");
+        summaryReportStringBuilder.append(System.getProperty("line.separator"));
+        summaryReportStringBuilder.append("	").append(assemblyName); // class name is mangled by thread with .1 appended: super.toString());
+        summaryReportStringBuilder.append(System.getProperty("line.separator"));
 
         for (SampleStatistics designPointStatistics : getDesignPointSampleStatistics()) {
-            buf.append(System.getProperty("line.separator"));
-            buf.append(designPointStatistics);
+            summaryReportStringBuilder.append(System.getProperty("line.separator"));
+            summaryReportStringBuilder.append(designPointStatistics);
         }
-        buf.append(System.getProperty("line.separator"));
-        return buf.toString();
+        summaryReportStringBuilder.append(System.getProperty("line.separator"));
+        return summaryReportStringBuilder.toString();
     }
 
     /**
@@ -1035,7 +1035,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             }
             catch (Exception e)
             {
-                
+                LOG.error("analystReportModel.writeToXMLFile(analystReportFile) failed,\n      {}\n      {}", analystReportFile.getAbsolutePath(), e);
             }
             
 //            // TODO the following block appears to break ViskitGlobals singleton pattern!

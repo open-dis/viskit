@@ -1508,7 +1508,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (assemblyModel.getCurrentFile().exists())
         {
             if  (assemblyModel.getMetadata() != null)
-                 LOG.info("Preparing assembly " + assemblyModel.getMetadata().name);
+                 LOG.info("Preparing assembly " + assemblyModel.getMetadata().name + "using Metadata file");
             else LOG.error("produceJavaAssemblyClass() assemblyModel modelMetadata is null");
             return buildJavaAssemblySource(assemblyModel.getCurrentFile());
         }
