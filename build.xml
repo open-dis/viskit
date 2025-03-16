@@ -764,7 +764,7 @@ their descpritions.
         <java classname="viskit.doe.DoeMain" classpathref="runtime.classpath" fork="true" dir="${basedir}"/>
     </target>
 
-    <target name="clean.all" depends="clean.build,clean.javadoc,clean.DefaultProject,clean.logs,reset.viskit"/>
+    <target name="clean.all" depends="clean.build,clean.javadoc,clean.DefaultProject,clean.logs,clean.projectZips,reset.viskit"/>
 
     <!--  === TARGET: clean.build === -->
     <target name="clean.build"
@@ -810,6 +810,15 @@ their descpritions.
             <fileset dir="MyViskitProjects/DefaultProject/build">
                 <include name="**/*.class"/>
                 <include name="**/*.java"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="clean.projectZips"
+            description="Deletes project zip files">
+        <delete verbose="true" failonerror="false" includeemptydirs="true">
+            <fileset dir="MyViskitProjects">
+                <include name="**/*.zip"/>
             </fileset>
         </delete>
     </target>
