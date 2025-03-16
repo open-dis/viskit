@@ -5,14 +5,18 @@
                    https://logging.apache.org/xml/ns
                    https://logging.apache.org/xml/ns/log4j-config-2.xsd">
     <Properties>
-        <Property name="LOG_PATTERN" value="[%-5level] %d{yyyy MMM dd HH:mm:ss 'GMT'Z} [%t] %C:%L - %m%n"/>
-        <Property name="CONSOLE_PATTERN" value="%highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green} %style{%d{yyyy MMM dd HH:mm:ss 'GMT'Z}}{blue} [%t] %C:%L - %m%n"/>
+        <Property name="LOG_PATTERN" value="[%-5level] %d{yyyy MMM dd HH:mm:ss} [%t] %C:%L - %m%n"/>
+        <Property name="CONSOLE_PATTERN" value="%highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green} %style{%d{yyyy MMM dd HH:mm:ss}}{blue} [%t] %C:%L - %m%n"/>
+    <!--<Property name="LOG_PATTERN" value="[%-5level] %d{yyyy MMM dd HH:mm:ss 'GMT'Z} [%t] %C:%L - %m%n"/>-->
+    <!--<Property name="CONSOLE_PATTERN" value="%highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green} %style{%d{yyyy MMM dd HH:mm:ss 'GMT'Z}}{blue} [%t] %C:%L - %m%n"/>-->
     </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="${CONSOLE_PATTERN}"/>
         </Console>
-        <RollingFile name="RollingLogFile" fileName="logs/error.0.log" filePattern="logs/error.%i.log" >
+        <RollingFile name="ErrorLog" fileName="logs/viskit.0.error.log" filePattern="logs/viskit.%i.error.log" >
+            <!-- https://logging.apache.org/log4j/2.x/manual/filters.html#LevelRangeFilter -->
+            <!-- OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL -->
             <LevelRangeFilter minLevel="FATAL" maxLevel="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
@@ -20,7 +24,15 @@
             </Policies>
             <!--<DefaultRolloverStrategy max="20" fileIndex="min"/>-->
         </RollingFile>
-        <RollingFile name="InfoLog" fileName="logs/viskit.0.log" filePattern="logs/viskit.%i.log">
+        <RollingFile name="RollingLogFile" fileName="logs/viskit.0.all.log" filePattern="logs/viskit.%i.all.log">
+            <LevelRangeFilter minLevel="FATAL" maxLevel="ALL" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+            </Policies>
+            <!--<DefaultRolloverStrategy max="20" fileIndex="min"/>-->
+        </RollingFile>
+        <RollingFile name="InfoLog" fileName="logs/viskit.0.info.log" filePattern="logs/viskit.%i.info.log">
             <LevelRangeFilter minLevel="WARN" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
@@ -28,13 +40,13 @@
             </Policies>
             <!--<DefaultRolloverStrategy max="20" fileIndex="min"/>-->
         </RollingFile>
-        <RollingFile name="DebugLog" fileName="logs/debug.0.log" filePattern="logs/debug.%i.log">
+        <RollingFile name="DebugLog" fileName="logs/viskit.0.debug.log" filePattern="logs/viskit.%i.debug.log">
             <LevelRangeFilter minLevel="DEBUG" maxLevel="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
                 <OnStartupTriggeringPolicy/>
             </Policies>
-            <DefaultRolloverStrategy max="10"/>
+            <!--<<DefaultRolloverStrategy max="10"/>-->
         </RollingFile>
     </Appenders>
     <Loggers>
@@ -43,6 +55,7 @@
             <AppenderRef ref="RollingLogFile"/>
             <AppenderRef ref="InfoLog" />
             <AppenderRef ref="DebugLog"/>
+            <AppenderRef ref="ErrorLog"/>
         </Root>
     </Loggers>
 </Configuration>
