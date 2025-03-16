@@ -1022,7 +1022,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             printWriter.flush();
         }
         
-          if (isEnableAnalystReports()) 
+        if (isEnableAnalystReports()) 
         {
             // debug TODO duplicative?
             createAnalystReportFile(); // ServerAssembly3.1
