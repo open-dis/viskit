@@ -78,7 +78,9 @@ public final class ZipUtilities
                 // hard code hack here, but so far, this utility is only being
                 // used to zip Viskit Projects, so, don't include the project's
                 // /build directory, or a NetBeans project private directory
-                if (!file.getName().equals("build") && !file.getName().equals("private"))
+                if (!file.getName().equals("archive") && 
+                    !file.getName().equals("build")   && 
+                    !file.getName().equals("private"))
                 {
                     processFolder(file, zipOutputStream, prefixLength);
                     directoryCount++;

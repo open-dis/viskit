@@ -98,7 +98,7 @@ public class AnalystReportController extends MvcAbstractController {
         String outputFilenameDated = (assemblyName + "_AnalystReport_" + dateOutput + ".xml");
         String outputFilename      = (assemblyName + "_AnalystReport"               + ".xml");
 
-        File analystReportXmlFile = new File(analystReportDirectory, outputFilenameDated);
+        File analystReportXmlFile = new File(analystReportDirectory, outputFilename);
         
         LOG.info("xmlSourceFile.getAbsolutePath()=\n      " + xmlSourceFile.getAbsolutePath());
         isFileReady(xmlSourceFile);
@@ -273,10 +273,13 @@ public class AnalystReportController extends MvcAbstractController {
             LOG.error("trouble converting XML to HTML", ioe);
         }
 
-        // always show latest report, they asked for it
+        // show latest report, they asked for it... also confirms operation in case window is hidden
+        LOG.info("Launching HTML Analyst Report in browser\n      {}", outputHtmlFilePath);
+        ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                    "Launching HTML Analyst Report in browser",
+                    "<html><body><p align='center'>Launching HTML Analyst Report in browser</p><br  />" +
+                                "<p align='center'>" + outputHtmlFilePath + "</p><br /></body></html>");
         showHtmlViewer(outputHtmlFilePath);
-        
-        // TODO popup
     }
 
     private void saveReport()

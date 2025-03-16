@@ -546,10 +546,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         
+        
+/* TODO fix functionality before exposing
         assemblyMenu.addSeparator();
         // TODO add icon?
         assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Prepare Assembly for Simulation Run", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+*/
 
         /*
         // TODO: Unknown as to what this does exactly
@@ -725,7 +728,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         );
 
         Action prepareSimulationRunnerAction = ActionIntrospector.getAction(getController(), "prepareSimulationRunner");
-        prepareAssemblyForSimulationRunButton = makeButton(prepareSimulationRunnerAction, "viskit/images/Play24.gif",
+        prepareAssemblyForSimulationRunButton = makeButton(prepareSimulationRunnerAction, 
+             "viskit/images/Play24.gif", // large
                 "Compile and initialize the assembly, prepare for Simulation Run");
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(adapterMode);

@@ -33,6 +33,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -619,8 +620,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             @Override
             public Void doInBackground() 
             {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
+                String dateOutput = formatter.format(new Date()); // today, now
+                
                 projectDirectory  = ViskitGlobals.instance().getViskitProject().getProjectDirectory();
-                projectZipFile    = new File(projectDirectory.getParentFile(), projectDirectory.getName() + ".zip");
+                projectZipFile    = new File(projectDirectory.getParentFile(), 
+                                            projectDirectory.getName() + "_" + dateOutput + ".zip");
                 projectZipLogFile = new File(projectDirectory, "projectZipDebug.log");
 
                 if (projectZipFile.exists())
@@ -1494,12 +1499,24 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
     }
 
-    private String produceJavaAssemblyClass() {
-        AssemblyModel vmod = (AssemblyModel) getModel();
-        if (!checkSaveForSourceCompile() || vmod.getCurrentFile() == null) {
+    private String produceJavaAssemblyClass() 
+    {
+        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (!checkSaveForSourceCompile() || assemblyModel.getCurrentFile() == null) {
             return null;
         }
-        return buildJavaAssemblySource(vmod.getCurrentFile());
+        if (assemblyModel.getCurrentFile().exists())
+        {
+            if  (assemblyModel.getMetadata() != null)
+                 LOG.info("Preparing assembly " + assemblyModel.getMetadata().name);
+            else LOG.error("produceJavaAssemblyClass() assemblyModel modelMetadata is null");
+            return buildJavaAssemblySource(assemblyModel.getCurrentFile());
+        }
+        else
+        {
+             LOG.error("produceJavaAssemblyClass() assemblyModel file does not exist]\n      {}", assemblyModel.getCurrentFile());
+             return "";
+        }
     }
 
     /**
@@ -1753,7 +1770,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         model.saveModel(tempFile);
     //todo switch to DOE
     }
-    private String[] execStrings;
+    private String[] execStringArray;
 
     // Known modelPath for Assembly compilation
     @Override
@@ -1767,10 +1784,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             String className = f.getName().substring(0, f.getName().indexOf('.'));
             className = paf.packageName + "." + className;
 
-            execStrings = buildExecStrings(className);
+            execStringArray = buildExecStringArray(className);
         } 
         else {
-            execStrings = null;
+            execStringArray = new String[0];
         }
     }
 
@@ -1798,12 +1815,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()
         {
             @Override
-            public Void doInBackground()
+            public Void doInBackground() // prepareSimulationRunner()
             {
                 // Compile and prep the execStrings
                 prepareAssemblySimulationRun();
 
-                if (execStrings == null)
+                if (execStringArray == null)
                 {
 //                  if (ViskitGlobals.instance().getActiveAssemblyModel() == null)
                     if (!ViskitGlobals.instance().getAssemblyViewFrame().hasAssembliesLoaded())
@@ -1842,10 +1859,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                             assemblyName); // "Simulation Run for " + 
                     
                     // Initializes a fresh class loader
-                    runner.exec(execStrings);
+                    runner.exec(execStringArray);
 
                     // reset
-                    execStrings = null;
+                    execStringArray = null;
                     
                     // provide user guidance on first initialization
                     if (!ViskitGlobals.instance().getSimulationRunPanel().hasLoadedAssembly())
@@ -1904,13 +1921,16 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param className the name of the Assembly file to compile
      * @return a parameter array
      */
-    private String[] buildExecStrings(String className)
+    private String[] buildExecStringArray(String className)
     {
+        if (((AssemblyModel) getModel()) == null)
+            LOG.error("buildExecStringArray(" + className + ") (AssemblyModel) getModel() is missing");
+        
         List<String> v = new ArrayList<>();
 
-        v.add(className);                                               // 0
+        v.add(className);                                             // 0
         v.add("" + ((AssemblyModel) getModel()).getMetadata().verbose); // 1
-        v.add(((AssemblyModel) getModel()).getMetadata().stopTime);     // 2
+        v.add(  ((AssemblyModel) getModel()).getMetadata().stopTime); // 2
 
         String[] ra = new String[v.size()];
         return v.toArray(ra);

@@ -352,7 +352,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             if  (priorWorkingClassLoaderNoReset != null)
             {
                 Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
-                LOG.info ("prepareAndStartAssemblySimulationRun() complete");
+                LOG.info ("prepareAndStartAssemblySimulationRun() complete for " + basicAssembly.getName());
                 LOG.debug("restored currentThread contextClassLoader='" + priorWorkingClassLoaderNoReset.getName() + "'");
             }
             else LOG.error("prepareAssemblySimulationRun() complete, but priorWorkingClassLoaderNoReset is unexpectedly null");
@@ -417,7 +417,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             System.out.println("| Simulation ended |");
             System.out.println("+------------------+");
 
-            simulationRunPanel.nowRunningLabel.setText("<html><body><p><b>Replications complete\n</b></p></body></html>");
+            simulationRunPanel.nowRunningLabel.setText("<html><body><p><b>Replications all complete.\n</b></p></body></html>");
             assemblySimulationRunStopListener.actionPerformed(null);
             
             // TODO when do we clean up this thread, or does it automatically get removed?
@@ -869,7 +869,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         titleKey = key;
     }
 
-    StringBuilder nowRunningsString = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
+    StringBuilder nowRunningMessageBuilder = new StringBuilder("<html><body><font color=black>\n" + "<p><b>Now Running Replication ");
 
     @Override
     public void propertyChange(PropertyChangeEvent event)
@@ -877,17 +877,17 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         LOG.debug(event.getPropertyName());
 
         if (event.getPropertyName().equals("replicationNumber")) {
-            int beginLength = nowRunningsString.length();
-            nowRunningsString.append(event.getNewValue());
+            int beginLength = nowRunningMessageBuilder.length();
+            nowRunningMessageBuilder.append(event.getNewValue());
             simulationRunPanel.setNumberOfReplications(Integer.parseInt(event.getNewValue().toString()));
-            nowRunningsString.append(" of ");
-            nowRunningsString.append(Integer.parseInt(simulationRunPanel.numberReplicationsTF.getText()));
-            nowRunningsString.append("</b>\n");
-            nowRunningsString.append("</font></p><br></body></html>\n");
-            simulationRunPanel.nowRunningLabel.setText(nowRunningsString.toString());
+            nowRunningMessageBuilder.append(" of ");
+            nowRunningMessageBuilder.append(Integer.parseInt(simulationRunPanel.numberReplicationsTF.getText()));
+            nowRunningMessageBuilder.append("...</b>\n");
+            nowRunningMessageBuilder.append("</font></p><br></body></html>\n");
+            simulationRunPanel.nowRunningLabel.setText(nowRunningMessageBuilder.toString());
 
             // reset display string in preparation for the next replication output
-            nowRunningsString.delete(beginLength, nowRunningsString.length());
+            nowRunningMessageBuilder.delete(beginLength, nowRunningMessageBuilder.length());
         }
     }
 
@@ -930,8 +930,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 // state set from the Viskit WorkingClassLoader
                 Thread.currentThread().setContextClassLoader(runSimulationClassLoader);
                 // TODO ensure no threading and singleton issues while inside ViskitGlobals?
-                LOG.info("getRunSimulationClassLoader() currentThread contextClassLoader=\n      " + 
-                         runSimulationClassLoader.getName() + " and created new ClassLoader for\n      " +
+                LOG.info("getRunSimulationClassLoader() currentThread\n      " + 
+                         "contextClassLoader=" + runSimulationClassLoader.getName() + " and created new ClassLoader for\n      " +
                          ViskitGlobals.instance().getProjectRootDirectoryPath());
             }
         }

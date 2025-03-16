@@ -12,8 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
@@ -82,7 +80,7 @@ public class ReportStatisticsConfiguration {
     /**
      * Assembly name
      */
-    private final String assemblyName;
+    private String assemblyName;
 
     /** Creates a new instance of ReportStatisticsConfig
      * @param assemblyName name of assembly

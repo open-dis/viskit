@@ -139,7 +139,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     private ReportStatisticsConfiguration reportStatisticsConfiguration; // depends on ViskitProject
     private       String projectDirectoryPath = new String();
     private       String projectName          = new String();
-    private final String assemblyName         = this.getName(); // TODO can't use this.getName(), since filename might not equal assembly name
+    private       String assemblyName         = new String();
         
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
@@ -175,7 +175,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     public BasicAssembly() 
     {
         decimalFormat1 = new DecimalFormat("0.0; -0.0");
-        decimalFormat4 = new DecimalFormat("0.0000; -0.000");
+        decimalFormat4 = new DecimalFormat(" 0.0000;-0.0000");
         setPrintReplicationReports(true); // TODO false
         setPrintSummaryReport(true);
         replicationDataSavedStatisticsList = new LinkedHashMap<>();
@@ -185,6 +185,19 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         propertyChangeListenerArray = new PropertyChangeListener[0];
         setNumberReplications(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
         hookupsCalled = false;
+        
+        fixThreadedName();
+    }
+    /** when threaded, Java appends &#x2e;1 <!-- .1 --> to filename. */
+    // https://stackoverflow.com/questions/18282086/how-tell-tell-javadoc-that-my-period-doesnt-end-a-sentence
+    private void fixThreadedName()
+    {
+        assemblyName = this.getName(); // need to get rid of appended .1 when threaded
+        if (assemblyName.endsWith(".1"))
+        {
+            // remove filename suffix that Java apparently adds when threaded
+            assemblyName = assemblyName.substring(0, assemblyName.lastIndexOf(".1"));
+        }
     }
 
     /**
@@ -776,9 +789,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     // TODO: Simkit not generisized yet
     @SuppressWarnings("unchecked")
     @Override
-    public void run() // we are now in the thread
+    public void run() // we are now in the simulation thread
     {
-        LOG.info("Now running inside BasicAssembly run() Simulation Run thread...");
+        fixThreadedName();
+        LOG.info(assemblyName + " is now running inside BasicAssembly run() Simulation Run thread...");
         
         stopSimulationRun = false;
         
@@ -878,6 +892,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         }
 
         int runCount = runEntitiesSet.size();
+        
+        LOG.info("Begin running simulation replications for " + getName());
 
         for (int replication = 0; replication < getNumberReplications(); replication++) {
             firePropertyChange("replicationNumber", (replication + 1));

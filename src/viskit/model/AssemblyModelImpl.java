@@ -192,7 +192,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         FileWriter fileWriter = null;
         try {
             tempAssemblyMarshallFile = TempFileManager.createTempFile("tempAssemblyMarshallFile", ".xml");
-            LOG.info("tempAssemblyMarshallFile=\n      " + tempAssemblyMarshallFile.getAbsolutePath());
+            LOG.debug("tempAssemblyMarshallFile=\n      " + tempAssemblyMarshallFile.getAbsolutePath());
         } 
         catch (IOException e) {
             assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
