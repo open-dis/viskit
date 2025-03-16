@@ -149,8 +149,9 @@ public class ViskitApplication
             if (args.length > 0)
                 initialAssemblyFile = args[0];
 
+            LOG.debug("***Inside ViskitApplication main, createGUI{}: ", args.length);
             if (viskit.ViskitStatics.debug) {
-                LOG.debug("***Inside ViskitApplication main, createGUI{}: ", args.length);
+                LOG.debug("***viskit.ViskitStatics.debug=" + viskit.ViskitStatics.debug);
             }
 
             setLookAndFeel();
