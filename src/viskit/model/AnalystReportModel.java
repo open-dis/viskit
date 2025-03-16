@@ -1140,15 +1140,17 @@ public final class AnalystReportModel extends MvcAbstractModel
         ViskitGlobals.instance().selectAnalystReportTab();
         popupTitle = "Ready to Edit and Display HTML Analyst Report";
         
-        String  menuImageURL = "doc/images/AnalystReportDisplayHtmlMenu.png";
-        boolean menuImageFileExists = (new File("doc/images/AnalystReportDisplayHtmlMenu.png").exists()); // debug
         message =
                    "<html><body>" +
                    "<p align='center'>Edit fields as needed, then select</p><br />" +
                    "<p align='center'><b>Display HTML Analyst Report</b></p><br />";
+        // no joy
+//        String  menuImageURL = "doc/images/AnalystReportDisplayHtmlMenu.png";
+//        boolean menuImageFileExists = (new File("doc/images/AnalystReportDisplayHtmlMenu.png").exists()); // debug
 //        if (imageFileExists)
 //            message += // not working
 //                   "<p align='center'><a href='" + imageURL + "'><img src='" + imageURL + "'/></a></p><br />";
+
         message += "<p align='center'>to see Analyst Report results</p><br /></body></html>";
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE, popupTitle, message);
         
