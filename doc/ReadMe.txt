@@ -18,6 +18,14 @@ To push:
 git push origin master <- GitLab
 git push github master <- GitHub mirror
 
+To see the SHA1 hash of where your current repo is:
+git rev-parse HEAD
+
+15 MAR 2025
+
+Commit hash on 28 OCT 2024 before major refactor;
+11ba864a90c14505f611759dc6137a4807cf41fa
+
 2008 JUL 20
 
 There are two differences between the trunk version of Viskit and the OA3302
