@@ -29,6 +29,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.jgraph.graph.DefaultGraphCell;
@@ -66,7 +67,7 @@ import viskit.mvc.MvcRecentFileListener;
  */
 public class EventGraphControllerImpl extends MvcAbstractController implements EventGraphController 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(EventGraphControllerImpl.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public EventGraphControllerImpl() {
         initConfig();

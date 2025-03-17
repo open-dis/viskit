@@ -42,6 +42,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.jdom.Document;
@@ -68,7 +69,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  */
 public class FileHandler 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(FileHandler.class);
+    static final Logger LOG = LogManager.getLogger();
     
     private static final String SCHEMA_LOC = XMLValidationTool.ASSEMBLY_SCHEMA;
 

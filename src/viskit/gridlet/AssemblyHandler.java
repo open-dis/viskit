@@ -17,12 +17,12 @@
  */
 package viskit.gridlet;
 
-import edu.nps.util.Log4jUtilities;
 import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Vector;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcHandler;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
@@ -33,8 +33,8 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  */
 public class AssemblyHandler implements XmlRpcHandler 
 {
-
-    static Logger LOG = Log4jUtilities.getLogger(AssemblyHandler.class);
+    static final Logger LOG = LogManager.getLogger();
+    
     SessionManager sessionManager;
     Hashtable<String, GridRunner> gridRuns;
 

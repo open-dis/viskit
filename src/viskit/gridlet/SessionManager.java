@@ -44,6 +44,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.PasswordFile;
@@ -59,7 +60,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
     private Hashtable<String, String> sessions;
     private static JAXBContext jaxbContext;
 
-    Logger LOG = Log4jUtilities.getLogger(SessionManager.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private static final String PASSWD = System.getProperty("user.home") + "/.viskit/passwd.xml";
     private static final String SALT = "gridkit!";

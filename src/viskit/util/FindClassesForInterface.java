@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
@@ -30,7 +31,7 @@ import viskit.doe.LocalBootLoader;
  */
 public class FindClassesForInterface
 {
-    static final Logger LOG = Log4jUtilities.getLogger(FindClassesForInterface.class);
+    static final Logger LOG = LogManager.getLogger();
 
     /**
      * Added by Mike Bailey

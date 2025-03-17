@@ -53,6 +53,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.apache.xmlrpc.XmlRpcClientLite;
@@ -101,7 +102,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class Gridlet extends Thread
 {
-    private final static Logger LOG = Log4jUtilities.getLogger(Gridlet.class);
+    static final Logger LOG = LogManager.getLogger();
 
     SimkitAssemblyXML2Java sax2j;
     XmlRpcClientLite xmlrpc;

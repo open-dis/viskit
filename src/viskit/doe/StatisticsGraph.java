@@ -38,6 +38,7 @@ import java.awt.Font;
 import java.util.Hashtable;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.jfree.chart.ChartPanel;
@@ -70,7 +71,7 @@ import org.jfree.data.category.DefaultIntervalCategoryDataset;
  */
 public class StatisticsGraph extends JPanel
 {
-    static final Logger LOG = Log4jUtilities.getLogger(StatisticsGraph.class);
+    static final Logger LOG = LogManager.getLogger();
 
     int designPoints;
     int samples;

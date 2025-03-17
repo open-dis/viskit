@@ -19,6 +19,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -50,7 +51,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class FileBasedClassManager {
 
-    static final Logger LOG = Log4jUtilities.getLogger(FileBasedClassManager.class);
+    static final Logger LOG = LogManager.getLogger();
 
     // Singleton:
     protected static FileBasedClassManager me;

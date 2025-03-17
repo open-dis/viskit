@@ -14,6 +14,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +30,7 @@ import viskit.doe.LocalBootLoader;
  */
 public class Compiler 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(Compiler.class);
+    static final Logger LOG = LogManager.getLogger();
 
     /** Diagnostic message when we have a successful compilation */
     public static final String COMPILE_SUCCESS_MESSAGE = "compile success!";

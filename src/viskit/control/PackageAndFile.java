@@ -2,6 +2,7 @@ package viskit.control;
 
 import edu.nps.util.Log4jUtilities;
 import java.io.File;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -11,7 +12,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class PackageAndFile { // TODO consider moving this small class into FileBasedClassManager
     
-    static final Logger LOG = Log4jUtilities.getLogger(PackageAndFile.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public String packageName;
     public File file;

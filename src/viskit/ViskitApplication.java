@@ -48,6 +48,7 @@ import java.net.URL;
 import java.util.Arrays;
 
 import javax.swing.*;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import viskit.view.MainFrame;
@@ -63,7 +64,7 @@ import viskit.view.dialog.ViskitUserPreferences;
  */
 public class ViskitApplication
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitApplication.class);
+    static final Logger LOG = LogManager.getLogger();
     
     public static final String VISKIT_SHORT_APPLICATION_NAME = "Viskit";
     public static final String VISKIT_WELCOME_MESSAGE        = "Welcome to " + VISKIT_SHORT_APPLICATION_NAME;

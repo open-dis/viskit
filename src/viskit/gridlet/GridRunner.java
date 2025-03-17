@@ -38,6 +38,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import simkit.random.MersenneTwister;
@@ -79,7 +80,7 @@ import viskit.xsd.bindings.assembly.*;
  */
 public class GridRunner /* complements DoeRunDriver*/
 {
-    private final static Logger LOG = Log4jUtilities.getLogger(GridRunner.class);
+    static final Logger LOG = LogManager.getLogger();
     
     String usid;
     Integer jobID;

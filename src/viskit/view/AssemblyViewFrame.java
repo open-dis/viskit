@@ -59,6 +59,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.Help;
 
@@ -135,7 +136,7 @@ import viskit.mvc.MvcRecentFileListener;
  */
 public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyView, DragStartListener
 {
-    static final Logger LOG = Log4jUtilities.getLogger(AssemblyViewFrame.class);
+    static final Logger LOG = LogManager.getLogger();
     
     private String title = new String();
     
@@ -966,8 +967,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                     addEventGraphsToLegoTree(file, file.isDirectory()); // recurse directories
             }
         } 
-        catch (URISyntaxException ex) {
-            Log4jUtilities.getLogger(getClass()).error(ex);
+        catch (URISyntaxException uriSyntaxException) {
+            LOG.error("buildTreePanels() {}", uriSyntaxException);
         }
 
         // Now add our EventGraphs path for LEGO tree inclusion of our SimEntities

@@ -25,6 +25,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 
@@ -32,11 +33,13 @@ import viskit.ViskitGlobals;
  * @author Rick Goldberg
  * @version $Id$
  */
-public class Boot extends URLClassLoader implements Runnable {
+public class Boot extends URLClassLoader implements Runnable
+{
+    static final Logger LOG = LogManager.getLogger();
+    
     static Boot bootee;
     static Thread booter;
     static Thread runner;
-    static Logger LOG = Log4jUtilities.getLogger(Boot.class);
     String[] args;
     public URL baseJarURL;
 

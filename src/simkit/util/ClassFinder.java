@@ -20,6 +20,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import simkit.random.RandomNumber;
@@ -48,7 +49,7 @@ import simkit.random.RandomVariate;
  */
 public class ClassFinder
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ClassFinder.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private static final String DEFAULT_EXT_DIR = "./configuration/ext"; // added empty directory configuration/ext
 
@@ -221,9 +222,16 @@ public class ClassFinder
                                 randomNumberClasses.put(theClass.getName(), (Class<? extends RandomNumber>) theClass);
                                 randomNumberClasses.put(theClass.getSimpleName(), (Class<? extends RandomNumber>) theClass);
                             }
-
-                        } catch (ClassNotFoundException | NoClassDefFoundError ex) {
-                            LOG.error("Jarfile {} can''t load class {}",jarFile.getName(), nextEntry);
+                        }
+                        catch (ClassNotFoundException | NoClassDefFoundError ex) {
+                            if (!jarFile.getName().contains("log4j-api-") && 
+                                !jarFile.getName().contains("log4j-core-") && 
+                                !jarFile.getName().contains("log4j-layout-")) 
+                            // hide unnecessary errors.  not sure why this began happening with log4j v2.24.3, example:
+                            // ERROR 2025 Mar 17 13:58:17 [Thread-5] simkit.util.ClassFinder:227 - Jarfile C:\x3d-nps-gitlab\viskit\lib\log4j-api-2.24.3.jar can''t load class META-INF/versions/9/org/apache/logging/log4j/util/Base64Util.class
+                            {
+                                LOG.error("Jarfile {} can''t load class {}",jarFile.getName(), nextEntry);
+                            }
                         }
                     }
                 }

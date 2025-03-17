@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.jgraph.graph.CellView;
@@ -67,7 +68,7 @@ import viskit.model.ViskitElement;
  */
 public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing 
 {
-    static Logger LOG = Log4jUtilities.getLogger(ViskitGraphRouting.class);
+    static final Logger LOG = LogManager.getLogger();
 
     Map<String, Vector<Object>> nodePairs = new HashMap<>();
 

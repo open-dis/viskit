@@ -27,6 +27,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
 import viskit.model.ViskitModelInstantiator;
@@ -43,7 +44,7 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  */
 public class InstantiationPanel extends JPanel implements ActionListener, CaretListener
 {
-    static final Logger LOG = Log4jUtilities.getLogger(InstantiationPanel.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private static final int FF = 0, CONSTR = 1, FACT = 2;
 

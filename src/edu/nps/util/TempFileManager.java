@@ -1,6 +1,7 @@
 package edu.nps.util;
 
 import java.io.*;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -29,7 +30,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class TempFileManager {
 
-    static final Logger LOG = Log4jUtilities.getLogger(TempFileManager.class);
+    static final Logger LOG = LogManager.getLogger();
 
     /**
      *  Creates a temporary file in the proper directory to allow for cleanup

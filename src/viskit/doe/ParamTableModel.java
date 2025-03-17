@@ -44,6 +44,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import javax.xml.bind.JAXBElement;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -56,7 +57,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class ParamTableModel extends DefaultTableModel implements TableModelListener
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ParamTableModel.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public static final int NUM_COLS = 6;
     public static String[] columnNames = {

@@ -12,6 +12,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -32,7 +33,7 @@ import viskit.ViskitStatics;
 @SuppressWarnings("serial")
 public class SourceWindow extends JFrame
 {
-    static final Logger LOG = Log4jUtilities.getLogger(SourceWindow.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public final String src;
     JTextArea jta;
@@ -319,7 +320,7 @@ public class SourceWindow extends JFrame
 
 class Searcher
 {
-    static final Logger LOG = Log4jUtilities.getLogger(Searcher.class);
+    static final Logger LOG = LogManager.getLogger();
 
     JTextComponent jtc;
     Document doc;

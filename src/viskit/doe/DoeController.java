@@ -44,6 +44,7 @@ import java.util.Vector;
 import edu.nps.util.DirectoryWatch;
 import edu.nps.util.FileFilterEx;
 import edu.nps.util.Log4jUtilities;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.EventGraph;
@@ -62,7 +63,7 @@ import viskit.xsd.bindings.assembly.TerminalParameter;
  */
 public class DoeController implements DoeEvents, ActionListener, OpenAssembly.AssembyChangeListener 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(DoeController.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private final JFileChooser openSaveFileChooser;
     private DoeMainFrame doeFrame;

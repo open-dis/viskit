@@ -46,6 +46,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.jgraph.graph.DefaultGraphCell;
@@ -90,7 +91,7 @@ import viskit.view.SimulationRunPanel;
  */
 public class AssemblyControllerImpl extends MvcAbstractController implements AssemblyController, OpenAssembly.AssembyChangeListener 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(AssemblyControllerImpl.class);
+    static final Logger LOG = LogManager.getLogger();
     private static int mutex = 0;
     Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
 

@@ -34,6 +34,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import static java.nio.file.FileVisitResult.*;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -54,7 +55,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class FindFile extends SimpleFileVisitor<Path>
 {
-    static final Logger LOG = Log4jUtilities.getLogger(FindFile.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private final PathMatcher matcher;
     private Path path;

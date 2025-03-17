@@ -36,6 +36,7 @@ import org.xml.sax.SAXParseException;
 
 // Local imports
 import edu.nps.util.Log4jUtilities;
+import org.apache.logging.log4j.LogManager;
 
 import viskit.ViskitUserConfiguration;
 
@@ -54,7 +55,9 @@ import viskit.ViskitUserConfiguration;
  *
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.util.XMLValidationTool">Terry Norbraten</a>
  */
-public class XMLValidationTool {
+public class XMLValidationTool
+{
+    static final Logger LOG = LogManager.getLogger();
 
     public static final String ASSEMBLY_SCHEMA = "http://diana.nps.edu/Simkit/assembly.xsd";
     public static final String EVENT_GRAPH_SCHEMA = "http://diana.nps.edu/Simkit/simkit.xsd";
@@ -64,8 +67,6 @@ public class XMLValidationTool {
 
     /** The locally resolved location for simkit schema */
     public static final String LOCAL_EVENT_GRAPH_SCHEMA = "xsd/simkit.xsd";
-
-    static final Logger LOG = Log4jUtilities.getLogger(XMLValidationTool.class);
 
     private FileWriter fWriter;
     private String xmlFile, schemaFile;
@@ -127,7 +128,7 @@ public class XMLValidationTool {
                 File errorsLog = new File(ViskitUserConfiguration.VISKIT_LOGS_DIR + "/validationErrors.log");
                 errorsLog.setWritable(true, false);
 
-                // New Log4jUtilities.getLogger() each Viskit startup
+                // New LOG each Viskit startup
                 if (errorsLog.exists()) {errorsLog.delete();}
                 fWriter = new FileWriter(errorsLog, true);
                 Calendar cal = Calendar.getInstance();

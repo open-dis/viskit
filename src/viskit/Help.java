@@ -48,6 +48,7 @@ import javax.help.CSH;
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
 import javax.help.SwingHelpUtilities;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import viskit.util.BrowserLauncher;
@@ -59,7 +60,7 @@ import viskit.util.Version;
  */
 public class Help
 {
-    static final Logger LOG = Log4jUtilities.getLogger(Help.class);
+    static final Logger LOG = LogManager.getLogger();
     
     public static final Version VERSION = new Version("version.txt");
     public static final String VERSION_STRING = VERSION.getVersionString();

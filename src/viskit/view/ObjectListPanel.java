@@ -25,6 +25,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
@@ -46,7 +47,7 @@ import viskit.control.AssemblyControllerImpl;
  */
 public class ObjectListPanel extends JPanel implements ActionListener, CaretListener
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ObjectListPanel.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private JDialog parent;
     private JLabel typeLabelArray[];

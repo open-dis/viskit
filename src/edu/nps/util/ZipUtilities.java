@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /** Class that zips a directory that is pointed to.The  processFolder method
@@ -38,7 +39,7 @@ import org.apache.logging.log4j.Logger;
  */
 public final class ZipUtilities
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ZipUtilities.class);
+    static final Logger LOG = LogManager.getLogger();
     
     private static int      fileCount = 0;
     private static int directoryCount = 0;

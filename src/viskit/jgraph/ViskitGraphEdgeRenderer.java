@@ -10,6 +10,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -30,9 +31,9 @@ import org.jgraph.graph.GraphConstants;
  * @since 2:32:30 PM
  * @version $Id$
  */
-public class ViskitGraphEdgeRenderer extends EdgeRenderer {
-    
-    protected static final Logger LOG = Log4jUtilities.getLogger(ViskitGraphEdgeRenderer.class);
+public class ViskitGraphEdgeRenderer extends EdgeRenderer 
+{
+    static final Logger LOG = LogManager.getLogger();
 
     double[] coo = new double[6];
 

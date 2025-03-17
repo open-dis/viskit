@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -53,7 +54,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class DirectoryWatch
 {
-    static final Logger LOG = Log4jUtilities.getLogger(DirectoryWatch.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private static int sequenceNum = 0;
     private final static int DEFAULTSLEEPTIMEMS = 3 * 1_000; // 3 seconds

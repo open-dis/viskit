@@ -36,7 +36,6 @@ package viskit.doe;
 import edu.nps.util.CryptoMethods;
 import edu.nps.util.SpringUtilities;
 import edu.nps.util.GenericConversion;
-import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import java.awt.*;
 import java.awt.event.*;
@@ -56,6 +55,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Document;
@@ -83,7 +83,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  */
 public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssembyChangeListener
 {
-    static final Logger LOG = Log4jUtilities.getLogger(JobLauncherTab2.class);
+    static final Logger LOG = LogManager.getLogger();
 
     DoeRunDriver doe;
 //    Map statisticsGraphs;

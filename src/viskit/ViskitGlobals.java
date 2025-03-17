@@ -81,6 +81,7 @@ import viskit.view.ViskitProjectSelectionPanel;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
 import viskit.view.dialog.ViskitUserPreferences;
 import edu.nps.util.SystemExitHandler;
+import org.apache.logging.log4j.LogManager;
 import static viskit.ViskitProject.DEFAULT_PROJECT_NAME;
 
 /**
@@ -97,7 +98,7 @@ import static viskit.ViskitProject.DEFAULT_PROJECT_NAME;
  */
 public class ViskitGlobals
 {
-    static Logger LOG = Log4jUtilities.getLogger(ViskitGlobals.class);
+    static final Logger LOG = LogManager.getLogger();
     
     /** Singleton pattern, with final version applied by NetBeans
      * @see https://stackoverflow.com/questions/2832297/java-singleton-pattern

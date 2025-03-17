@@ -9,6 +9,7 @@ import java.util.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -23,9 +24,9 @@ import viskit.xsd.bindings.eventgraph.*;
  * @since March 23, 2004, 4:59 PM
  * @version $Id$
  */
-public class SimkitXML2Java {
-
-    static final Logger LOG = Log4jUtilities.getLogger(SimkitXML2Java.class);
+public class SimkitXML2Java
+{
+    static final Logger LOG = LogManager.getLogger();
 
     /* convenience Strings for formatting */
     /** space character */

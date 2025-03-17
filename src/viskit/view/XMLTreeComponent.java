@@ -44,6 +44,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -64,7 +65,7 @@ import viskit.doe.FileHandler;
  */
 public class XMLTreeComponent extends JTree 
 {   
-    static final Logger LOG = Log4jUtilities.getLogger(XMLTreeComponent.class);
+    static final Logger LOG = LogManager.getLogger();
 
     DefaultTreeModel mod;
 
@@ -358,7 +359,7 @@ public class XMLTreeComponent extends JTree
 
 class XmlTreePanel extends JPanel
 {
-    static final Logger LOG = Log4jUtilities.getLogger(XmlTreePanel.class);
+    static final Logger LOG = LogManager.getLogger();
     
     public XMLTreeComponent xmlTreeComponent;
     public JTextArea sourceXmlTextArea;

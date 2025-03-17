@@ -12,6 +12,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import static viskit.ViskitStatics.DESCRIPTION_HINT;
@@ -33,7 +34,7 @@ import viskit.view.TransitionsPanel;
  */
 public class EventNodeInspectorDialog extends JDialog
 {
-    static final Logger LOG = Log4jUtilities.getLogger(EventNodeInspectorDialog.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private static EventNodeInspectorDialog dialog;
     private EventNode node;

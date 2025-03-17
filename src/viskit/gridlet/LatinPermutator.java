@@ -28,6 +28,7 @@ package viskit.gridlet;
 import edu.nps.util.Log4jUtilities;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import simkit.random.MersenneTwister;
 
@@ -37,7 +38,7 @@ import simkit.random.MersenneTwister;
  */
 public class LatinPermutator 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(LatinPermutator.class);
+    static final Logger LOG = LogManager.getLogger();
     
     MersenneTwister rnd;
     int size;

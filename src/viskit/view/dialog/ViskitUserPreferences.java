@@ -57,6 +57,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import viskit.control.EventGraphController;
@@ -78,7 +79,7 @@ import viskit.control.AssemblyControllerImpl;
  */
 public class ViskitUserPreferences extends JDialog
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitUserPreferences.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private static ViskitUserPreferences settingsDialog;
     private static boolean modified = false;

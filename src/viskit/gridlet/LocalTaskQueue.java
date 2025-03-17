@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.doe.DoeException;
@@ -25,7 +26,7 @@ import viskit.doe.LocalBootLoader;
 @SuppressWarnings("serial")
 public class LocalTaskQueue extends ArrayList<Object> 
 {
-    static Logger LOG = Log4jUtilities.getLogger(LocalTaskQueue.class);
+    static final Logger LOG = LogManager.getLogger();
     
     GridRunner gridRunner;
     int totalTasks;

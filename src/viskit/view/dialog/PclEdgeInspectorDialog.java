@@ -18,6 +18,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
@@ -40,7 +41,7 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  */
 public class PclEdgeInspectorDialog extends JDialog
 {
-    static final Logger LOG = Log4jUtilities.getLogger(PclEdgeInspectorDialog.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private final JLabel sourceLabel;
 

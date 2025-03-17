@@ -18,6 +18,7 @@ import java.net.URLClassLoader;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -87,7 +88,7 @@ import viskit.ViskitStatics;
  */
 public class LocalBootLoader extends URLClassLoader {
 
-    private final static Logger LOG = Log4jUtilities.getLogger(LocalBootLoader.class);
+    static final Logger LOG = LogManager.getLogger();
     
     String[] classPathArray = new String[0];
     LocalBootLoader localBootLoader; // formerly "stage1"

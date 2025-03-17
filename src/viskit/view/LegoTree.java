@@ -16,6 +16,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.*;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -42,9 +43,9 @@ import viskit.ViskitStatics;
  * @since 9:44:31 AM
  * @version $Id$
  */
-public class LegoTree extends JTree implements DragGestureListener, DragSourceListener {
-
-    static final Logger LOG = Log4jUtilities.getLogger(LegoTree.class);
+public class LegoTree extends JTree implements DragGestureListener, DragSourceListener 
+{
+    static final Logger LOG = LogManager.getLogger();
 
     private DefaultMutableTreeNode rootNode;
 

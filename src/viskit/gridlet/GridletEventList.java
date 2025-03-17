@@ -17,6 +17,7 @@ import edu.nps.util.Log4jUtilities;
 import java.io.ByteArrayOutputStream;
 import simkit.EventList;
 import java.io.PrintWriter;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -25,7 +26,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class GridletEventList extends EventList
 {
-    static final Logger LOG = Log4jUtilities.getLogger(GridletEventList.class);
+    static final Logger LOG = LogManager.getLogger();
     
     private final PrintWriter printWriter;
     private final ByteArrayOutputStream buffer;

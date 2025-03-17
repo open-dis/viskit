@@ -45,6 +45,7 @@ import javax.swing.tree.TreeSelectionModel;
 import java.util.List;
 import java.util.Iterator;
 import java.awt.*;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -58,7 +59,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class ParamTree extends JTree
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ParamTree.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public ParamTree(List list) {
         getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);

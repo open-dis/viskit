@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
@@ -21,7 +22,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 
 public class Launcher extends Thread implements Runnable
 {
-    static final Logger LOG = Log4jUtilities.getLogger(Launcher.class);
+    static final Logger LOG = LogManager.getLogger();
     
     static ClassLoader cloader;
     String assembly = null;

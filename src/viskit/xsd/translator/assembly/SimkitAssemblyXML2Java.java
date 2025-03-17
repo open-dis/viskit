@@ -12,6 +12,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.control.AssemblyControllerImpl;
 import viskit.ViskitGlobals;
@@ -27,7 +28,7 @@ import viskit.xsd.translator.eventgraph.SimkitXML2Java;
  */
 public class SimkitAssemblyXML2Java
 {
-    static final Logger LOG = Log4jUtilities.getLogger(SimkitAssemblyXML2Java.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public static final String ASSEMBLY_BINDINGS = "viskit.xsd.bindings.assembly";
     static final boolean DEBUG = false; // TODO: tie to ViskitStatics.debug?

@@ -44,6 +44,7 @@ import java.util.*;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -74,7 +75,7 @@ import viskit.util.XsltUtility;
  */
 public final class AnalystReportModel extends MvcAbstractModel
 {
-    static final Logger LOG = Log4jUtilities.getLogger(AnalystReportModel.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private boolean debug = false;
 
@@ -1142,7 +1143,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         
         message =
                    "<html><body>" +
-                   "<p align='center'>Edit fields as needed, then select</p><br />" +
+                   "<p align='center'>Edit tabbed field values as needed, then select</p><br />" +
                    "<p align='center'><b>Display HTML Analyst Report</b></p><br />";
         // no joy
 //        String  menuImageURL = "doc/images/AnalystReportDisplayHtmlMenu.png";
@@ -1151,7 +1152,7 @@ public final class AnalystReportModel extends MvcAbstractModel
 //            message += // not working
 //                   "<p align='center'><a href='" + imageURL + "'><img src='" + imageURL + "'/></a></p><br />";
 
-        message += "<p align='center'>to see Analyst Report results</p><br /></body></html>";
+        message += "<p align='center'>in Analyst Report menu to view results</p><br /></body></html>";
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE, popupTitle, message);
         
         /* better not to present another decision, had thread-completion issues anyway

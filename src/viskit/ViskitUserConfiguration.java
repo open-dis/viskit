@@ -18,6 +18,7 @@ import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.commons.configuration2.tree.NodeCombiner;
 import org.apache.commons.configuration2.tree.NodeModel;
 import org.apache.commons.configuration2.tree.UnionCombiner;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -37,7 +38,7 @@ import viskit.doe.FileHandler;
  */
 public class ViskitUserConfiguration 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitUserConfiguration.class);
+    static final Logger LOG = LogManager.getLogger();
     
     // lazy loading, not immediate loading which can fail
     private static volatile ViskitUserConfiguration INSTANCE = null;

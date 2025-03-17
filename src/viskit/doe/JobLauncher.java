@@ -51,6 +51,7 @@ import edu.nps.util.SpringUtilities;
 import edu.nps.util.TempFileManager;
 import java.net.URI;
 import java.net.URISyntaxException;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
@@ -72,7 +73,7 @@ import viskit.util.TitleListener;
  */
 public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.DirectoryChangeListener 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(JobLauncher.class);
+    static final Logger LOG = LogManager.getLogger();
 
     File inputFile;
     File filteredFile;

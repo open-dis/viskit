@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
@@ -59,7 +60,7 @@ import viskit.xsd.cli.Boot;
  */
 public class BshGridlet extends Thread
 {
-    static final Logger LOG = Log4jUtilities.getLogger(BshGridlet.class);
+    static final Logger LOG = LogManager.getLogger();
     
     SimkitAssemblyXML2Java sax2j;
     XmlRpcClientLite xmlrpc;

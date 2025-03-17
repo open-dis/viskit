@@ -48,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.JAXBElement;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -60,7 +61,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class DoeFileModel
 {
-    static final Logger LOG = Log4jUtilities.getLogger(DoeFileModel.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public File userFile;
     public ParamTable paramTable;

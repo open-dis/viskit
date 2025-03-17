@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /** This class was written by CDR Duane Davis for the AUV Workbench.
@@ -18,7 +19,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class XsltUtility 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(XsltUtility.class);
+    static final Logger LOG = LogManager.getLogger();
 
     /**
      * Runs an XSL Transformation on an XML file and writes the result to another file

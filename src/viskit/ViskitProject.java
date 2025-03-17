@@ -47,6 +47,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileView;
 
 import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.jdom.Document;
@@ -92,7 +93,7 @@ public class ViskitProject
     public static final String DIST_DIRECTORY_NAME    = "dist";
     public static final String LIB_DIRECTORY_NAME     = "lib";
 
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitProject.class);
+    static final Logger LOG = LogManager.getLogger();
 
     /** This static variable will get updated at launch if user's home directory doesn't exist */
     public static String VISKIT_PROJECTS_DIRECTORY = DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH;

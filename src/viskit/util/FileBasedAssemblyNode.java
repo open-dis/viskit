@@ -2,6 +2,7 @@ package viskit.util;
 
 import edu.nps.util.Log4jUtilities;
 import java.io.File;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /** Utility class to help identify whether an Event Graph or PCL is from XML or *.class
@@ -21,7 +22,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class FileBasedAssemblyNode
 {
-    static final Logger LOG = Log4jUtilities.getLogger(FileBasedAssemblyNode.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public static final String FBAN_DELIM = "<fbasdelim>";
     public String loadedClass;

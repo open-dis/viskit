@@ -35,6 +35,7 @@ package viskit.doe;
 
 import edu.nps.util.Log4jUtilities;
 import javax.swing.*;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
 
@@ -49,7 +50,7 @@ import viskit.ViskitStatics;
  */
 public class DoeMain implements DoeEvents
 {
-    static final Logger LOG = Log4jUtilities.getLogger(DoeMain.class);
+    static final Logger LOG = LogManager.getLogger();
 
     private DoeController controller;
     private DoeMainFrame mainFrame;

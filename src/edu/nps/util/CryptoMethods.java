@@ -46,6 +46,7 @@ import java.util.StringTokenizer;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -60,7 +61,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class CryptoMethods
 {
-    static final Logger LOG = Log4jUtilities.getLogger(CryptoMethods.class);
+    static final Logger LOG = LogManager.getLogger();
     
   private static final byte[] PRIVATE_KEY =
       {106,93,45,-24,68,125,-92,103};

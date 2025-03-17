@@ -65,6 +65,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
@@ -88,7 +89,7 @@ import viskit.mvc.MvcController;
  */
 public class AnalystReportViewFrame extends MvcAbstractViewFrame implements OpenAssembly.AssembyChangeListener {
 
-    static final Logger LOG = Log4jUtilities.getLogger(AnalystReportViewFrame.class);
+    static final Logger LOG = LogManager.getLogger();
     private final static String FRAME_DEFAULT_TITLE = "Viskit Analyst Report Editor";
     private AnalystReportModel analystReportModel;
     private JMenu analystReportMenu;

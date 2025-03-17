@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.*;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
@@ -25,7 +26,7 @@ import viskit.gridlet.SessionManager;
  */
 public class RemoteDriverImpl implements DoeDriver
 {
-    private final static Logger LOG = Log4jUtilities.getLogger(RemoteDriverImpl.class);
+    static final Logger LOG = LogManager.getLogger();
     
     XmlRpcClientLite rpc;
     Vector<Object> args = new Vector<>();

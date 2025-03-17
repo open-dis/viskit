@@ -17,6 +17,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.text.NumberFormat;
 import javax.swing.text.NumberFormatter;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -24,7 +25,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class QStatisticsConsole extends JFrame implements ActionListener, WindowListener 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(QStatisticsConsole.class);
+    static final Logger LOG = LogManager.getLogger();
     
     DoeRunDriver doe;
     int delay = 0;

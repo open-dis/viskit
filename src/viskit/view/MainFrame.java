@@ -55,6 +55,7 @@ import viskit.util.OpenAssembly;
 import viskit.mvc.MvcModel;
 import edu.nps.util.SystemExitHandler;
 import java.util.TimerTask;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitApplication;
 import viskit.assembly.SimulationRunInterface;
@@ -125,7 +126,7 @@ public class MainFrame extends JFrame
     private AssemblyControllerImpl     assemblyController;
     private EventGraphControllerImpl eventGraphController;
     
-    static final Logger LOG = Log4jUtilities.getLogger(MainFrame.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public MainFrame(String initialAssemblyFile) 
     {

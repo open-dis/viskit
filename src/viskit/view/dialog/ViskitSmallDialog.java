@@ -11,6 +11,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
 
@@ -33,7 +34,7 @@ import viskit.ViskitStatics;
  */
 public abstract class ViskitSmallDialog extends JDialog
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitSmallDialog.class);
+    static final Logger LOG = LogManager.getLogger();
 
     protected static boolean modified = false;
     private static ViskitSmallDialog dialog;

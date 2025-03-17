@@ -45,15 +45,16 @@ import javax.swing.JComponent;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.plaf.ComponentUI;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * @version $Id: BrowserLauncher.java 1860 2008-06-17 23:48:42Z ahbuss $
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.util.BrowserLauncher">Terry Norbraten, NPS MOVES</a>
  */
-public class BrowserLauncher extends BasicContentViewerUI {
-
-    static final Logger LOG = Log4jUtilities.getLogger(BrowserLauncher.class);
+public class BrowserLauncher extends BasicContentViewerUI 
+{
+    static final Logger LOG = LogManager.getLogger();
 
     public static ComponentUI createUI(JComponent x) {
         return new BrowserLauncher((JHelpContentViewer) x);

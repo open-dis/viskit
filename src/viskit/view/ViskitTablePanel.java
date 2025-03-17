@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.doe.DoeMain;
 import viskit.model.ViskitElement;
@@ -33,7 +34,7 @@ import viskit.model.ViskitElement;
  */
 public abstract class ViskitTablePanel extends JPanel
 {
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitTablePanel.class);
+    static final Logger LOG = LogManager.getLogger();
 
     protected JTable tab;
     private JScrollPane jsp;

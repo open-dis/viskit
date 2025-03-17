@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -31,9 +32,9 @@ import viskit.xsd.bindings.eventgraph.Parameter;
  * @since 9:43:42 AM
  * @version $Id$
  */
-public abstract class ViskitModelInstantiator {
-
-    static final Logger LOG = Log4jUtilities.getLogger(ViskitModelInstantiator.class);
+public abstract class ViskitModelInstantiator
+{
+    static final Logger LOG = LogManager.getLogger();
     private String type;
     private String name = "";
     private String description = "";

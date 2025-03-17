@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -46,7 +47,7 @@ import viskit.doe.FileHandler;
  */
 public class ReportStatisticsConfiguration {
 
-    static final Logger LOG = Log4jUtilities.getLogger(ReportStatisticsConfiguration.class);
+    static final Logger LOG = LogManager.getLogger();
     
     static ViskitProject localViskitProject; // avoid ViskitGlobals while in separate thread context
 

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.nps.util.Log4jUtilities;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import simkit.random.*;
 import viskit.ViskitStatics;
@@ -28,7 +29,7 @@ import viskit.ViskitStatics;
  */
 public class VsimkitObjects
 {
-    static final Logger LOG = Log4jUtilities.getLogger(VsimkitObjects.class);
+    static final Logger LOG = LogManager.getLogger();
 
     /**
      * VGlobals uses this field, which combines all the methods below.

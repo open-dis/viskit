@@ -36,6 +36,7 @@ package edu.nps.util;
 import javax.swing.*;
 import javax.swing.SpringLayout;
 import java.awt.*;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -52,7 +53,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class SpringUtilities
 {
-    static final Logger LOG = Log4jUtilities.getLogger(SpringUtilities.class);
+    static final Logger LOG = LogManager.getLogger();
     
     /**
      * A debugging utility that prints to stdout the component's

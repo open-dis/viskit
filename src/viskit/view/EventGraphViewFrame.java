@@ -53,6 +53,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -109,7 +110,7 @@ import viskit.mvc.MvcRecentFileListener;
  */
 public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGraphView
 {
-    static final Logger LOG = Log4jUtilities.getLogger(EventGraphViewFrame.class);
+    static final Logger LOG = LogManager.getLogger();
 
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
     public final static int SELECT_MODE = 0;

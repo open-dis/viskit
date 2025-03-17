@@ -49,6 +49,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Vector;
 import javax.swing.text.JTextComponent;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.model.AdapterEdge;
 import viskit.model.EventGraphNode;
@@ -67,7 +68,7 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  */
 public class AdapterConnectionInspectorDialog extends JDialog 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(AdapterConnectionInspectorDialog.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public static String xnewProperty;
     public static String newTarget,  newTargetEvent,  newSource,  newSourceEvent;

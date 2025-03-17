@@ -48,6 +48,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -64,9 +65,9 @@ import viskit.view.AnalystReportViewFrame;
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.control.AnalystReportController">Terry Norbraten, NPS MOVES</a>
  * @version $Id$
  */
-public class AnalystReportController extends MvcAbstractController {
-
-    static final Logger LOG = Log4jUtilities.getLogger(AnalystReportController.class);
+public class AnalystReportController extends MvcAbstractController
+{
+    static final Logger LOG = LogManager.getLogger();
 
     private static AnalystReportViewFrame analystReportViewFrame;
     private File   currentAssemblyFile;
@@ -107,7 +108,7 @@ public class AnalystReportController extends MvcAbstractController {
         } 
         catch (IOException ioe)
         {
-            LOG.warn(ioe);  // TODO file already exists
+            LOG.debug(ioe);  // typically this file already exists, authors are progressively/iteratively editing it
         }
         LOG.info("analystReportXmlFile.toPath()=\n      " + analystReportXmlFile.getAbsolutePath());
         isFileReady(xmlSourceFile);

@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Properties;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 
@@ -27,9 +28,9 @@ import viskit.ViskitGlobals;
  *
  * @author ahbuss
  */
-public class Version {
-
-    static Logger LOG = Log4jUtilities.getLogger(Version.class);
+public class Version
+{
+    static final Logger LOG = LogManager.getLogger();
 
     protected String versionString;
 

@@ -64,6 +64,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -100,8 +101,9 @@ import viskit.doe.FileHandler;
  *
  * @author <a href="mailto:tdnorbra@nps.edu">Terry Norbraten</a>
  */
-public class EventGraphCache {
-    static final Logger LOG = Log4jUtilities.getLogger(EventGraphCache.class);
+public class EventGraphCache 
+{
+    static final Logger LOG = LogManager.getLogger();;
     private static EventGraphCache me;
 
     /**

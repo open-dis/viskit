@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -27,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 @Deprecated(since = "1.0.16", forRemoval = true) // TODO huh? seems to still be in use...
 public class Splash2 extends JFrame
 {
-    static final Logger LOG = Log4jUtilities.getLogger(Splash2.class);
+    static final Logger LOG = LogManager.getLogger();
 
     Robot robot;
     BufferedImage screenImg;

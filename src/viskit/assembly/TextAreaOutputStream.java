@@ -41,6 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import javax.swing.JTextArea;
 import javax.swing.Timer;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -62,7 +63,7 @@ public class TextAreaOutputStream extends ByteArrayOutputStream implements Actio
   public static final int OUTPUTLIMIT = 1024 * 1024 * 8; // 8Mb
   public static final int BACKOFFSIZE = 1024 * 16;       // 16Kb, must be less than OUTPUTLIMIT
   
-  static final Logger LOG = Log4jUtilities.getLogger(TextAreaOutputStream.class);
+    static final Logger LOG = LogManager.getLogger();
   
   private final JTextArea jTextArea;
   private final Timer swingTimer;

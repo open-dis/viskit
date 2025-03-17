@@ -63,6 +63,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.event.HyperlinkEvent;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -126,7 +127,7 @@ public class ViskitStatics
 
     public static final String OPERATING_SYSTEM = System.getProperty("os.name");
 
-    static final Logger        LOG   = Log4jUtilities.getLogger(ViskitStatics.class);
+    static final Logger LOG = LogManager.getLogger();
 
     public static boolean      debug = false;
 
