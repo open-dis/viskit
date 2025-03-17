@@ -53,6 +53,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import javax.swing.JOptionPane;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -90,7 +91,7 @@ import viskit.view.SimulationRunPanel;
  */
 public abstract class BasicAssembly extends BasicSimEntity implements Runnable 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(BasicAssembly.class);
+    static final Logger LOG = LogManager.getLogger();
     
     protected Map<Integer, List<SavedStats>> replicationDataSavedStatisticsList;
     protected PropertyChangeListener[]       replicationStatisticsPropertyChangeListenerArray;
@@ -187,6 +188,23 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         hookupsCalled = false;
         
         fixThreadedName();
+    }
+    
+    /** assembly name with &#46;1 appended while within thread.
+     * @return name of implementing assembly */
+    @Override
+    public String getName()
+    {
+//      fixThreadedName(); // do not invoke while within thread
+        return assemblyName;
+    }
+    
+    /** assembly name with &#46;1 removed, do not use while within thread.
+     * @return name of implementing assembly */
+    public String getFixedName()
+    {
+        fixThreadedName();
+        return assemblyName;
     }
     /** when threaded, Java appends &#x2e;1 <!-- .1 --> to filename. */
     // https://stackoverflow.com/questions/18282086/how-tell-tell-javadoc-that-my-period-doesnt-end-a-sentence
