@@ -627,7 +627,7 @@ their descpritions.
 
         <splash imageurl="file:${basedir}/${splash.image}"
                 useproxy="true"
-            showduration="1000"
+            showduration="5"
              displayText=" Visual Simkit for Discrete Event Simulation (DES) "/>
 
         <java classname="${main.class}"
