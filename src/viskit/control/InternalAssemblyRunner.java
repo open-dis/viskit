@@ -52,6 +52,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Map;
 import javax.swing.*;
+import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 
@@ -83,7 +84,7 @@ import viskit.view.dialog.ViskitUserPreferences;
  */
 public class InternalAssemblyRunner implements PropertyChangeListener 
 {
-    static final Logger LOG = Log4jUtilities.getLogger(InternalAssemblyRunner.class);
+    static final Logger LOG = LogManager.getLogger();
 
     /** The name of the basicAssembly to run */
     private String simulationRunAssemblyClassName;
@@ -352,7 +353,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             if  (priorWorkingClassLoaderNoReset != null)
             {
                 Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
-                LOG.info ("prepareAndStartAssemblySimulationRun() complete for " + basicAssembly.getName());
+                LOG.info ("prepareAndStartAssemblySimulationRun() complete for " + basicAssembly.getFixedName());
                 LOG.debug("restored currentThread contextClassLoader='" + priorWorkingClassLoaderNoReset.getName() + "'");
             }
             else LOG.error("prepareAssemblySimulationRun() complete, but priorWorkingClassLoaderNoReset is unexpectedly null");
@@ -361,6 +362,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             LOG.error("prepareAssemblySimulationRun() reflection exception: " + exception.getMessage());
         }
+        // the following redundant "catch (Exception ue)" is correct for handling reflection exceptions
         catch (Exception ue) // any other unexpected exceptions?? sometimes strange things happen with reflection and threading
         {
             LOG.error("prepareAssemblySimulationRun() reflection uncaught exception: " + ue);
