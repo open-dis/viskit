@@ -14,7 +14,6 @@
 
 package viskit.test;
 
-import edu.nps.util.Log4jUtilities;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +23,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Vector;
 import javax.xml.bind.JAXBElement;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.*;
@@ -35,8 +35,10 @@ import viskit.ViskitGlobals;
  * @author Rick Goldberg
  * @version $Id: TestGridkitServerAssembly3.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
-public class TestGridkitServerAssembly3 extends Thread {
-    static Logger log = Log4jUtilities.getLogger(TestGridkitServerAssembly3.class);
+public class TestGridkitServerAssembly3 extends Thread 
+{
+    static final Logger LOG = LogManager.getLogger();
+    
     XmlRpcClientLite xmlrpc;
     Vector<Object> args;
     String usid;
@@ -61,7 +63,7 @@ public class TestGridkitServerAssembly3 extends Thread {
         // get the jarurl path to viskit.EventGraphAssemblyComboMain
         URL url = ViskitGlobals.instance().getViskitApplicationClassLoader().getResource("viskit/EventGraphAssemblyComboMain.class");
         // strip the injar path
-        log.info(url);
+        LOG.info(url);
 
         // We're in a jar
         if (url.getFile().contains("!"))
@@ -78,7 +80,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             basedir += paths[i]+"/";
         }
 
-        log.info(basedir);
+        LOG.info(basedir);
     }
 
     @Override
@@ -107,7 +109,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             args.add(usid);
             args.add(arrivalProcess);
             ret = xmlrpc.execute("gridkit.addEventGraph",args);
-            log.info("addEventGraph returned "+ret);
+            LOG.info("addEventGraph returned "+ret);
 
             // send SimpleServer.xml
             String simpleServer;
@@ -126,7 +128,7 @@ public class TestGridkitServerAssembly3 extends Thread {
             args.add(usid);
             args.add(simpleServer);
             ret = xmlrpc.execute("gridkit.addEventGraph",args);
-            log.info("addEventGraph returned "+ret);
+            LOG.info("addEventGraph returned "+ret);
 
             // send ServerAssembly3.xml now that deps are loaded
             // first make a jaxb tree to add DesignParameters
@@ -288,16 +290,16 @@ public class TestGridkitServerAssembly3 extends Thread {
             args.add(usid);
             args.add(serverAssembly3exp);
             ret = xmlrpc.execute("gridkit.setAssembly", args);
-            log.info("setAssembly returned "+ret);
+            LOG.info("setAssembly returned "+ret);
 
             // run it
             args.clear();
             args.add(usid);
             ret = xmlrpc.execute("gridkit.run", args);
-            log.info("run returned "+ ret);
+            LOG.info("run returned "+ ret);
 
             if (ret instanceof Exception) {
-                log.error(ret);
+                LOG.error(ret);
                 return;
             }
 
@@ -368,12 +370,12 @@ public class TestGridkitServerAssembly3 extends Thread {
 
             args.clear();
             args.add(usid);
-            log.info("Logging out:  "+xmlrpc.execute("gridkit.logout",args));
+            LOG.info("Logging out:  "+xmlrpc.execute("gridkit.logout",args));
 
             System.out.println("Test complete!");
 
         } catch (IOException | NumberFormatException | XmlRpcException | URISyntaxException e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 
@@ -382,6 +384,6 @@ public class TestGridkitServerAssembly3 extends Thread {
         try {
             TestGridkitServerAssembly3 test = new TestGridkitServerAssembly3(args[0], Integer.parseInt(args[1]));
             test.start();
-        } catch (Exception e) { log.error(e); }
+        } catch (Exception e) { LOG.error(e); }
     }
 }

@@ -1,6 +1,8 @@
 package viskit.test;
 
 import java.util.Arrays;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import simkit.Schedule;
 import simkit.SimEntityBase;
 
@@ -62,7 +64,9 @@ Time: 5.0000	CurrentEvent: FooBar 	{[I@19b49e6} [1]
  * @version $Id$
  * @author abuss
  */
-public class TestVarArgs extends SimEntityBase  {
+public class TestVarArgs extends SimEntityBase  
+{
+    static final Logger LOG = LogManager.getLogger();
 
     public void doRun() {
         waitDelay("Foo", 1.0, (Object) new String[] { "Hi", "Mom!" });

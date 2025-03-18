@@ -18,12 +18,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import javax.xml.bind.JAXBException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author Rick Goldberg
  */
-public class TestCodeFormat extends Thread {
+public class TestCodeFormat extends Thread 
+{
+    static final Logger LOG = LogManager.getLogger();
 
     String testFile;
     JAXBContext jaxbCtx;

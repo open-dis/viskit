@@ -7,14 +7,13 @@
  */
 package viskit.test;
 
-import edu.nps.util.Log4jUtilities;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Vector;
-import java.util.logging.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
@@ -25,9 +24,9 @@ import viskit.ViskitGlobals;
  * @author Rick Goldberg
  * @version $Id: TestGridkitLogin.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
-public class TestGridkitLogin extends Thread {
-
-    static Logger LOG = Log4jUtilities.getLogger(TestGridkitLogin.class);
+public class TestGridkitLogin extends Thread 
+{
+    static final Logger LOG = LogManager.getLogger();
 
     XmlRpcClientLite xmlrpc;
 
@@ -189,7 +188,8 @@ public class TestGridkitLogin extends Thread {
             }
 
         } catch (XmlRpcException | IOException | URISyntaxException ex) {
-            java.util.logging.Logger.getLogger(TestGridkitLogin.class.getName()).log(Level.SEVERE, null, ex);
+//            java.util.logging.Logger.getLogger(TestGridkitLogin.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error("Exception {}", ex);
         }
 
     }

@@ -7,9 +7,9 @@
  */
 package viskit.test;
 
-import edu.nps.util.Log4jUtilities;
 import java.io.IOException;
 import java.util.Vector;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.xmlrpc.XmlRpcClientLite;
 import org.apache.xmlrpc.XmlRpcException;
@@ -20,10 +20,11 @@ import org.apache.xmlrpc.XmlRpcException;
  * @author Rick Goldberg
  * @version $Id: TestGridkitQstat.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
-public class TestGridkitQstat extends Thread {
+public class TestGridkitQstat extends Thread 
+{
+    static final Logger LOG = LogManager.getLogger();
 
     XmlRpcClientLite xmlrpc;
-    static Logger log = Log4jUtilities.getLogger(TestGridkitQstat.class);
 
     /**
      * Creates a new instance of TestGridkitLogin
@@ -58,7 +59,7 @@ public class TestGridkitQstat extends Thread {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
-                    log.error(e);
+                    LOG.error(e);
                 }
                 System.out.println("=======================================");
             }
@@ -70,7 +71,7 @@ public class TestGridkitQstat extends Thread {
             System.out.println("logged out");
 
         } catch (IOException | XmlRpcException e) {
-            log.error(e);
+            LOG.error(e);
         }
 
     }
@@ -87,7 +88,7 @@ public class TestGridkitQstat extends Thread {
             TestGridkitQstat test = new TestGridkitQstat(args[0], Integer.parseInt(args[1]));
             test.start();
         } catch (Exception e) {
-            log.error(e);
+            LOG.error(e);
         }
     }
 }
