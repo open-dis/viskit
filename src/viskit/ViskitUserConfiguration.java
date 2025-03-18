@@ -132,7 +132,7 @@ public class ViskitUserConfiguration
     {
         if (!initalized)
         {     
-            LOG.info("initializing ViskitUserConfiguration");        
+            LOG.info("initializing ViskitUserConfiguration by reading files in .viskit directory");        
             initialize(); // this should only occur once
         }
         // LOG.info("created ViskitUserConfiguration singleton (if this message occurs again, it is a problem)");   
