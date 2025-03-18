@@ -33,8 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.control;
 
-import edu.nps.util.Log4jUtilities;
-
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -48,8 +46,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.apache.logging.log4j.LogManager;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
