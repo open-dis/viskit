@@ -1,7 +1,6 @@
 package viskit.jgraph;
 
 import java.awt.Color;
-import java.util.Hashtable;
 import java.util.Map;
 import javax.swing.tree.DefaultMutableTreeNode;
 
