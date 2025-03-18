@@ -36,20 +36,17 @@ package viskit.view;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 
-import edu.nps.util.Log4jUtilities;
 import edu.nps.util.SpringUtilities;
 
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -57,7 +54,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -593,7 +589,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     @SuppressWarnings("unchecked")
-    private void fillEntityParams() {
+    private void fillEntityParams() 
+    {
         wantEntityParameterDescriptions.setSelected(analystReportModel.isPrintParameterComments());
         wantEntityParameterTables.setSelected(analystReportModel.isPrintParameterTable());
 
@@ -965,7 +962,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel) {
+    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel)
+    {
         Action action = ActionIntrospector.getAction(source, method);
         if (action == null)
         {
