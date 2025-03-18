@@ -95,7 +95,18 @@ public class AnalystReportController extends MvcAbstractController
         String dateOutput = formatter.format(new Date()); // today, now
 
         String userName = System.getProperty("user.name");
+        
         String assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getName();
+        if ((assemblyName == null) || assemblyName.isBlank())
+             assemblyName = currentAssemblyFile.getName().substring(0,currentAssemblyFile.getName().lastIndexOf(".xml"));
+        if (((assemblyName == null) || assemblyName.isBlank()) && (analystReportModel != null))
+            assemblyName = analystReportModel.getReportName();
+        if ((assemblyName == null) || assemblyName.isBlank())
+        {
+            assemblyName = "ERROR_AssemblyNameNotFound";
+            LOG.error("setReportXML unable to find assemblyName");
+        }
+        
         String outputFilenameDated = (assemblyName + "_AnalystReport_" + dateOutput + ".xml");
         String outputFilename      = (assemblyName + "_AnalystReport"               + ".xml");
 
