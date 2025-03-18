@@ -1,8 +1,10 @@
-A requirement of Simkit is that if a user requires certain jars from being found 
-on the classpath, then they must be listed in a config/ClassFinder.properties 
-file in this manner:
+A requirement of Simkit is that if a user wants to prevent certain jars 
+from being found on the classpath, then they must be listed to be skipped
+in a config/ClassFinder.properties file in this manner:
 
-log4j-api-2.17.0.jar=skip
+log4j-api-2.24.3.jar=skip
+log4j-core-2.24.3.jar=skip
+log4j-layout-template-json-2.24.3.jar=skip
 ...
 
 This is especially true when Simkit searches the entire classpath for external
