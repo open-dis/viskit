@@ -923,7 +923,7 @@ their descpritions.
                      author="${javadoc.author}"
                      bottom="${javadoc.copyright}"
                      breakiterator="${javadoc.breakiterator}"
-                     classpath="lib/*.jar;lib/log4j-api-2.23.1.jar;lib/log4j-api-2.23.1.jar"
+                     classpath="${log4j.jars}"
                      Encoding="${javadoc.encoding}"
                      Doctitle="${javadoc.doctitle}"
                      Header="${javadoc.doctitle}"
