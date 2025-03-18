@@ -34,7 +34,6 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.assembly;
 
 import edu.nps.util.GenericConversion;
-import edu.nps.util.Log4jUtilities;
 
 import java.beans.PropertyChangeListener;
 
@@ -49,12 +48,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.text.DecimalFormat;
-
 import java.util.*;
-
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
-
 import org.apache.logging.log4j.Logger;
 
 import simkit.BasicSimEntity;
@@ -72,8 +68,8 @@ import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitProject;
-// import static viskit.ViskitGlobals.isFileReady; // while in thread, do not invoke ViskitGlobals!
 import viskit.model.AnalystReportModel;
+// import static viskit.ViskitGlobals.isFileReady; // while in thread, do not invoke ViskitGlobals!
 
 import viskit.model.AssemblyNode;
 
