@@ -90,7 +90,7 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     int chosenPort;
     String clusterWebStatus1 = "http://" + clusterDNS + "/ganglia/";
     String clusterWebStatus2 = "http://" + clusterDNS + "/ganglia/?m=cpu_user&r=hour&s=descending&c=MOVES&h=&sh=1&hc=3";
-    String clusterWebStatus = "http://" + clusterDNS + "/ganglia/?r=hour&c=MOVES&h=&sh=0";
+    String clusterWebStatus  = "http://" + clusterDNS + "/ganglia/?r=hour&c=MOVES&h=&sh=0";
     private JButton canButt;
     private JButton runButt;
     private JButton closeButt;
