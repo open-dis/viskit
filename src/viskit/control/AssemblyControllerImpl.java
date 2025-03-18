@@ -3,11 +3,8 @@ package viskit.control;
 import actions.ActionIntrospector;
 
 import edu.nps.util.DirectoryWatch;
-import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import edu.nps.util.ZipUtilities;
-import static edu.nps.util.ZipUtilities.getDirectoryCount;
-import static edu.nps.util.ZipUtilities.getFileCount;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -27,10 +24,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
