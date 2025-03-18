@@ -33,7 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.model;
 
-import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 
 import java.io.File;
@@ -62,7 +61,6 @@ import viskit.doe.FileHandler;
 import viskit.mvc.MvcAbstractModel;
 import viskit.reports.HistogramChart;
 import viskit.reports.LinearRegressionChart;
-import viskit.util.XsltUtility;
 
 /** This class constructs and exports an analyst report based on the parameters
  * selected by the Analyst Report panel in the Viskit UI.  This file uses the
@@ -422,7 +420,7 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    public List<String[]> unMakeStatsSummList(Element statisticalResults) {
+    public List<String[]> unMakeStatisticsSummaryList(Element statisticalResults) {
         Vector<String[]> v = new Vector<>();
 
         Element sumReports = statisticalResults.getChild("SummaryReport");
@@ -524,7 +522,8 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     // TODO: Fix generics: version of JDOM does not support generics
     @SuppressWarnings("unchecked")
-    List unMakeBehaviorList(Element localRoot) {
+    List unMakeBehaviorList(Element localRoot) 
+    {
         Vector v = new Vector();
 
         Element listEl = localRoot.getChild("BehaviorList");
@@ -582,23 +581,23 @@ public final class AnalystReportModel extends MvcAbstractModel
     // TODO: Fix generics: version of JDOM does not support generics
     @SuppressWarnings("unchecked")
     Vector<Object[]> unMakeParameterTables(Element rootOfTabs) {
-        Element elm = rootOfTabs.getChild("ParameterTables");
-        List<Element> lis = elm.getChildren("EntityParameterTable");
-        Vector<Object[]> v = new Vector<>(lis.size());   // list of entpartab elms
-        List<Element> lis_0, lis_1;
+        Element element = rootOfTabs.getChild("ParameterTables");
+        List<Element> entityParameterTableList = element.getChildren("EntityParameterTable");
+        Vector<Object[]> v = new Vector<>(entityParameterTableList.size());   // list of entpartab elms
+        List<Element> elementList_0, elementList_1;
         Vector<Object[]> v_0, v_1;
-        String name, val;
-        for(Element e_0 : lis) {
-            lis_0 = e_0.getChildren();       //list of parts: class/id/phys/dynam
-            v_0 = new Vector<>(lis_0.size());
-            for(Element e_1 : lis_0) {
-                lis_1 = e_1.getChildren("parameter");     // list of param elms
+        String name, value;
+        for(Element e_0 : entityParameterTableList) {
+            elementList_0 = e_0.getChildren();       //list of parts: class/id/phys/dynam
+            v_0 = new Vector<>(elementList_0.size());
+            for(Element e_1 : elementList_0) {
+                elementList_1 = e_1.getChildren("parameter");     // list of param elms
 
-                v_1 = new Vector<>(lis_1.size());
-                for(Element e_2 : lis_1) {
+                v_1 = new Vector<>(elementList_1.size());
+                for(Element e_2 : elementList_1) {
                     name = e_2.getAttributeValue("name");
-                    val  = e_2.getAttributeValue("value");
-                    v_1.add(new String[]{name, val});
+                    value  = e_2.getAttributeValue("value");
+                    v_1.add(new String[]{name, value});
                 }
                 v_0.add(new Object[]{e_1.getName(),v_1});
             }
@@ -624,13 +623,13 @@ public final class AnalystReportModel extends MvcAbstractModel
         Element localRootElement = EventGraphCache.instance().getAssemblyDocument().getRootElement();
         List<Element> simEntityList = localRootElement.getChildren("SimEntity");
         String entityName;
-        List<Element> entityParams;
+        List<Element> entityParametersElementList;
         for (Element temp : simEntityList) {
             entityName = temp.getAttributeValue("name");
-            entityParams = temp.getChildren("MultiParameter");
-            for (Element param : entityParams) {
-                if (param.getAttributeValue("type").equals("diskit.SMAL.EntityDefinition")) {
-                    table.addContent(extractSMAL(entityName, param));
+            entityParametersElementList = temp.getChildren("MultiParameter");
+            for (Element parameterElement : entityParametersElementList) {
+                if (parameterElement.getAttributeValue("type").equals("diskit.SMAL.EntityDefinition")) {
+                    table.addContent(extractSMAL(entityName, parameterElement));
                 }
             }
         }
@@ -689,14 +688,14 @@ public final class AnalystReportModel extends MvcAbstractModel
     private Element makeTableEntry(String category, Element data) {
         Element tableEntry = new Element(category);
         List<Element> dataList = data.getChildren("TerminalParameter");
-        Element param;
+        Element parameterElement;
         for (Element temp : dataList) {
             if (!temp.getAttributeValue("value").equals("0")) {
-                param = new Element("parameter");
-                param.setAttribute("name", temp.getAttributeValue("name"));
-                param.setAttribute("value", temp.getAttributeValue("value"));
+                parameterElement = new Element("parameter");
+                parameterElement.setAttribute("name", temp.getAttributeValue("name"));
+                parameterElement.setAttribute("value", temp.getAttributeValue("value"));
 
-                tableEntry.addContent(param);
+                tableEntry.addContent(parameterElement);
             }
         }
         return tableEntry;
@@ -735,8 +734,8 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     /**
      * This method re-shuffles the statistics report to a format that is handled
-     * by the xslt for the analyst report.  The mis-match of formatting was discovered
-     * after all classes were written. This should be cleaned up or the XML formatted
+     * by the xslt for the analyst report.  The mismatch of formatting was discovered
+     * after all classes were written. TODO this should be cleaned up or the XML formatted
      * more uniformly.
      * @return the replication report
      */
@@ -744,22 +743,22 @@ public final class AnalystReportModel extends MvcAbstractModel
     @SuppressWarnings("unchecked")
     private Element makeReplicationReport() 
     {
-        Element repReports = new Element("ReplicationReports");
-        List<Element> simEntities = statisticsReportDocument.getRootElement().getChildren("SimEntity");
+        Element replicatioReportsElement = new Element("ReplicationReports");
+        List<Element> simEntitiesElementList = statisticsReportDocument.getRootElement().getChildren("SimEntity");
 
         // variables for JFreeChart construction
         HistogramChart histogramChart = new HistogramChart();
         LinearRegressionChart linearRegressionChart = new LinearRegressionChart();
         String chartTitle, axisLabel, typeStat = "", dataPointProperty;
-        List<Element> dataPoints, replicationReports, replications;
+        List<Element> dataPointsElementList, replicationReportsElementList, replicationsElementList;
         boolean isCount;
         Object obj;
-        Element entity, histogramChartURL, linearRegressionChartURL, repRecord;
-        double[] data;
-        int idx;
-        for (Element simEntity : simEntities) {
-            dataPoints = simEntity.getChildren("DataPoint");
-            for (Element dataPoint : dataPoints) {
+        Element entityElement, histogramChartUrlElement, linearRegressionChartUrlElement, replicationRecordElement;
+        double[] dataArray;
+        int index;
+        for (Element simEntityElement : simEntitiesElementList) {
+            dataPointsElementList = simEntityElement.getChildren("DataPoint");
+            for (Element dataPoint : dataPointsElementList) {
                 dataPointProperty = dataPoint.getAttributeValue("property");
                 for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
                     obj = getPclNodeCache().get(entry.getKey());
@@ -773,55 +772,55 @@ public final class AnalystReportModel extends MvcAbstractModel
                         }
                     }
                 }
-                entity = new Element("SimEntity");
-                entity.setAttribute("name", simEntity.getAttributeValue("name"));
-                entity.setAttribute("property", dataPointProperty);
-                replicationReports = dataPoint.getChildren("ReplicationReport");
+                entityElement = new Element("SimEntity");
+                entityElement.setAttribute("name", simEntityElement.getAttributeValue("name"));
+                entityElement.setAttribute("property", dataPointProperty);
+                replicationReportsElementList = dataPoint.getChildren("ReplicationReport");
 
                 // Chart title and label
-                chartTitle = simEntity.getAttributeValue("name");
+                chartTitle = simEntityElement.getAttributeValue("name");
                 axisLabel  = dataPoint.getAttributeValue("property") ;
 
-                for (Element replicationReport : replicationReports) {
-                    replications = replicationReport.getChildren("Replication");
+                for (Element replicationReport : replicationReportsElementList) {
+                    replicationsElementList = replicationReport.getChildren("Replication");
 
                     // Create a data set instance and histogramChart for each replication report
-                    data = new double[replicationReport.getChildren().size()];
-                    idx = 0;
-                    for (Element replication : replications) {
-                        repRecord = new Element("Replication");
-                        repRecord.setAttribute("number", replication.getAttributeValue("number"));
-                        repRecord.setAttribute("count", replication.getAttributeValue("count"));
-                        repRecord.setAttribute("minObs", replication.getAttributeValue("minObs"));
-                        repRecord.setAttribute("maxObs", replication.getAttributeValue("maxObs"));
-                        repRecord.setAttribute("mean", replication.getAttributeValue("mean"));
-                        repRecord.setAttribute("stdDeviation", replication.getAttributeValue("stdDeviation"));
-                        repRecord.setAttribute("variance", replication.getAttributeValue("variance"));
-                        entity.addContent(repRecord);
+                    dataArray = new double[replicationReport.getChildren().size()];
+                    index = 0;
+                    for (Element replication : replicationsElementList) {
+                        replicationRecordElement = new Element("Replication");
+                        replicationRecordElement.setAttribute("number", replication.getAttributeValue("number"));
+                        replicationRecordElement.setAttribute("count", replication.getAttributeValue("count"));
+                        replicationRecordElement.setAttribute("minObs", replication.getAttributeValue("minObs"));
+                        replicationRecordElement.setAttribute("maxObs", replication.getAttributeValue("maxObs"));
+                        replicationRecordElement.setAttribute("mean", replication.getAttributeValue("mean"));
+                        replicationRecordElement.setAttribute("stdDeviation", replication.getAttributeValue("stdDeviation"));
+                        replicationRecordElement.setAttribute("variance", replication.getAttributeValue("variance"));
+                        entityElement.addContent(replicationRecordElement);
 
                         // Add the raw count, or mean of replication data to the chart generators
                         LOG.debug(replication.getAttributeValue(typeStat));
-                        data[idx] = Double.parseDouble(replication.getAttributeValue(typeStat));
-                        idx++;
+                        dataArray[index] = Double.parseDouble(replication.getAttributeValue(typeStat));
+                        index++;
                     }
 
-                    histogramChartURL = new Element("HistogramChart");
-                    linearRegressionChartURL = new Element("LinearRegressionChart");
+                    histogramChartUrlElement = new Element("HistogramChart");
+                    linearRegressionChartUrlElement = new Element("LinearRegressionChart");
 
-                    histogramChartURL.setAttribute("dir", histogramChart.createChart(chartTitle, axisLabel, data));
-                    entity.addContent(histogramChartURL);
+                    histogramChartUrlElement.setAttribute("dir", histogramChart.createChart(chartTitle, axisLabel, dataArray));
+                    entityElement.addContent(histogramChartUrlElement);
 
                     // data[] must be > than length 1 for scatter regression
-                    if (data.length > 1) {
-                        linearRegressionChartURL.setAttribute("dir", linearRegressionChart.createChart(chartTitle, axisLabel, data));
-                        entity.addContent(linearRegressionChartURL);
+                    if (dataArray.length > 1) {
+                        linearRegressionChartUrlElement.setAttribute("dir", linearRegressionChart.createChart(chartTitle, axisLabel, dataArray));
+                        entityElement.addContent(linearRegressionChartUrlElement);
                     }
 
-                    repReports.addContent(entity);
+                    replicatioReportsElement.addContent(entityElement);
                 }
             }
         }
-        return repReports;
+        return replicatioReportsElement;
     }
 
     /**
@@ -842,40 +841,40 @@ public final class AnalystReportModel extends MvcAbstractModel
      * @param dir     the directory of the image
      * @return the Image url embedded in well formed XML
      */
-    private Element makeImage(String imageID, String dir) {
-        Element image = new Element(imageID + "Image");
+    private Element makeImageElement(String imageID, String dir) {
+        Element imageElement = new Element(imageID + "Image");
 
         // Set relative path only
-        image.setAttribute("dir", dir.substring(dir.indexOf("images"), dir.length()));
-        return image;
+        imageElement.setAttribute("dir", dir.substring(dir.indexOf("images"), dir.length()));
+        return imageElement;
     }
 
-    private String unMakeImage(Element e, String imageID) {
-        return _unMakeContent(e, imageID + "Image", "dir");
+    private String unMakeImage(Element element, String imageID) {
+        return _unMakeContent(element, imageID + "Image", "dir");
     }
 
     /**
      * Creates a standard 'Comments' element used by all sections of the report
-     * to add comments
+     * to add comments.  TODO rename as Description for correctness.
      *
      * @param parent
-     * @param commentTag  the tag used to identify unique Comments (used by XSLT)
-     * @param commentText the text comments
+     * @param descriptionTag  the tag used to identify unique Comments (used by XSLT)
+     * @param descriptionText the text comments
      */
-    public void makeComments(Element parent, String commentTag, String commentText) {
-        replaceChild(parent, _makeContent(commentTag, "Comments", commentText));
+    public void makeComments(Element parent, String descriptionTag, String descriptionText) {
+        replaceChild(parent, _makeContent(descriptionTag, "Comments", descriptionText));
     }
 
-    /** @param commentTag the comment Element, which actually contains description
-     * @param commentText the comment text, which actually contains description
+    /** @param descriptionTag the comment Element, which actually contains description
+     * @param descriptionText the comment text, which actually contains description
      * @return the Comments Element
      */
-    public Element xmakeComments(String commentTag, String commentText) {
-        return _makeContent(commentTag, "Comments", commentText);
+    public Element xmakeComments(String descriptionTag, String descriptionText) {
+        return _makeContent(descriptionTag, "Comments", descriptionText);
     }
 
-    private String unMakeComments(Element e) {
-        return _unMakeContent(e, "Comments");
+    private String unMakeComments(Element element) {
+        return _unMakeContent(element, "Comments");
     }
 
     /**
@@ -894,11 +893,11 @@ public final class AnalystReportModel extends MvcAbstractModel
         replaceChild(parent,_makeContent(commentTag,"Conclusions",conclusionText));
     }
 
-    /** @param e the Element to extract information from
+    /** @param element the Element to extract information from
      * @return a String object of the Element's contents
      */
-    public String unMakeConclusions(Element e) {
-        return _unMakeContent(e, "Conclusions");
+    public String unMakeConclusions(Element element) {
+        return _unMakeContent(element, "Conclusions");
     }
 
     /**
@@ -917,12 +916,12 @@ public final class AnalystReportModel extends MvcAbstractModel
      * Creates a standard 'Production Notes' element used by all sections of the
      * report to add production notes
      *
-     * @param parent the parent element to add content too
+     * @param parentElement the parent element to add content too
      * @param productionNotesTag the tag used to identify unique production notes (used by XSLT)
      * @param productionNotesText author's text block
      */
-    public void makeProductionNotes(Element parent, String productionNotesTag, String productionNotesText) {
-        replaceChild(parent, _makeContent(productionNotesTag, "ProductionNotes", productionNotesText));
+    public void makeProductionNotes(Element parentElement, String productionNotesTag, String productionNotesText) {
+        replaceChild(parentElement, _makeContent(productionNotesTag, "ProductionNotes", productionNotesText));
     }
 
     public String unMakeProductionNotes(Element e) {
@@ -957,12 +956,12 @@ public final class AnalystReportModel extends MvcAbstractModel
         return "";
     }
 
-    private void replaceChild(Element parent, Element child) {
-        if (parent == null)
+    private void replaceChild(Element parentElement, Element childElement) {
+        if (parentElement == null)
             return;
 
-        parent.removeChildren(child.getName());
-        parent.addContent(child);
+        parentElement.removeChildren(childElement.getName());
+        parentElement.addContent(childElement);
     }
 
     /**
@@ -1241,8 +1240,8 @@ public final class AnalystReportModel extends MvcAbstractModel
     public void setSimulationLocationDescription  (String s)    {makeComments(simulationLocationElement, "SL", s);}
     public void setSimulationLocationConclusions  (String s)    {makeConclusions(simulationLocationElement, "SL", s);}
     public void setSimulationLocationProductionNotes(String s)  {makeProductionNotes(simulationLocationElement, "SL", s);}
-    public void setLocationImage           (String s)    {replaceChild(simulationLocationElement, makeImage("Location", s)); }
-    public void setChartImage              (String s)    {replaceChild(simulationLocationElement, makeImage("Chart", s)); }
+    public void setLocationImage           (String s)    {replaceChild(simulationLocationElement, makeImageElement("Location", s)); }
+    public void setChartImage              (String s)    {replaceChild(simulationLocationElement, makeImageElement("Chart", s)); }
 
     // entity-parameters
     //good
@@ -1293,7 +1292,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     public void    setSimConfigurationEntityTable         (String s) { }; //todo//todo
     public void    setSimulationConfigurationConclusions  (String s) { makeConclusions(simulationConfigurationElement, "SC", s); }
     public void    setSimulationConfigationProductionNotes(String s) {makeProductionNotes(simulationConfigurationElement, "SC", s);}
-    public void    setAssemblyImageLocation        (String s) {replaceChild(simulationConfigurationElement, makeImage("Assembly", s));}
+    public void    setAssemblyImageLocation        (String s) {replaceChild(simulationConfigurationElement, makeImageElement("Assembly", s));}
 
     // stat results:
     // good
@@ -1314,7 +1313,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     public void setStatisticsConclusions          (String s) { makeConclusions(statisticalResultsElement,"SR", s); }
     public String getStatsFilePath()         { return statisticalResultsElement.getAttributeValue("file"); }
     public List<Object> getStatisticsReplicationsList() {return unMakeReplicationList(statisticalResultsElement);}
-    public List<String[]> getStastSummaryList() {return unMakeStatsSummList(statisticalResultsElement);}
+    public List<String[]> getStastSummaryList() {return unMakeStatisticsSummaryList(statisticalResultsElement);}
 
     public Map<String, AssemblyNode> getPclNodeCache() {
         return pclNodeCache;

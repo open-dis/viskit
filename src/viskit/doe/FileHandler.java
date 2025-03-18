@@ -33,7 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
-import edu.nps.util.Log4jUtilities;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -86,21 +85,21 @@ public class FileHandler
         return _openFile(doc, f);
     }
 
-    public static DoeFileModel _openFile(Document doc, File f) throws Exception {
-        Element elm = doc.getRootElement();
-        if (!elm.getName().equalsIgnoreCase("SimkitAssembly")) {
+    public static DoeFileModel _openFile(Document document, File file) throws Exception {
+        Element element = document.getRootElement();
+        if (!element.getName().equalsIgnoreCase("SimkitAssembly")) {
             throw new Exception("Root element must be named \"SimkitAssembly\".");
         }
 
-        DoeFileModel dfm = new DoeFileModel();
-        dfm.userFile = f;
+        DoeFileModel doeFileModel = new DoeFileModel();
+        doeFileModel.userFile = file;
 
-        dfm.jdomDocument = doc;
-        dfm.designParms = getDesignParams(doc);
-        dfm.setSimEntities(getSimEntities(doc));
-        dfm.paramTable = new ParamTable(dfm.getSimEntities(), dfm.designParms);
+        doeFileModel.jdomDocument = document;
+        doeFileModel.designParameters = getDesignParameters(document);
+        doeFileModel.setSimEntities(getSimEntities(document));
+        doeFileModel.parameterTable = new ParameterTable(doeFileModel.getSimEntities(), doeFileModel.designParameters);
 
-        return dfm;
+        return doeFileModel;
     }
 
     // todo replace above
@@ -108,9 +107,9 @@ public class FileHandler
         DoeFileModel dfm = new DoeFileModel();
         dfm.userFile = f;
         // todo dfm.jaxbRoot = assembly;
-        dfm.designParms = simkitAssembly.getDesignParameters();
+        dfm.designParameters = simkitAssembly.getDesignParameters();
         dfm.setSimEntities(simkitAssembly.getSimEntity());
-        dfm.paramTable = new ParamTable(dfm.getSimEntities(), dfm.designParms);
+        dfm.parameterTable = new ParameterTable(dfm.getSimEntities(), dfm.designParameters);
 
         return dfm;
     }
@@ -153,7 +152,7 @@ public class FileHandler
      */
     public static void runFile(File file, String title, JFrame mainFrame) {
         try {
-            new JobLauncher(true, file.getAbsolutePath(), title, mainFrame); // TODO broken
+            JobLauncher jobLauncher = new JobLauncher(true, file.getAbsolutePath(), title, mainFrame); // TODO broken
         } 
         catch (Exception e) {
             LOG.error("runFile(" + file.getAbsolutePath() + ", " + title + ") exception: " + e.getMessage());
@@ -167,15 +166,15 @@ public class FileHandler
 
     // TODO: JDOM v1.1 does not yet support generics
     @SuppressWarnings("unchecked")
-    private static List<TerminalParameter> getDesignParams(Document doc) throws Exception {
-        Element elm = doc.getRootElement();
-        return elm.getChildren("TerminalParameter");
+    private static List<TerminalParameter> getDesignParameters(Document document) throws Exception {
+        Element element = document.getRootElement();
+        return element.getChildren("TerminalParameter");
     }
 
     // TODO: JDOM v1.1 does not yet support generics
     @SuppressWarnings("unchecked")
-    private static List<SimEntity> getSimEntities(Document doc) throws Exception {
-        Element elm = doc.getRootElement();
-        return elm.getChildren("SimEntity");
+    private static List<SimEntity> getSimEntities(Document document) throws Exception {
+        Element element = document.getRootElement();
+        return element.getChildren("SimEntity");
     }
 }

@@ -30,28 +30,31 @@ import java.awt.event.WindowEvent;
  */
 public class EventListDialog extends JDialog {
 
-    private static EventListDialog dialog;
+    private static EventListDialog eventListDialog;
     private static int selection = -1;
     private String[] names;
     private final JButton okButton;
-    private JButton canButt;
+    private final JButton cancelButton;
     private final JList<String> list;
-    private final JPanel buttPan;
+    private final JPanel buttonPanel;
     public static String newName;
 
-    public static int showDialog(Dialog f, String title, String[] names) {
-        if (dialog == null) {
-            dialog = new EventListDialog(f, title, names);
-        } else {
-            dialog.setParams(f, names);
+    public static int showDialog(Dialog f, String title, String[] names)
+    {
+        if (eventListDialog == null) {
+            eventListDialog = new EventListDialog(f, title, names);
+        } 
+        else {
+            eventListDialog.setParameters(f, names);
         }
 
-        dialog.setVisible(true);
+        eventListDialog.setVisible(true);
         // above call blocks
         return selection;
     }
 
-    private EventListDialog(Dialog parent, String title, String[] names) {
+    private EventListDialog(Dialog parent, String title, String[] names) 
+    {
         super(parent, title, true);
         this.names = names;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -61,23 +64,24 @@ public class EventListDialog extends JDialog {
         list.getSelectionModel().addListSelectionListener(new mySelectionListener());
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButton = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButton);
-        buttPan.add(canButt);
-        buttPan.add(Box.createHorizontalStrut(5));
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+            okButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(Box.createHorizontalStrut(5));
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
 
-        setParams(parent, names);
+        setParameters(parent, names);
     }
 
-    public final void setParams(Component c, String[] names) {
+    public final void setParameters(Component component, String[] names) 
+    {
         this.names = names;
 
         fillWidgets();
@@ -87,31 +91,32 @@ public class EventListDialog extends JDialog {
         }
         okButton.setEnabled(names == null);
 
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
         pack();
-        setLocationRelativeTo(c);
+        setLocationRelativeTo(component);
     }
 
-    String[] colNames = {"property name", "property type"};
+    String[] columnNames = {"property name", "property type"};
 
-    private void fillWidgets() {
+    private void fillWidgets()
+    {
         if (names != null) {
-            DefaultListModel<String> dlm = new myUneditableListModel(names);
-            //DefaultTableModel dtm = new myUneditableTableModel(names,colNames);
-            list.setModel(dlm);
+            DefaultListModel<String> defaultListModel = new myUneditableListModel(names);
+            //DefaultTableModel dtm = new myUneditableTableModel(names,columnNames);
+            list.setModel(defaultListModel);
             list.setVisibleRowCount(5);
         //list.setPreferredScrollableViewportSize(new Dimension(400,200));
         }
-        JPanel content = new JPanel();
-        content.setLayout(new BorderLayout());
-        content.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
+        contentPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        JScrollPane jsp = new JScrollPane(list);
-        content.add(jsp, BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(list);
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
 
-        content.add(buttPan, BorderLayout.SOUTH);
+        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
         //content.add(Box.createVerticalStrut(5));
-        setContentPane(content);
+        setContentPane(contentPanel);
     }
 
     private void unloadWidgets() {
@@ -137,16 +142,17 @@ public class EventListDialog extends JDialog {
     class mySelectionListener implements ListSelectionListener {
 
         @Override
-        public void valueChanged(ListSelectionEvent e) {
+        public void valueChanged(ListSelectionEvent e) 
+        {
             //Ignore extra messages.
             if (e.getValueIsAdjusting()) {
                 return;
             }
 
-            ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-            if (!lsm.isSelectionEmpty()) {
+            ListSelectionModel listSelectionModel = (ListSelectionModel) e.getSource();
+            if (!listSelectionModel.isSelectionEmpty()) {
 
-                selection = lsm.getMinSelectionIndex();
+                selection = listSelectionModel.getMinSelectionIndex();
                 okButton.setEnabled(true);
                 getRootPane().setDefaultButton(okButton);
             }
@@ -156,17 +162,19 @@ public class EventListDialog extends JDialog {
     class myCloseListener extends WindowAdapter {
 
         @Override
-        public void windowClosing(WindowEvent e) {
-            if (selection != -1) {
+        public void windowClosing(WindowEvent e) 
+        {
+            if (selection != -1) 
+            {
                 int ret = JOptionPane.showConfirmDialog(EventListDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
                     okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

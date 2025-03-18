@@ -87,8 +87,8 @@ public class DoeMainFrame extends JFrame implements DoeEvents {
         if (dfm == null) {
             doTitle("");
         } else {
-            dfm.paramTable.setBorder(new EtchedBorder()); // double etched with below
-            leftJsp = new JScrollPane(dfm.paramTable); //dfm.paramTree);
+            dfm.parameterTable.setBorder(new EtchedBorder()); // double etched with below
+            leftJsp = new JScrollPane(dfm.parameterTable); //dfm.paramTree);
             leftJsp.setBorder(BorderFactory.createCompoundBorder(new EmptyBorder(10, 10, 5, 10), new EtchedBorder()));
             doTitle(dfm.userFile.getName());
         }

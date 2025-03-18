@@ -28,14 +28,13 @@ BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THEs
 POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.doe;
 
 import bsh.Interpreter;
 import bsh.NameSpace;
-import edu.nps.util.Log4jUtilities;
 import viskit.util.OpenAssembly;
 import viskit.xsd.bindings.assembly.*;
 
@@ -55,7 +54,7 @@ import org.apache.logging.log4j.Logger;
  * @since 4:13:25 PM
  * @version $Id$
  */
-public class ParamTableModel extends DefaultTableModel implements TableModelListener
+public class ParameterTableModel extends DefaultTableModel implements TableModelListener
 {
     static final Logger LOG = LogManager.getLogger();
 
@@ -75,7 +74,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     public static final int MIN_COL = 4;
     public static final int MAX_COL = 5;
     Object[][] mydata = new Object[0][0];
-    Vector<Object[]> rows;
+    ArrayList<Object[]> rows;
     public Set<Integer> noEditRows = new HashSet<>();
     public Set<Integer> multiRows = new HashSet<>();
     public boolean dirty = false;
@@ -83,32 +82,32 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
     /**
      *
      * @param simEntitiesJaxb
-     * @param designParamsJaxb
+     * @param designParametersJaxb
      */
-    public ParamTableModel(List<SimEntity> simEntitiesJaxb, List<TerminalParameter> designParamsJaxb) {
+    public ParameterTableModel(List<SimEntity> simEntitiesJaxb, List<TerminalParameter> designParametersJaxb) {
         super(0, 0);
 
-        initBeanShell();
-        rows = new Vector<>();
+        initializeBeanShell();
+        rows = new ArrayList<>();
 
         int i = 0;
-        for (SimEntity se : simEntitiesJaxb) {
-            if (!(se instanceof SimEntity)) {
-                LOG.error("Error ParamTableModel(), element not SimEntity");
+        for (SimEntity simEntity : simEntitiesJaxb) {
+            if (!(simEntity instanceof SimEntity)) {
+                LOG.error("Error ParameterTableModel() constructor, element not SimEntity");
             }
-            processRow(se, "SimEntity_" + i++);
+            processRow(simEntity, "SimEntity_" + i++);
         }
         mydata = rows.toArray(mydata);
-        if (designParamsJaxb != null) {
-            for (TerminalParameter tp : designParamsJaxb) {
-                if (!(tp instanceof TerminalParameter)) {
+        if (designParametersJaxb != null) {
+            for (TerminalParameter terminalParameter : designParametersJaxb) {
+                if (!(terminalParameter instanceof TerminalParameter)) {
                     LOG.error("Error ParamTableModel(), element not TerminalParameter");
                 }
-                processDesignParam(tp);
+                processDesignParameter(terminalParameter);
             }
         }
         dirty = false;
-        this.addTableModelListener(ParamTableModel.this);
+        this.addTableModelListener(ParameterTableModel.this);
     }
 
     @Override
@@ -119,43 +118,43 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
         OpenAssembly.inst().doParamLocallyEditted(dummyListener);
     }
 
-    private void processDesignParam(TerminalParameter tp) {
+    private void processDesignParameter(TerminalParameter terminalParameter) {
 
-        String nm = tp.getName();
-        if (nm.isEmpty()) {
-            LOG.error("Terminal param w/out name ref!");
+        String name = terminalParameter.getName();
+        if (name.isEmpty()) {
+            LOG.error("Terminal param without name ref!");
         }
 
-        if (termHashMap.get(nm) == null) {return;}
+        if (terminalParameterHashMap.get(name) == null) {return;}
         
-        int row = termHashMap.get(nm);
+        int row = terminalParameterHashMap.get(name);
 
-        String val = tp.getValue();
-        val = (val == null) ? "" : val;
-        setValueAt(val, row, VALUE_COL);
+        String valueString = terminalParameter.getValue();
+        valueString = (valueString == null) ? "" : valueString;
+        setValueAt(valueString, row, VALUE_COL);
 
-        JAXBElement<ValueRange> vr = tp.getValueRange();
+        JAXBElement<ValueRange> valueRange = terminalParameter.getValueRange();
 
-        setValueAt(vr.getValue().getLowValue(), row, MIN_COL);
-        setValueAt(vr.getValue().getHighValue(), row, MAX_COL);
+        setValueAt(valueRange.getValue().getLowValue(), row, MIN_COL);
+        setValueAt(valueRange.getValue().getHighValue(), row, MAX_COL);
 
         setValueAt(true, row, FACTOR_COL); //cb
     }
 
     Interpreter interpreter;
 
-    private void initBeanShell() {
+    private void initializeBeanShell() {
         interpreter = new Interpreter();
-        interpreter.setStrictJava(true);       // no loose typeing
-        NameSpace ns = interpreter.getNameSpace();
-        ns.importPackage("simkit.*");
-        ns.importPackage("simkit.random.*");
-        ns.importPackage("simkit.smdx.*");
-        ns.importPackage("simkit.stat.*");
-        ns.importPackage("simkit.util.*");
-        ns.importPackage("diskit.*");         // 17 Nov 2004
+        interpreter.setStrictJava(true);       // no loose typing
+        NameSpace nameSpace = interpreter.getNameSpace();
+        nameSpace.importPackage("simkit.*");
+        nameSpace.importPackage("simkit.random.*");
+        nameSpace.importPackage("simkit.smdx.*");
+        nameSpace.importPackage("simkit.stat.*");
+        nameSpace.importPackage("simkit.util.*");
+        nameSpace.importPackage("diskit.*");         // 17 Nov 2004
     }
-    Map<String, Integer> termHashMap = new HashMap<>();
+    Map<String, Integer> terminalParameterHashMap = new HashMap<>();
     List<Object> elementsByRow = new ArrayList<>();
 
     private void processRow(Object obj, String defaultName) {
@@ -213,7 +212,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
             rows.add(oa);
             elementsByRow.add(obj);
 
-            termHashMap.put(tpname, rows.size() - 1);
+            terminalParameterHashMap.put(tpname, rows.size() - 1);
         } else if (obj instanceof MultiParameter) {
             MultiParameter mp = (MultiParameter) obj;
             String MPname = mp.getName();
@@ -312,7 +311,7 @@ public class ParamTableModel extends DefaultTableModel implements TableModelList
             case FACTOR_COL:
                 return Boolean.class;
             default:
-                //assert false:"Column error in ParamTableModel";
+                //assert false:"Column error in ParameterTableModel";
                 LOG.error("Column error in ParamTableModel");
         }
         return null;

@@ -159,7 +159,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         DoeFileModel dfm = doeFrame.getModel();
         int reti = JOptionPane.YES_OPTION;
         if (dfm != null) {
-            if (((ParamTableModel) dfm.paramTable.getModel()).dirty) {
+            if (((ParameterTableModel) dfm.parameterTable.getModel()).dirty) {
                 reti = JOptionPane.showConfirmDialog(doeFrame, "Save changes?");
                 if (reti == JOptionPane.YES_OPTION) {
                     doSave(dfm);
@@ -172,7 +172,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     private void clearDirty() {
         DoeFileModel dfm = doeFrame.getModel();
         if (dfm != null) {
-            ((ParamTableModel) dfm.paramTable.getModel()).dirty = false;
+            ((ParameterTableModel) dfm.parameterTable.getModel()).dirty = false;
         }
     }
 
@@ -240,10 +240,10 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         // check for anything checked
         check:
         {
-            int n = dfm.paramTable.getModel().getRowCount();
+            int n = dfm.parameterTable.getModel().getRowCount();
 
             for (int r = 0; r < n; r++) {
-                if (((Boolean) dfm.paramTable.getModel().getValueAt(r, ParamTableModel.FACTOR_COL))) {
+                if (((Boolean) dfm.parameterTable.getModel().getValueAt(r, ParameterTableModel.FACTOR_COL))) {
                     break check;
                 }
             }

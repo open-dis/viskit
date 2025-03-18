@@ -127,7 +127,7 @@ public class AnalystReportController extends MvcAbstractController
         }
         if (analystReportModel == null)
         {
-            LOG.error("setReportXML() problem getting analystReportModel");
+            LOG.info("setReportXML() creating analystReportModel");
             analystReportModel =  new AnalystReportModel(analystReportXmlFile);
         }
 
