@@ -1,7 +1,5 @@
 package simkit.util;
 
-import edu.nps.util.Log4jUtilities;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -56,7 +54,6 @@ public class ClassFinder
     private static final ClassFinder INSTANCE;
 
     private final Locale locale;
-
     
     /** Static initializer */
     static 
@@ -224,14 +221,8 @@ public class ClassFinder
                             }
                         }
                         catch (ClassNotFoundException | NoClassDefFoundError ex) {
-                            if (!jarFile.getName().contains("log4j-api-") && 
-                                !jarFile.getName().contains("log4j-core-") && 
-                                !jarFile.getName().contains("log4j-layout-")) 
-                            // hide unnecessary errors.  not sure why this began happening with log4j v2.24.3, example:
-                            // ERROR 2025 Mar 17 13:58:17 [Thread-5] simkit.util.ClassFinder:227 - Jarfile C:\x3d-nps-gitlab\viskit\lib\log4j-api-2.24.3.jar can''t load class META-INF/versions/9/org/apache/logging/log4j/util/Base64Util.class
-                            {
-                                LOG.error("Jarfile {} can''t load class {}",jarFile.getName(), nextEntry);
-                            }
+                            //  see ClassFinder.properties for list of classes (e.g. log4j-*) to skip
+//                          LOG.error("Jarfile {} can''t load class {}",jarFile.getName(), nextEntry);
                         }
                     }
                 }
