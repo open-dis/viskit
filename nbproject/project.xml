@@ -181,7 +181,7 @@
             <compilation-unit>
                 <package-root>test</package-root>
                 <unit-tests/>
-                <classpath mode="compile">build/classes:lib/jaxb/jaxb-api.jar:lib/log4j-layout-template-json-2.24.3.jar:lib/log4j-core-2.24.3.jar:lib/simkit.jar:lib/xmlrpc-2.0.jar:lib/support/junit.jar</classpath>
+                <classpath mode="compile">build/classes:lib/jaxb/jaxb-api.jar:lib/log4j-api-2.24.3.jar;lib/log4j-core-2.24.3.jar;lib/log4j-layout-template-json-2.24.3.jar:lib/simkit.jar:lib/xmlrpc-2.0.jar:lib/support/junit.jar</classpath>
                 <built-to>build/classes</built-to>
                 <source-level>17</source-level>
             </compilation-unit>
