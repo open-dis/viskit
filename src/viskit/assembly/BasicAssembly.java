@@ -192,6 +192,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     public String getName()
     {
 //      fixThreadedName(); // do not invoke while within thread
+        
+        if ((assemblyName == null) || assemblyName.isBlank())
+        {
+            assemblyName = getClass().getSimpleName();
+//          assemblyName = assemblyName.substring(assemblyName.indexOf(".") + 1);
+        }
+        if ((assemblyName == null) || assemblyName.isBlank())
+        {
+            assemblyName = "ERROR_AssemblyNameNotFound";
+            LOG.error("setReportXML unable to find assemblyName");
+        }
         return assemblyName;
     }
     
@@ -1106,12 +1117,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * We report the path back to the caller immediately, and it is the 
      * caller's responsibility to dispose of the file once done with it.
      */
-    private void createAnalystReportFile() //  TODO duplicative?
+    private void createAnalystReportFile() //  intentionally duplicative, creating copy with timestamped filename
     {
         // TODO needs to match statistics file naming convention:
         analystReportFile = new File(viskitProject.getAnalystReportsDirectory(), 
-                assemblyName + "_" + "AnalystReport" + "_" + ViskitStatics.todaysDate() + ".xml"); // 
-        LOG.info("createAnalystReportFile() new analyst report (duplicative?):\n  " + analystReportFile.getAbsolutePath());
+                this.getName() + "_" + "AnalystReport" + "_" + ViskitStatics.todaysDate() + ".xml"); // 
+        LOG.info("createAnalystReportFile() new analyst report (duplicative):\n  " + analystReportFile.getAbsolutePath());
     }
 
     public void setVerboseReplication(int i) {
