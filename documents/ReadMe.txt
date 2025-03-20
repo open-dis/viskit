@@ -23,7 +23,7 @@ git rev-parse HEAD
 
 15 MAR 2025
 
-Commit hash on 28 OCT 2024 before major refactor;
+Commit hash on 28 OCT 2024 before major refactor:
 11ba864a90c14505f611759dc6137a4807cf41fa
 
 2008 JUL 20
