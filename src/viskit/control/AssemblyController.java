@@ -202,16 +202,16 @@ public interface AssemblyController {
     void postQuit();
 
     /**
-     * @param lis the AssembyChangeListener to add as a listener
+     * @param lis the AssemblyChangeListener to add as a listener
      */
-    void addAssemblyFileListener(OpenAssembly.AssembyChangeListener lis);
+    void addAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis);
 
     /**
-     * @param lis the AssembyChangeListener to remove as a listener
+     * @param lis the AssemblyChangeListener to remove as a listener
      */
-    void removeAssemblyFileListener(OpenAssembly.AssembyChangeListener lis);
+    void removeAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis);
 
-    OpenAssembly.AssembyChangeListener getAssemblyChangeListener();
+    OpenAssembly.AssemblyChangeListener getAssemblyChangeListener();
 
     /** @return a DirectoryChangeListener */
     DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener();

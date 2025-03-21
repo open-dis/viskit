@@ -83,7 +83,7 @@ import viskit.mvc.MvcController;
  * @since 2:47:03 PM
  * @version $Id$
  */
-public class AnalystReportViewFrame extends MvcAbstractViewFrame implements OpenAssembly.AssembyChangeListener {
+public class AnalystReportViewFrame extends MvcAbstractViewFrame implements OpenAssembly.AssemblyChangeListener {
 
     static final Logger LOG = LogManager.getLogger();
     private final static String FRAME_DEFAULT_TITLE = "Viskit Analyst Report Editor";
@@ -135,7 +135,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
      * @param param the object to act upon
      */
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         switch (action) {
             case NEW_ASSEMBLY:
                 currentAssemblyFile = (File) param;

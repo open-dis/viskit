@@ -81,7 +81,7 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  * @since 2:50:08 PM
  * @version $Id$
  */
-public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssembyChangeListener
+public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.AssemblyChangeListener
 {
     static final Logger LOG = LogManager.getLogger();
 
@@ -443,7 +443,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         @Override
         public void keyTyped(KeyEvent e) {
             //LOG.info("sending paramlocallyeditted from JobLauncherTab");
-            OpenAssembly.inst().doParamLocallyEditted(JobLauncherTab2.this);     // inform who is listening that we tweeked the params
+            OpenAssembly.inst().doParamLocallyEdited(JobLauncherTab2.this);     // inform who is listening that we tweeked the params
         }
     };
 
@@ -488,12 +488,12 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         public void actionPerformed(ActionEvent e) {
             // The user has hit the save button;
             saveParamsToJaxbNoNotify();
-            OpenAssembly.inst().doSendAssemblyJaxbChanged(JobLauncherTab2.this);
+            OpenAssembly.inst().doFireActionAssemblyJaxbChanged(JobLauncherTab2.this);
         }
     }
 
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
     }
 
     @Override

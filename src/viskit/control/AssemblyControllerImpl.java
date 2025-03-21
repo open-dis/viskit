@@ -82,7 +82,7 @@ import viskit.view.SimulationRunPanel;
  * @since 9:26:02 AM
  * @version $Id: AssemblyControllerImpl.java 2884 2015-09-02 17:21:52Z tdnorbra $
  */
-public class AssemblyControllerImpl extends MvcAbstractController implements AssemblyController, OpenAssembly.AssembyChangeListener 
+public class AssemblyControllerImpl extends MvcAbstractController implements AssemblyController, OpenAssembly.AssemblyChangeListener 
 {
     static final Logger LOG = LogManager.getLogger();
     private static int mutex = 0;
@@ -181,11 +181,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         return openAssembliesList;
     }
 
-    private boolean checkSaveIfDirty() {
-        if (localDirty) {
+    private boolean checkSaveIfDirty() 
+    {
+        if (localDirty) 
+        {
             StringBuilder sb = new StringBuilder("<html><p align='center'>Execution parameters have been modified.<br>(");
 
-            for (Iterator<OpenAssembly.AssembyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
+            for (Iterator<OpenAssembly.AssemblyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
                 sb.append(itr.next().getHandle());
                 sb.append(", ");
             }
@@ -322,15 +324,15 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     /** @return the listener for this AssemblyControllerImpl */
     @Override
-    public OpenAssembly.AssembyChangeListener getAssemblyChangeListener() {
+    public OpenAssembly.AssemblyChangeListener getAssemblyChangeListener() {
         return assemblyChangeListener;
     }
     private boolean localDirty = false;
-    private Set<OpenAssembly.AssembyChangeListener> isLocalDirty = new HashSet<>();
-    OpenAssembly.AssembyChangeListener assemblyChangeListener = new OpenAssembly.AssembyChangeListener() {
+    private Set<OpenAssembly.AssemblyChangeListener> isLocalDirty = new HashSet<>();
+    OpenAssembly.AssemblyChangeListener assemblyChangeListener = new OpenAssembly.AssemblyChangeListener() {
 
         @Override
-        public void assemblyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
+        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
             switch (action) {
                 case JAXB_CHANGED:
                     isLocalDirty.remove(source);
@@ -396,17 +398,17 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         assemblyChangeListener.assemblyChanged(action, source, param);
     }
 
     @Override
-    public void addAssemblyFileListener(OpenAssembly.AssembyChangeListener lis) {
+    public void addAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis) {
         OpenAssembly.inst().addListener(lis);
     }
 
     @Override
-    public void removeAssemblyFileListener(OpenAssembly.AssembyChangeListener lis) {
+    public void removeAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis) {
         OpenAssembly.inst().removeListener(lis);
     }
 
@@ -847,9 +849,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private boolean closeAll = false;
 
     @Override
-    public void closeAll() {
+    public void closeAll() 
+    {
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyViewFrame().getOpenModels();
-        for (AssemblyModel assemblyModel : assemblyModelArray) {
+        for (AssemblyModel assemblyModel : assemblyModelArray) 
+        {
             setModel((MvcModel) assemblyModel);
             setCloseAll(true);
             close();
@@ -867,22 +872,25 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public boolean preClose() {
-        AssemblyModel vmod = (AssemblyModel) getModel();
-        if (vmod == null) {
+    public boolean preClose() 
+    {
+        AssemblyModelImpl assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel(); // (AssemblyModel) getModel();
+        if (assemblyModel == null) {
             return false;
         }
-
-        if (vmod.isDirty()) {
+        LOG.debug("preClose() close assembly {}", assemblyModel.getCurrentAssemblyModelName());
+        if (assemblyModel.isDirty()) {
             return checkSaveIfDirty();
         }
-
         return true;
     }
 
     @Override
-    public void postClose() {
-        OpenAssembly.inst().doSendCloseAssembly();
+    public void postClose() 
+    {
+        LOG.debug("postClose() close assembly {}", OpenAssembly.inst().getName());
+        OpenAssembly.inst().doFireActionCloseAssembly();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
     }
 
     private void markAssemblyConfigurationClosed(File f) {

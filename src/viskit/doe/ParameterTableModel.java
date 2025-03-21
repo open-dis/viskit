@@ -115,7 +115,7 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
         if (viskit.ViskitStatics.debug) {
             LOG.info("Sending paramlocally editted from ParamTableModel");
         }
-        OpenAssembly.inst().doParamLocallyEditted(dummyListener);
+        OpenAssembly.inst().doParamLocallyEdited(dummyListener);
     }
 
     private void processDesignParameter(TerminalParameter terminalParameter) {
@@ -344,10 +344,10 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
 
         fireTableCellUpdated(row, col);
     }
-    OpenAssembly.AssembyChangeListener dummyListener = new OpenAssembly.AssembyChangeListener() {
+    OpenAssembly.AssemblyChangeListener dummyListener = new OpenAssembly.AssemblyChangeListener() {
 
         @Override
-        public void assemblyChanged(int action, OpenAssembly.AssembyChangeListener source, Object param) {
+        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
         }
 
         @Override

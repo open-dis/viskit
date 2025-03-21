@@ -13,6 +13,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.util.FileBasedAssemblyNode;
@@ -35,12 +37,13 @@ import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
  */
 public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 {
+    static final Logger LOG = LogManager.getLogger();
     
-
     private static JAXBContext jaxbContext;
     private ObjectFactory objectFactory;
     private SimkitAssembly jaxbRoot;
-    private File currentAssemblyModelFile;
+    private String currentAssemblyModelName = new String();
+    private File   currentAssemblyModelFile;
     private String title = new String();
     private boolean modelDirty = false;
     private GraphMetadata graphMetadata;
@@ -1190,6 +1193,22 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
      */
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    /**
+     * @return the currentAssemblyModelName
+     */
+    public String getCurrentAssemblyModelName() {
+        if (currentAssemblyModelFile != null)
+        {
+            currentAssemblyModelName = currentAssemblyModelFile.getName();
+            return currentAssemblyModelName;
+        }
+        else 
+        {
+            LOG.error("getCurrentAssemblyModelName() found currentAssemblyModelFile is null, no name returned");
+            return "";
+        }
     }
 
 } // end class AssemblyModelImpl

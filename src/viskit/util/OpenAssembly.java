@@ -77,33 +77,33 @@ public class OpenAssembly {
     /** Singleton class */
     private OpenAssembly() {}
 
-    /** @param f the Assembly XML file to announce to all the Assembly Listeners
+    /** @param newFile the Assembly XML file to announce to all the Assembly Listeners
      * @param jaxb the JAXB root of this XML file
      */
-    public void setFile(File f, SimkitAssembly jaxb) {
-        if (f != null) {
-            file = f;
+    public void setFile(File newFile, SimkitAssembly jaxb) {
+        if (newFile != null) {
+            this.file = newFile;
             jaxbRoot = jaxb;
             jaxbFactory = new ObjectFactory();
 
             // This is crucial for Viskit being able to open associated Event Graphs for
             // this Assembly
-            EventGraphCache.instance().makeEntityTable(file);
-            doSendNewAssembly(file);
+            EventGraphCache.instance().makeEntityTable(newFile);
+            doFireActionNewAssembly(newFile);
             
             // this works but TODO unnecessary?  can also see graphMetadata
-            this.name = f.getName();
+            name = newFile.getName();
             if (name.toLowerCase().endsWith(".xml"))
                 name = name.substring(0, name.indexOf(".xml"));
         }
     }
-    private final Set<AssembyChangeListener> listeners = new HashSet<>();
+    private final Set<AssemblyChangeListener> listeners = new HashSet<>();
 
     /**
      * @param listener assembly change listener
      * @return true if was not already registered
      */
-    public boolean addListener(AssembyChangeListener listener) {
+    public boolean addListener(AssemblyChangeListener listener) {
         return listeners.add(listener);
     }
 
@@ -111,35 +111,35 @@ public class OpenAssembly {
      * @param listener assembly change listener
      * @return true if it had been registered
      */
-    public boolean removeListener(AssembyChangeListener listener) {
+    public boolean removeListener(AssemblyChangeListener listener) {
         return listeners.remove(listener);
     }
 
-    public void doParamLocallyEditted(AssembyChangeListener source) {
-        fireAction(AssembyChangeListener.PARAM_LOCALLY_EDITED, source, null);
+    public void doParamLocallyEdited(AssemblyChangeListener source) {
+        fireAction(AssemblyChangeListener.PARAM_LOCALLY_EDITED, source, null);
     }
 
-    public void doSendAssemblyJaxbChanged(AssembyChangeListener source) {
-        fireAction(AssembyChangeListener.JAXB_CHANGED, source, null);
+    public void doFireActionAssemblyJaxbChanged(AssemblyChangeListener source) {
+        fireAction(AssemblyChangeListener.JAXB_CHANGED, source, null);
     }
 
-    public void doSendNewAssembly(File f) {
-        fireAction(AssembyChangeListener.NEW_ASSEMBLY, null, f);
+    public void doFireActionNewAssembly(File f) {
+        fireAction(AssemblyChangeListener.NEW_ASSEMBLY, null, f);
     }
 
-    public void doSendCloseAssembly() {
-        fireAction(AssembyChangeListener.CLOSE_ASSEMBLY, null, null);
+    public void doFireActionCloseAssembly() {
+        fireAction(AssemblyChangeListener.CLOSE_ASSEMBLY, null, null);
     }
 
-    private void fireAction(int action, AssembyChangeListener source, Object param) {
-        for (AssembyChangeListener lis : listeners) {
-            if (lis != source) {
-                lis.assemblyChanged(action, source, param);
+    private void fireAction(int action, AssemblyChangeListener source, Object param) {
+        for (AssemblyChangeListener listener : listeners) {
+            if (listener != source) {
+                listener.assemblyChanged(action, source, param);
             }
         }
     }
 
-    static public interface AssembyChangeListener {
+    static public interface AssemblyChangeListener {
 
         // public final static int JDOM_CHANGED = 0;
         int JAXB_CHANGED = 1;
@@ -150,10 +150,10 @@ public class OpenAssembly {
         /**
          * Notify the assembly listeners of a change
          * @param action the change taking place
-         * @param source the AssembyChangeListener
+         * @param source the AssemblyChangeListener
          * @param param the object that changes
          */
-        void assemblyChanged(int action, AssembyChangeListener source, Object param);
+        void assemblyChanged(int action, AssemblyChangeListener source, Object param);
 
         /** @return the handle for this Assembly ChangeListener */
         String getHandle();

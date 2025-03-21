@@ -172,7 +172,7 @@ public class MainFrame extends JFrame
         ChangeListener tabChangeListener = new myTabChangeListener();
         myQuitAction = new QuitAction("Quit");
 
-        topTabbedPane = new JTabbedPane();
+        topTabbedPane = new JTabbedPane(JTabbedPane.TOP); // windows tabs are left justified, macOS is t
 
         // Swing:
         getContentPane().add(topTabbedPane);
@@ -293,7 +293,7 @@ public class MainFrame extends JFrame
             tabIndices[TAB0_ANALYSTREPORT_INDEX] = assemblyPaneIndex;
             AnalystReportController analystReportController = (AnalystReportController) analystReportPanel.getController();
             analystReportController.setMainTabbedPane(topTabbedPane, assemblyPaneIndex);
-            getAssemblyController().addAssemblyFileListener((OpenAssembly.AssembyChangeListener) analystReportPanel);
+            getAssemblyController().addAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportPanel);
         } 
         else
         {
@@ -589,7 +589,7 @@ public class MainFrame extends JFrame
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] != -1) {
                     getAssemblyController().removeAssemblyFileListener(getAssemblyController().getAssemblyChangeListener());
-                    getAssemblyController().removeAssemblyFileListener((OpenAssembly.AssembyChangeListener) analystReportPanel);
+                    getAssemblyController().removeAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportPanel);
                     getAssemblyController().removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentAssemblyFileListener());
                     getAssemblyController().removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentProjectFileSetListener());
 
