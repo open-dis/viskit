@@ -796,11 +796,13 @@ their descpritions.
     </target>
 
     <target name="clean.DefaultProject">
+        <!-- do not delete viskitProject.xml project file, it is required
         <delete verbose="true">
             <fileset dir="MyViskitProjects/DefaultProject">
                 <include name="viskitProject.xml"/>
             </fileset>
         </delete>
+        -->
         <delete verbose="true">
             <fileset dir="MyViskitProjects/DefaultProject/AnalystReports">
                 <include name="**/*.png"/>
