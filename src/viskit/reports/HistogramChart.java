@@ -62,9 +62,9 @@ public class HistogramChart
 
     /**
      * Creates a data set that is used for making a relative-frequency histogram.
-     * @param label
-     * @param data
-     * @return
+     * @param label the name of the ScatterPlot
+     * @param data an array of doubles that are to be plotted
+     * @return the dataset
      */
     private IntervalXYDataset createDataset(String label, double[] data)
     {

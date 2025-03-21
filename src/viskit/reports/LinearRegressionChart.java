@@ -58,7 +58,6 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.reports;
 
-import edu.nps.util.Log4jUtilities;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
@@ -132,9 +131,9 @@ public class LinearRegressionChart
 
     /**
      * Creates a data set that is used for making a scatter plot of the data
-     * @param label the name of the ScatterPlot
+     * @param label the name of the Linear Regression ScatterPlot
      * @param data an array of doubles that are to be plotted
-     * @return
+     * @return the dataset
      */
     private XYDataset createDataset(String label, double[] data) {
         XYSeries series = new XYSeries(label);
