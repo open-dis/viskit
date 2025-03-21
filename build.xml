@@ -275,6 +275,7 @@ their descpritions.
              schema="${simkit.xsd}"
              destdir="${dir.src}">
             <produces dir="${dir.src.simevg}"/>
+            <classpath refid="jaxb.compile.path"/>
         </xjc>
         <xjc extension="true"
              package="viskit.xsd.bindings.assembly"
