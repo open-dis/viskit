@@ -235,11 +235,11 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         modelImplementation.initialize();
         eventGraphView.addTab(modelImplementation);
 
-        Model[] openAlready = eventGraphView.getOpenModels();
+        Model[] openAlreadyModelArray = eventGraphView.getOpenModels();
         boolean isOpenAlready = false;
         String path;
-        if (openAlready != null) {
-            for (Model model : openAlready) {
+        if (openAlreadyModelArray != null) {
+            for (Model model : openAlreadyModelArray) {
                 if (model.getLastFile() != null) {
                     path = model.getLastFile().getAbsolutePath();
                     if (path.equals(file.getAbsolutePath())) {
@@ -267,7 +267,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
             // Check for good compilation. TODO: Possibly grossly unnecessary since all classpaths and initial Event Graph parsing areadly took place in the project space during startup (tdn) 9/14/24
 //            handleCompileAndSave(mod, file); <- possible source of Viskit barfing when opening a large set of Event Graphs
-        } else {
+        } 
+        else {
             eventGraphView.deleteTab(modelImplementation); // Not a good open, tell view
         }
 
@@ -1142,7 +1143,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             fileName = localLastFile.getName();
         }
 
-        File imageFile = ((EventGraphView) getView()).saveFileAsk(fileName + imgSaveCount + ".png", false,
+        String imageFileName = ViskitGlobals.instance().getActiveAssemblyModel().getName() + fileName + imgSaveCount + ".png";
+        File imageFile = ((EventGraphView) getView()).saveFileAsk(imageFileName, false,
                 "Save Image, Event Graph Diagram...");
 
         if (imageFile == null) {
@@ -1157,11 +1159,12 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void captureEventGraphImages(List<File> eventGraphs, List<File> eventGraphImages) {
-        Iterator<File> itr = eventGraphImages.listIterator(0);
+    public void captureEventGraphImages(List<File> eventGraphs, List<File> eventGraphImages) 
+    {
+        Iterator<File> fileIterator = eventGraphImages.listIterator(0);
 
         File imageFile;
-        TimerCallback tcb;
+        TimerCallback timerCallback;
 
         // create and save the image
         EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
@@ -1176,27 +1179,29 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         closeAll();
 
         // Each Event Graph needs to be opened first
-        for (File eventGraph : eventGraphs) {
+        for (File eventGraph : eventGraphs) 
+        {
             _doOpenEventGraph(eventGraph);
             LOG.debug("eventGraph: " + eventGraph);
 
             // Now capture and store the Event Graph images
-            if (itr.hasNext()) {
-                imageFile = itr.next();
-                LOG.debug("eventGraphImage is: " + imageFile);
+            if (fileIterator.hasNext()) 
+            {
+                imageFile = fileIterator.next();
+                LOG.info("captureEventGraphImages() image " + imageFile.getName() + "\n      {}", imageFile);
 
                 // Don't display an extra frame while taking snapshots
-                tcb = new TimerCallback(imageFile, false, eventGraphViewFrame.getCurrentJgraphComponent());
+                timerCallback = new TimerCallback(imageFile, false, eventGraphViewFrame.getCurrentJgraphComponent());
 
                 // Make sure we have a directory ready to receive these images
                 if (!imageFile.getParentFile().isDirectory()) {
-                    imageFile.getParentFile().mkdirs();
+                     imageFile.getParentFile().mkdirs();
                 }
 
                 // Fire this quickly as another Event Graph will immediately load
-                final Timer tim = new Timer(0, tcb);
-                tim.setRepeats(false);
-                tim.start();
+                final Timer timer = new Timer(0, timerCallback);
+                timer.setRepeats(false);
+                timer.start();
             }
         }
     }
@@ -1208,9 +1213,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         JFrame frame;
         Component component;
 
-        TimerCallback(File f, boolean b, Component component) {
-            fil = f;
-            display = b;
+        TimerCallback(File file, boolean whetherToDisplay, Component component) {
+            fil = file;
+            display = whetherToDisplay;
             this.component = component;
         }
 

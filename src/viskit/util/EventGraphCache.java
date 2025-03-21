@@ -111,8 +111,8 @@ public class EventGraphCache
      * being linked to in the AnalystReport
      */
     private final List<String> eventGraphNamesList;
-    private final List<File> eventGraphFilesList;
-    private final List<File> eventGraphImageFilesList;
+    private final List<File>   eventGraphFilesList;
+    private final List<File>   eventGraphImageFilesList;
 
     /** The jdom.Document object of the assembly file */
     private Document assemblyDocument;
@@ -126,8 +126,8 @@ public class EventGraphCache
     }
 
     private EventGraphCache() {
-        eventGraphNamesList  = new LinkedList<>();
-        eventGraphFilesList  = new LinkedList<>();
+        eventGraphNamesList      = new LinkedList<>();
+        eventGraphFilesList      = new LinkedList<>();
         eventGraphImageFilesList = new LinkedList<>();
     }
 
@@ -212,23 +212,26 @@ public class EventGraphCache
      *
      * @param eventGraphFile the Event Graph file type and name to save
      */
-    private void saveEventGraphReferences(File eventGraphFile) {
+    private void saveEventGraphReferences(File eventGraphFile)
+    {
         LOG.debug("Event Graph: {}", eventGraphFile);
 
         // find the package seperator
-        int lastSlash = eventGraphFile.getPath().lastIndexOf(File.separator);
-        int pos = eventGraphFile.getPath().lastIndexOf(".");
+        int lastSlashIndex = eventGraphFile.getPath().lastIndexOf(File.separator);
+        int lastDotIndex   = eventGraphFile.getPath().lastIndexOf(".");
 
-        String packageName = eventGraphFile.getParentFile().getName();
-        String eventGraphName = eventGraphFile.getPath().substring(lastSlash + 1, pos);
+        String    packageName = eventGraphFile.getParentFile().getName();
+        String   assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getName();
+        String eventGraphName = eventGraphFile.getPath().substring(lastSlashIndex + 1, lastDotIndex);
         eventGraphNamesList.add(packageName + "." + eventGraphName);
 
         LOG.debug("EventGraph Name: {}", eventGraphName);
 
-        String eventGraph_image_directory =
+        String eventGraphImageDirectory =
             ViskitGlobals.instance().getViskitProject().getAnalystReportEventGraphImagesDirectory().getPath();
 
-        File eventGraphImageFile = new File(eventGraph_image_directory + "/" + packageName + "/" + eventGraphName + ".xml.png");
+        String eventGraphImageFileName =  "EventGraph_" + eventGraphName + ".xml.png"; // assemblyName + "_"  + // packageName + "/" + 
+        File   eventGraphImageFile = new File(eventGraphImageDirectory, eventGraphImageFileName);
         LOG.debug("Event Graph Image location:\n      {}", eventGraphImageFile.getAbsolutePath());
 
         eventGraphImageFilesList.add(eventGraphImageFile);

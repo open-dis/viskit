@@ -78,8 +78,8 @@ public class ViskitProject
     public static final String VISKIT_ICON_FILE_NAME = "Viskit.ico";
     public static final String VISKIT_CONFIG_DIRECTORY = "configuration";
     public static final String VISKIT_ICON_SOURCE = VISKIT_CONFIG_DIRECTORY + "/" + VISKIT_ICON_FILE_NAME;
-    public static final String ANALYST_REPORT_CHARTS_DIRECTORY_NAME = "charts";
     public static final String ANALYST_REPORT_IMAGES_DIRECTORY_NAME = "images";
+    public static final String ANALYST_REPORT_CHARTS_DIRECTORY_PATH = ANALYST_REPORT_IMAGES_DIRECTORY_NAME + "/" + "charts";
     public static final String ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME = ASSEMBLIES_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENT_GRAPHS_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_STATISTICS_DIRECTORY_NAME = "statistics";
@@ -162,16 +162,16 @@ public class ViskitProject
             }
         }
 
-        setAnalystReportChartsDirectory(new File(getAnalystReportsDirectory(), ANALYST_REPORT_CHARTS_DIRECTORY_NAME));
-        if (!analystReportChartsDirectory.exists()) {
-            getAnalystReportChartsDirectory().mkdirs();
-        }
-
         setAnalystReportImagesDirectory(new File(getAnalystReportsDirectory(), ANALYST_REPORT_IMAGES_DIRECTORY_NAME));
 
         setAnalystReportAssemblyImagesDirectory(new File(getAnalystReportImagesDirectory(), ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME));
         if (!analystReportAssemblyImagesDirectory.exists()) {
             getAnalystReportAssemblyImagesDirectory().mkdirs();
+        }
+
+        setAnalystReportChartsDirectory(new File(getAnalystReportsDirectory(), ANALYST_REPORT_CHARTS_DIRECTORY_PATH));
+        if (!analystReportChartsDirectory.exists()) {
+            getAnalystReportChartsDirectory().mkdirs();
         }
 
         setAnalystReportEventGraphImagesDirectory(new File(getAnalystReportImagesDirectory(), ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME));

@@ -346,7 +346,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
             // Simulation run starts the runnable assembly in a separate thread
             simulationRunThread = new Thread(assemblyRunnable);
-            new SimulationRunMonitor(simulationRunThread).execute();
+            new SimulationRunMonitor(simulationRunThread).execute(); // commence thread
             // Simulation Run thread is now launched and will execute separately
 
             // Restore current thread context to Viskit's WorkingClassLoader prior to returning control
@@ -382,7 +382,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         public Void doInBackground() {
             setProgress(0);
 
-            simulationRunMonitorThread.start();
+            simulationRunMonitorThread.start(); // commence thread
             try {
                 simulationRunMonitorThread.join();
                 LOG.info("SimulationRunMonitor now running in simulationRunThread");

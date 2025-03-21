@@ -809,8 +809,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private void fillStatisticsPanel() {
         boolean bool = analystReportModel.isPrintStatisticsComments();
         wantStatisticsDescriptionAnalysis.setSelected(bool);
-        statisticsComments.setText(analystReportModel.getStatsComments());
-        statisticsConclusions.setText(analystReportModel.getStatsConclusions());
+        statisticsComments.setText(analystReportModel.getStatisticsComments());
+        statisticsConclusions.setText(analystReportModel.getStatisticsConclusions());
         statisticsComments.setEnabled(bool);
         statisticsConclusions.setEnabled(bool);
 
@@ -852,7 +852,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
             statisticsReplicationReportsPanel.add(Box.createVerticalStrut(20));
         }
-        List summs = analystReportModel.getStastSummaryList();
+        List summs = analystReportModel.getStatisticsSummaryList();
 
         columnNames = new String[] {"Entity", "Property", "# Replications", "Minimum", "Maximum", "Mean", "Standard Deviation", "Variance"};
         String[][] saa = new String[summs.size()][];

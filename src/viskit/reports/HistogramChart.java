@@ -16,9 +16,11 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.IntervalXYDataset;
+import viskit.ViskitGlobals;
 import static viskit.ViskitProject.ANALYST_REPORTS_DIRECTORY_NAME;
-import static viskit.ViskitProject.ANALYST_REPORT_CHARTS_DIRECTORY_NAME;
 import viskit.ViskitUserConfiguration;
+import static viskit.ViskitProject.ANALYST_REPORT_CHARTS_DIRECTORY_PATH;
+import static viskit.reports.LinearRegressionChart.LOG;
 
 /**
  *
@@ -38,22 +40,24 @@ public class HistogramChart
     /**
      * Creates a histogram image in PNG format based on the parameters provided
      *
+     * @param assemblyName name of assembly
      * @param title the title of the Histogram
      * @param plotLabel the label for the Histogram
      * @param dataArray an array of doubles that are to be plotted
      * @return the path url of the created object
      */
-    public String createChart(String title, String plotLabel, double[] dataArray) 
+    public String createChart(String assemblyName, String title, String plotLabel, double[] dataArray) 
     {
-        File chartsDirectory = new File(ViskitUserConfiguration.instance().getViskitProjectDirectory(),
-                ANALYST_REPORTS_DIRECTORY_NAME + "/" + ANALYST_REPORT_CHARTS_DIRECTORY_NAME);
-        File fileLocation = new File(chartsDirectory, plotLabel + "Histogram.png");
-//      File fileLocation = new File(viskitProject.getAnalystReportChartsDirectory(), plotLabel + "Histogram.png");
+        File chartsDirectory = new File(
+                ViskitUserConfiguration.instance().getViskitProjectDirectory(),
+                ANALYST_REPORTS_DIRECTORY_NAME + "/" + ANALYST_REPORT_CHARTS_DIRECTORY_PATH);
+        String chartFileName = assemblyName + "_" + plotLabel + "Histogram.png";
+        File   chartFile = new File(chartsDirectory, chartFileName);
         IntervalXYDataset dataset = createDataset(plotLabel, dataArray);
-        saveChart(createChart(dataset, title, "Value"), fileLocation);
+        saveChart(createChart(dataset, title, "Value"), chartFile);
 
-        // Return relative path only
-        return ANALYST_REPORT_CHARTS_DIRECTORY_NAME + "/" + fileLocation.getName();
+        String relativePath = ANALYST_REPORT_CHARTS_DIRECTORY_PATH + "/" + chartFile.getName(); // return relative path only
+        return relativePath;
     }
 
     /**
@@ -120,13 +124,17 @@ public class HistogramChart
     /**
      * Saves a chart to PNG format
      * @param chart the created JFreeChart instance
-     * @param outFile the path to save the generated PNG to
+     * @param chartFile the path to save the generated PNG to
      */
-    private void saveChart(JFreeChart chart, File outFile) {
+    private void saveChart(JFreeChart chart, File chartFile) {
 
         try {
-            ChartUtils.saveChartAsPNG(outFile, chart, 969, 641);
-        } catch (IOException ioe) {
+            if (!chartFile.getParentFile().exists())
+                 chartFile.getParentFile().mkdirs(); // ensure intermediate path is present
+            ChartUtils.saveChartAsPNG(chartFile, chart, 969, 641);
+            LOG.info("saveChart successful, " + chartFile.getName() + "\n      {}", chartFile);
+        } 
+        catch (IOException ioe) {
             LOG.error(ioe);
         }
     }

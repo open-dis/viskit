@@ -80,8 +80,8 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import static viskit.ViskitProject.ANALYST_REPORTS_DIRECTORY_NAME;
-import static viskit.ViskitProject.ANALYST_REPORT_CHARTS_DIRECTORY_NAME;
 import viskit.ViskitUserConfiguration;
+import static viskit.ViskitProject.ANALYST_REPORT_CHARTS_DIRECTORY_PATH;
 
 /**
  * Create Scatter Plots from statistical data collected from experimental
@@ -110,21 +110,24 @@ public class LinearRegressionChart
     /**
      * Creates a scatterplot image in PNG format based on the parameters provided
      *
+     * @param assemblyName name of assembly
      * @param title the title of the ScatterPlot
      * @param plotLabel the label for the ScatterPlot
      * @param data an array of doubles that are to be plotted
      * @return the path url of the created object
      */
-    public String createChart(String title, String plotLabel, double[] data) 
+    public String createChart(String assemblyName, String title, String plotLabel, double[] data) 
     {
-        File chartsDirectory = new File(ViskitUserConfiguration.instance().getViskitProjectDirectory(),
-                ANALYST_REPORTS_DIRECTORY_NAME + "/" + ANALYST_REPORT_CHARTS_DIRECTORY_NAME);
-        File fileLocation = new File(chartsDirectory, plotLabel + "LinearRegression.png");
+        File chartsDirectory = new File(
+                ViskitUserConfiguration.instance().getViskitProjectDirectory(),
+                ANALYST_REPORTS_DIRECTORY_NAME + "/" + ANALYST_REPORT_CHARTS_DIRECTORY_PATH);
+        String chartFileName = assemblyName + "_" + plotLabel + "LinearRegression.png";
+        File   chartFile = new File(chartsDirectory, chartFileName);
         XYDataset dataset = createDataset(plotLabel, data);
-        saveChart(createChart(dataset, title, "Value"), fileLocation);
+        saveChart(createChart(dataset, title, "Value"), chartFile);
 
-        // Set relative path only
-        return ANALYST_REPORT_CHARTS_DIRECTORY_NAME + "/" + fileLocation.getName();
+        String relativePath = ANALYST_REPORT_CHARTS_DIRECTORY_PATH + "/" + chartFile.getName(); // return relative path only
+        return relativePath;
     }
 
     /**
@@ -191,13 +194,17 @@ public class LinearRegressionChart
     /**
      * Saves a chart to PNG format
      * @param chart the created JFreeChart instance
-     * @param outFile the path to save the generated PNG to
+     * @param chartFile the path to save the generated PNG to
      */
-    private void saveChart(JFreeChart chart, File outFile) {
+    private void saveChart(JFreeChart chart, File chartFile) {
 
         try {
-            ChartUtils.saveChartAsPNG(outFile, chart, 969, 641);
-        } catch (IOException ioe) {
+            if (!chartFile.getParentFile().exists())
+                 chartFile.getParentFile().mkdirs(); // ensure intermediate path is present
+            ChartUtils.saveChartAsPNG(chartFile, chart, 969, 641);
+            LOG.info("saveChart successful, " + chartFile.getName() + "\n      {}", chartFile);
+        } 
+        catch (IOException ioe) {
             LOG.error(ioe);
         }
     }
