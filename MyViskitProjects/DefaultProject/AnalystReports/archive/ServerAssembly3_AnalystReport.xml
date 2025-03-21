@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AnalystReport name="***ENTER REPORT TITLE HERE***" access="" author="***ENTER NAME OF AUTHOR HERE***" date="3/20/25, 10:53 PM">
+  <ExecutiveSummary comments="true">
+    <ESComments text="***ENTER EXECUTIVE SUMMARY HERE***" />
+  </ExecutiveSummary>
+  <Location comments="true" images="true">
+    <SLComments text="***ENTER SIMULATION LOCATION DESCRIPTION HERE***" />
+    <SLProductionNotes text="***ENTER SIMULATION PRODUCTION NOTES HERE***" />
+    <SLConclusions text="***ENTER SIMULATION LOCATION CONCLUSIONS HERE***" />
+  </Location>
+  <SimulationConfiguration comments="true" image="true" entityTable="true">
+    <EntityTable />
+    <EntityTable />
+    <SCComments text="***ENTER ASSEMBLY CONFIGURATION DESCRIPTION HERE***" />
+    <SCProductionNotes text="***ENTER ASSEMBLY CONFIGURATION PRODUCTION NOTES HERE***" />
+    <SCConclusions text="***ENTER ASSEMBLY CONFIGURATION CONCLUSIONS HERE***" />
+    <AssemblyImage dir="images\Assemblies\ServerAssembly3.xml.png" />
+  </SimulationConfiguration>
+  <EntityParameters comments="true" parameterTables="true">
+    <EPConclusions text="***ENTER ENTITY PARAMETER CONCLUSIONS HERE***" />
+    <ParameterTables />
+    <ParameterTables />
+    <EPComments text="***ENTER ENTITY PARAMETER DESCRIPTION HERE***" />
+  </EntityParameters>
+  <StatisticalResults comments="true" replicationStats="true" summaryStats="true" file="C:\x3d-nps-gitlab\viskit\MyViskitProjects\DefaultProject\AnalystReports\statistics\ServerAssembly3_Statistics_20250320.2252.xml">
+    <ReplicationReports>
+      <SimEntity name="" property="numInQueueStat">
+        <Replication number="1" count="968" minObs="0." maxObs="230." mean="101.074" stdDeviation="69.851" variance="4879.203" />
+        <Replication number="2" count="894" minObs="0." maxObs="216." mean="100.780" stdDeviation="62.982" variance="3966.759" />
+        <Replication number="3" count="890" minObs="0." maxObs="191." mean="97.385" stdDeviation="57.506" variance="3306.914" />
+        <Replication number="4" count="944" minObs="0." maxObs="254." mean="116.041" stdDeviation="74.946" variance="5616.896" />
+        <Replication number="5" count="878" minObs="0." maxObs="180." mean="103.116" stdDeviation="50.715" variance="2571.973" />
+        <Replication number="6" count="936" minObs="0." maxObs="247." mean="123.814" stdDeviation="68.078" variance="4634.615" />
+        <Replication number="7" count="917" minObs="0." maxObs="220." mean="101.417" stdDeviation="59.552" variance="3546.467" />
+        <Replication number="8" count="910" minObs="0." maxObs="212." mean="100.489" stdDeviation="59.236" variance="3508.856" />
+        <Replication number="9" count="888" minObs="0." maxObs="221." mean="113.536" stdDeviation="65.361" variance="4272.104" />
+        <Replication number="10" count="971" minObs="0." maxObs="230." mean="114.992" stdDeviation="61.807" variance="3820.074" />
+        <Replication number="11" count="960" minObs="0." maxObs="242." mean="116.617" stdDeviation="74.103" variance="5491.227" />
+        <Replication number="12" count="915" minObs="0." maxObs="216." mean="103.056" stdDeviation="56.537" variance="3196.452" />
+        <Replication number="13" count="943" minObs="0." maxObs="243." mean="119.449" stdDeviation="69.193" variance="4787.701" />
+        <Replication number="14" count="928" minObs="0." maxObs="236." mean="122.055" stdDeviation="68.603" variance="4706.373" />
+        <Replication number="15" count="921" minObs="0." maxObs="250." mean="123.266" stdDeviation="73.058" variance="5337.448" />
+        <Replication number="16" count="948" minObs="0." maxObs="222." mean="117.480" stdDeviation="64.326" variance="4137.852" />
+        <Replication number="17" count="893" minObs="0." maxObs="219." mean="105.134" stdDeviation="62.096" variance="3855.970" />
+        <Replication number="18" count="970" minObs="0." maxObs="240." mean="116.978" stdDeviation="69.632" variance="4848.637" />
+        <Replication number="19" count="971" minObs="0." maxObs="256." mean="124.967" stdDeviation="76.902" variance="5913.989" />
+        <Replication number="20" count="904" minObs="0." maxObs="225." mean="109.014" stdDeviation="65.122" variance="4240.932" />
+        <Replication number="21" count="945" minObs="0." maxObs="222." mean="119.403" stdDeviation="63.883" variance="4081.091" />
+        <Replication number="22" count="915" minObs="0." maxObs="245." mean="122.113" stdDeviation="74.272" variance="5516.386" />
+        <Replication number="23" count="973" minObs="0." maxObs="261." mean="126.437" stdDeviation="74.934" variance="5615.157" />
+        <Replication number="24" count="970" minObs="0." maxObs="252." mean="128.011" stdDeviation="74.932" variance="5614.736" />
+        <Replication number="25" count="886" minObs="0." maxObs="211." mean="99.612" stdDeviation="59.609" variance="3553.280" />
+        <Replication number="26" count="941" minObs="0." maxObs="237." mean="121.182" stdDeviation="66.850" variance="4468.952" />
+        <Replication number="27" count="931" minObs="0." maxObs="207." mean="100.236" stdDeviation="60.468" variance="3656.433" />
+        <Replication number="28" count="936" minObs="0." maxObs="236." mean="109.676" stdDeviation="67.428" variance="4546.484" />
+        <Replication number="29" count="995" minObs="0." maxObs="253." mean="120.717" stdDeviation="70.677" variance="4995.277" />
+        <Replication number="30" count="992" minObs="0." maxObs="254." mean="130.707" stdDeviation="74.703" variance="5580.516" />
+        <HistogramChart dir="images/charts/ServerAssembly3_numInQueueStatHistogram.png" />
+        <LinearRegressionChart dir="images/charts/ServerAssembly3_numInQueueStatLinearRegression.png" />
+      </SimEntity>
+      <SimEntity name="" property="numAvailServersStat">
+        <Replication number="1" count="738" minObs="0." maxObs="2." mean="0.760" stdDeviation="0.748" variance="0.559" />
+        <Replication number="2" count="678" minObs="0." maxObs="2." mean="0.812" stdDeviation="0.762" variance="0.580" />
+        <Replication number="3" count="699" minObs="0." maxObs="2." mean="0.912" stdDeviation="0.765" variance="0.585" />
+        <Replication number="4" count="690" minObs="0." maxObs="2." mean="0.747" stdDeviation="0.739" variance="0.547" />
+        <Replication number="5" count="699" minObs="0." maxObs="2." mean="0.939" stdDeviation="0.750" variance="0.562" />
+        <Replication number="6" count="689" minObs="0." maxObs="2." mean="0.805" stdDeviation="0.758" variance="0.574" />
+        <Replication number="7" count="695" minObs="0." maxObs="2." mean="0.793" stdDeviation="0.728" variance="0.531" />
+        <Replication number="8" count="698" minObs="0." maxObs="2." mean="0.840" stdDeviation="0.756" variance="0.572" />
+        <Replication number="9" count="667" minObs="0." maxObs="2." mean="0.852" stdDeviation="0.763" variance="0.583" />
+        <Replication number="10" count="739" minObs="0." maxObs="2." mean="0.794" stdDeviation="0.752" variance="0.565" />
+        <Replication number="11" count="719" minObs="0." maxObs="2." mean="0.794" stdDeviation="0.729" variance="0.531" />
+        <Replication number="12" count="699" minObs="0." maxObs="2." mean="0.839" stdDeviation="0.753" variance="0.567" />
+        <Replication number="13" count="700" minObs="0." maxObs="2." mean="0.794" stdDeviation="0.737" variance="0.544" />
+        <Replication number="14" count="691" minObs="0." maxObs="2." mean="0.848" stdDeviation="0.748" variance="0.559" />
+        <Replication number="15" count="671" minObs="0." maxObs="2." mean="0.773" stdDeviation="0.744" variance="0.554" />
+        <Replication number="16" count="725" minObs="0." maxObs="2." mean="0.816" stdDeviation="0.757" variance="0.573" />
+        <Replication number="17" count="674" minObs="0." maxObs="2." mean="0.850" stdDeviation="0.769" variance="0.591" />
+        <Replication number="18" count="730" minObs="0." maxObs="2." mean="0.805" stdDeviation="0.757" variance="0.573" />
+        <Replication number="19" count="715" minObs="0." maxObs="2." mean="0.781" stdDeviation="0.756" variance="0.571" />
+        <Replication number="20" count="679" minObs="0." maxObs="2." mean="0.821" stdDeviation="0.744" variance="0.553" />
+        <Replication number="21" count="723" minObs="0." maxObs="2." mean="0.809" stdDeviation="0.750" variance="0.563" />
+        <Replication number="22" count="670" minObs="0." maxObs="2." mean="0.789" stdDeviation="0.751" variance="0.564" />
+        <Replication number="23" count="711" minObs="0." maxObs="2." mean="0.765" stdDeviation="0.748" variance="0.560" />
+        <Replication number="24" count="718" minObs="0." maxObs="2." mean="0.776" stdDeviation="0.742" variance="0.551" />
+        <Replication number="25" count="673" minObs="0." maxObs="2." mean="0.839" stdDeviation="0.768" variance="0.591" />
+        <Replication number="26" count="704" minObs="0." maxObs="2." mean="0.817" stdDeviation="0.765" variance="0.584" />
+        <Replication number="27" count="724" minObs="0." maxObs="2." mean="0.819" stdDeviation="0.729" variance="0.532" />
+        <Replication number="28" count="701" minObs="0." maxObs="2." mean="0.791" stdDeviation="0.745" variance="0.555" />
+        <Replication number="29" count="742" minObs="0." maxObs="2." mean="0.751" stdDeviation="0.713" variance="0.509" />
+        <Replication number="30" count="738" minObs="0." maxObs="2." mean="0.792" stdDeviation="0.754" variance="0.568" />
+        <HistogramChart dir="images/charts/ServerAssembly3_numAvailServersStatHistogram.png" />
+        <LinearRegressionChart dir="images/charts/ServerAssembly3_numAvailServersStatLinearRegression.png" />
+      </SimEntity>
+    </ReplicationReports>
+    <SummaryReport>
+      <SummaryRecord entity="" property="numInQueueStat" numRuns="30" minObs="878." maxObs="995." mean="934.433" stdDeviation="33.110" variance="1096.254" />
+      <SummaryRecord entity="" property="numAvailServersStat" numRuns="30" minObs="667." maxObs="742." mean="703.300" stdDeviation="22.757" variance="517.872" />
+      <SummaryRecord entity="" property="numInQueueStat" numRuns="30" minObs="878." maxObs="995." mean="934.433" stdDeviation="33.110" variance="1096.254" />
+      <SummaryRecord entity="" property="numAvailServersStat" numRuns="30" minObs="667." maxObs="742." mean="703.300" stdDeviation="22.757" variance="517.872" />
+    </SummaryReport>
+    <SRComments text="***ENTER STATISTICAL RESULTS DESCRIPTION HERE***" />
+    <SRConclusions text="***ENTER STATISTICAL RESULTS CONCLUSIONS HERE***" />
+  </StatisticalResults>
+  <ConclusionsRecommendations comments="true">
+    <CRComments text="***ENTER ANALYST CONCLUSIONS HERE***" />
+    <CRConclusions text="***ENTER RECOMMENDATIONS FOR FUTURE WORK HERE***" />
+  </ConclusionsRecommendations>
+  <BehaviorDescriptions comments="true" descriptions="true" image="true" details="true">
+    <BehaviorList>
+      <Behavior name="examples.ArrivalProcess">
+        <description text="Getting started: producing customers at random intervals." />
+        <parameter name="interarrivalTime" type="simkit.random.RandomVariate" description="typical time duration between arrivals" />
+        <stateVariable name="numberArrivals" type="int" description="how many customers have arrived" />
+        <EventGraphImage dir="images\EventGraphs\EventGraph_ArrivalProcess.xml.png" />
+      </Behavior>
+      <Behavior name="examples.SimpleServer">
+        <description text="One of the most fundamental examples, a simple server that handles client customers" />
+        <parameter name="serviceTime" type="simkit.random.RandomVariate" description="time duration to perform service" />
+        <parameter name="totalNumberServers" type="int" description="how many servers are provided" />
+        <stateVariable name="numberInQueue" type="int" description="number of customers in queue" />
+        <stateVariable name="numberAvailableServers" type="int" description="number of available servers at a given time" />
+        <EventGraphImage dir="images\EventGraphs\EventGraph_SimpleServer.xml.png" />
+      </Behavior>
+    </BehaviorList>
+    <BDComments text="" />
+    <BDConclusions text="" />
+  </BehaviorDescriptions>
+</AnalystReport>
+
