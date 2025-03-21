@@ -788,8 +788,10 @@ their descpritions.
 
     <target name="clean.javadoc"
             description="Deletes javadoc files">
-        <delete dir="javadoc" failonerror="false" verbose="true" includeemptydirs="true">
-            <include name="**/*"/>
+        <delete failonerror="false" verbose="true" includeemptydirs="true">
+            <fileset dir="javadoc">
+                <include name="**/*"/>
+            </fileset>
         </delete>
     </target>
 
