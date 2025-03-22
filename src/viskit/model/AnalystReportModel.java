@@ -143,8 +143,11 @@ public final class AnalystReportModel extends MvcAbstractModel
     public static final String SUMMARY_STATISTICS          = "summaryStatistics";
     public static final String SHOW_DESCRIPTION            = "showDescription";
     public static final String SHOW_ENTITY_TABLE           = "showEntityTable";
+    public static final String SHOW_IMAGE                  = "showImage";
     public static final String SHOW_IMAGES                 = "images";
     public static final String SHOW_PARAMETER_TABLES       = "showParameterTables";
+    public static final String TEXT                        = "text";
+    
     public static final String NO_DESCRIPTION_PROVIDED     = "no description provided";
 
     /** Must have the order of the PCL as input from AssemblyModel */
@@ -333,7 +336,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     {
         simulationLocationElement = new Element(LOCATION);
         simulationLocationElement.setAttribute(SHOW_DESCRIPTION, "true");
-        simulationLocationElement.setAttribute(SHOW_IMAGES,   "true");
+        simulationLocationElement.setAttribute(SHOW_IMAGE,   "true");
         makeCustomDescriptionElement(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
         makeProductionNotes(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
         makeConclusions(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
@@ -345,7 +348,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     {
         assemblyConfigurationElement = new Element(SIMULATION_CONFIGURATION);
         assemblyConfigurationElement.setAttribute(SHOW_DESCRIPTION, "true");
-        assemblyConfigurationElement.setAttribute("image", "true");
+        assemblyConfigurationElement.setAttribute(SHOW_IMAGE, "true");
         assemblyConfigurationElement.setAttribute(SHOW_ENTITY_TABLE, "true");
         makeCustomDescriptionElement(assemblyConfigurationElement, "SC", "");
         makeProductionNotes(assemblyConfigurationElement, "SC", ""); // TODO SC -> SimulationConfiguration
@@ -373,12 +376,12 @@ public final class AnalystReportModel extends MvcAbstractModel
     }
 
     /** Creates the behavior descriptions portion of the report */
-    private void createBehaviorDescriptions() {
+    private void createBehaviorDescriptions() 
+    {
         behaviorDescriptionsElement = new Element(BEHAVIOR_DESCRIPTIONS);
         behaviorDescriptionsElement.setAttribute(SHOW_DESCRIPTION, "true");
-        behaviorDescriptionsElement.setAttribute("descriptions", "true");
-        behaviorDescriptionsElement.setAttribute("image", "true");
-        behaviorDescriptionsElement.setAttribute("details", "true");
+        behaviorDescriptionsElement.setAttribute("showDetails", "true");
+        behaviorDescriptionsElement.setAttribute("showImage", "true");
         makeCustomDescriptionElement(behaviorDescriptionsElement,"BD", "");
         makeConclusions(behaviorDescriptionsElement,"BD", "");
 
@@ -530,8 +533,8 @@ public final class AnalystReportModel extends MvcAbstractModel
                 // prevent returning a null if there was no attribute value
                 descriptionString = (localRootElement.getChildText("Description") == null) ? NO_DESCRIPTION_PROVIDED : localRootElement.getChildText("Description");
 
-                descriptionElement = new Element("description");
-                descriptionElement.setAttribute("text", descriptionString);
+                descriptionElement = new Element("Description");
+                descriptionElement.setAttribute(TEXT, descriptionString);
                 behaviorElement.addContent(descriptionElement);
 
                 if (showAllDetails) {
@@ -595,8 +598,8 @@ public final class AnalystReportModel extends MvcAbstractModel
                 name = behavior.getAttributeValue(NAME);
                 behaviorArrayList.add(name);
 
-                descriptionElement = behavior.getChild("description");
-                descriptionText    = descriptionElement.getAttributeValue("text");
+                descriptionElement = behavior.getChild("Description");
+                descriptionText    = descriptionElement.getAttributeValue(TEXT);
                 behaviorArrayList.add(descriptionText);
 
                 parameterElementList = behavior.getChildren(PARAMETER);
@@ -891,10 +894,10 @@ public final class AnalystReportModel extends MvcAbstractModel
      * Converts boolean input into a 'true'/'false' string representation for
      * use as an attribute value in the Analyst report XML.
      *
-     * @param booleanFlag the boolean variable to convert
+     * @param value the boolean variable to convert
      * @return the string representation of the boolean variable
      */
-    private String booleanToString(boolean booleanFlag) {return booleanFlag ? "true" : "false";}
+    private String booleanToString(boolean value) {return value ? "true" : "false";}
 
     private boolean stringToBoolean(String s) {return s.equalsIgnoreCase("true");}
 
@@ -997,30 +1000,32 @@ public final class AnalystReportModel extends MvcAbstractModel
         return _unMakeContent(e, "ProductionNotes");
     }
 
-    private Element _makeElementContent(String elementPrefix, String suffix, String textValue) {
+    private Element _makeElementContent(String elementPrefix, String suffix, String textValue)
+    {
         Element newElement = new Element((elementPrefix + suffix));
-        newElement.setAttribute("text", textValue);
+        newElement.setAttribute(TEXT, textValue);
         return newElement;
     }
 
-    private String _unMakeContent(Element element, String suffix) {
-        return _unMakeContent(element,suffix,"text");
+    private String _unMakeContent(Element element, String suffix) 
+    {
+        return _unMakeContent(element,suffix,TEXT);
     }
 
-    private String _unMakeContent(Element element, String suffix, String attrName) 
+    private String _unMakeContent(Element element, String suffix, String attributeName) 
     {
         if (element == null) {return "";}
         List content = element.getContent();
         Object o;
         Element contentELement;
-        for (Iterator itr = content.iterator(); itr.hasNext();) {
-            o = itr.next();
+        for (Iterator iterator = content.iterator(); iterator.hasNext();) {
+            o = iterator.next();
             if (!(o instanceof Element)) {
                 continue;
             }
             contentELement = (Element) o;
             if (contentELement.getName().endsWith(suffix)) {
-                return contentELement.getAttributeValue(attrName);
+                return contentELement.getAttributeValue(attributeName);
             }
         }
         return "";
@@ -1058,7 +1063,7 @@ public final class AnalystReportModel extends MvcAbstractModel
 
         setAssemblyConfigurationIncluded(true);
         setShowAssemblyConfigurationImage(true);
-        setShowAssemblyEntityTable(true);
+        setShowAssemblyEntityDefinitionsTable(true);
         setAssemblyDesignConsiderations       ("***ENTER ASSEMBLY DESIGN CONSIDERATIONS HERE***");
         setAssemblyConfigationProductionNotes ("***ENTER ASSEMBLY CONFIGURATION PRODUCTION NOTES HERE***");
         setAssemblyConfigurationConclusions   ("***ENTER ASSEMBLY CONFIGURATION CONCLUSIONS HERE***");
@@ -1281,13 +1286,13 @@ public final class AnalystReportModel extends MvcAbstractModel
     public void setAuthor                     (String s) { rootElement.setAttribute(AUTHOR, s); };
     public void setDocumentAccessLabel        (String s) { rootElement.setAttribute(ACCESS, s);}
     public void setDateOfReport               (String s) { rootElement.setAttribute(DATE, s);}
-    public void setDebug                      (boolean bool) { this.debug = bool; }
+    public void setDebug                      (boolean value) { this.debug = value; }
     public void setReportName                 (String s) { rootElement.setAttribute(NAME, s); }
 
     public boolean isShowRecommendationsConclusions() { return stringToBoolean(conclusionsRecommendationsElement.getAttributeValue(SHOW_DESCRIPTION)); }
     public String  getConclusions()                    { return unMakeCustomDescriptionElements(conclusionsRecommendationsElement);}
     public String  getRecommendations()                { return unMakeConclusions(conclusionsRecommendationsElement);}
-    public void setShowRecommendationsConclusions(boolean bool) { conclusionsRecommendationsElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool)); }
+    public void setShowRecommendationsConclusions(boolean value) { conclusionsRecommendationsElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value)); }
     public void setConclusions                     (String s)     { makeCustomDescriptionElement(conclusionsRecommendationsElement,"CR", s); }   // watch the wording
     public void setRecommendations                 (String s)     { makeConclusions(conclusionsRecommendationsElement,"CR", s); }
 
@@ -1298,9 +1303,9 @@ public final class AnalystReportModel extends MvcAbstractModel
              return true; // default
         else return stringToBoolean(executiveSummaryElement.getAttributeValue(SHOW_DESCRIPTION));
     }
-    public void    setShowExecutiveSummary  (boolean bool) 
+    public void    setShowExecutiveSummary  (boolean value) 
     {
-        executiveSummaryElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool));
+        executiveSummaryElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value));
     }
     public String  getExecutiveSummary() 
     { 
@@ -1313,9 +1318,9 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     // sim-location:
     public boolean isShowScenarioLocationDescription() {return stringToBoolean(simulationLocationElement.getAttributeValue(SHOW_DESCRIPTION));}
-    public void    setScenarioLocationIncluded  (boolean bool) {simulationLocationElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool));}
-    public boolean isShowScenarioLocationImage()    {return stringToBoolean(simulationLocationElement.getAttributeValue("images"));}
-    public void    setShowScenarioLocationImage     (boolean bool) {simulationLocationElement.setAttribute("images", booleanToString(bool));}
+    public void    setScenarioLocationIncluded  (boolean value) {simulationLocationElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value));}
+    public boolean isShowScenarioLocationImage()    {return stringToBoolean(simulationLocationElement.getAttributeValue(SHOW_IMAGE));}
+    public void    setShowScenarioLocationImage     (boolean value) {simulationLocationElement.setAttribute(SHOW_IMAGE, booleanToString(value));}
 
     public String  getScenarioLocationDescription()        {return unMakeCustomDescriptionElements(simulationLocationElement);}
     public String  getScenarioLocationConclusions()     {return unMakeConclusions(simulationLocationElement);}
@@ -1331,8 +1336,8 @@ public final class AnalystReportModel extends MvcAbstractModel
     // entity-parameters
     public boolean isShowEntitypParametersDescription() { return stringToBoolean(entityParametersElement.getAttributeValue(SHOW_DESCRIPTION));}
     public boolean isShowEntityParametersTable()        { return stringToBoolean(entityParametersElement.getAttributeValue(SHOW_PARAMETER_TABLES)); }
-    public void   setShowEntityParametersDescription    (boolean bool) { entityParametersElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool)); }
-    public void   setShowEntityParametersTable          (boolean bool) { entityParametersElement.setAttribute("parameterTables", booleanToString(bool)); }
+    public void   setShowEntityParametersDescription    (boolean value) { entityParametersElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value)); }
+    public void   setShowEntityParametersTable          (boolean value) { entityParametersElement.setAttribute("parameterTables", booleanToString(value)); }
 
     public String  getParameterComments()    { return unMakeCustomDescriptionElements(entityParametersElement);} // TODO check, apparent mismatch
     public String  getParameterConclusions() { return unMakeConclusions(entityParametersElement);}               // TODO check, apparent mismatch
@@ -1343,14 +1348,14 @@ public final class AnalystReportModel extends MvcAbstractModel
     // behavior descriptions:
     //good
     public boolean isShowBehaviorDesignAnalysisDescriptions()             { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue(SHOW_DESCRIPTION));}
-    public void   setShowBehaviorDesignAnalysisDescriptions(boolean bool) { behaviorDescriptionsElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool)); }
+    public void   setShowBehaviorDesignAnalysisDescriptions(boolean value) { behaviorDescriptionsElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value)); }
 
-    public boolean isShowBehaviorDescriptions() { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("descriptions"));}
-    public boolean isShowEventGraphDetails()    { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("details"));}
-    public boolean isShowEventGraphImages()     { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("image"));}
-    public void   setShowBehaviorDescriptions (boolean bool) { behaviorDescriptionsElement.setAttribute("descriptions", booleanToString(bool)); }
-    public void   setShowEventGraphDetails    (boolean bool) { behaviorDescriptionsElement.setAttribute("details", booleanToString(bool)); }
-    public void   setShowEventGraphImages     (boolean bool) { behaviorDescriptionsElement.setAttribute("image", booleanToString(bool)); }
+    public boolean isShowBehaviorDescriptions() { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue(SHOW_DESCRIPTION));}
+    public boolean isShowEventGraphDetails()    { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("showDetails"));}
+    public boolean isShowEventGraphImage()     { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("showImage"));}
+    public void   setShowBehaviorDescriptions (boolean value) { behaviorDescriptionsElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value)); }
+    public void   setShowEventGraphDetails    (boolean value) { behaviorDescriptionsElement.setAttribute("showDtails", booleanToString(value)); }
+    public void   setShowEventGraphImages     (boolean value) { behaviorDescriptionsElement.setAttribute("showImage", booleanToString(value)); }
 
     public String  getBehaviorDescription()             { return unMakeCustomDescriptionElements(behaviorDescriptionsElement); }
     public String  getBehaviorConclusions()          { return unMakeConclusions(behaviorDescriptionsElement); }
@@ -1360,14 +1365,14 @@ public final class AnalystReportModel extends MvcAbstractModel
     // sim-config:
     //good
     public boolean isShowAssemblyConfigurationDescription() { return stringToBoolean(assemblyConfigurationElement.getAttributeValue(SHOW_DESCRIPTION));}
-    public boolean isShowAssemblyEntityTable()       { return stringToBoolean(assemblyConfigurationElement.getAttributeValue(SHOW_ENTITY_TABLE));}
-    public boolean isShowAssemblyImage()             { return stringToBoolean(assemblyConfigurationElement.getAttributeValue("image"));}
-    public void    setAssemblyConfigurationIncluded  (boolean bool) { assemblyConfigurationElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool));}
-    public void    setShowAssemblyEntityTable        (boolean bool) { assemblyConfigurationElement.setAttribute(SHOW_ENTITY_TABLE, booleanToString(bool)); }
-    public void    setShowAssemblyConfigurationImage      (boolean bool) { assemblyConfigurationElement.setAttribute("image", booleanToString(bool)); }
+    public boolean isShowAssemblyEntityDefinitionsTable()       { return stringToBoolean(assemblyConfigurationElement.getAttributeValue(SHOW_ENTITY_TABLE));}
+    public boolean isShowAssemblyImage()             { return stringToBoolean(assemblyConfigurationElement.getAttributeValue(SHOW_IMAGE));}
+    public void    setAssemblyConfigurationIncluded  (boolean value) { assemblyConfigurationElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value));}
+    public void    setShowAssemblyEntityDefinitionsTable        (boolean value) { assemblyConfigurationElement.setAttribute(SHOW_ENTITY_TABLE, booleanToString(value)); }
+    public void    setShowAssemblyConfigurationImage      (boolean value) { assemblyConfigurationElement.setAttribute(SHOW_IMAGE, booleanToString(value)); }
 
     public String     getSimulationConfigurationComments()        {return unMakeCustomDescriptionElements(assemblyConfigurationElement);}
-    public String[][] getSimulationConfigurationEntityTable()     {return unMakeEntityTable();}
+    public String[][] getAssemblyDesignEntityDefinitionsTable()     {return unMakeEntityTable();}
     public String     getSimulationConfigurationConclusions()     {return unMakeConclusions(assemblyConfigurationElement);}
     public String     getSimulationConfigurationProductionNotes() {return unMakeProductionNotes(assemblyConfigurationElement);}
     public String     getAssemblyImageLocation()                  {return unMakeImage(assemblyConfigurationElement, "Assembly");}
@@ -1385,11 +1390,11 @@ public final class AnalystReportModel extends MvcAbstractModel
     public boolean isShowSummaryStatistics()     { return stringToBoolean(statisticalResultsElement.getAttributeValue(SUMMARY_STATISTICS)); }
     public boolean isShowStatisticsCharts()      { return stringToBoolean(statisticalResultsElement.getAttributeValue("charts")); }
     //todo later public boolean isOverlayStatsCharts()    { return stringToBoolean(statisticalResults.getAttributeValue("overlay")); }
-    public void setShowReplicationStatistics   (boolean bool) { statisticalResultsElement.setAttribute(REPLICATION_STATISTICS, booleanToString(bool)); }
-    public void setShowStatisticsDescriptionAnalysis      (boolean bool) { statisticalResultsElement.setAttribute(SHOW_DESCRIPTION ,booleanToString(bool)); }
-    public void setShowSummaryStatistics       (boolean bool) { statisticalResultsElement.setAttribute(SUMMARY_STATISTICS, booleanToString(bool)); }
-    public void setShowStatisticsCharts        (boolean bool) { statisticalResultsElement.setAttribute("charts", booleanToString(bool)); }
-    //todo later public void setOverlayStatsCharts      (boolean bool) { statisticalResults.setAttribute("overlay", booleanToString(bool)); }
+    public void setShowReplicationStatistics   (boolean value) { statisticalResultsElement.setAttribute(REPLICATION_STATISTICS, booleanToString(value)); }
+    public void setShowStatisticsDescriptionAnalysis      (boolean value) { statisticalResultsElement.setAttribute(SHOW_DESCRIPTION ,booleanToString(value)); }
+    public void setShowSummaryStatistics       (boolean value) { statisticalResultsElement.setAttribute(SUMMARY_STATISTICS, booleanToString(value)); }
+    public void setShowStatisticsCharts        (boolean value) { statisticalResultsElement.setAttribute("charts", booleanToString(value)); }
+    //todo later public void setOverlayStatsCharts      (boolean value) { statisticalResults.setAttribute("overlay", booleanToString(bool)); }
 
     public String  getStatisticsDescription()        { return unMakeCustomDescriptionElements(statisticalResultsElement);}
     public String  getStatisticsConclusions()     { return unMakeConclusions(statisticalResultsElement);}

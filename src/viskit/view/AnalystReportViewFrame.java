@@ -356,8 +356,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         analystReportModel.setExecutiveSummary(executiveSummaryTA.getText());
     }
     /************************/
-    JCheckBox showScenarioLocationDescriptions;
-    JCheckBox showScenarioLocationImages;
+    JCheckBox showScenarioLocationDescriptionsCB;
+    JCheckBox showScenarioLocationImagesCB;
     JTextArea scenarioLocationDesignConsiderationsTA, scenarioLocationConclusionsTA, scenarioLocationProductionNotesTA;
     JTextField scenarioLocationImageTF;
     JButton scenarioLocationImageButton;
@@ -368,10 +368,10 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     {
         JPanel scenarioLocationPanel = new JPanel();
         scenarioLocationPanel.setLayout(new BoxLayout(scenarioLocationPanel, BoxLayout.Y_AXIS));
-        showScenarioLocationDescriptions = new JCheckBox("Show location features and post-experiment descriptions", true);
-        showScenarioLocationDescriptions.setToolTipText("Show entries in output report");
-        showScenarioLocationDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        scenarioLocationPanel.add(showScenarioLocationDescriptions);
+        showScenarioLocationDescriptionsCB = new JCheckBox("Show location features and post-experiment descriptions", true);
+        showScenarioLocationDescriptionsCB.setToolTipText("Show entries in output report");
+        showScenarioLocationDescriptionsCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        scenarioLocationPanel.add(showScenarioLocationDescriptionsCB);
 
         JScrollPane jsp = new JScrollPane(scenarioLocationDesignConsiderationsTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -388,10 +388,10 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Significant Location Features"));
         scenarioLocationPanel.add(jsp);
 
-        showScenarioLocationImages = new JCheckBox("Show location and chart image(s)", true);
-        showScenarioLocationImages.setToolTipText("Show entries in output report");
-        showScenarioLocationImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        scenarioLocationPanel.add(showScenarioLocationImages);
+        showScenarioLocationImagesCB = new JCheckBox("Show location and chart image(s)", true);
+        showScenarioLocationImagesCB.setToolTipText("Show entries in output report");
+        showScenarioLocationImagesCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        scenarioLocationPanel.add(showScenarioLocationImagesCB);
 
         JPanel imp = new JPanel();
         imp.setLayout(new BoxLayout(imp, BoxLayout.X_AXIS));
@@ -424,29 +424,29 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
     private void fillScenarioLocationPanel()
     {
-        showScenarioLocationDescriptions.setSelected(analystReportModel.isShowScenarioLocationDescription());
+        showScenarioLocationDescriptionsCB.setSelected(analystReportModel.isShowScenarioLocationDescription());
         scenarioLocationDesignConsiderationsTA.setText(analystReportModel.getScenarioLocationDescription());
-        scenarioLocationDesignConsiderationsTA.setEnabled(showScenarioLocationDescriptions.isSelected());
+        scenarioLocationDesignConsiderationsTA.setEnabled(showScenarioLocationDescriptionsCB.isSelected());
         scenarioLocationProductionNotesTA.setText(analystReportModel.getScenarioLocationProductionNotes());
-        scenarioLocationProductionNotesTA.setEnabled(showScenarioLocationDescriptions.isSelected());
+        scenarioLocationProductionNotesTA.setEnabled(showScenarioLocationDescriptionsCB.isSelected());
         scenarioLocationConclusionsTA.setText(analystReportModel.getScenarioLocationConclusions());
-        scenarioLocationConclusionsTA.setEnabled(showScenarioLocationDescriptions.isSelected());
-        showScenarioLocationImages.setSelected(analystReportModel.isShowScenarioLocationImage());
-        scenarioLocationImageTF.setEnabled(showScenarioLocationImages.isSelected());
-        scenarioLocationImageButton.setEnabled(showScenarioLocationImages.isSelected());
-        simulationChartImageTF.setEnabled(showScenarioLocationImages.isSelected());
-        simulationChartImageButton.setEnabled(showScenarioLocationImages.isSelected());
+        scenarioLocationConclusionsTA.setEnabled(showScenarioLocationDescriptionsCB.isSelected());
+        showScenarioLocationImagesCB.setSelected(analystReportModel.isShowScenarioLocationImage());
+        scenarioLocationImageTF.setEnabled(showScenarioLocationImagesCB.isSelected());
+        scenarioLocationImageButton.setEnabled(showScenarioLocationImagesCB.isSelected());
+        simulationChartImageTF.setEnabled(showScenarioLocationImagesCB.isSelected());
+        simulationChartImageButton.setEnabled(showScenarioLocationImagesCB.isSelected());
         scenarioLocationImageTF.setText(analystReportModel.getLocationImage());
         simulationChartImageTF.setText(analystReportModel.getChartImage());
     }
 
     private void unFillScenarioLocationPanel() 
     {
-        analystReportModel.setScenarioLocationIncluded(showScenarioLocationDescriptions.isSelected());
+        analystReportModel.setScenarioLocationIncluded(showScenarioLocationDescriptionsCB.isSelected());
         analystReportModel.setScenarioLocationDescription(scenarioLocationDesignConsiderationsTA.getText());
         analystReportModel.setScenarioLocationProductionNotes(scenarioLocationProductionNotesTA.getText());
         analystReportModel.setScenarioLocationConclusions(scenarioLocationConclusionsTA.getText());
-        analystReportModel.setShowScenarioLocationImage(showScenarioLocationImages.isSelected());
+        analystReportModel.setShowScenarioLocationImage(showScenarioLocationImagesCB.isSelected());
 
         String s = scenarioLocationImageTF.getText().trim();
         if (s != null && !s.isEmpty())
@@ -458,11 +458,11 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     /************************/
-    JCheckBox showAssemblyDesignConsiderationsAndAnalysis;
-    JTextArea assemblyDesignConsiderations, simConfigConclusions, simProductionNotes;
-    JCheckBox showAssemblyConfigurationImages;
-    JCheckBox showEntityTable;
-    JTable entityTable;
+    JCheckBox showAssemblyDesignConsiderationsAndAnalysisCB;
+    JTextArea assemblyDesignConsiderationsTA, assemblyDesignConclusionsTA, assemblyDesignProductionNotesTA;
+    JCheckBox showAssemblyConfigurationImageCB;
+    JCheckBox showEntityDefinitionsTableCB;
+    JTable entityDefinitionsTable;
     JTextField configurationImagePathTF;
     JButton configurationImageButton;
 
@@ -470,45 +470,45 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     {
         JPanel assemblyDesignPanel = new JPanel();
         assemblyDesignPanel.setLayout(new BoxLayout(assemblyDesignPanel, BoxLayout.Y_AXIS));
-        showAssemblyDesignConsiderationsAndAnalysis = new JCheckBox("Show Assembly Design Considerations and Post-Experiment Analysis", true);
-        showAssemblyDesignConsiderationsAndAnalysis.setToolTipText("Show entries in output report");
-        showAssemblyDesignConsiderationsAndAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        assemblyDesignPanel.add(showAssemblyDesignConsiderationsAndAnalysis);
+        showAssemblyDesignConsiderationsAndAnalysisCB = new JCheckBox("Show Assembly Design Considerations and Post-Experiment Analysis", true);
+        showAssemblyDesignConsiderationsAndAnalysisCB.setToolTipText("Show entries in output report");
+        showAssemblyDesignConsiderationsAndAnalysisCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        assemblyDesignPanel.add(showAssemblyDesignConsiderationsAndAnalysisCB);
 
-        JScrollPane jsp = new JScrollPane(assemblyDesignConsiderations = new WrappingTextArea());
+        JScrollPane jsp = new JScrollPane(assemblyDesignConsiderationsTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Assembly Design Considerations"));
         assemblyDesignPanel.add(jsp);
 
-        jsp = new JScrollPane(simProductionNotes = new WrappingTextArea());
+        jsp = new JScrollPane(assemblyDesignProductionNotesTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Production Notes"));
         assemblyDesignPanel.add(jsp);
 
-        jsp = new JScrollPane(simConfigConclusions = new WrappingTextArea());
+        jsp = new JScrollPane(assemblyDesignConclusionsTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Simulation Assembly Design"));
         assemblyDesignPanel.add(jsp);
 
-        showEntityTable = new JCheckBox("Show entity definition table", true);
-        showEntityTable.setToolTipText("Show entries in output report");
-        showEntityTable.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        assemblyDesignPanel.add(showEntityTable);
+        showEntityDefinitionsTableCB = new JCheckBox("Show entity definition table", true);
+        showEntityDefinitionsTableCB.setToolTipText("Show entries in output report");
+        showEntityDefinitionsTableCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        assemblyDesignPanel.add(showEntityDefinitionsTableCB);
 
         JPanel pp = new JPanel();
         pp.setLayout(new BoxLayout(pp, BoxLayout.X_AXIS));
         pp.add(Box.createHorizontalGlue());
-        pp.add(new JScrollPane(entityTable = new JTable()));
+        pp.add(new JScrollPane(entityDefinitionsTable = new JTable()));
         pp.add(Box.createHorizontalGlue());
         pp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         assemblyDesignPanel.add(pp);
-        //p.add(new JScrollPane(entityTable = new JTable()));
-        entityTable.setPreferredScrollableViewportSize(new Dimension(550, 120));
+        //p.add(new JScrollPane(entityDefinitionsTable = new JTable()));
+        entityDefinitionsTable.setPreferredScrollableViewportSize(new Dimension(550, 120));
 
-        showAssemblyConfigurationImages = new JCheckBox("Show Assembly Configuration Image", true);
-        showAssemblyConfigurationImages.setToolTipText("Show entries in output report");
-        showAssemblyConfigurationImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        assemblyDesignPanel.add(showAssemblyConfigurationImages);
+        showAssemblyConfigurationImageCB = new JCheckBox("Show Assembly Configuration Image", true);
+        showAssemblyConfigurationImageCB.setToolTipText("Show entries in output report");
+        showAssemblyConfigurationImageCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        assemblyDesignPanel.add(showAssemblyConfigurationImageCB);
 
         JPanel imp = new JPanel();
         imp.setLayout(new BoxLayout(imp, BoxLayout.X_AXIS));
@@ -528,37 +528,37 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
     private void fillSimulationConfigurationPanel() 
     {
-        showAssemblyDesignConsiderationsAndAnalysis.setSelected(analystReportModel.isShowAssemblyConfigurationDescription());
-        assemblyDesignConsiderations.setText(analystReportModel.getSimulationConfigurationComments());
-        assemblyDesignConsiderations.setEnabled(showAssemblyDesignConsiderationsAndAnalysis.isSelected());
+        showAssemblyDesignConsiderationsAndAnalysisCB.setSelected(analystReportModel.isShowAssemblyConfigurationDescription());
+        assemblyDesignConsiderationsTA.setText(analystReportModel.getSimulationConfigurationComments());
+        assemblyDesignConsiderationsTA.setEnabled(showAssemblyDesignConsiderationsAndAnalysisCB.isSelected());
 
-        showEntityTable.setSelected(analystReportModel.isShowAssemblyEntityTable());
+        showEntityDefinitionsTableCB.setSelected(analystReportModel.isShowAssemblyEntityDefinitionsTable());
 
-        String[][] stringArrayArray = analystReportModel.getSimulationConfigurationEntityTable();
-        entityTable.setModel(new DefaultTableModel(stringArrayArray, new String[] {"Entity Name", "Behavior Type"}));
-        entityTable.getColumnModel().getColumn(0).setPreferredWidth(200);
-        entityTable.getColumnModel().getColumn(1).setPreferredWidth(200);
+        String[][] stringArrayArray = analystReportModel.getAssemblyDesignEntityDefinitionsTable();
+        entityDefinitionsTable.setModel(new DefaultTableModel(stringArrayArray, new String[] {"Entity Name", "Behavior Type"}));
+        entityDefinitionsTable.getColumnModel().getColumn(0).setPreferredWidth(200);
+        entityDefinitionsTable.getColumnModel().getColumn(1).setPreferredWidth(200);
 
-        simProductionNotes.setText(analystReportModel.getSimulationConfigurationProductionNotes());
-        simProductionNotes.setEnabled(analystReportModel.isShowAssemblyConfigurationDescription());
+        assemblyDesignProductionNotesTA.setText(analystReportModel.getSimulationConfigurationProductionNotes());
+        assemblyDesignProductionNotesTA.setEnabled(analystReportModel.isShowAssemblyConfigurationDescription());
 
-        simConfigConclusions.setText(analystReportModel.getSimulationConfigurationConclusions());
-        simConfigConclusions.setEnabled(analystReportModel.isShowAssemblyConfigurationDescription());
+        assemblyDesignConclusionsTA.setText(analystReportModel.getSimulationConfigurationConclusions());
+        assemblyDesignConclusionsTA.setEnabled(analystReportModel.isShowAssemblyConfigurationDescription());
 
-        showAssemblyConfigurationImages.setSelected(analystReportModel.isShowAssemblyImage());
-        configurationImageButton.setEnabled(showAssemblyConfigurationImages.isSelected());
-        configurationImagePathTF.setEnabled(showAssemblyConfigurationImages.isSelected());
+        showAssemblyConfigurationImageCB.setSelected(analystReportModel.isShowAssemblyImage());
+        configurationImageButton.setEnabled(showAssemblyConfigurationImageCB.isSelected());
+        configurationImagePathTF.setEnabled(showAssemblyConfigurationImageCB.isSelected());
         configurationImagePathTF.setText(analystReportModel.getAssemblyImageLocation());
     }
 
     private void unFillSimulationConfigurationPanel() 
     {
-        analystReportModel.setAssemblyConfigurationIncluded(showAssemblyDesignConsiderationsAndAnalysis.isSelected());
-        analystReportModel.setAssemblyDesignConsiderations(assemblyDesignConsiderations.getText());
-        analystReportModel.setAssemblyConfigationProductionNotes(simProductionNotes.getText());
-        analystReportModel.setAssemblyConfigurationConclusions(simConfigConclusions.getText());
-        analystReportModel.setShowAssemblyEntityTable(showEntityTable.isSelected());
-        analystReportModel.setShowAssemblyConfigurationImage(showAssemblyConfigurationImages.isSelected());
+        analystReportModel.setAssemblyConfigurationIncluded(showAssemblyDesignConsiderationsAndAnalysisCB.isSelected());
+        analystReportModel.setAssemblyDesignConsiderations(assemblyDesignConsiderationsTA.getText());
+        analystReportModel.setAssemblyConfigationProductionNotes(assemblyDesignProductionNotesTA.getText());
+        analystReportModel.setAssemblyConfigurationConclusions(assemblyDesignConclusionsTA.getText());
+        analystReportModel.setShowAssemblyEntityDefinitionsTable(showEntityDefinitionsTableCB.isSelected());
+        analystReportModel.setShowAssemblyConfigurationImage(showAssemblyConfigurationImageCB.isSelected());
         String s = configurationImagePathTF.getText();
         if (s != null && s.length() > 0) {
             analystReportModel.setAssemblyImageLocation(s);
@@ -709,7 +709,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         behaviorDescriptionTA.setEnabled(showBehaviorDesignAnalysisDescriptions.isSelected());
         behaviorConclusionsTA.setText(analystReportModel.getBehaviorConclusions());
         behaviorConclusionsTA.setEnabled(showBehaviorDesignAnalysisDescriptions.isSelected());
-        showBehaviorImages.setEnabled(analystReportModel.isShowEventGraphImages());
+        showBehaviorImages.setEnabled(analystReportModel.isShowEventGraphImage());
         showBehaviorDescriptions.setSelected(analystReportModel.isShowBehaviorDescriptions());
         behaviorTabs.setEnabled(showBehaviorDescriptions.isSelected());
 
