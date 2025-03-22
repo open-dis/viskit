@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- SVN ID: $Id$ -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="2.0">
   <xs:element name="SimEntity">
     <xs:complexType>
       <xs:sequence>
@@ -70,7 +70,6 @@
           <xs:element ref="Schedule"/>
           <xs:element ref="Cancel"/>
         </xs:choice>
-
         <!-- Regardless of this sequence, code blocks will appear in the correct
              place in generated source code -->
         <xs:element minOccurs="0" ref="Code"/>

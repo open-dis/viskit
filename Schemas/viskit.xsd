@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="2.0">
   <!-- this is next-generation merged schema, work in progress, not yet used -->
   <!-- change: renamed   simkit.xsd (dissimilar) Schedule as AssemblySchedule -->
   <!-- change: renamed assembly.xsd (dissimilar) SimEntity as AssemblySimEntity -->
@@ -267,6 +267,7 @@
       </xs:sequence>
       <xs:attribute name="listenerName" use="required"/>
       <xs:attribute name="property"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="SampleStatistics" substitutionGroup="Statistics">
@@ -287,6 +288,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="IndexedSampleStatistics" substitutionGroup="Statistics">
@@ -295,6 +297,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="SampleStatistics"/>
       </xs:sequence>
       <xs:attribute name="name"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Results">
@@ -308,6 +311,7 @@
       <xs:attribute name="designPoint" use="required"/>
       <xs:attribute name="index"/>
       <xs:attribute name="job"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="DesignPoint">
@@ -320,6 +324,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Statistics"/>
       </xs:sequence>
       <xs:attribute name="index"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Replication">
@@ -328,6 +333,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Statistics"/>
       </xs:sequence>
       <xs:attribute name="index"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Script" type="xs:string"/>
@@ -337,6 +343,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="DesignPoint"/>
       </xs:sequence>
       <xs:attribute name="index"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Experiment">
@@ -373,11 +380,13 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="EventGraph">
     <xs:complexType mixed="true">
       <xs:attribute name="fileName"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="PasswordFile">
@@ -386,12 +395,14 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="User"/>
       </xs:sequence>
       <xs:attribute name="name" default="/tmp/passwd.xml"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="User">
     <xs:complexType>
       <xs:attribute name="name" use="required" type="xs:ID"/>
       <xs:attribute name="password" use="required"/>
+      <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <!-- simkit.xsd ============================================ -->
