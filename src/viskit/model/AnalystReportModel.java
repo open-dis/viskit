@@ -78,7 +78,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     private boolean debug = false;
 
     /** UTH - Assembly file */
-    private File assemblyFile;
+    private File   assemblyFile;
     
     private String assemblyName;
 
@@ -90,14 +90,14 @@ public final class AnalystReportModel extends MvcAbstractModel
     private Document reportJdomDocument;
 
     /** The file name selected by the user from "SAVE AS" menu option */
-    private String  analystReportFileXmlName;
-    private File    analystReportFileXml;
+    private String  analystReportXmFilelName;
+    private File    analystReportXmlFile;
 
     /** The root element of the report xml document */
     private Element rootElement;
-    private Element exececutiveSummaryElement;
+    private Element executiveSummaryElement;
     private Element simulationLocationElement;
-    private Element simulationConfigurationElement;
+    private Element assemblyConfigurationElement;
     private Element entityParametersElement;
     private Element behaviorDescriptionsElement;
     private Element statisticalResultsElement;
@@ -113,16 +113,22 @@ public final class AnalystReportModel extends MvcAbstractModel
     public static final String DIR                         = "dir";
     public static final String ENTITY_PARAMETERS           = "EntityParameters";
     public static final String ENTITY_PARAMETERS_TABLE     = "EntityParametersTable";
+    public static final String ENTITY_TABLE                = "EntityTable";
     public static final String EXECUTIVE_SUMMARY           = "ExecutiveSummary";
     public static final String HISTOGRAM_CHART             = "HistogramChart";
     public static final String IMAGE                       = "Image";
     public static final String LINEAR_REGRESSION_CHART     = "LinearRegressionChart";
     public static final String LOCATION                    = "Location";
     public static final String MULTI_PARAMETER             = "MultiParameter";
+    public static final String PARAMETER                   = "Parameter";
     public static final String PARAMETER_TABLES            = "ParameterTables";
     public static final String REPLICATION                 = "Replication";
     public static final String REPLICATION_REPORT          = "ReplicationReport";
+    public static final String SIM_ENTITY                  = "SimEntity";
     public static final String SIMULATION_CONFIGURATION    = "SimulationConfiguration";
+    public static final String SUMMARY                     = "Summary";
+    public static final String SUMMARY_REPORT              = "SummaryReport";
+    
     public static final String STATISTICAL_RESULTS         = "StatisticalResults";
     public static final String SUMMARY_RECORD              = "SummaryRecord";
     
@@ -133,10 +139,13 @@ public final class AnalystReportModel extends MvcAbstractModel
     public static final String DATE                        = "date";
     public static final String ENTITY                      = "entity";
     public static final String PROPERTY                    = "property";
-    public static final String SHOW_PARAMETER_TABLES       = "showParameterTables";
-    
+    public static final String REPLICATION_STATISTICS      = "replicationStatistics";
+    public static final String SUMMARY_STATISTICS          = "summaryStatistics";
+    public static final String SHOW_DESCRIPTION            = "showDescription";
+    public static final String SHOW_ENTITY_TABLE           = "showEntityTable";
     public static final String SHOW_IMAGES                 = "images";
-    public static final String NO_COMMENT_PROVIDED         = "no comment provided";
+    public static final String SHOW_PARAMETER_TABLES       = "showParameterTables";
+    public static final String NO_DESCRIPTION_PROVIDED     = "no description provided";
 
     /** Must have the order of the PCL as input from AssemblyModel */
     private Map<String, AssemblyNode> pclNodeCache;
@@ -218,7 +227,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         }
         assemblyName = newAnalystReportFileXml.getName().substring(0, newAnalystReportFileXml.getName().lastIndexOf("_AnalystReport"));
         try {
-            analystReportFileXml = newAnalystReportFileXml;
+            analystReportXmlFile = newAnalystReportFileXml;
             parseXML(newAnalystReportFileXml);
         } 
         catch (Exception ex) {
@@ -233,7 +242,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         reportJdomDocument.setRootElement(rootElement);
 
         fillDocument();
-        setDefaultValues();
+        setDefaultPanelValues();
     }
 
     private void fillDocument()
@@ -288,12 +297,12 @@ public final class AnalystReportModel extends MvcAbstractModel
     {
         reportJdomDocument                = EventGraphCache.instance().loadXML(file);
         rootElement                       = reportJdomDocument.getRootElement();
-        exececutiveSummaryElement         = rootElement.getChild(EXECUTIVE_SUMMARY);
+        executiveSummaryElement           = rootElement.getChild(EXECUTIVE_SUMMARY);
         simulationLocationElement         = rootElement.getChild(LOCATION);
-        simulationConfigurationElement    = rootElement.getChild("SimulationConfiguration");
+        assemblyConfigurationElement    = rootElement.getChild(SIMULATION_CONFIGURATION);
         entityParametersElement           = rootElement.getChild(ENTITY_PARAMETERS);
         behaviorDescriptionsElement       = rootElement.getChild(BEHAVIOR_DESCRIPTIONS);
-        statisticalResultsElement         = rootElement.getChild("StatisticalResults");
+        statisticalResultsElement         = rootElement.getChild(STATISTICAL_RESULTS);
         conclusionsRecommendationsElement = rootElement.getChild(CONCLUSIONS_RECOMMENDATIONS);
     }
 
@@ -314,18 +323,18 @@ public final class AnalystReportModel extends MvcAbstractModel
      */
     public void createExecutiveSummary()
     {
-        exececutiveSummaryElement = new Element(EXECUTIVE_SUMMARY);
-        exececutiveSummaryElement.setAttribute("comments", "true"); // TODO description
-        rootElement.addContent(exececutiveSummaryElement);
+        executiveSummaryElement = new Element(EXECUTIVE_SUMMARY);
+        executiveSummaryElement.setAttribute(SHOW_DESCRIPTION, "true");
+        rootElement.addContent(executiveSummaryElement);
     }
 
     /** Creates the SimulationLocation portion of the analyst report XML */
     public void createSimulationLocation()
     {
         simulationLocationElement = new Element(LOCATION);
-        simulationLocationElement.setAttribute("comments", "true"); // TODO description
+        simulationLocationElement.setAttribute(SHOW_DESCRIPTION, "true");
         simulationLocationElement.setAttribute(SHOW_IMAGES,   "true");
-        makeComments(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
+        makeCustomDescriptionElement(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
         makeProductionNotes(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
         makeConclusions(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
         rootElement.addContent(simulationLocationElement);
@@ -334,27 +343,27 @@ public final class AnalystReportModel extends MvcAbstractModel
     /** Creates the simulation configuration portion of the Analyst report XML */
     private void createSimulationConfiguration() 
     {
-        simulationConfigurationElement = new Element("SimulationConfiguration");
-        simulationConfigurationElement.setAttribute("comments", "true"); // TODO description
-        simulationConfigurationElement.setAttribute("image", "true");
-        simulationConfigurationElement.setAttribute("entityTable", "true");
-        makeComments(simulationConfigurationElement, "SC", ""); // TODO description
-        makeProductionNotes(simulationConfigurationElement, "SC", ""); // TODO SC -> SimulationConfiguration
-        makeConclusions(simulationConfigurationElement, "SC", "");
+        assemblyConfigurationElement = new Element(SIMULATION_CONFIGURATION);
+        assemblyConfigurationElement.setAttribute(SHOW_DESCRIPTION, "true");
+        assemblyConfigurationElement.setAttribute("image", "true");
+        assemblyConfigurationElement.setAttribute(SHOW_ENTITY_TABLE, "true");
+        makeCustomDescriptionElement(assemblyConfigurationElement, "SC", "");
+        makeProductionNotes(assemblyConfigurationElement, "SC", ""); // TODO SC -> SimulationConfiguration
+        makeConclusions(assemblyConfigurationElement, "SC", "");
         if (assemblyFile != null) {
-            simulationConfigurationElement.addContent(EventGraphCache.instance().getEntityTable());
+            assemblyConfigurationElement.addContent(EventGraphCache.instance().getEntityTable());
         }
 
-        rootElement.addContent(simulationConfigurationElement);
+        rootElement.addContent(assemblyConfigurationElement);
     }
 
     /** Creates the entity parameter section of this analyst report */
     private void createEntityParameters() 
     {
         entityParametersElement = new Element(ENTITY_PARAMETERS);
-        entityParametersElement.setAttribute("comments", "true"); // TODO description
+        entityParametersElement.setAttribute(SHOW_DESCRIPTION, "true");
         entityParametersElement.setAttribute(SHOW_PARAMETER_TABLES, "true");
-        makeComments(entityParametersElement, "EP", "");
+        makeCustomDescriptionElement(entityParametersElement, "EP", "");
         makeConclusions(entityParametersElement, "EP", "");
         if (assemblyFile != null) {
             entityParametersElement.addContent(makeParameterTables());
@@ -366,11 +375,11 @@ public final class AnalystReportModel extends MvcAbstractModel
     /** Creates the behavior descriptions portion of the report */
     private void createBehaviorDescriptions() {
         behaviorDescriptionsElement = new Element(BEHAVIOR_DESCRIPTIONS);
-        behaviorDescriptionsElement.setAttribute("comments", "true"); // TODO description
+        behaviorDescriptionsElement.setAttribute(SHOW_DESCRIPTION, "true");
         behaviorDescriptionsElement.setAttribute("descriptions", "true");
         behaviorDescriptionsElement.setAttribute("image", "true");
         behaviorDescriptionsElement.setAttribute("details", "true");
-        makeComments(behaviorDescriptionsElement,"BD", "");
+        makeCustomDescriptionElement(behaviorDescriptionsElement,"BD", "");
         makeConclusions(behaviorDescriptionsElement,"BD", "");
 
         behaviorDescriptionsElement.addContent(processBehaviors(true, true, true));
@@ -383,28 +392,28 @@ public final class AnalystReportModel extends MvcAbstractModel
     @SuppressWarnings("unchecked")
     private void createStatisticsResults() 
     {
-        statisticalResultsElement = new Element("StatisticalResults");
+        statisticalResultsElement = new Element(STATISTICAL_RESULTS);
         rootElement.addContent(statisticalResultsElement);
 
-        statisticalResultsElement.setAttribute("comments", "true"); // TODO description
-        statisticalResultsElement.setAttribute("replicationStats", "true"); // TODO full name
-        statisticalResultsElement.setAttribute("summaryStats", "true");     // TODO full name
-        makeComments(statisticalResultsElement,"SR", "");
+        statisticalResultsElement.setAttribute(SHOW_DESCRIPTION, "true");
+        statisticalResultsElement.setAttribute(REPLICATION_STATISTICS, "true"); // TODO full name
+        statisticalResultsElement.setAttribute(SUMMARY_STATISTICS, "true");     // TODO full name
+        makeCustomDescriptionElement(statisticalResultsElement,"SR", "");
         makeConclusions(statisticalResultsElement,"SR", "");
 
         if (statisticsReportPath != null && statisticsReportPath.length() > 0) {
             statisticalResultsElement.setAttribute("file", statisticsReportPath);
 
-            Element sumReport = new Element("SummaryReport");
-            List<Element> itr = statisticsReportDocument.getRootElement().getChildren("SimEntity");
+            Element sumReport = new Element(SUMMARY_REPORT);
+            List<Element> itr = statisticsReportDocument.getRootElement().getChildren(SIM_ENTITY);
             List<Element> summItr;
-            Element temp, summaryRecord, summStats;
+            Element temp, summaryRecord, summaryStatistics;
             for (Element entity : itr) {
                 temp = (Element) entity.clone();
-                temp.removeChildren("SummaryReport");
+                temp.removeChildren(SUMMARY_REPORT);
 
-                summStats = entity.getChild("SummaryReport");
-                summItr = summStats.getChildren("Summary");
+                summaryStatistics = entity.getChild(SUMMARY_REPORT);
+                summItr = summaryStatistics.getChildren(SUMMARY);
                 for (Element temp2 : summItr) {
                     summaryRecord = new Element(SUMMARY_RECORD);
                     summaryRecord.setAttribute(ENTITY, entity.getAttributeValue(NAME));
@@ -432,7 +441,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         Vector<String[]> r;
         String[] sa;
         Element repReports = statisticalResults.getChild("ReplicationReports");
-        List<Element> simEnts = repReports.getChildren("SimEntity");
+        List<Element> simEnts = repReports.getChildren(SIM_ENTITY);
         for (Element sEnt : simEnts) {
 
             se = new Vector<>(3);
@@ -463,7 +472,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     public List<String[]> unMakeStatisticsSummaryList(Element statisticalResults) {
         Vector<String[]> v = new Vector<>();
 
-        Element sumReports = statisticalResults.getChild("SummaryReport");
+        Element sumReports = statisticalResults.getChild(SUMMARY_REPORT);
         List<Element> recs = sumReports.getChildren(SUMMARY_RECORD);
         String[] sa;
         for (Element rec : recs) {
@@ -487,8 +496,8 @@ public final class AnalystReportModel extends MvcAbstractModel
      */
     private void createConclusionsRecommendations() {
         conclusionsRecommendationsElement = new Element(CONCLUSIONS_RECOMMENDATIONS);
-        conclusionsRecommendationsElement.setAttribute("comments", "true"); // TODO description
-        makeComments(conclusionsRecommendationsElement, "CR", "");
+        conclusionsRecommendationsElement.setAttribute(SHOW_DESCRIPTION, "true");
+        makeCustomDescriptionElement(conclusionsRecommendationsElement, "CR", "");
         makeConclusions(conclusionsRecommendationsElement, "CR", "");
         rootElement.addContent(conclusionsRecommendationsElement);
     }
@@ -507,32 +516,33 @@ public final class AnalystReportModel extends MvcAbstractModel
         Element behaviorElement, localRootElement, descriptionElement, parameterElement, stateVariable, eventGraphImageElement;
         String descriptionString, imagePath;
         Document tmpDocument;
-        List<Element> lre, lre2;
+        List<Element> localRootElementParameters, lre2;
         for (int i = 0; i < EventGraphCache.instance().getEventGraphNamesList().size(); i++) 
         {
             behaviorElement = new Element("Behavior");
             behaviorElement.setAttribute(NAME, EventGraphCache.instance().getEventGraphNamesList().get(i));
 
-            if (showDescription) {
+            if (showDescription)
+            {
                 tmpDocument = EventGraphCache.instance().loadXML(EventGraphCache.instance().getEventGraphFilesList().get(i));
                 localRootElement = tmpDocument.getRootElement();
 
                 // prevent returning a null if there was no attribute value
-                descriptionString = (localRootElement.getChildText("Comment") == null) ? NO_COMMENT_PROVIDED : localRootElement.getChildText("Comment");
+                descriptionString = (localRootElement.getChildText("Description") == null) ? NO_DESCRIPTION_PROVIDED : localRootElement.getChildText("Description");
 
                 descriptionElement = new Element("description");
                 descriptionElement.setAttribute("text", descriptionString);
                 behaviorElement.addContent(descriptionElement);
 
                 if (showAllDetails) {
-                    lre = localRootElement.getChildren("Parameter");
-                    for (Element temp : lre) {
-                        parameterElement = new Element("parameter");
+                    localRootElementParameters = localRootElement.getChildren(PARAMETER);
+                    for (Element temp : localRootElementParameters) {
+                        parameterElement = new Element(PARAMETER);
                         parameterElement.setAttribute(NAME, temp.getAttributeValue(NAME));
                         parameterElement.setAttribute("type", temp.getAttributeValue("type"));
 
                         // The data "null" is not legal for a JDOM attribute
-                        parameterElement.setAttribute("description", (temp.getChildText("Comment") == null) ? NO_COMMENT_PROVIDED : temp.getChildText("Comment"));
+                        parameterElement.setAttribute("description", (temp.getChildText("Description") == null) ? NO_DESCRIPTION_PROVIDED : temp.getChildText("Description"));
                         behaviorElement.addContent(parameterElement);
                     }
                     lre2 = localRootElement.getChildren("StateVariable");
@@ -542,7 +552,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                         stateVariable.setAttribute("type", temp.getAttributeValue("type"));
 
                         // The data "null" is not legal for a JDOM attribute
-                        stateVariable.setAttribute("description", (temp.getChildText("Comment") == null) ? NO_COMMENT_PROVIDED : temp.getChildText("Comment"));
+                        stateVariable.setAttribute("description", (temp.getChildText("Description") == null) ? NO_DESCRIPTION_PROVIDED : temp.getChildText("Description"));
                         behaviorElement.addContent(stateVariable);
                     }
                 }
@@ -589,7 +599,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                 descriptionText    = descriptionElement.getAttributeValue("text");
                 behaviorArrayList.add(descriptionText);
 
-                parameterElementList = behavior.getChildren("parameter");
+                parameterElementList = behavior.getChildren(PARAMETER);
 
                 parameterArrayList = new ArrayList<>();
                 for (Element parameterElement : parameterElementList) {
@@ -638,7 +648,7 @@ public final class AnalystReportModel extends MvcAbstractModel
             elementList_0 = e_0.getChildren();       //list of parts: class/id/phys/dynam
             v_0 = new Vector<>(elementList_0.size());
             for(Element e_1 : elementList_0) {
-                elementList_1 = e_1.getChildren("parameter");     // list of param elms
+                elementList_1 = e_1.getChildren(PARAMETER);     // list of param elms
 
                 v_1 = new Vector<>(elementList_1.size());
                 for(Element e_2 : elementList_1) {
@@ -668,7 +678,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     private Element makeTablesCommon(String tableName) {
         Element table = new Element(tableName);
         Element localRootElement = EventGraphCache.instance().getAssemblyDocument().getRootElement();
-        List<Element> simEntityList = localRootElement.getChildren("SimEntity");
+        List<Element> simEntityList = localRootElement.getChildren(SIM_ENTITY);
         String entityName;
         List<Element> entityParametersElementList;
         for (Element temp : simEntityList) {
@@ -738,7 +748,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         Element parameterElement;
         for (Element temp : dataList) {
             if (!temp.getAttributeValue("value").equals("0")) {
-                parameterElement = new Element("parameter");
+                parameterElement = new Element(PARAMETER);
                 parameterElement.setAttribute(NAME, temp.getAttributeValue(NAME));
                 parameterElement.setAttribute("value", temp.getAttributeValue("value"));
 
@@ -753,20 +763,20 @@ public final class AnalystReportModel extends MvcAbstractModel
     public String[][] unMakeEntityTable() 
     {
         String[][] emptyResult = new String[0][0];
-        if (simulationConfigurationElement == null)
+        if (assemblyConfigurationElement == null)
         {
             LOG.error("AnalystReportModel unMakeEntityTable() simulationConfigurationElement is null");
             return emptyResult;
         }
-        if (!simulationConfigurationElement.getChildren().isEmpty())
+        if (!assemblyConfigurationElement.getChildren().isEmpty())
         {
-            Element element = simulationConfigurationElement.getChild("EntityTable");
+            Element element = assemblyConfigurationElement.getChild(ENTITY_TABLE);
             if (element == null)
             {
                 LOG.error("AnalystReportModel unMakeEntityTable() simulationConfigurationElement EntityTable is null");
                 return emptyResult;
             }
-            List<Element> elementsList = element.getChildren("SimEntity");
+            List<Element> elementsList = element.getChildren(SIM_ENTITY);
 
             String[][] sa = new String[elementsList.size()][2];
             int i = 0;
@@ -791,7 +801,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     private Element makeReplicationReport() 
     {
         Element replicatioReportsElement = new Element("ReplicationReports");
-        List<Element> simEntitiesElementList = statisticsReportDocument.getRootElement().getChildren("SimEntity");
+        List<Element> simEntitiesElementList = statisticsReportDocument.getRootElement().getChildren(SIM_ENTITY);
 
         // variables for JFreeChart construction
         HistogramChart histogramChart = new HistogramChart();
@@ -819,7 +829,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                         }
                     }
                 }
-                entityElement = new Element("SimEntity");
+                entityElement = new Element(SIM_ENTITY);
                 entityElement.setAttribute(NAME, simEntityElement.getAttributeValue(NAME));
                 entityElement.setAttribute(PROPERTY, dataPointProperty);
                 replicationReportsElementList = dataPoint.getChildren(REPLICATION_REPORT);
@@ -908,27 +918,32 @@ public final class AnalystReportModel extends MvcAbstractModel
     }
 
     /**
-     * Creates a standard 'Comments' element used by all sections of the report
-     * to add comments.  TODO rename as Description for correctness.
+     * Creates a standard 'Description' element used by all sections of the report
+     * to add descriptions.  TODO rename as Description for correctness.
      *
-     * @param parent
-     * @param descriptionTag  the tag used to identify unique Comments (used by XSLT)
-     * @param descriptionText the text comments
+     * @param parent parentElement
+     * @param descriptionTag  the tag used to identify unique Description elements (used by XSLT)
+     * @param descriptionText the text descriptions
      */
-    public void makeComments(Element parent, String descriptionTag, String descriptionText) {
-        replaceChild(parent, _makeContent(descriptionTag, "Comments", descriptionText));
+    public void makeCustomDescriptionElement(Element parent, String descriptionTag, String descriptionText)
+    {
+        Element newElement = _makeElementContent(descriptionTag, "Description", descriptionText);
+        replaceChild(parent, newElement);
     }
 
-    /** @param descriptionTag the comment Element, which actually contains description
-     * @param descriptionText the comment text, which actually contains description
-     * @return the Comments Element
-     */
-    public Element xmakeComments(String descriptionTag, String descriptionText) {
-        return _makeContent(descriptionTag, "Comments", descriptionText);
-    }
+//    /** Unused
+//     * @param descriptionTag the comment Element, which actually contains description
+//     * @param descriptionText the comment text, which actually contains description
+//     * @return the Comments Element
+//     */
+//    public Element xmakeComments(String descriptionTag, String descriptionText) 
+//    {
+//        return _makeElementContent(descriptionTag, "Description", descriptionText);
+//    }
 
-    private String unMakeComments(Element element) {
-        return _unMakeContent(element, "Comments");
+    private String unMakeCustomDescriptionElements(Element element) 
+    {
+        return _unMakeContent(element, "Description");
     }
 
     /**
@@ -940,11 +955,11 @@ public final class AnalystReportModel extends MvcAbstractModel
      * @return conclusions the Comments embedded in well formed XML
      */
     public Element xmakeConclusions(String commentTag, String conclusionText) {
-        return _makeContent(commentTag,"Conclusions",conclusionText);
+        return _makeElementContent(commentTag,"Conclusions",conclusionText);
     }
 
     public void makeConclusions(Element parent, String commentTag, String conclusionText) {
-        replaceChild(parent,_makeContent(commentTag,"Conclusions",conclusionText));
+        replaceChild(parent,_makeElementContent(commentTag,"Conclusions",conclusionText));
     }
 
     /** @param element the Element to extract information from
@@ -963,7 +978,7 @@ public final class AnalystReportModel extends MvcAbstractModel
      * @return the ProductionNotes Element
      */
     public Element xmakeProductionNotes(String productionNotesTag, String productionNotesText) {
-        return _makeContent(productionNotesTag, "ProductionNotes", productionNotesText);
+        return _makeElementContent(productionNotesTag, "ProductionNotes", productionNotesText);
     }
 
     /**
@@ -975,42 +990,44 @@ public final class AnalystReportModel extends MvcAbstractModel
      * @param productionNotesText author's text block
      */
     public void makeProductionNotes(Element parentElement, String productionNotesTag, String productionNotesText) {
-        replaceChild(parentElement, _makeContent(productionNotesTag, "ProductionNotes", productionNotesText));
+        replaceChild(parentElement, _makeElementContent(productionNotesTag, "ProductionNotes", productionNotesText));
     }
 
     public String unMakeProductionNotes(Element e) {
         return _unMakeContent(e, "ProductionNotes");
     }
 
-    private Element _makeContent(String commentTag, String suffix, String commentText) {
-        Element comments = new Element((commentTag + suffix));
-        comments.setAttribute("text", commentText);
-        return comments;
+    private Element _makeElementContent(String elementPrefix, String suffix, String textValue) {
+        Element newElement = new Element((elementPrefix + suffix));
+        newElement.setAttribute("text", textValue);
+        return newElement;
     }
 
-    private String _unMakeContent(Element e, String suffix) {
-        return _unMakeContent(e,suffix,"text");
+    private String _unMakeContent(Element element, String suffix) {
+        return _unMakeContent(element,suffix,"text");
     }
 
-    private String _unMakeContent(Element e, String suffix, String attrName) {
-        if (e == null) {return "";}
-        List content = e.getContent();
+    private String _unMakeContent(Element element, String suffix, String attrName) 
+    {
+        if (element == null) {return "";}
+        List content = element.getContent();
         Object o;
-        Element celem;
+        Element contentELement;
         for (Iterator itr = content.iterator(); itr.hasNext();) {
             o = itr.next();
             if (!(o instanceof Element)) {
                 continue;
             }
-            celem = (Element) o;
-            if (celem.getName().endsWith(suffix)) {
-                return celem.getAttributeValue(attrName);
+            contentELement = (Element) o;
+            if (contentELement.getName().endsWith(suffix)) {
+                return contentELement.getAttributeValue(attrName);
             }
         }
         return "";
     }
 
-    private void replaceChild(Element parentElement, Element childElement) {
+    private void replaceChild(Element parentElement, Element childElement)
+    {
         if (parentElement == null)
             return;
 
@@ -1021,71 +1038,69 @@ public final class AnalystReportModel extends MvcAbstractModel
     /**
      * TODO: Change this to put in appropriate sample text
      */
-    private void setDefaultValues() {
+    private void setDefaultPanelValues() 
+    {
         //Header values
-        setReportName ("***ENTER REPORT TITLE HERE***");
-        setAccessLabel("***ENTER ACCESS LABEL HERE***");
-        setAuthor     ("***ENTER NAME OF AUTHOR HERE***");
-        setDateOfReport(DateFormat.getInstance().format(new Date()));
+        setReportName         ("***ENTER REPORT TITLE HERE***");
+        setDocumentAccessLabel("***ENTER ACCESS LABEL HERE***");
+        setAuthor             ("***ENTER NAME OF AUTHOR HERE***");
+        setDateOfReport       (DateFormat.getInstance().format(new Date()));
+        setDocumentAccessLabel("");
 
-        //Executive Summary values
-        setExecutiveSummaryCommentsVisible(true);
-        setExecutiveSummary("***ENTER EXECUTIVE SUMMARY HERE***");
+        setShowExecutiveSummary(true);
+        setExecutiveSummary   ("***ENTER EXECUTIVE SUMMARY HERE***");
 
-        //SimulationLocation Values
-        setPrintSimulationLocationComments(true);
-        setPrintSimulationLocationImage(true);
-        setSimulationLocationDescription("***ENTER SIMULATION LOCATION DESCRIPTION HERE***");
-        setSimulationLocationConclusions("***ENTER SIMULATION LOCATION CONCLUSIONS HERE***");
-        setSimulationLocationProductionNotes("***ENTER SIMULATION PRODUCTION NOTES HERE***");
-        //setChartImage(""); // TODO:  generate nauthical chart image, set file location
+        setScenarioLocationIncluded(true);
+        setShowScenarioLocationImage(true);
+        setScenarioLocationConclusions    ("***ENTER SCENARIO LOCATION CONCLUSIONS HERE***");
+        setScenarioLocationProductionNotes("***ENTER SIMULATION PRODUCTION NOTES HERE***");
+        //setChartImage(""); // TODO: generate nauthical chart image, set file location
 
-        //Simulation Configuration Values
-        setPrintSimulationConfigurationComments(true);
-        setPrintAssemblyImage(true);
-        setPrintEntityTable(true);
-        setSimulationConfigurationDescription("***ENTER ASSEMBLY CONFIGURATION DESCRIPTION HERE***");
-        setSimulationConfigurationConclusions("***ENTER ASSEMBLY CONFIGURATION CONCLUSIONS HERE***");
-        setSimulationConfigationProductionNotes("***ENTER ASSEMBLY CONFIGURATION PRODUCTION NOTES HERE***");
+        setAssemblyConfigurationIncluded(true);
+        setShowAssemblyConfigurationImage(true);
+        setShowAssemblyEntityTable(true);
+        setAssemblyDesignConsiderations       ("***ENTER ASSEMBLY DESIGN CONSIDERATIONS HERE***");
+        setAssemblyConfigationProductionNotes ("***ENTER ASSEMBLY CONFIGURATION PRODUCTION NOTES HERE***");
+        setAssemblyConfigurationConclusions   ("***ENTER ASSEMBLY CONFIGURATION CONCLUSIONS HERE***");
 
         //Entity Parameters values
-        setPrintParameterComments(true);
-        setPrintParameterTable(true);
-        setParameterDescription("***ENTER ENTITY PARAMETER DESCRIPTION HERE***");
-        setParameterConclusions("***ENTER ENTITY PARAMETER CONCLUSIONS HERE***");
+        setShowEntityParametersDescription(true);
+        setShowEntityParametersTable(true);
+        setEntityParametersDescription("***ENTER ENTITY PARAMETER DESCRIPTION HERE***");
+        setEntityParametersConclusions("***ENTER ENTITY PARAMETER CONCLUSIONS HERE***");
 
         //BehaviorParameter values
-        setPrintBehaviorDefComments(true);
+        setShowBehaviorDesignAnalysisDescriptions(true);
         setShowEventGraphImages(true);
         setShowBehaviorDescriptions(true);
-        setPrintEventGraphDetails(true);
+        setShowEventGraphDetails(true);
         setBehaviorDescription("***ENTER ENTITY BEHAVIOR DESCRIPTION HERE***");
         setBehaviorConclusions("***ENTER ENTITY BEHAVIOR CONCLUSIONS HERE***");
 
         //StatisticalResults values
-        setPrintStatisticsComments(true);
-        setPrintReplicationStatistics(true);
-        setPrintSummaryStatistics(true);
+        setShowStatisticsDescriptionAnalysis(true);
+        setShowReplicationStatistics(true);
+        setShowSummaryStatistics(true);
         setStatisticsDescription("***ENTER STATISTICAL RESULTS DESCRIPTION HERE***");
         setStatisticsConclusions("***ENTER STATISTICAL RESULTS CONCLUSIONS HERE***");
 
         //Recommendations/Conclusions
-        setPrintRecommendationsConclusions(true);
+        setShowRecommendationsConclusions(true);
         setConclusions    ("***ENTER ANALYST CONCLUSIONS HERE***");
         setRecommendations("***ENTER RECOMMENDATIONS FOR FUTURE WORK HERE***");
     }
 
-    public boolean isDebug()                     {return debug;}
+    public boolean isDebug()                         {return debug;}
 
-    public Document   getReportJdomDocument()    {return reportJdomDocument;}
-    public Document   getStatisticsReport()      {return statisticsReportDocument;}
-    public Element    getRootElement()           {return rootElement;}
-    public String     getAnalystReportFileXmlName() {return analystReportFileXmlName;}
-    public File       getAnalystReportXmlFile()     {return analystReportFileXml;}
-    public String     getAuthor()                {return rootElement.getAttributeValue(AUTHOR);}
-    public String     getAccess()                {return rootElement.getAttributeValue(ACCESS);}
-    public String     getDateOfReport()          {return rootElement.getAttributeValue(DATE);}
-    public String     getReportName()            {return rootElement.getAttributeValue(NAME);}
+    public Document   getReportJdomDocument()        {return reportJdomDocument;}
+    public Document   getStatisticsReport()          {return statisticsReportDocument;}
+    public Element    getRootElement()               {return rootElement;}
+    public String     getAnalystReportFileXmlName()  {return analystReportXmFilelName;}
+    public File       getAnalystReportXmlFile()      {return analystReportXmlFile;}
+    public String     getAuthor()                    {return rootElement.getAttributeValue(AUTHOR);}
+    public String     getDocumentAccessLabel()       {return rootElement.getAttributeValue(ACCESS);}
+    public String     getDateOfReport()              {return rootElement.getAttributeValue(DATE);}
+    public String     getReportName()                {return rootElement.getAttributeValue(NAME);}
 
     /**
      * Called twice.  Once for preliminary Analyst Report, then for full integration Analyst Report.
@@ -1098,10 +1113,10 @@ public final class AnalystReportModel extends MvcAbstractModel
         // Subsequent calls within the same runtime require a cleared cache
         // which this does
         EventGraphCache.instance().makeEntityTable(assemblyFile);
-        if (simulationConfigurationElement == null)
+        if (assemblyConfigurationElement == null)
             return; // stats report not set for recording
 
-        simulationConfigurationElement.addContent(EventGraphCache.instance().getEntityTable());
+        assemblyConfigurationElement.addContent(EventGraphCache.instance().getEntityTable());
         entityParametersElement.addContent(makeParameterTables());
         createBehaviorDescriptions();
     }
@@ -1257,117 +1272,128 @@ public final class AnalystReportModel extends MvcAbstractModel
     }
 
     public void setAnalystReportFileName      (String newAnalystReportFileName) 
-                                              { this.analystReportFileXmlName = newAnalystReportFileName; }
+                                              { this.analystReportXmFilelName = newAnalystReportFileName; }
     public void setAnalystReportFile          (File newAnalystReportFile) 
-                                              { this.analystReportFileXml     = newAnalystReportFile; }
+                                              { this.analystReportXmlFile     = newAnalystReportFile; }
     public void setStatisticsReportDocument   (Document newStatisticsReportDocument)      
                                               { this.statisticsReportDocument = newStatisticsReportDocument; }
     public void setStatisticsReportPath       (String filePath)           { this.statisticsReportPath = filePath; }
     public void setAuthor                     (String s) { rootElement.setAttribute(AUTHOR, s); };
-    public void setAccessLabel                (String s) { rootElement.setAttribute(ACCESS, s);}
+    public void setDocumentAccessLabel        (String s) { rootElement.setAttribute(ACCESS, s);}
     public void setDateOfReport               (String s) { rootElement.setAttribute(DATE, s);}
     public void setDebug                      (boolean bool) { this.debug = bool; }
     public void setReportName                 (String s) { rootElement.setAttribute(NAME, s); }
 
-    public boolean isPrintRecommendationsConclusions() { return stringToBoolean(conclusionsRecommendationsElement.getAttributeValue("comments")); } // TODO description
-    public String  getConclusions()                    { return unMakeComments(conclusionsRecommendationsElement);}
+    public boolean isShowRecommendationsConclusions() { return stringToBoolean(conclusionsRecommendationsElement.getAttributeValue(SHOW_DESCRIPTION)); }
+    public String  getConclusions()                    { return unMakeCustomDescriptionElements(conclusionsRecommendationsElement);}
     public String  getRecommendations()                { return unMakeConclusions(conclusionsRecommendationsElement);}
-    public void setPrintRecommendationsConclusions(boolean bool) { conclusionsRecommendationsElement.setAttribute("comments", booleanToString(bool)); } // TODO description
-    public void setConclusions                     (String s)     { makeComments(conclusionsRecommendationsElement,"CR", s); }   // watch the wording
+    public void setShowRecommendationsConclusions(boolean bool) { conclusionsRecommendationsElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool)); }
+    public void setConclusions                     (String s)     { makeCustomDescriptionElement(conclusionsRecommendationsElement,"CR", s); }   // watch the wording
     public void setRecommendations                 (String s)     { makeConclusions(conclusionsRecommendationsElement,"CR", s); }
 
     // exec summary:
-    // good
-    public boolean isExecutiveSummaryCommentsVisible() { return stringToBoolean(exececutiveSummaryElement.getAttributeValue("comments"));} // TODO description
-    public void    setExecutiveSummaryCommentsVisible  (boolean bool) {exececutiveSummaryElement.setAttribute("comments", booleanToString(bool));} // TODO description
-    public String  getExecutiveSummary() { return unMakeComments(exececutiveSummaryElement);}
-    public void    setExecutiveSummary   (String s) { makeComments(exececutiveSummaryElement,"ES", s);} // TODO description
+    public boolean isShowExecutiveSummary() 
+    { 
+        if  (executiveSummaryElement.getAttributeValue(SHOW_DESCRIPTION) == null)
+             return true; // default
+        else return stringToBoolean(executiveSummaryElement.getAttributeValue(SHOW_DESCRIPTION));
+    }
+    public void    setShowExecutiveSummary  (boolean bool) 
+    {
+        executiveSummaryElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool));
+    }
+    public String  getExecutiveSummary() 
+    { 
+        return unMakeCustomDescriptionElements(executiveSummaryElement);
+    }
+    public void    setExecutiveSummary   (String s) 
+    { 
+        makeCustomDescriptionElement(executiveSummaryElement,"ES", s);
+    }
 
     // sim-location:
-    // good
-    public boolean isPrintSimulationLocationComments() {return stringToBoolean(simulationLocationElement.getAttributeValue("comments"));} // TODO description
-    public void    setPrintSimulationLocationComments  (boolean bool) {simulationLocationElement.setAttribute("comments", booleanToString(bool));} // TODO description
-    public boolean isPrintSimulationLocationImage()    {return stringToBoolean(simulationLocationElement.getAttributeValue("images"));}
-    public void    setPrintSimulationLocationImage     (boolean bool) {simulationLocationElement.setAttribute("images", booleanToString(bool));}
+    public boolean isShowScenarioLocationDescription() {return stringToBoolean(simulationLocationElement.getAttributeValue(SHOW_DESCRIPTION));}
+    public void    setScenarioLocationIncluded  (boolean bool) {simulationLocationElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool));}
+    public boolean isShowScenarioLocationImage()    {return stringToBoolean(simulationLocationElement.getAttributeValue("images"));}
+    public void    setShowScenarioLocationImage     (boolean bool) {simulationLocationElement.setAttribute("images", booleanToString(bool));}
 
-    public String  getSimulationLocationComments()        {return unMakeComments(simulationLocationElement);}
-    public String  getSimulationLocationConclusions()     {return unMakeConclusions(simulationLocationElement);}
-    public String  getSimulationLocationProductionNotes() {return unMakeProductionNotes(simulationLocationElement);}
+    public String  getScenarioLocationDescription()        {return unMakeCustomDescriptionElements(simulationLocationElement);}
+    public String  getScenarioLocationConclusions()     {return unMakeConclusions(simulationLocationElement);}
+    public String  getScenarioLocationProductionNotes() {return unMakeProductionNotes(simulationLocationElement);}
     public String  getLocationImage()              {return unMakeImage(simulationLocationElement, LOCATION);}
     public String  getChartImage()                 {return unMakeImage(simulationLocationElement, CHART);}
-    public void setSimulationLocationDescription  (String s)    {makeComments(simulationLocationElement, "SL", s);}
-    public void setSimulationLocationConclusions  (String s)    {makeConclusions(simulationLocationElement, "SL", s);}
-    public void setSimulationLocationProductionNotes(String s)  {makeProductionNotes(simulationLocationElement, "SL", s);}
+    public void setScenarioLocationDescription  (String s)    {makeCustomDescriptionElement(simulationLocationElement, "SL", s);}
+    public void setScenarioLocationConclusions  (String s)    {makeConclusions(simulationLocationElement, "SL", s);}
+    public void setScenarioLocationProductionNotes(String s)  {makeProductionNotes(simulationLocationElement, "SL", s);}
     public void setLocationImage           (String s)    {replaceChild(simulationLocationElement, makeImageElement(LOCATION, s)); }
     public void setChartImage              (String s)    {replaceChild(simulationLocationElement, makeImageElement(CHART, s)); }
 
     // entity-parameters
-    //good
-    public boolean isPrintParameterComments() { return stringToBoolean(entityParametersElement.getAttributeValue("comments"));} // TODO description
-    public boolean isPrintParameterTable()    { return stringToBoolean(entityParametersElement.getAttributeValue(SHOW_PARAMETER_TABLES)); }
-    public void   setPrintParameterComments   (boolean bool) { entityParametersElement.setAttribute("comments", booleanToString(bool)); } // TODO description
-    public void   setPrintParameterTable      (boolean bool) { entityParametersElement.setAttribute("parameterTables", booleanToString(bool)); }
+    public boolean isShowEntitypParametersDescription() { return stringToBoolean(entityParametersElement.getAttributeValue(SHOW_DESCRIPTION));}
+    public boolean isShowEntityParametersTable()        { return stringToBoolean(entityParametersElement.getAttributeValue(SHOW_PARAMETER_TABLES)); }
+    public void   setShowEntityParametersDescription    (boolean bool) { entityParametersElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool)); }
+    public void   setShowEntityParametersTable          (boolean bool) { entityParametersElement.setAttribute("parameterTables", booleanToString(bool)); }
 
-    public String  getParameterComments()    { return unMakeComments(entityParametersElement);} // TODO description
-    public String  getParameterConclusions() { return unMakeConclusions(entityParametersElement);}
-    public Vector<Object[]> getParameterTables() {return unMakeParameterTables(entityParametersElement);}
-    public void setParameterDescription         (String s){ makeComments(entityParametersElement,"EP", s); }
-    public void setParameterConclusions      (String s){ makeConclusions(entityParametersElement,"EP", s); }
+    public String  getParameterComments()    { return unMakeCustomDescriptionElements(entityParametersElement);} // TODO check, apparent mismatch
+    public String  getParameterConclusions() { return unMakeConclusions(entityParametersElement);}               // TODO check, apparent mismatch
+    public Vector<Object[]> getEntityParameterTables() {return unMakeParameterTables(entityParametersElement);}
+    public void setEntityParametersDescription         (String s){ makeCustomDescriptionElement(entityParametersElement,"EP", s); }
+    public void setEntityParametersConclusions      (String s){ makeConclusions(entityParametersElement,"EP", s); }
 
     // behavior descriptions:
     //good
-    public boolean isPrintBehaviorDefComments()             { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("comments"));} // TODO description
-    public void   setPrintBehaviorDefComments(boolean bool) { behaviorDescriptionsElement.setAttribute("comments", booleanToString(bool)); } // TODO description
+    public boolean isShowBehaviorDesignAnalysisDescriptions()             { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue(SHOW_DESCRIPTION));}
+    public void   setShowBehaviorDesignAnalysisDescriptions(boolean bool) { behaviorDescriptionsElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool)); }
 
     public boolean isShowBehaviorDescriptions() { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("descriptions"));}
-    public boolean isPrintEventGraphDetails()    { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("details"));}
+    public boolean isShowEventGraphDetails()    { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("details"));}
     public boolean isShowEventGraphImages()     { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue("image"));}
     public void   setShowBehaviorDescriptions (boolean bool) { behaviorDescriptionsElement.setAttribute("descriptions", booleanToString(bool)); }
-    public void   setPrintEventGraphDetails    (boolean bool) { behaviorDescriptionsElement.setAttribute("details", booleanToString(bool)); }
+    public void   setShowEventGraphDetails    (boolean bool) { behaviorDescriptionsElement.setAttribute("details", booleanToString(bool)); }
     public void   setShowEventGraphImages     (boolean bool) { behaviorDescriptionsElement.setAttribute("image", booleanToString(bool)); }
 
-    public String  getBehaviorComments()             { return unMakeComments(behaviorDescriptionsElement); }
+    public String  getBehaviorDescription()             { return unMakeCustomDescriptionElements(behaviorDescriptionsElement); }
     public String  getBehaviorConclusions()          { return unMakeConclusions(behaviorDescriptionsElement); }
-    public void    setBehaviorDescription (String s) { makeComments(behaviorDescriptionsElement,"BD", s); }
+    public void    setBehaviorDescription (String s) { makeCustomDescriptionElement(behaviorDescriptionsElement,"BD", s); }
     public void    setBehaviorConclusions (String s) { makeConclusions(behaviorDescriptionsElement,"BD", s); }
     public List    getBehaviorList()                 { return unMakeBehaviorList(behaviorDescriptionsElement); }
     // sim-config:
     //good
-    public boolean isPrintSimulationConfigurationComments() { return stringToBoolean(simulationConfigurationElement.getAttributeValue("comments"));} // TODO description
-    public boolean isPrintEntityTable()       { return stringToBoolean(simulationConfigurationElement.getAttributeValue("entityTable"));}
-    public boolean isPrintAssemblyImage()     { return stringToBoolean(simulationConfigurationElement.getAttributeValue("image"));}
-    public void    setPrintSimulationConfigurationComments  (boolean bool) { simulationConfigurationElement.setAttribute("comments", booleanToString(bool));} // TODO description
-    public void    setPrintEntityTable        (boolean bool) { simulationConfigurationElement.setAttribute("entityTable", booleanToString(bool)); }
-    public void    setPrintAssemblyImage      (boolean bool) { simulationConfigurationElement.setAttribute("image", booleanToString(bool)); }
+    public boolean isShowAssemblyConfigurationDescription() { return stringToBoolean(assemblyConfigurationElement.getAttributeValue(SHOW_DESCRIPTION));}
+    public boolean isShowAssemblyEntityTable()       { return stringToBoolean(assemblyConfigurationElement.getAttributeValue(SHOW_ENTITY_TABLE));}
+    public boolean isShowAssemblyImage()             { return stringToBoolean(assemblyConfigurationElement.getAttributeValue("image"));}
+    public void    setAssemblyConfigurationIncluded  (boolean bool) { assemblyConfigurationElement.setAttribute(SHOW_DESCRIPTION, booleanToString(bool));}
+    public void    setShowAssemblyEntityTable        (boolean bool) { assemblyConfigurationElement.setAttribute(SHOW_ENTITY_TABLE, booleanToString(bool)); }
+    public void    setShowAssemblyConfigurationImage      (boolean bool) { assemblyConfigurationElement.setAttribute("image", booleanToString(bool)); }
 
-    public String     getSimulationConfigurationComments()        {return unMakeComments(simulationConfigurationElement);}
+    public String     getSimulationConfigurationComments()        {return unMakeCustomDescriptionElements(assemblyConfigurationElement);}
     public String[][] getSimulationConfigurationEntityTable()     {return unMakeEntityTable();}
-    public String     getSimulationConfigurationConclusions()     {return unMakeConclusions(simulationConfigurationElement);}
-    public String     getSimulationConfigurationProductionNotes() {return unMakeProductionNotes(simulationConfigurationElement);}
-    public String     getAssemblyImageLocation()                  {return unMakeImage(simulationConfigurationElement, "Assembly");}
+    public String     getSimulationConfigurationConclusions()     {return unMakeConclusions(assemblyConfigurationElement);}
+    public String     getSimulationConfigurationProductionNotes() {return unMakeProductionNotes(assemblyConfigurationElement);}
+    public String     getAssemblyImageLocation()                  {return unMakeImage(assemblyConfigurationElement, "Assembly");}
 
-    public void    setSimulationConfigurationDescription  (String s) { makeComments(simulationConfigurationElement, "SC", s); }
-    public void    setSimulationConfigurationEntityTable  (String s) { }; //todo
-    public void    setSimulationConfigurationConclusions  (String s) { makeConclusions(simulationConfigurationElement, "SC", s); }
-    public void    setSimulationConfigationProductionNotes(String s) {makeProductionNotes(simulationConfigurationElement, "SC", s);}
-    public void    setAssemblyImageLocation        (String s) {replaceChild(simulationConfigurationElement, makeImageElement("Assembly", s));}
+    public void    setAssemblyDesignConsiderations  (String s) { makeCustomDescriptionElement(assemblyConfigurationElement, "SC", s); }
+    public void    setSimulationConfigurationEntityTable  (String s) { }; //todo//todo
+    public void    setAssemblyConfigurationConclusions  (String s) { makeConclusions(assemblyConfigurationElement, "SC", s); }
+    public void    setAssemblyConfigationProductionNotes(String s) {makeProductionNotes(assemblyConfigurationElement, "SC", s);}
+    public void    setAssemblyImageLocation        (String s) {replaceChild(assemblyConfigurationElement, makeImageElement("Assembly", s));}
 
     // stat results:
     // good
-    public boolean isPrintReplicationStatistics() { return stringToBoolean(statisticalResultsElement.getAttributeValue("replicationStats")); }
-    public boolean isPrintStatisticsComments()    { return stringToBoolean(statisticalResultsElement.getAttributeValue("comments")); } // TODO description
-    public boolean isPrintSummaryStatistics()     { return stringToBoolean(statisticalResultsElement.getAttributeValue("summaryStats")); }
-    public boolean isPrintStatisticsCharts()      { return stringToBoolean(statisticalResultsElement.getAttributeValue("charts")); }
+    public boolean isShowReplicationStatistics() { return stringToBoolean(statisticalResultsElement.getAttributeValue(REPLICATION_STATISTICS)); }
+    public boolean isShowStatiisticalResultsDescriptionAnalysis()    { return stringToBoolean(statisticalResultsElement.getAttributeValue(SHOW_DESCRIPTION)); }
+    public boolean isShowSummaryStatistics()     { return stringToBoolean(statisticalResultsElement.getAttributeValue(SUMMARY_STATISTICS)); }
+    public boolean isShowStatisticsCharts()      { return stringToBoolean(statisticalResultsElement.getAttributeValue("charts")); }
     //todo later public boolean isOverlayStatsCharts()    { return stringToBoolean(statisticalResults.getAttributeValue("overlay")); }
-    public void setPrintReplicationStatistics   (boolean bool) { statisticalResultsElement.setAttribute("replicationStats", booleanToString(bool)); }
-    public void setPrintStatisticsComments      (boolean bool) { statisticalResultsElement.setAttribute("comments", booleanToString(bool)); } // TODO description
-    public void setPrintSummaryStatistics       (boolean bool) { statisticalResultsElement.setAttribute("summaryStats", booleanToString(bool)); }
-    public void setPrintStatisticsCharts        (boolean bool) { statisticalResultsElement.setAttribute("charts", booleanToString(bool)); }
+    public void setShowReplicationStatistics   (boolean bool) { statisticalResultsElement.setAttribute(REPLICATION_STATISTICS, booleanToString(bool)); }
+    public void setShowStatisticsDescriptionAnalysis      (boolean bool) { statisticalResultsElement.setAttribute(SHOW_DESCRIPTION ,booleanToString(bool)); }
+    public void setShowSummaryStatistics       (boolean bool) { statisticalResultsElement.setAttribute(SUMMARY_STATISTICS, booleanToString(bool)); }
+    public void setShowStatisticsCharts        (boolean bool) { statisticalResultsElement.setAttribute("charts", booleanToString(bool)); }
     //todo later public void setOverlayStatsCharts      (boolean bool) { statisticalResults.setAttribute("overlay", booleanToString(bool)); }
 
-    public String  getStatisticsComments()        { return unMakeComments(statisticalResultsElement);}
+    public String  getStatisticsDescription()        { return unMakeCustomDescriptionElements(statisticalResultsElement);}
     public String  getStatisticsConclusions()     { return unMakeConclusions(statisticalResultsElement);}
-    public void setStatisticsDescription          (String s) { makeComments(statisticalResultsElement,"SR", s); }
+    public void setStatisticsDescription          (String s) { makeCustomDescriptionElement(statisticalResultsElement,"SR", s); }
     public void setStatisticsConclusions          (String s) { makeConclusions(statisticalResultsElement,"SR", s); }
     public String getStatisticsFilePath()         { return statisticalResultsElement.getAttributeValue("file"); }
     public List<Object>   getStatisticsReplicationsList() {return unMakeReplicationList(statisticalResultsElement);}

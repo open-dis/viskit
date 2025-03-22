@@ -258,7 +258,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
             .addGap(0, 330, Short.MAX_VALUE)
         );
 
-        analystReportTabbedPane.addTab("3 Simulation Location", _3_SimulationLocationPanel);
+        analystReportTabbedPane.addTab("3 Scenario Location", _3_SimulationLocationPanel);
 
         javax.swing.GroupLayout _4_AssemblyConfirgurationPanelLayout = new javax.swing.GroupLayout(_4_AssemblyConfirgurationPanel);
         _4_AssemblyConfirgurationPanel.setLayout(_4_AssemblyConfirgurationPanelLayout);
