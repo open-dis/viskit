@@ -470,7 +470,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     {
         JPanel assemblyDesignPanel = new JPanel();
         assemblyDesignPanel.setLayout(new BoxLayout(assemblyDesignPanel, BoxLayout.Y_AXIS));
-        showAssemblyDesignConsiderationsAndAnalysisCB = new JCheckBox("Show Assembly Design Considerations and Post-Experiment Analysis", true);
+        showAssemblyDesignConsiderationsAndAnalysisCB = new JCheckBox("Show Assembly Design Considerations, Production Notes, and Post-Experiment Analysis", true);
         showAssemblyDesignConsiderationsAndAnalysisCB.setToolTipText("Show entries in output report");
         showAssemblyDesignConsiderationsAndAnalysisCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         assemblyDesignPanel.add(showAssemblyDesignConsiderationsAndAnalysisCB);
@@ -645,14 +645,14 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     {
         analystReportModel.setShowEntityParametersDescription(showEntityParameterTablesDescription.isSelected());
         analystReportModel.setShowEntityParametersTable(showEntityParameterTables.isSelected());
-        analystReportModel.setEntityParametersDescription(entityParameterTablesOverviewTA.getText());
+        analystReportModel.setEntityParametersOverview(entityParameterTablesOverviewTA.getText());
     }
-    JCheckBox showBehaviorDesignAnalysisDescriptions;
-    JCheckBox showBehaviorDescriptions;
-    JCheckBox showBehaviorImages;
-    JTextArea behaviorDescriptionTA;
-    JTextArea behaviorConclusionsTA;
-    JTabbedPane behaviorTabs;
+    JCheckBox   showBehaviorDesignAnalysisDescriptions;
+    JCheckBox   showBehaviorDescriptionsCB;
+    JCheckBox   showBehaviorImagesCB;
+    JTextArea   behaviorDescriptionsTA;
+    JTextArea   behaviorConclusionsTA;
+    JTabbedPane behaviorTabbedPane;
 
     private JPanel makeBehaviorDescriptionsPanel() 
     {
@@ -663,7 +663,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         showBehaviorDesignAnalysisDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         behaviorDescriptionsPanel.add(showBehaviorDesignAnalysisDescriptions);
 
-        JScrollPane scrollPane = new JScrollPane(behaviorDescriptionTA = new WrappingTextArea());
+        JScrollPane scrollPane = new JScrollPane(behaviorDescriptionsTA = new WrappingTextArea());
         scrollPane.setBorder(new TitledBorder("Behavior Design Descriptions"));
         scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         behaviorDescriptionsPanel.add(scrollPane);
@@ -673,19 +673,19 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         behaviorDescriptionsPanel.add(scrollPane);
 
-        showBehaviorDescriptions = new JCheckBox("Show Behavior Fescriptions", true);
-        showBehaviorDescriptions.setToolTipText("Show entries in output report");
-        showBehaviorDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        behaviorDescriptionsPanel.add(showBehaviorDescriptions);
+        showBehaviorDescriptionsCB = new JCheckBox("Show Behavior Descriptions", true);
+        showBehaviorDescriptionsCB.setToolTipText("Show entries in output report");
+        showBehaviorDescriptionsCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        behaviorDescriptionsPanel.add(showBehaviorDescriptionsCB);
 
-        showBehaviorImages = new JCheckBox("Show Behavior Images", true);
-        showBehaviorImages.setToolTipText("Show entries in output report");
-        showBehaviorImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        behaviorDescriptionsPanel.add(showBehaviorImages);
+        showBehaviorImagesCB = new JCheckBox("Show Behavior Images", true);
+        showBehaviorImagesCB.setToolTipText("Show entries in output report");
+        showBehaviorImagesCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        behaviorDescriptionsPanel.add(showBehaviorImagesCB);
 
-        behaviorTabs = new JTabbedPane(JTabbedPane.LEFT);
-        behaviorTabs.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        behaviorDescriptionsPanel.add(behaviorTabs);
+        behaviorTabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+        behaviorTabbedPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        behaviorDescriptionsPanel.add(behaviorTabbedPane);
         behaviorDescriptionsPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         
         return behaviorDescriptionsPanel;
@@ -694,10 +694,10 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private void unFillBehaviorDescriptionsPanel()
     {
         analystReportModel.setShowBehaviorDesignAnalysisDescriptions(showBehaviorDesignAnalysisDescriptions.isSelected());
-        analystReportModel.setBehaviorDescription(behaviorDescriptionTA.getText());
+        analystReportModel.setBehaviorDescription(behaviorDescriptionsTA.getText());
         analystReportModel.setBehaviorConclusions(behaviorConclusionsTA.getText());
-        analystReportModel.setShowBehaviorDescriptions(showBehaviorDescriptions.isSelected());
-        analystReportModel.setShowEventGraphImages(showBehaviorImages.isSelected());
+        analystReportModel.setShowBehaviorDescriptions(showBehaviorDescriptionsCB.isSelected());
+        analystReportModel.setShowEventGraphImages(showBehaviorImagesCB.isSelected());
 
         // tables are uneditable
     }
@@ -705,18 +705,18 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private void fillBehaviorDescriptionsPanel() 
     {
         showBehaviorDesignAnalysisDescriptions.setSelected(analystReportModel.isShowBehaviorDesignAnalysisDescriptions());
-        behaviorDescriptionTA.setText(analystReportModel.getBehaviorDescription());
-        behaviorDescriptionTA.setEnabled(showBehaviorDesignAnalysisDescriptions.isSelected());
+        behaviorDescriptionsTA.setText(analystReportModel.getBehaviorDescription());
+        behaviorDescriptionsTA.setEnabled(showBehaviorDesignAnalysisDescriptions.isSelected());
         behaviorConclusionsTA.setText(analystReportModel.getBehaviorConclusions());
         behaviorConclusionsTA.setEnabled(showBehaviorDesignAnalysisDescriptions.isSelected());
-        showBehaviorImages.setEnabled(analystReportModel.isShowEventGraphImage());
-        showBehaviorDescriptions.setSelected(analystReportModel.isShowBehaviorDescriptions());
-        behaviorTabs.setEnabled(showBehaviorDescriptions.isSelected());
+        showBehaviorImagesCB.setEnabled(analystReportModel.isShowEventGraphImage());
+        showBehaviorDescriptionsCB.setSelected(analystReportModel.isShowBehaviorDescriptions());
+        behaviorTabbedPane.setEnabled(showBehaviorDescriptionsCB.isSelected());
 
         // TODO: JDOM v1.1 does not yet support generics
         List behaviorList = analystReportModel.getBehaviorList();
 
-        behaviorTabs.removeAll();
+        behaviorTabbedPane.removeAll();
         for (Iterator itr = behaviorList.iterator(); itr.hasNext();) 
         {
             List nextBehavior = (List) itr.next();
@@ -771,27 +771,27 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
             scrollPane.setBorder(new TitledBorder("State variables"));
             panel.add(scrollPane);
 
-            behaviorTabs.add(behaviorName, panel);
+            behaviorTabbedPane.add(behaviorName, panel);
         }
     }
-    JCheckBox showStatisticsDescriptionAnalysis;
-    JCheckBox showReplicationStatistics;
-    JCheckBox showSummaryStatistics;
+    JCheckBox showStatisticsDescriptionAnalysisCB;
+    JCheckBox showReplicationStatisticsCB;
+    JCheckBox showSummaryStatisticsCB;
     JTextArea statisticsDescription;
     JTextArea statisticsConclusions;
     JPanel statisticsSummaryPanel;
     JPanel statisticsReplicationReportsPanel;
-    JScrollPane repsJsp;
+    JScrollPane replicationStatisticsScrollPane;
     JScrollPane statisticsSummaryScrollPane;
 
     private JPanel makeStatisticalResultsPanel() 
     {
         JPanel statisticalResultsPanel = new JPanel();
         statisticalResultsPanel.setLayout(new BoxLayout(statisticalResultsPanel, BoxLayout.Y_AXIS));
-        showStatisticsDescriptionAnalysis = new JCheckBox("Show statistical description and analysis", true);
-        showStatisticsDescriptionAnalysis.setToolTipText("Show entries in output report");
-        showStatisticsDescriptionAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statisticalResultsPanel.add(showStatisticsDescriptionAnalysis);
+        showStatisticsDescriptionAnalysisCB = new JCheckBox("Show statistical description and analysis", true);
+        showStatisticsDescriptionAnalysisCB.setToolTipText("Show entries in output report");
+        showStatisticsDescriptionAnalysisCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        statisticalResultsPanel.add(showStatisticsDescriptionAnalysisCB);
 
         JScrollPane scrollPane = new JScrollPane(statisticsDescription = new WrappingTextArea());
         scrollPane.setBorder(new TitledBorder("Description of Expected Results"));
@@ -799,24 +799,25 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         statisticalResultsPanel.add(scrollPane);
 
         scrollPane = new JScrollPane(statisticsConclusions = new WrappingTextArea());
-        scrollPane.setBorder(new TitledBorder("Analysis of Experimental Results"));
+        scrollPane.setBorder(new TitledBorder("Analysis of Experimental Results and Conclusions"));
         scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         statisticalResultsPanel.add(scrollPane);
 
-        showReplicationStatistics = new JCheckBox("Show replication statistics", true);
-        showReplicationStatistics.setToolTipText("Show entries in output report");
-        showReplicationStatistics.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statisticalResultsPanel.add(showReplicationStatistics);
+        showReplicationStatisticsCB = new JCheckBox("Show replication statistics", true);
+        showReplicationStatisticsCB.setToolTipText("Show entries in output report");
+        showReplicationStatisticsCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        statisticalResultsPanel.add(showReplicationStatisticsCB);
 
-        repsJsp = new JScrollPane(statisticsReplicationReportsPanel = new JPanel());
-        repsJsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        replicationStatisticsScrollPane = new JScrollPane(statisticsReplicationReportsPanel = new JPanel());
+        // TODO limit initial height replicationStatisticsScrollPane, perhaps multi-part split pane?
+        replicationStatisticsScrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         statisticsReplicationReportsPanel.setLayout(new BoxLayout(statisticsReplicationReportsPanel, BoxLayout.Y_AXIS));
-        statisticalResultsPanel.add(repsJsp);
+        statisticalResultsPanel.add(replicationStatisticsScrollPane);
 
-        showSummaryStatistics = new JCheckBox("Show summary statistics", true);
-        showSummaryStatistics.setToolTipText("Show entries in output report");
-        showSummaryStatistics.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        statisticalResultsPanel.add(showSummaryStatistics);
+        showSummaryStatisticsCB = new JCheckBox("Show summary statistics", true);
+        showSummaryStatisticsCB.setToolTipText("Show entries in output report");
+        showSummaryStatisticsCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        statisticalResultsPanel.add(showSummaryStatisticsCB);
 
         statisticsSummaryScrollPane = new JScrollPane(statisticsSummaryPanel = new JPanel());
         statisticsSummaryScrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -830,16 +831,16 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private void fillStatisticalResultsPanel() 
     {
         boolean value = analystReportModel.isShowStatiisticalResultsDescriptionAnalysis();
-        showStatisticsDescriptionAnalysis.setSelected(value);
+        showStatisticsDescriptionAnalysisCB.setSelected(value);
         statisticsDescription.setText(analystReportModel.getStatisticsDescription());
         statisticsConclusions.setText(analystReportModel.getStatisticsConclusions());
         statisticsDescription.setEnabled(value);
         statisticsConclusions.setEnabled(value);
 
         value = analystReportModel.isShowReplicationStatistics();
-        showReplicationStatistics.setSelected(value);
+        showReplicationStatisticsCB.setSelected(value);
         value = analystReportModel.isShowSummaryStatistics();
-        showSummaryStatistics.setSelected(value);
+        showSummaryStatisticsCB.setSelected(value);
 
         List statisticsReplicationsList = analystReportModel.getStatisticsReplicationsList();
         statisticsReplicationReportsPanel.removeAll();
@@ -894,17 +895,17 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-        repsJsp.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+        replicationStatisticsScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
         statisticsSummaryScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
     }
 
     private void unFillStatisticalResultsPanel()
     {
-        analystReportModel.setShowStatisticsDescriptionAnalysis(showStatisticsDescriptionAnalysis.isSelected());
+        analystReportModel.setShowStatisticsDescriptionAnalysis(showStatisticsDescriptionAnalysisCB.isSelected());
         analystReportModel.setStatisticsDescription(statisticsDescription.getText());
         analystReportModel.setStatisticsConclusions(statisticsConclusions.getText());
-        analystReportModel.setShowReplicationStatistics(showReplicationStatistics.isSelected());
-        analystReportModel.setShowSummaryStatistics(showSummaryStatistics.isSelected());
+        analystReportModel.setShowReplicationStatistics(showReplicationStatisticsCB.isSelected());
+        analystReportModel.setShowSummaryStatistics(showSummaryStatisticsCB.isSelected());
     }
     
     JCheckBox showConclusionsRecommendationsCB;
@@ -915,7 +916,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     {
         JPanel conclusionsRecommendationsPanel = new JPanel();
         conclusionsRecommendationsPanel.setLayout(new BoxLayout(conclusionsRecommendationsPanel, BoxLayout.Y_AXIS));
-        showConclusionsRecommendationsCB = new JCheckBox("Show Conclusions and Recommendations", true);
+        showConclusionsRecommendationsCB = new JCheckBox("Show Conclusions and Recommendations for Future Work", true);
         showConclusionsRecommendationsCB.setToolTipText("Show entries in output report");
         showConclusionsRecommendationsCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         conclusionsRecommendationsPanel.add(showConclusionsRecommendationsCB);

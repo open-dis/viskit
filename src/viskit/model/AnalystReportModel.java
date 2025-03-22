@@ -148,7 +148,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     public static final String SHOW_PARAMETER_TABLES       = "showParameterTables";
     public static final String TEXT                        = "text";
     
-    public static final String NO_DESCRIPTION_PROVIDED     = "no description provided";
+    public static final String NO_DESCRIPTION_PROVIDED     = "no description found in Event Graph";
 
     /** Must have the order of the PCL as input from AssemblyModel */
     private Map<String, AssemblyNode> pclNodeCache;
@@ -537,7 +537,8 @@ public final class AnalystReportModel extends MvcAbstractModel
                 descriptionElement.setAttribute(TEXT, descriptionString);
                 behaviorElement.addContent(descriptionElement);
 
-                if (showAllDetails) {
+                if (showAllDetails) 
+                {
                     localRootElementParameters = localRootElement.getChildren(PARAMETER);
                     for (Element temp : localRootElementParameters) {
                         parameterElement = new Element(PARAMETER);
@@ -1057,22 +1058,23 @@ public final class AnalystReportModel extends MvcAbstractModel
 
         setScenarioLocationIncluded(true);
         setShowScenarioLocationImage(true);
+        setScenarioLocationDescription    ("***ENTER SCENARIO LOCATION DESCRIPTION HERE***");
+        setScenarioLocationProductionNotes("***ENTER SCENARIO LOCATION PRODUCTION NOTES HERE***");
         setScenarioLocationConclusions    ("***ENTER SCENARIO LOCATION CONCLUSIONS HERE***");
-        setScenarioLocationProductionNotes("***ENTER SIMULATION PRODUCTION NOTES HERE***");
         //setChartImage(""); // TODO: generate nauthical chart image, set file location
 
         setAssemblyConfigurationIncluded(true);
         setShowAssemblyConfigurationImage(true);
         setShowAssemblyEntityDefinitionsTable(true);
         setAssemblyDesignConsiderations       ("***ENTER ASSEMBLY DESIGN CONSIDERATIONS HERE***");
-        setAssemblyConfigationProductionNotes ("***ENTER ASSEMBLY CONFIGURATION PRODUCTION NOTES HERE***");
-        setAssemblyConfigurationConclusions   ("***ENTER ASSEMBLY CONFIGURATION CONCLUSIONS HERE***");
+        setAssemblyConfigationProductionNotes ("***ENTER ASSEMBLY DESIGN PRODUCTION NOTES HERE***");
+        setAssemblyConfigurationConclusions   ("***ENTER ASSEMBLY DESIGN CONCLUSIONS HERE***");
 
         //Entity Parameters values
         setShowEntityParametersDescription(true);
         setShowEntityParametersTable(true);
-        setEntityParametersDescription("***ENTER ENTITY PARAMETER DESCRIPTION HERE***");
-        setEntityParametersConclusions("***ENTER ENTITY PARAMETER CONCLUSIONS HERE***");
+        setEntityParametersOverview("***ENTER ENTITY PARAMETER OVERVIEW HERE***");
+        setEntityParametersConclusions("***ENTER ENTITY PARAMETER CONCLUSIONS HERE***"); // TODO not shown?
 
         //BehaviorParameter values
         setShowBehaviorDesignAnalysisDescriptions(true);
@@ -1342,7 +1344,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     public String  getParameterComments()    { return unMakeCustomDescriptionElements(entityParametersElement);} // TODO check, apparent mismatch
     public String  getParameterConclusions() { return unMakeConclusions(entityParametersElement);}               // TODO check, apparent mismatch
     public Vector<Object[]> getEntityParameterTables() {return unMakeParameterTables(entityParametersElement);}
-    public void setEntityParametersDescription         (String s){ makeCustomDescriptionElement(entityParametersElement,"EP", s); }
+    public void setEntityParametersOverview         (String s){ makeCustomDescriptionElement(entityParametersElement,"EP", s); }
     public void setEntityParametersConclusions      (String s){ makeConclusions(entityParametersElement,"EP", s); }
 
     // behavior descriptions:
