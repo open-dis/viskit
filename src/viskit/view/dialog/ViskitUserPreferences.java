@@ -244,12 +244,12 @@ public class ViskitUserPreferences extends JDialog
         JPanel lookAndFeelInnerPanel = new JPanel();
         lookAndFeelInnerPanel.setLayout(new BoxLayout(lookAndFeelInnerPanel, BoxLayout.Y_AXIS));
         lookAndFeelInnerPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        defaultLafRB = new JRadioButton("Default Look and Feel &nbsp; (best LAF for Windows)");
-        defaultLafRB.setToolTipText("Best for Windows");
+        defaultLafRB = new JRadioButton("Default Look and Feel"); //  &nbsp; (best LAF for Windows)
+        defaultLafRB.setToolTipText("Most reliable LAF"); // Best for Windows
         defaultLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         lookAndFeelInnerPanel.add(defaultLafRB);
-        platformLafRB = new JRadioButton("Platform Look and Feel (best LAF for macOS)");
-        platformLafRB.setToolTipText("Best for macOS");
+        platformLafRB = new JRadioButton("Platform Look and Feel"); //  (best LAF for macOS)
+        platformLafRB.setToolTipText("Alternative for macOS"); // Best for macOS
         platformLafRB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         lookAndFeelInnerPanel.add(platformLafRB);
         otherLafRB = new JRadioButton("Other");
