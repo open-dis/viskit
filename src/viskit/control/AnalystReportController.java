@@ -360,14 +360,18 @@ public class AnalystReportController extends MvcAbstractController
         analystReportViewFrame.fillLayout();
     }
 
-    public void showHtmlViewer(String htmlFilepath) 
+    public void showHtmlViewer(String htmlFilepath) // TODO problem on mac?
     {
+        URI htmlFilepathURI;
         ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
         // pop up the system html viewer, or send currently running browser to html page
         try {
+            htmlFilepathURI = new URI(htmlFilepath.replaceAll("\\\\", "/"));
             // must convert slashes here when creating URI, not beforehand
-            Desktop.getDesktop().browse(new URI(htmlFilepath.replaceAll("\\\\", "/")));
+            Desktop.getDesktop().browse(htmlFilepathURI);
         } 
+        // see https://StackOverflow.com/questions/31367967/open-in-default-browser-exception
+        // exception on macos is a JDK problem, have to fall back to Runtime.exec for browser launch
         catch (URISyntaxException ex) {
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE,
                     "Browser Launch Error",
@@ -380,7 +384,7 @@ public class AnalystReportController extends MvcAbstractController
                     "Browser Launch Error",
                     "<html><p align='center'>IOException displaying HTML:<br>" + ex.getMessage() + "<br /></p></html>"
             );
-            LOG.error(ex.getMessage());
+            LOG.error("showHtmlViewer() Browser Launch Error\n      " + htmlFilepath + "\n{}",ex.getMessage());
         }
     }
 
