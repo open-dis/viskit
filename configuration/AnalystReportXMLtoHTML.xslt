@@ -91,9 +91,9 @@
                 <p/>
                 <hr/>
                 <!-- Statistical Reports -->
-                <xsl:apply-templates select="//StatisticalResults" mode="StatsHeader"/>
-                <xsl:apply-templates select="//StatisticalResults/ReplicationReports/SimEntity" mode="RepStats"/>
-                <xsl:apply-templates select="//StatisticalResults/SummaryReport" mode="SumStats"/>
+                <xsl:apply-templates select="//StatisticalResults" mode="StatisticsHeader"/>
+                <xsl:apply-templates select="//StatisticalResults/ReplicationReports/SimEntity" mode="ReplicationStatistics"/>
+                <xsl:apply-templates select="//StatisticalResults/SummaryReport" mode="SummaryStatistics"/>
                 <p/>
                 <p/>
                 <hr/>
@@ -692,7 +692,7 @@
     </xsl:template>
 
     <!-- Statistical Results -->
-    <xsl:template match="SRComments" mode="StatsHeader">
+    <xsl:template match="SRComments" mode="StatisticsHeader">
         <font size="4">
             <p align="left">
                 <font size="4">
@@ -707,7 +707,7 @@
             </font>
         </p>
     </xsl:template>
-    <xsl:template match="SRConclusions" mode="StatsHeader">
+    <xsl:template match="SRConclusions" mode="StatisticsHeader">
         <p align="left">
             <i>Analysis of Experimental Results</i><br/>
             <font color="#00006C">
@@ -718,7 +718,7 @@
             <b><u>Summary Statistics section</u>: Primary Measures of Effectiveness (MoEs) / Measures of Performance (MoPs) and corresponding statistical plots</b>
         </p>
     </xsl:template>
-    <xsl:template match="SimEntity" mode="RepStats">
+    <xsl:template match="SimEntity" mode="ReplicationStatistics">
 
         <!-- Capture this Entity's name for its Figure Caption -->
         <xsl:variable name="entityProperty" select="@property"/>
@@ -927,7 +927,7 @@
         <p/>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
-    <xsl:template match="SummaryReport" mode="SumStats">
+    <xsl:template match="SummaryReport" mode="SummaryStatistics">
         <p/>
         <p align="left">
             <font size="4">
