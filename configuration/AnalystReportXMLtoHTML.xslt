@@ -64,7 +64,7 @@
                 </center>
                 <hr/>
                 <!-- Executive Summary: NOTE - omitted if analyst did not include comments -->
-                <xsl:apply-templates select="//ExecutiveSummary"/>
+                <xsl:apply-templates select="//ExecutiveSummaryDescription"/>
                 <p/>
                 <p/>
                 <hr/>
@@ -164,7 +164,7 @@
     </xsl:template>
 
     <!-- Executive Summary template -->
-    <xsl:template match="ESComments">
+    <xsl:template match="ExecutiveSummaryDescription">
         <p align="left">
             <font size="4">
                 <b><a name="ExecutiveSummary">Executive Summary</a></b>

@@ -208,7 +208,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
             fillExecutiveSummary();
             fillScenarioLocationPanel();
             fillSimulationConfigurationPanel();
-            fillEntityParametersTablePanel();
+            fillEntityParametersTablesPanel();
             fillBehaviorDescriptionsPanel();
             fillStatisticalResultsPanel();
             fillConclusionsRecommendationsPanel();
@@ -313,7 +313,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         tabs.add("2 Executive Summary",               makeExecutiveSummaryPanel());
         tabs.add("3 Scenario Location",               makeScenarioLocationPanel());
         tabs.add("4 Assembly Design",                 makeAssemblyDesignPanel());
-        tabs.add("5 Entity Parameters",               makeEntityParameterTablesPanel());
+        tabs.add("5 Entity Parameters",               makeEntityParametersTablesPanel());
         tabs.add("6 Behavior Descriptions",           makeBehaviorDescriptionsPanel());
         tabs.add("7 Statistical Results",             makeStatisticalResultsPanel());
         tabs.add("8 Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
@@ -487,7 +487,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
         jsp = new JScrollPane(assemblyDesignConclusionsTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Simulation Assembly Design"));
+        jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Assembly Design"));
         assemblyDesignPanel.add(jsp);
 
         showEntityDefinitionsTableCB = new JCheckBox("Show entity definition table", true);
@@ -529,7 +529,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private void fillSimulationConfigurationPanel() 
     {
         showAssemblyDesignConsiderationsAndAnalysisCB.setSelected(analystReportModel.isShowAssemblyConfigurationDescription());
-        assemblyDesignConsiderationsTA.setText(analystReportModel.getSimulationConfigurationComments());
+        assemblyDesignConsiderationsTA.setText(analystReportModel.getConfigurationComments());
         assemblyDesignConsiderationsTA.setEnabled(showAssemblyDesignConsiderationsAndAnalysisCB.isSelected());
 
         showEntityDefinitionsTableCB.setSelected(analystReportModel.isShowAssemblyEntityDefinitionsTable());
@@ -539,10 +539,10 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         entityDefinitionsTable.getColumnModel().getColumn(0).setPreferredWidth(200);
         entityDefinitionsTable.getColumnModel().getColumn(1).setPreferredWidth(200);
 
-        assemblyDesignProductionNotesTA.setText(analystReportModel.getSimulationConfigurationProductionNotes());
+        assemblyDesignProductionNotesTA.setText(analystReportModel.getAssemblyConfigurationProductionNotes());
         assemblyDesignProductionNotesTA.setEnabled(analystReportModel.isShowAssemblyConfigurationDescription());
 
-        assemblyDesignConclusionsTA.setText(analystReportModel.getSimulationConfigurationConclusions());
+        assemblyDesignConclusionsTA.setText(analystReportModel.getAssemblyConfigurationConclusions());
         assemblyDesignConclusionsTA.setEnabled(analystReportModel.isShowAssemblyConfigurationDescription());
 
         showAssemblyConfigurationImageCB.setSelected(analystReportModel.isShowAssemblyImage());
@@ -565,55 +565,55 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
-    JCheckBox showEntityParameterTablesDescription;
-    JCheckBox showEntityParameterTables;
-    JTabbedPane   entityParameterTablesTabbedPane;
-    JTextArea     entityParameterTablesOverviewTA;
-    JScrollPane   entityParameterTablesOverviewSP;
+    JCheckBox showEntityParametersOverviewCB;
+    JTextArea     entityParametersOverviewTA;
+    JScrollPane   entityParametersOverviewSP;
+    JCheckBox showEntityParametersTablesCB;
+    JTabbedPane   entityParametersTablesTabbedPane;
 
-    private JPanel makeEntityParameterTablesPanel()
+    private JPanel makeEntityParametersTablesPanel()
     {
-        JPanel entityParametersTablePanel = new JPanel();
-        entityParametersTablePanel.setLayout(new BoxLayout(entityParametersTablePanel, BoxLayout.Y_AXIS));
-        showEntityParameterTablesDescription = new JCheckBox("Show Entity Parameter Descriptions", true);
-        showEntityParameterTablesDescription.setToolTipText("Show entries in output report");
-        showEntityParameterTablesDescription.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        entityParametersTablePanel.add(showEntityParameterTablesDescription);
+        JPanel entityParametersTablesPanel = new JPanel();
+        entityParametersTablesPanel.setLayout(new BoxLayout(entityParametersTablesPanel, BoxLayout.Y_AXIS));
+        showEntityParametersOverviewCB = new JCheckBox("Show Entity Parameters Overview", true);
+        showEntityParametersOverviewCB.setToolTipText("Show overview in output report");
+        showEntityParametersOverviewCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        entityParametersTablesPanel.add(showEntityParametersOverviewCB);
 
-        entityParameterTablesOverviewTA = new WrappingTextArea();
-        entityParameterTablesOverviewSP = new JScrollPane(entityParameterTablesOverviewTA);
-        entityParameterTablesOverviewSP.setBorder(new TitledBorder("Entity Parameters Overview"));
-        entityParameterTablesOverviewSP.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        entityParametersTablePanel.add(entityParameterTablesOverviewSP);
+        entityParametersOverviewTA = new WrappingTextArea();
+        entityParametersOverviewSP = new JScrollPane(entityParametersOverviewTA);
+        entityParametersOverviewSP.setBorder(new TitledBorder("Entity Parameters Overview"));
+        entityParametersOverviewSP.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        entityParametersTablesPanel.add(entityParametersOverviewSP);
 
-        showEntityParameterTables = new JCheckBox("Show Entity Parameter Tables", true);
-        showEntityParameterTables.setToolTipText("Show entries in output report");
-        showEntityParameterTables.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        entityParametersTablePanel.add(showEntityParameterTables);
+        showEntityParametersTablesCB = new JCheckBox("Show Entity Parameter Tables", true);
+        showEntityParametersTablesCB.setToolTipText("Show entries in output report");
+        showEntityParametersTablesCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        entityParametersTablesPanel.add(showEntityParametersTablesCB);
 
         // TODO: post-experiment
 
-        entityParameterTablesTabbedPane = new JTabbedPane(JTabbedPane.LEFT);
-        entityParameterTablesTabbedPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        entityParametersTablePanel.add(entityParameterTablesTabbedPane);
-        entityParametersTablePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        return entityParametersTablePanel;
+        entityParametersTablesTabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+        entityParametersTablesTabbedPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        entityParametersTablesPanel.add(entityParametersTablesTabbedPane);
+        entityParametersTablesPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        return entityParametersTablesPanel;
     }
 
     @SuppressWarnings("unchecked")
-    private void fillEntityParametersTablePanel() 
+    private void fillEntityParametersTablesPanel() 
     {
-        showEntityParameterTablesDescription.setSelected(analystReportModel.isShowEntitypParametersDescription());
-        showEntityParameterTables.setSelected(analystReportModel.isShowEntityParametersTable());
+        showEntityParametersOverviewCB.setSelected(analystReportModel.isShowEntityParametersOverview());
+        showEntityParametersTablesCB.setSelected  (analystReportModel.isShowEntityParametersTables());
 
-        entityParameterTablesOverviewTA.setText(analystReportModel.getParameterComments());
+            entityParametersOverviewTA.setText    (analystReportModel.getEntityParametersOverview());
 
         Vector<String> colNames = new Vector<>();
         colNames.add("category");
         colNames.add("name");
         colNames.add("description");
 
-        Vector<Object[]> v = analystReportModel.getEntityParameterTables();
+        Vector<Object[]> v = analystReportModel.getEntityParametersTables();
 
         for (Object[] oa : v) {
             Vector<Vector<String>> tableVector = new Vector<>();
@@ -637,15 +637,15 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
                 }
             });
 
-            entityParameterTablesTabbedPane.add(nm, new JScrollPane(new EntityParameterTable(tableVector, colNames)));
+            entityParametersTablesTabbedPane.add(nm, new JScrollPane(new EntityParameterTable(tableVector, colNames)));
         }
     }
 
     private void unFillEntityParameterTablesPanel() 
     {
-        analystReportModel.setShowEntityParametersDescription(showEntityParameterTablesDescription.isSelected());
-        analystReportModel.setShowEntityParametersTable(showEntityParameterTables.isSelected());
-        analystReportModel.setEntityParametersOverview(entityParameterTablesOverviewTA.getText());
+        analystReportModel.setShowEntityParametersOverview(showEntityParametersOverviewCB.isSelected());
+        analystReportModel.setShowEntityParametersTables(showEntityParametersTablesCB.isSelected());
+        analystReportModel.setEntityParametersOverview(entityParametersOverviewTA.getText());
     }
     JCheckBox   showBehaviorDesignAnalysisDescriptions;
     JCheckBox   showBehaviorDescriptionsCB;
@@ -658,27 +658,27 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     {
         JPanel behaviorDescriptionsPanel = new JPanel();
         behaviorDescriptionsPanel.setLayout(new BoxLayout(behaviorDescriptionsPanel, BoxLayout.Y_AXIS));
-        showBehaviorDesignAnalysisDescriptions = new JCheckBox("Show Behavior Design and Post-Experiment Analysis", true);
+        showBehaviorDesignAnalysisDescriptions = new JCheckBox("Show Event Graph Behavior Considerations and Post-Experiment Analysis", true);
         showBehaviorDesignAnalysisDescriptions.setToolTipText("Show entries in output report");
         showBehaviorDesignAnalysisDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         behaviorDescriptionsPanel.add(showBehaviorDesignAnalysisDescriptions);
 
         JScrollPane scrollPane = new JScrollPane(behaviorDescriptionsTA = new WrappingTextArea());
-        scrollPane.setBorder(new TitledBorder("Behavior Design Descriptions"));
+        scrollPane.setBorder(new TitledBorder("Event Graph Behavior Design Descriptions"));
         scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         behaviorDescriptionsPanel.add(scrollPane);
 
         scrollPane = new JScrollPane(behaviorConclusionsTA = new WrappingTextArea());
-        scrollPane.setBorder(new TitledBorder("Post-Experiment Analysis of Entity Behaviors"));
+        scrollPane.setBorder(new TitledBorder("Post-Experiment Analysis of Event Graph Entity Behaviors"));
         scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         behaviorDescriptionsPanel.add(scrollPane);
 
-        showBehaviorDescriptionsCB = new JCheckBox("Show Behavior Descriptions", true);
+        showBehaviorDescriptionsCB = new JCheckBox("Show Event Graph Behavior Descriptions", true);
         showBehaviorDescriptionsCB.setToolTipText("Show entries in output report");
         showBehaviorDescriptionsCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         behaviorDescriptionsPanel.add(showBehaviorDescriptionsCB);
 
-        showBehaviorImagesCB = new JCheckBox("Show Behavior Images", true);
+        showBehaviorImagesCB = new JCheckBox("Show Event Graph Behavior Images", true);
         showBehaviorImagesCB.setToolTipText("Show entries in output report");
         showBehaviorImagesCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         behaviorDescriptionsPanel.add(showBehaviorImagesCB);
