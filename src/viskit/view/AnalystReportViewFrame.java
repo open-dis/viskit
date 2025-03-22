@@ -170,14 +170,16 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         dirty = b;
     }
 
-    public void setReportBuilder(AnalystReportModel newAnalystReportModel) {
+    public void setReportBuilder(AnalystReportModel newAnalystReportModel) 
+    {
         analystReportModel = newAnalystReportModel;
         setModel(analystReportModel); // hold on locally
         getController().setModel(getModel()); // tell controller
     }
 
     /** invokes _fillLayout() when Swing interface is ready */
-    public void fillLayout() {
+    public void fillLayout() 
+    {
 
         // We don't always come in on the swing thread.thread
         // TODO need to ensure that panel update occurs before Analyst Report is generated
@@ -217,7 +219,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
-    public void unFillLayout() {
+    public void unFillLayout() 
+    {
         unFillHeader();
         unFillExecutiveSummary();
         unFillSimulationLocation();
@@ -318,53 +321,56 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         add(tabs);
     //setBorder(new EmptyBorder(10,10,10,10));
     }
-    JCheckBox wantExecutiveSummary;
-    JTextArea execSummTA;
+    JCheckBox showExecutiveSummary;
+    JTextArea executiveSummaryTA;
 
     private JPanel makeExecutiveSummaryPanel() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        wantExecutiveSummary = new JCheckBox("Include executive summary", true);
-        wantExecutiveSummary.setToolTipText("Include entries in output report");
-        wantExecutiveSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(wantExecutiveSummary);
+        showExecutiveSummary = new JCheckBox("Include executive summary", true);
+        showExecutiveSummary.setToolTipText("Include entries in output report");
+        showExecutiveSummary.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(showExecutiveSummary);
 
-        JScrollPane jsp = new JScrollPane(execSummTA = new WrappingTextArea());
+        JScrollPane jsp = new JScrollPane(executiveSummaryTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(jsp);
 
-        execSummTA.setLineWrap(true);
-        execSummTA.setWrapStyleWord(true);
+        executiveSummaryTA.setLineWrap(true);
+        executiveSummaryTA.setWrapStyleWord(true);
         p.setBorder(new EmptyBorder(10, 10, 10, 10));
         return p;
     }
 
-    private void fillExecutiveSummary() {
-        wantExecutiveSummary.setSelected(analystReportModel.isExecutiveSummaryComments());
-        execSummTA.setText(analystReportModel.getExecutiveSummary());
-        execSummTA.setEnabled(wantExecutiveSummary.isSelected());
+    private void fillExecutiveSummary() 
+    {
+        showExecutiveSummary.setSelected(analystReportModel.isExecutiveSummaryCommentsVisible());
+        executiveSummaryTA.setText(analystReportModel.getExecutiveSummary());
+        executiveSummaryTA.setEnabled(showExecutiveSummary.isSelected());
     }
 
-    private void unFillExecutiveSummary() {
-        analystReportModel.setExecutiveSummaryComments(wantExecutiveSummary.isSelected());
-        analystReportModel.setExecutiveSummary(execSummTA.getText());
+    private void unFillExecutiveSummary() 
+    {
+        analystReportModel.setExecutiveSummaryCommentsVisible(showExecutiveSummary.isSelected());
+        analystReportModel.setExecutiveSummary(executiveSummaryTA.getText());
     }
     /************************/
-    JCheckBox wantLocationDescriptions;
-    JCheckBox wantLocationImages;
+    JCheckBox showLocationDescriptions;
+    JCheckBox showLocationImages;
     JTextArea locationCommentsTA, locationConclusionsTA, locationProductionNotesTA;
-    JTextField simLocationImageTF;
-    JButton simLocationImageButton;
-    JTextField simChartImageTF;
-    JButton simChartImageButton;
+    JTextField simulationLocationImageTF;
+    JButton simulationLocationImageButton;
+    JTextField simulationChartImageTF;
+    JButton simulationChartImageButton;
 
-    private JPanel makeSimulationLocationPanel() {
+    private JPanel makeSimulationLocationPanel() 
+    {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        wantLocationDescriptions = new JCheckBox("Include location features and post-experiment descriptions", true);
-        wantLocationDescriptions.setToolTipText("Include entries in output report");
-        wantLocationDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(wantLocationDescriptions);
+        showLocationDescriptions = new JCheckBox("Include location features and post-experiment descriptions", true);
+        showLocationDescriptions.setToolTipText("Include entries in output report");
+        showLocationDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(showLocationDescriptions);
 
         JScrollPane jsp = new JScrollPane(locationCommentsTA = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -381,32 +387,32 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Significant Location Features"));
         p.add(jsp);
 
-        wantLocationImages = new JCheckBox("Include location and chart image(s)", true);
-        wantLocationImages.setToolTipText("Include entries in output report");
-        wantLocationImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(wantLocationImages);
+        showLocationImages = new JCheckBox("Include location and chart image(s)", true);
+        showLocationImages.setToolTipText("Include entries in output report");
+        showLocationImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(showLocationImages);
 
         JPanel imp = new JPanel();
         imp.setLayout(new BoxLayout(imp, BoxLayout.X_AXIS));
         imp.add(new JLabel("Location image "));
-        imp.add(simLocationImageTF = new JTextField(20));
-        imp.add(simLocationImageButton = new JButton("..."));
-        simLocationImageButton.addActionListener(new fileChoiceListener(simLocationImageTF));
-        Dimension ps = simLocationImageTF.getPreferredSize();
-        simLocationImageTF.setMaximumSize(new Dimension(Integer.MAX_VALUE, ps.height));
-        simLocationImageTF.setEditable(false);
+        imp.add(simulationLocationImageTF = new JTextField(20));
+        imp.add(simulationLocationImageButton = new JButton("..."));
+        simulationLocationImageButton.addActionListener(new fileChoiceListener(simulationLocationImageTF));
+        Dimension ps = simulationLocationImageTF.getPreferredSize();
+        simulationLocationImageTF.setMaximumSize(new Dimension(Integer.MAX_VALUE, ps.height));
+        simulationLocationImageTF.setEditable(false);
         imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(imp);
 
         imp = new JPanel();
         imp.setLayout(new BoxLayout(imp, BoxLayout.X_AXIS));
         imp.add(new JLabel("Chart image "));
-        imp.add(simChartImageTF = new JTextField(20));
-        imp.add(simChartImageButton = new JButton("..."));
-        simChartImageButton.addActionListener(new fileChoiceListener(simChartImageTF));
-        ps = simChartImageTF.getPreferredSize();
-        simChartImageTF.setMaximumSize(new Dimension(Integer.MAX_VALUE, ps.height));
-        simChartImageTF.setEditable(false);
+        imp.add(simulationChartImageTF = new JTextField(20));
+        imp.add(simulationChartImageButton = new JButton("..."));
+        simulationChartImageButton.addActionListener(new fileChoiceListener(simulationChartImageTF));
+        ps = simulationChartImageTF.getPreferredSize();
+        simulationChartImageTF.setMaximumSize(new Dimension(Integer.MAX_VALUE, ps.height));
+        simulationChartImageTF.setEditable(false);
         imp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(imp);
 
@@ -417,43 +423,44 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
     private void fillSimulationLocation()
     {
-        wantLocationDescriptions.setSelected(analystReportModel.isPrintSimulationLocationComments());
+        showLocationDescriptions.setSelected(analystReportModel.isPrintSimulationLocationComments());
         locationCommentsTA.setText(analystReportModel.getSimulationLocationComments());
-        locationCommentsTA.setEnabled(wantLocationDescriptions.isSelected());
+        locationCommentsTA.setEnabled(showLocationDescriptions.isSelected());
         locationProductionNotesTA.setText(analystReportModel.getSimulationLocationProductionNotes());
-        locationProductionNotesTA.setEnabled(wantLocationDescriptions.isSelected());
+        locationProductionNotesTA.setEnabled(showLocationDescriptions.isSelected());
         locationConclusionsTA.setText(analystReportModel.getSimulationLocationConclusions());
-        locationConclusionsTA.setEnabled(wantLocationDescriptions.isSelected());
-        wantLocationImages.setSelected(analystReportModel.isPrintSimulationLocationImage());
-        simLocationImageTF.setEnabled(wantLocationImages.isSelected());
-        simLocationImageButton.setEnabled(wantLocationImages.isSelected());
-        simChartImageTF.setEnabled(wantLocationImages.isSelected());
-        simChartImageButton.setEnabled(wantLocationImages.isSelected());
-        simLocationImageTF.setText(analystReportModel.getLocationImage());
-        simChartImageTF.setText(analystReportModel.getChartImage());
+        locationConclusionsTA.setEnabled(showLocationDescriptions.isSelected());
+        showLocationImages.setSelected(analystReportModel.isPrintSimulationLocationImage());
+        simulationLocationImageTF.setEnabled(showLocationImages.isSelected());
+        simulationLocationImageButton.setEnabled(showLocationImages.isSelected());
+        simulationChartImageTF.setEnabled(showLocationImages.isSelected());
+        simulationChartImageButton.setEnabled(showLocationImages.isSelected());
+        simulationLocationImageTF.setText(analystReportModel.getLocationImage());
+        simulationChartImageTF.setText(analystReportModel.getChartImage());
     }
 
-    private void unFillSimulationLocation() {
-        analystReportModel.setPrintSimulationLocationComments(wantLocationDescriptions.isSelected());
+    private void unFillSimulationLocation() 
+    {
+        analystReportModel.setPrintSimulationLocationComments(showLocationDescriptions.isSelected());
         analystReportModel.setSimulationLocationDescription(locationCommentsTA.getText());
         analystReportModel.setSimulationLocationProductionNotes(locationProductionNotesTA.getText());
         analystReportModel.setSimulationLocationConclusions(locationConclusionsTA.getText());
-        analystReportModel.setPrintSimulationLocationImage(wantLocationImages.isSelected());
+        analystReportModel.setPrintSimulationLocationImage(showLocationImages.isSelected());
 
-        String s = simLocationImageTF.getText().trim();
+        String s = simulationLocationImageTF.getText().trim();
         if (s != null && !s.isEmpty())
             analystReportModel.setLocationImage(s);
 
-        s = simChartImageTF.getText();
+        s = simulationChartImageTF.getText();
         if (s != null && !s.isEmpty())
             analystReportModel.setChartImage(s);
     }
 
     /************************/
-    JCheckBox wantAssemblyDesignAndAnalysis;
+    JCheckBox showAssemblyDesignAndAnalysis;
     JTextArea assemblyDesignConsiderations, simConfigConclusions, simProductionNotes;
-    JCheckBox wantSimConfigImages;
-    JCheckBox wantEntityTable;
+    JCheckBox showSimulationConfigurationImages;
+    JCheckBox showEntityTable;
     JTable entityTable;
     JTextField configImgPathTF;
     JButton configImgButt;
@@ -461,10 +468,10 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private JPanel makeAssemblyDesignPanel() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        wantAssemblyDesignAndAnalysis = new JCheckBox("Include assembly-design considerations and post-experiment analysis", true);
-        wantAssemblyDesignAndAnalysis.setToolTipText("Include entries in output report");
-        wantAssemblyDesignAndAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(wantAssemblyDesignAndAnalysis);
+        showAssemblyDesignAndAnalysis = new JCheckBox("Include assembly-design considerations and post-experiment analysis", true);
+        showAssemblyDesignAndAnalysis.setToolTipText("Include entries in output report");
+        showAssemblyDesignAndAnalysis.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(showAssemblyDesignAndAnalysis);
 
         JScrollPane jsp = new JScrollPane(assemblyDesignConsiderations = new WrappingTextArea());
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -481,10 +488,10 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         jsp.setBorder(new TitledBorder("Post-Experiment Analysis of Simulation Assembly Design"));
         p.add(jsp);
 
-        wantEntityTable = new JCheckBox("Include entity definition table", true);
-        wantEntityTable.setToolTipText("Include entries in output report");
-        wantEntityTable.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(wantEntityTable);
+        showEntityTable = new JCheckBox("Include entity definition table", true);
+        showEntityTable.setToolTipText("Include entries in output report");
+        showEntityTable.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(showEntityTable);
 
         JPanel pp = new JPanel();
         pp.setLayout(new BoxLayout(pp, BoxLayout.X_AXIS));
@@ -496,10 +503,10 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         //p.add(new JScrollPane(entityTable = new JTable()));
         entityTable.setPreferredScrollableViewportSize(new Dimension(550, 120));
 
-        wantSimConfigImages = new JCheckBox("Include simulation configuration image", true);
-        wantSimConfigImages.setToolTipText("Include entries in output report");
-        wantSimConfigImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(wantSimConfigImages);
+        showSimulationConfigurationImages = new JCheckBox("Include simulation configuration image", true);
+        showSimulationConfigurationImages.setToolTipText("Include entries in output report");
+        showSimulationConfigurationImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(showSimulationConfigurationImages);
 
         JPanel imp = new JPanel();
         imp.setLayout(new BoxLayout(imp, BoxLayout.X_AXIS));
@@ -517,15 +524,16 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return p;
     }
 
-    private void fillSimulationConfiguration() {
-        wantAssemblyDesignAndAnalysis.setSelected(analystReportModel.isPrintSimulationConfigurationComments());
+    private void fillSimulationConfiguration() 
+    {
+        showAssemblyDesignAndAnalysis.setSelected(analystReportModel.isPrintSimulationConfigurationComments());
         assemblyDesignConsiderations.setText(analystReportModel.getSimulationConfigurationComments());
-        assemblyDesignConsiderations.setEnabled(wantAssemblyDesignAndAnalysis.isSelected());
+        assemblyDesignConsiderations.setEnabled(showAssemblyDesignAndAnalysis.isSelected());
 
-        wantEntityTable.setSelected(analystReportModel.isPrintEntityTable());
+        showEntityTable.setSelected(analystReportModel.isPrintEntityTable());
 
-        String[][] sa = analystReportModel.getSimulationConfigurationEntityTable();
-        entityTable.setModel(new DefaultTableModel(sa, new String[] {"Entity Name", "Behavior Type"}));
+        String[][] stringArrayArray = analystReportModel.getSimulationConfigurationEntityTable();
+        entityTable.setModel(new DefaultTableModel(stringArrayArray, new String[] {"Entity Name", "Behavior Type"}));
         entityTable.getColumnModel().getColumn(0).setPreferredWidth(200);
         entityTable.getColumnModel().getColumn(1).setPreferredWidth(200);
 
@@ -535,19 +543,20 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         simConfigConclusions.setText(analystReportModel.getSimulationConfigurationConclusions());
         simConfigConclusions.setEnabled(analystReportModel.isPrintSimulationConfigurationComments());
 
-        wantSimConfigImages.setSelected(analystReportModel.isPrintAssemblyImage());
-        configImgButt.setEnabled(wantSimConfigImages.isSelected());
-        configImgPathTF.setEnabled(wantSimConfigImages.isSelected());
+        showSimulationConfigurationImages.setSelected(analystReportModel.isPrintAssemblyImage());
+        configImgButt.setEnabled(showSimulationConfigurationImages.isSelected());
+        configImgPathTF.setEnabled(showSimulationConfigurationImages.isSelected());
         configImgPathTF.setText(analystReportModel.getAssemblyImageLocation());
     }
 
-    private void unFillSimulationConfiguration() {
-        analystReportModel.setPrintSimulationConfigurationComments(wantAssemblyDesignAndAnalysis.isSelected());
+    private void unFillSimulationConfiguration() 
+    {
+        analystReportModel.setPrintSimulationConfigurationComments(showAssemblyDesignAndAnalysis.isSelected());
         analystReportModel.setSimulationConfigurationDescription(assemblyDesignConsiderations.getText());
         analystReportModel.setSimulationConfigationProductionNotes(simProductionNotes.getText());
         analystReportModel.setSimulationConfigurationConclusions(simConfigConclusions.getText());
-        analystReportModel.setPrintEntityTable(wantEntityTable.isSelected());
-        analystReportModel.setPrintAssemblyImage(wantSimConfigImages.isSelected());
+        analystReportModel.setPrintEntityTable(showEntityTable.isSelected());
+        analystReportModel.setPrintAssemblyImage(showSimulationConfigurationImages.isSelected());
         String s = configImgPathTF.getText();
         if (s != null && s.length() > 0) {
             analystReportModel.setAssemblyImageLocation(s);
@@ -634,9 +643,9 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         analystReportModel.setPrintParameterTable(wantEntityParameterTables.isSelected());
         analystReportModel.setParameterDescription(entityParamCommentsTA.getText());
     }
-    JCheckBox doBehaviorDesignAnalysisDescriptions;
-    JCheckBox doBehaviorDescriptions;
-    JCheckBox doBehaviorImages;
+    JCheckBox showBehaviorDesignAnalysisDescriptions;
+    JCheckBox showBehaviorDescriptions;
+    JCheckBox showBehaviorImages;
     JTextArea behaviorDescriptionTA;
     JTextArea behaviorConclusionsTA;
     JTabbedPane behaviorTabs;
@@ -644,10 +653,10 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private JPanel makeBehaviorsPanel() {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        doBehaviorDesignAnalysisDescriptions = new JCheckBox("Include behavior design and post-experiment analysis", true);
-        doBehaviorDesignAnalysisDescriptions.setToolTipText("Include entries in output report");
-        doBehaviorDesignAnalysisDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(doBehaviorDesignAnalysisDescriptions);
+        showBehaviorDesignAnalysisDescriptions = new JCheckBox("Include behavior design and post-experiment analysis", true);
+        showBehaviorDesignAnalysisDescriptions.setToolTipText("Include entries in output report");
+        showBehaviorDesignAnalysisDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(showBehaviorDesignAnalysisDescriptions);
 
         JScrollPane jsp = new JScrollPane(behaviorDescriptionTA = new WrappingTextArea());
         jsp.setBorder(new TitledBorder("Behavior Design Descriptions"));
@@ -659,15 +668,15 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         p.add(jsp);
 
-        doBehaviorDescriptions = new JCheckBox("Include behavior descriptions", true);
-        doBehaviorDescriptions.setToolTipText("Include entries in output report");
-        doBehaviorDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(doBehaviorDescriptions);
+        showBehaviorDescriptions = new JCheckBox("Include behavior descriptions", true);
+        showBehaviorDescriptions.setToolTipText("Include entries in output report");
+        showBehaviorDescriptions.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(showBehaviorDescriptions);
 
-        doBehaviorImages = new JCheckBox("Include behavior images", true);
-        doBehaviorImages.setToolTipText("Include entries in output report");
-        doBehaviorImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        p.add(doBehaviorImages);
+        showBehaviorImages = new JCheckBox("Include behavior images", true);
+        showBehaviorImages.setToolTipText("Include entries in output report");
+        showBehaviorImages.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        p.add(showBehaviorImages);
 
         behaviorTabs = new JTabbedPane(JTabbedPane.LEFT);
         behaviorTabs.setAlignmentX(JComponent.LEFT_ALIGNMENT);
@@ -677,30 +686,31 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     private void unFillBehaviors() {
-        analystReportModel.setPrintBehaviorDefComments(doBehaviorDesignAnalysisDescriptions.isSelected());
+        analystReportModel.setPrintBehaviorDefComments(showBehaviorDesignAnalysisDescriptions.isSelected());
         analystReportModel.setBehaviorDescription(behaviorDescriptionTA.getText());
         analystReportModel.setBehaviorConclusions(behaviorConclusionsTA.getText());
-        analystReportModel.setPrintBehaviorDescriptions(doBehaviorDescriptions.isSelected());
-        analystReportModel.setPrintEventGraphImages(doBehaviorImages.isSelected());
+        analystReportModel.setShowBehaviorDescriptions(showBehaviorDescriptions.isSelected());
+        analystReportModel.setShowEventGraphImages(showBehaviorImages.isSelected());
 
         // tables are uneditable
     }
 
     private void fillBehaviors() {
-        doBehaviorDesignAnalysisDescriptions.setSelected(analystReportModel.isPrintBehaviorDefComments());
+        showBehaviorDesignAnalysisDescriptions.setSelected(analystReportModel.isPrintBehaviorDefComments());
         behaviorDescriptionTA.setText(analystReportModel.getBehaviorComments());
-        behaviorDescriptionTA.setEnabled(doBehaviorDesignAnalysisDescriptions.isSelected());
+        behaviorDescriptionTA.setEnabled(showBehaviorDesignAnalysisDescriptions.isSelected());
         behaviorConclusionsTA.setText(analystReportModel.getBehaviorConclusions());
-        behaviorConclusionsTA.setEnabled(doBehaviorDesignAnalysisDescriptions.isSelected());
-        doBehaviorImages.setEnabled(analystReportModel.isPrintEventGraphImages());
-        doBehaviorDescriptions.setSelected(analystReportModel.isPrintBehaviorDescriptions());
-        behaviorTabs.setEnabled(doBehaviorDescriptions.isSelected());
+        behaviorConclusionsTA.setEnabled(showBehaviorDesignAnalysisDescriptions.isSelected());
+        showBehaviorImages.setEnabled(analystReportModel.isShowEventGraphImages());
+        showBehaviorDescriptions.setSelected(analystReportModel.isShowBehaviorDescriptions());
+        behaviorTabs.setEnabled(showBehaviorDescriptions.isSelected());
 
         // TODO: JDOM v1.1 does not yet support generics
         List behaviorList = analystReportModel.getBehaviorList();
 
         behaviorTabs.removeAll();
-        for (Iterator itr = behaviorList.iterator(); itr.hasNext();) {
+        for (Iterator itr = behaviorList.iterator(); itr.hasNext();) 
+        {
             List nextBehavior = (List) itr.next();
             String behaviorName = (String) nextBehavior.get(0);
             String behaviorDescription = (String) nextBehavior.get(1);
@@ -708,50 +718,52 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
             List behaviorStateVariables = (List) nextBehavior.get(3);
             String behaviorImagePath = (String) nextBehavior.get(4);
 
-            JPanel p = new JPanel();
-            p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-            JLabel lab = new JLabel("Description:  " + behaviorDescription);
-            lab.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-            p.add(lab);
+            JLabel label = new JLabel("Description:  " + behaviorDescription);
+            label.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            panel.add(label);
 
-            lab = new JLabel("Image location:  " + behaviorImagePath);
-            p.add(lab);
+            label = new JLabel("Image location:  " + behaviorImagePath);
+            panel.add(label);
 
-            Vector<String> cols = new Vector<>(3);
-            cols.add("name");
-            cols.add("type");
-            cols.add("description");
+            Vector<String> columns = new Vector<>(3);
+            columns.add("name");
+            columns.add("type");
+            columns.add("description");
 
             Vector<Vector<String>> data = new Vector<>(behaviorParameters.size());
-            for (Object behaviorParameter : behaviorParameters) {
-                String[] sa = (String[]) behaviorParameter;
+            for (Object behaviorParameter : behaviorParameters) 
+            {
+                String[] stringArray = (String[]) behaviorParameter;
                 Vector<String> row = new Vector<>(3);
-                row.add(sa[0]);
-                row.add(sa[1]);
-                row.add(sa[2]);
+                row.add(stringArray[0]);
+                row.add(stringArray[1]);
+                row.add(stringArray[2]);
                 data.add(row);
             }
-            JScrollPane jsp = new JScrollPane(new ROTable(data, cols));
-            jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-            jsp.setBorder(new TitledBorder("Parameters"));
-            p.add(jsp);
+            JScrollPane scrollPane = new JScrollPane(new ROTable(data, columns));
+            scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            scrollPane.setBorder(new TitledBorder("Parameters"));
+            panel.add(scrollPane);
 
             data = new Vector<>(behaviorStateVariables.size());
-            for (Object behaviorStateVariable : behaviorStateVariables) {
-                String[] sa = (String[]) behaviorStateVariable;
+            for (Object behaviorStateVariable : behaviorStateVariables) 
+            {
+                String[] stringArray = (String[]) behaviorStateVariable;
                 Vector<String> row = new Vector<>(3);
-                row.add(sa[0]);
-                row.add(sa[1]);
-                row.add(sa[2]);
+                row.add(stringArray[0]);
+                row.add(stringArray[1]);
+                row.add(stringArray[2]);
                 data.add(row);
             }
-            jsp = new JScrollPane(new ROTable(data, cols));
-            jsp.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-            jsp.setBorder(new TitledBorder("State variables"));
-            p.add(jsp);
+            scrollPane = new JScrollPane(new ROTable(data, columns));
+            scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            scrollPane.setBorder(new TitledBorder("State variables"));
+            panel.add(scrollPane);
 
-            behaviorTabs.add(behaviorName, p);
+            behaviorTabs.add(behaviorName, panel);
         }
     }
     JCheckBox wantStatisticsDescriptionAnalysis;

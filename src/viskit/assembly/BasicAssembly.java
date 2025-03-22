@@ -814,7 +814,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     // TODO: Simkit not generisized yet
     @SuppressWarnings("unchecked")
     @Override
-    public void run() // we are now in the simulation thread
+    public void run() // we are now in the simulation thread, commence thread complete
     {
         fixThreadedName();
         LOG.info(assemblyName + " is now running inside BasicAssembly run() Simulation Run thread...");
@@ -920,12 +920,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         
         LOG.info("Begin running simulation replications for " + getName());
 
-        for (int replication = 0; replication < getNumberReplications(); replication++) {
+        for (int replication = 0; replication < getNumberReplications(); replication++)
+        {
             firePropertyChange("replicationNumber", (replication + 1));
-            if ((replication + 1) == getVerboseReplication()) {
+            if ((replication + 1) == getVerboseReplication())
+            {
                 Schedule.setVerbose(true);
                 Schedule.setReallyVerbose(true);
-            } else {
+            } 
+            else 
+            {
                 Schedule.setVerbose(isVerbose());
                 Schedule.setReallyVerbose(isVerbose());
             }
@@ -937,8 +941,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 runCount = nextRunCount;
 
                 // print out new reRuns
-                // Note: too many Sysouts for multiple replications.  Comment
-                // in for debugging only.
+                // Note: too many Sysouts for multiple replications. 
+                // Comment in for debugging only.
 //                LOG.info("ReRun entities added since startup: ");
 //                Set<SimEntity> entitiesWithRunEvents = Schedule.getDefaultEventList().getRerun();
 //                for (SimEntity entity : entitiesWithRunEvents) {
