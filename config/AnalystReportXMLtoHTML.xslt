@@ -117,18 +117,16 @@
 
     <!-- Title information template -->
     <xsl:template match="AnalystReport">
-        <p align="center">
-            <font size="2">
-                <b>***</b>
-                THIS REntityParametersORT IS:
-                <b>
+        <xsl:if test="(string-length(@accessRights) > 0)">
+            <p align="center">
+                <font size="2">
+                    Access rights for this report:
                     <b>
-                        <xsl:value-of select="@classification"/>
-                        ***
+                        <xsl:value-of select="@accessRights"/>
                     </b>
-                </b>
-            </font>
-        </p>
+                </font>
+            </p>
+        </xsl:if>
         <p align="center">
             <font size="6">
                 <xsl:value-of select="@name"/>
@@ -182,12 +180,16 @@
     </xsl:template>
 
     <!-- Scenario Location templates -->
-    <xsl:template match="ScenarioLocationDescription">
+    <xsl:template match="ScenarioLocation">
         <p align="left">
             <font size="4">
                 <b><a name="ScenarioLocation">Scenario Location for the Simulation</a></b>
             </font>
         </p>
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+    
+    <xsl:template match="ScenarioLocationDescription">
         <p align="left">
             <i>Description of Scenario Location Features</i><br/>
             <font color="#00006C">
@@ -198,15 +200,22 @@
     <xsl:template match="ScenarioLocationProductionNotes">
         <p align="left">
             <i>Production Notes</i>
-            <p>All units are meters and degrees unless otherwise noted.</p>
+        </p>
+        <p align="left">
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
+        <p>
+            All units are meters and degrees unless otherwise noted.
+        </p>
     </xsl:template>
+    
     <xsl:template match="ScenarioLocationConclusions">
         <p align="left">
-            <i>Post-Experiment Analysis of Significant Scenario Location Features</i><br/>
+            <i>Post-Experiment Analysis of Significant Scenario Location Features</i>
+        </p>
+        <p align="left">
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -288,6 +297,10 @@
             <font size="4">
                 <b>
                     <a name="SimulationConfiguration">Simulation Configuration: Viskit Assembly</a>
+                    <xsl:if test="(string-length(@assemblyName)> 0)">
+                        for
+                        <xsl:value-of select="@assemblyName"/>
+                    </xsl:if>
                 </b>
                 <br/>
             </font>
@@ -299,6 +312,13 @@
             simulation replications, either for visual validation of behavior
             or statistical analysis of Measures of Effectiveness (MoEs).
         </p>
+        <xsl:apply-templates select="SimulationConfigurationDescription"/>
+        <xsl:apply-templates select="SimulationConfigurationProductionNotes"/>
+        <xsl:apply-templates select="SimulationConfigurationConclusions"/>
+        <!-- ... which launches EntityTable templates -->
+    </xsl:template>
+    
+    <xsl:template match="SimulationConfigurationDescription" mode="ConfigHeader">
         <p align="left">
             <i>Simulation Configuration Considerations</i><br/>
             <font color="#00006C">
@@ -309,15 +329,18 @@
     <xsl:template match="SimulationConfigurationProductionNotes" mode="ConfigHeader">
         <p align="left">
             <i>Simulation Configuration Production Notes</i>
-            <p>All units are meters and degrees unless otherwise noted.</p>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
+        <p>All units are meters and degrees unless otherwise noted.</p>
     </xsl:template>
+    
     <xsl:template match="SimulationConfigurationConclusions" mode="ConfigHeader">
         <p align="left">
-            <i>Post-Experiment Analysis of Simulation Configuration</i><br/>
+            <i>Post-Experiment Analysis of Simulation Configuration</i>
+        </p>
+        <p align="left">
             <font color="#000099">
                 <xsl:value-of select="@text"/>
             </font>
@@ -331,7 +354,7 @@
                     <th bgcolor="#FFFFCC">Simulation Entity</th>
                     <th bgcolor="#FFFFCC">Behavior Definitions</th>
                 </tr>
-                <xsl:apply-templates select="//SimulationConfiguration/EntityTable/SimEntity" mode="EntitiesTable"/>
+                <xsl:apply-templates select="EntityTable/*" mode="EntitiesTable"/>
             </table>
         </div>
         <p/>

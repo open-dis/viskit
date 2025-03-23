@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><ViskitProject>
+  <!-- viskitProject.xml -->
+  <AnalystReports name="AnalystReports"/>
+  <AssembliesDirectory name="Assemblies"/>
+  <EventGraphsDirectory name="EventGraphs"/>
+  <BuildDirectory name="build">
+    <ClassesDirectory name="classes"/>
+    <SourceDirectory name="src"/>
+  </BuildDirectory>
+  <DistDirectory name="dist"/>
+  <LibDirectory name="lib"/>
+  <Project name="DefaultProject"/>
+  <Cached>
+    <EventGraphs class="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/build/classes/examples/SimpleServer.class" digest="421dc83719567cf26512ffc19106801f" xml="C:/x3d-nps-gitlab/viskit/MyViskitProjects/DefaultProject/EventGraphs/examples/SimpleServer.xml"/>
+  </Cached>
+</ViskitProject>

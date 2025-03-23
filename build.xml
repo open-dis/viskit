@@ -324,14 +324,14 @@ their descpritions.
                 <include name="viskit/images/*.gif"/>
                 <include name="viskit/images/*.jpg"/>
             </fileset>
-            <fileset dir="${configuration.dir}">
+            <fileset dir="${config.dir}">
                 <include name="log4j2.xml"/>
             </fileset>
         </copy>
 
         <!-- ClassFinder prop for Simkit class skipping -->
         <copy todir="${dir.build.classes}/config">
-            <fileset dir="${configuration.dir}">
+            <fileset dir="${config.dir}">
                 <include name="${class.finder.props}"/>
                 <include name="${analyst.report.stylesheet}"/>
             </fileset>
@@ -835,7 +835,7 @@ their descpritions.
         <copy todir="${dot.viskit.dir}" verbose="true" file="${c_app.xml}"/>
         <copy todir="${dot.viskit.dir}" verbose="true" file="${c_gui.xml}"/>
         <copy todir="${dot.viskit.dir}" verbose="true" file="${c_README.md}"/>
-        <copy todir="MyViskitProjects/DefaultProject" file="${viskitProject.xml}" overwrite="true"/>
+        <copy todir="MyViskitProjects/DefaultProject" file="${viskitProject.xml}" overwrite="true" verbose="true"/>
         <antcall target="show.user.c_app.xml"/>
         <antcall target="show.user.c_gui.xml"/>
     </target>

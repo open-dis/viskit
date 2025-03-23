@@ -56,6 +56,7 @@ import viskit.mvc.MvcAbstractController;
 import viskit.model.AnalystReportModel;
 import viskit.util.XsltUtility;
 import viskit.view.AnalystReportViewFrame;
+import static viskit.ViskitProject.VISKIT_CONFIG_DIRECTORY;
 
 /** A controller for the analyst report panel.  All functions are to be
  * performed here vice the view.
@@ -216,7 +217,7 @@ public class AnalystReportController extends MvcAbstractController
         int idx = outputFileName.lastIndexOf(".");
 
         outputFileName = outputFileName.substring(0, idx) + ".xml"; // TODO superfluous?
-        XsltUtility.runXslt(analystReportModel.getAnalystReportXmlFile().getAbsolutePath(),
+        XsltUtility.runXsltStylesheet(analystReportModel.getAnalystReportXmlFile().getAbsolutePath(),
                 outputFileName, "config/AnalystReportXMLtoHTML.xslt");
     }
 
@@ -275,9 +276,9 @@ public class AnalystReportController extends MvcAbstractController
         // always generate new report before display, regardless of old or new name
         // TODO:  change XML input to temp file, rather than final file, if possible
         try {
-            XsltUtility.runXslt(analystReportModel.getAnalystReportXmlFile().getCanonicalPath(), // XML  input
+            XsltUtility.runXsltStylesheet(analystReportModel.getAnalystReportXmlFile().getCanonicalPath(), // XML  input
                 outputHtmlFilePath, // HTML output
-                "config/AnalystReportXMLtoHTML.xslt");  // stylesheet
+                VISKIT_CONFIG_DIRECTORY + "/" + "AnalystReportXMLtoHTML.xslt");  // XSLT stylesheet
         }
         catch (IOException ioe)
         {

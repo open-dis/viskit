@@ -54,6 +54,8 @@ import org.jdom.filter.ElementFilter;
 
 import viskit.util.EventGraphCache;
 import viskit.ViskitGlobals;
+import static viskit.ViskitProject.ASSEMBLIES_DIRECTORY_NAME;
+import static viskit.ViskitProject.VISKIT_VERSION;
 import static viskit.ViskitStatics.isFileReady;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
@@ -96,8 +98,8 @@ public final class AnalystReportModel extends MvcAbstractModel
     /** The root element of the report xml document */
     private Element rootElement;
     private Element executiveSummaryElement;
-    private Element simulationLocationElement;
-    private Element assemblyConfigurationElement;
+    private Element scenarioLocationElement;
+    private Element simulationConfigurationElement;
     private Element entityParametersElement;
     private Element behaviorDescriptionsElement;
     private Element statisticalResultsElement;
@@ -135,7 +137,8 @@ public final class AnalystReportModel extends MvcAbstractModel
     
     // attribute constants (to avoid spelling errors in source)
     public static final String NAME                        = "name";
-    public static final String ACCESS                      = "access";
+    public static final String ACCESS_RIGHTS               = "accessRights";
+    public static final String ASSEMBLY_NAME               = "assemblyName";
     public static final String AUTHOR                      = "author";
     public static final String DATE                        = "date";
     public static final String DESCRIPTION_ATTRIBUTE       = "description";
@@ -150,6 +153,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     public static final String SHOW_IMAGES                 = "images"; // TODO
     public static final String SHOW_OVERVIEW               = "showOverview";
     public static final String TEXT                        = "text";
+    public static final String VERSION                     = "version";
     
     public static final String NO_DESCRIPTION_PROVIDED     = "no description found in Event Graph";
 
@@ -295,21 +299,34 @@ public final class AnalystReportModel extends MvcAbstractModel
     }
 
     /**
-     * Parse a completed out report from XML
-     * @param file the XML file to parse
-     * @throws Exception is a parsing error is encountered
+     * Parse a completed Analyst Report from XML
+     * @param analystReportXmlFile the XML file to parse
+     * @throws Exception if a parsing error is encountered
      */
-    private void parseXML(File file) throws Exception 
+    private void parseXML(File analystReportXmlFile) throws Exception 
     {
-        reportJdomDocument                = EventGraphCache.instance().loadXML(file);
-        rootElement                       = reportJdomDocument.getRootElement();
-        executiveSummaryElement           = rootElement.getChild(EXECUTIVE_SUMMARY);
-        simulationLocationElement         = rootElement.getChild(SCENARIO_LOCATION);
-        assemblyConfigurationElement    = rootElement.getChild(SIMULATION_CONFIGURATION);
-        entityParametersElement           = rootElement.getChild(ENTITY_PARAMETERS);
-        behaviorDescriptionsElement       = rootElement.getChild(BEHAVIOR_DESCRIPTIONS);
-        statisticalResultsElement         = rootElement.getChild(STATISTICAL_RESULTS);
-        conclusionsRecommendationsElement = rootElement.getChild(CONCLUSIONS_RECOMMENDATIONS);
+        if (analystReportXmlFile == null)
+        {
+            LOG.error("parseXML() analystReportXmlFile is null");
+            return;
+        }
+        isFileReady(analystReportXmlFile);
+        try
+        {
+            reportJdomDocument                = EventGraphCache.instance().loadXML(analystReportXmlFile);
+            rootElement                       = reportJdomDocument.getRootElement();
+            executiveSummaryElement           = rootElement.getChild(EXECUTIVE_SUMMARY);
+            scenarioLocationElement           = rootElement.getChild(SCENARIO_LOCATION);
+            simulationConfigurationElement    = rootElement.getChild(SIMULATION_CONFIGURATION);
+            entityParametersElement           = rootElement.getChild(ENTITY_PARAMETERS);
+            behaviorDescriptionsElement       = rootElement.getChild(BEHAVIOR_DESCRIPTIONS);
+            statisticalResultsElement         = rootElement.getChild(STATISTICAL_RESULTS);
+            conclusionsRecommendationsElement = rootElement.getChild(CONCLUSIONS_RECOMMENDATIONS);
+        }
+        catch (Exception ex)
+        {
+            LOG.error("parseXML({}.xml exception: {}",analystReportXmlFile.getName(), ex);
+        }
     }
 
     /**
@@ -318,10 +335,11 @@ public final class AnalystReportModel extends MvcAbstractModel
     public void createHeader() 
     {
         // keeping filename out of files seemslike a good idea, but might be userful on the display as an uneditable value
-        rootElement.setAttribute(NAME,   "");
-        rootElement.setAttribute(ACCESS, "");
-        rootElement.setAttribute(AUTHOR, "");
-        rootElement.setAttribute(DATE,   "");
+        rootElement.setAttribute(NAME,          "");
+        rootElement.setAttribute(ACCESS_RIGHTS, "");
+        rootElement.setAttribute(AUTHOR,        "");
+        rootElement.setAttribute(DATE,          "");
+        rootElement.setAttribute(VERSION,       VISKIT_VERSION);
     }
 
     /**
@@ -337,30 +355,30 @@ public final class AnalystReportModel extends MvcAbstractModel
     /** Creates the SimulationLocation portion of the analyst report XML */
     public void createSimulationLocation()
     {
-        simulationLocationElement = new Element(SCENARIO_LOCATION);
-        simulationLocationElement.setAttribute(SHOW_DESCRIPTION, "true");
-        simulationLocationElement.setAttribute(SHOW_IMAGE,   "true");
-        makeCustomDescriptionElement(simulationLocationElement, "ScenarioLocation", "");
-        makeProductionNotes(simulationLocationElement, "ScenarioLocation", "");
-        makeConclusions(simulationLocationElement, "ScenarioLocation", "");
-        rootElement.addContent(simulationLocationElement);
+        scenarioLocationElement = new Element(SCENARIO_LOCATION);
+        scenarioLocationElement.setAttribute(SHOW_DESCRIPTION, "true");
+        scenarioLocationElement.setAttribute(SHOW_IMAGE,   "true");
+        makeDescriptionElement(scenarioLocationElement, "ScenarioLocation", "");
+        makeProductionNotesElement(scenarioLocationElement, "ScenarioLocation", "");
+        makeConclusionsElement(scenarioLocationElement, "ScenarioLocation", "");
+        rootElement.addContent(scenarioLocationElement);
     }
 
     /** Creates the simulation configuration portion of the Analyst report XML */
     private void createSimulationConfiguration() 
     {
-        assemblyConfigurationElement = new Element(SIMULATION_CONFIGURATION);
-        assemblyConfigurationElement.setAttribute(SHOW_DESCRIPTION, "true");
-        assemblyConfigurationElement.setAttribute(SHOW_IMAGE, "true");
-        assemblyConfigurationElement.setAttribute(SHOW_ENTITY_TABLE, "true");
-        makeCustomDescriptionElement(assemblyConfigurationElement, SIMULATION_CONFIGURATION, "");
-        makeProductionNotes(assemblyConfigurationElement, SIMULATION_CONFIGURATION, ""); // TODO SC -> SimulationConfiguration
-        makeConclusions(assemblyConfigurationElement, SIMULATION_CONFIGURATION, "");
+        simulationConfigurationElement = new Element(SIMULATION_CONFIGURATION);
+        simulationConfigurationElement.setAttribute(ASSEMBLY_NAME,     assemblyName);
+        simulationConfigurationElement.setAttribute(SHOW_DESCRIPTION,  "true");
+        simulationConfigurationElement.setAttribute(SHOW_IMAGE,        "true");
+        simulationConfigurationElement.setAttribute(SHOW_ENTITY_TABLE, "true");
+        makeDescriptionElement(simulationConfigurationElement, SIMULATION_CONFIGURATION, "");
+        makeProductionNotesElement   (simulationConfigurationElement, SIMULATION_CONFIGURATION, "");
+        makeConclusionsElement       (simulationConfigurationElement, SIMULATION_CONFIGURATION, "");
         if (assemblyFile != null) {
-            assemblyConfigurationElement.addContent(EventGraphCache.instance().getEntityTable());
+            simulationConfigurationElement.addContent(EventGraphCache.instance().getEntityTable());
         }
-
-        rootElement.addContent(assemblyConfigurationElement);
+        rootElement.addContent(simulationConfigurationElement);
     }
 
     /** Creates the entity parameter section of this analyst report */
@@ -369,8 +387,8 @@ public final class AnalystReportModel extends MvcAbstractModel
         entityParametersElement = new Element(ENTITY_PARAMETERS);
         entityParametersElement.setAttribute(SHOW_DESCRIPTION, "true");
         entityParametersElement.setAttribute(SHOW_PARAMETER_TABLES, "true");
-        makeCustomDescriptionElement(entityParametersElement, ENTITY_PARAMETERS, "");
-        makeConclusions(entityParametersElement, ENTITY_PARAMETERS, "");
+        makeDescriptionElement(entityParametersElement, ENTITY_PARAMETERS, "");
+        makeConclusionsElement(entityParametersElement, ENTITY_PARAMETERS, "");
         if (assemblyFile != null) {
             entityParametersElement.addContent(makeParameterTables());
         }
@@ -385,8 +403,8 @@ public final class AnalystReportModel extends MvcAbstractModel
         behaviorDescriptionsElement.setAttribute(SHOW_DESCRIPTION, "true");
         behaviorDescriptionsElement.setAttribute("showDetails", "true");
         behaviorDescriptionsElement.setAttribute("showImage", "true");
-        makeCustomDescriptionElement(behaviorDescriptionsElement,BEHAVIOR_DESCRIPTIONS, "");
-        makeConclusions(behaviorDescriptionsElement,BEHAVIOR_DESCRIPTIONS, "");
+        makeDescriptionElement(behaviorDescriptionsElement,BEHAVIOR_DESCRIPTIONS, "");
+        makeConclusionsElement(behaviorDescriptionsElement,BEHAVIOR_DESCRIPTIONS, "");
 
         behaviorDescriptionsElement.addContent(processBehaviors(true, true, true));
 
@@ -404,8 +422,8 @@ public final class AnalystReportModel extends MvcAbstractModel
         statisticalResultsElement.setAttribute(SHOW_DESCRIPTION, "true");
         statisticalResultsElement.setAttribute(REPLICATION_STATISTICS, "true"); // TODO full name
         statisticalResultsElement.setAttribute(SUMMARY_STATISTICS, "true");     // TODO full name
-        makeCustomDescriptionElement(statisticalResultsElement,STATISTICAL_RESULTS, "");
-        makeConclusions(statisticalResultsElement,STATISTICAL_RESULTS, "");
+        makeDescriptionElement(statisticalResultsElement,STATISTICAL_RESULTS, "");
+        makeConclusionsElement(statisticalResultsElement,STATISTICAL_RESULTS, "");
 
         if (statisticsReportPath != null && statisticsReportPath.length() > 0) {
             statisticalResultsElement.setAttribute("file", statisticsReportPath);
@@ -504,8 +522,8 @@ public final class AnalystReportModel extends MvcAbstractModel
     {
         conclusionsRecommendationsElement = new Element(CONCLUSIONS_RECOMMENDATIONS);
         conclusionsRecommendationsElement.setAttribute(SHOW_DESCRIPTION, "true");
-        makeCustomDescriptionElement(conclusionsRecommendationsElement, CONCLUSIONS_RECOMMENDATIONS, "");
-        makeConclusions(conclusionsRecommendationsElement, CONCLUSIONS_RECOMMENDATIONS, "");
+        makeDescriptionElement(conclusionsRecommendationsElement, CONCLUSIONS_RECOMMENDATIONS, "");
+        makeConclusionsElement(conclusionsRecommendationsElement, CONCLUSIONS_RECOMMENDATIONS, "");
         rootElement.addContent(conclusionsRecommendationsElement);
     }
 
@@ -689,7 +707,8 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    private Element makeTablesCommon(String tableName) {
+    private Element makeTablesCommon(String tableName) 
+    {
         Element table = new Element(tableName);
         Element localRootElement = EventGraphCache.instance().getAssemblyDocument().getRootElement();
         List<Element> simEntityList = localRootElement.getChildren(SIM_ENTITY);
@@ -777,14 +796,14 @@ public final class AnalystReportModel extends MvcAbstractModel
     public String[][] unMakeEntityTable() 
     {
         String[][] emptyResult = new String[0][0];
-        if (assemblyConfigurationElement == null)
+        if (simulationConfigurationElement == null)
         {
             LOG.error("AnalystReportModel unMakeEntityTable() simulationConfigurationElement is null");
             return emptyResult;
         }
-        if (!assemblyConfigurationElement.getChildren().isEmpty())
+        if (!simulationConfigurationElement.getChildren().isEmpty())
         {
-            Element element = assemblyConfigurationElement.getChild(ENTITY_TABLE);
+            Element element = simulationConfigurationElement.getChild(ENTITY_TABLE);
             if (element == null)
             {
                 LOG.error("AnalystReportModel unMakeEntityTable() simulationConfigurationElement EntityTable is null");
@@ -939,7 +958,7 @@ public final class AnalystReportModel extends MvcAbstractModel
      * @param elementPrefix  the tag prefix used to identify unique Description elements (used by XSLT)
      * @param descriptionText the text descriptions
      */
-    public void makeCustomDescriptionElement(Element parentElement, String elementPrefix, String descriptionText)
+    public void makeDescriptionElement(Element parentElement, String elementPrefix, String descriptionText)
     {
         Element newElement = _makeElementContent(elementPrefix, DESCRIPTION, descriptionText);
         replaceChildren(parentElement, newElement);
@@ -960,20 +979,21 @@ public final class AnalystReportModel extends MvcAbstractModel
         return _unMakeContent(element, DESCRIPTION);
     }
 
-    /**
-     * Creates a standard 'Conclusions' element used by all sections of the report
-     * to add conclusions
-     *
-     * @param commentTag     the tag used to identify unique Comments (used by XSLT)
-     * @param conclusionText the text comments
-     * @return conclusions the Comments embedded in well formed XML
-     */
-    public Element xmakeConclusions(String commentTag, String conclusionText) {
-        return _makeElementContent(commentTag,"Conclusions",conclusionText);
-    }
+//    /** Unused
+//     * Creates a standard 'Conclusions' element used by all sections of the report
+//     * to add conclusions
+//     *
+//     * @param commentTag     the tag used to identify unique Comments (used by XSLT)
+//     * @param conclusionText the text comments
+//     * @return conclusions the Comments embedded in well formed XML
+//     */
+//    public Element xmakeConclusions(String commentTag, String conclusionText) {
+//        return _makeElementContent(commentTag,"Conclusions",conclusionText);
+//    }
 
-    public void makeConclusions(Element parent, String commentTag, String conclusionText) {
-        replaceChildren(parent,_makeElementContent(commentTag,"Conclusions",conclusionText));
+    public void makeConclusionsElement(Element parentElement, String elementPrefix, String conclusionText) 
+    {
+        replaceChildren(parentElement,_makeElementContent(elementPrefix,"Conclusions",conclusionText));
     }
 
     /** @param element the Element to extract information from
@@ -1001,11 +1021,12 @@ public final class AnalystReportModel extends MvcAbstractModel
      * report to add production notes
      *
      * @param parentElement the parent element to add content too
-     * @param productionNotesTag the tag used to identify unique production notes (used by XSLT)
+     * @param elementPrefix the tag used to identify unique production notes (used by XSLT)
      * @param productionNotesText author's text block
      */
-    public void makeProductionNotes(Element parentElement, String productionNotesTag, String productionNotesText) {
-        replaceChildren(parentElement, _makeElementContent(productionNotesTag, "ProductionNotes", productionNotesText));
+    public void makeProductionNotesElement(Element parentElement, String elementPrefix, String productionNotesText) 
+    {
+        replaceChildren(parentElement, _makeElementContent(elementPrefix, "ProductionNotes", productionNotesText));
     }
 
     public String unMakeProductionNotes(Element e) {
@@ -1057,13 +1078,12 @@ public final class AnalystReportModel extends MvcAbstractModel
      */
     private void setDefaultPanelValues() 
     {
-        //Header values
-        setReportName         ("***ENTER REPORT TITLE HERE***");
-        setDocumentAccessLabel("***ENTER ACCESS LABEL HERE***");
-        setAuthor             ("***ENTER NAME OF AUTHOR HERE***");
-        setDateOfReport       (DateFormat.getInstance().format(new Date()));
-        setDocumentAccessLabel("");
-
+        // Header values
+        setReportName          ("***ENTER REPORT TITLE HERE***");
+        setAuthor              ("***ENTER NAME OF AUTHOR HERE***");
+        setDateOfReport        (DateFormat.getInstance().format(new Date()));
+        setDocumentAccessRights("");
+        
         setShowExecutiveSummary(true);
         setExecutiveSummary   ("***ENTER EXECUTIVE SUMMARY HERE***");
 
@@ -1085,7 +1105,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         setShowEntityParametersOverview(true);
         setShowEntityParametersTables   (true);
         setEntityParametersOverview    ("***ENTER ENTITY PARAMETERS OVERVIEW HERE***");
-        setEntityParametersConclusions ("***ENTER ENTITY PARAMETERS CONCLUSIONS HERE***"); // TODO not shown?
+        setEntityParametersConclusions ("***ENTER ENTITY PARAMETERS CONCLUSIONS HERE***");
 
         //BehaviorParameter values
         setShowBehaviorDesignAnalysisDescriptions(true);
@@ -1116,7 +1136,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     public String     getAnalystReportFileXmlName()  {return analystReportXmFilelName;}
     public File       getAnalystReportXmlFile()      {return analystReportXmlFile;}
     public String     getAuthor()                    {return rootElement.getAttributeValue(AUTHOR);}
-    public String     getDocumentAccessLabel()       {return rootElement.getAttributeValue(ACCESS);}
+    public String     getDocumentAccessRights()      {return rootElement.getAttributeValue(ACCESS_RIGHTS);}
     public String     getDateOfReport()              {return rootElement.getAttributeValue(DATE);}
     public String     getReportName()                {return rootElement.getAttributeValue(NAME);}
 
@@ -1131,10 +1151,10 @@ public final class AnalystReportModel extends MvcAbstractModel
         // Subsequent calls within the same runtime require a cleared cache
         // which this does
         EventGraphCache.instance().makeEntityTable(assemblyFile);
-        if (assemblyConfigurationElement == null)
+        if (simulationConfigurationElement == null)
             return; // stats report not set for recording
 
-        assemblyConfigurationElement.addContent(EventGraphCache.instance().getEntityTable());
+        simulationConfigurationElement.addContent(EventGraphCache.instance().getEntityTable());
         entityParametersElement.addContent(makeParameterTables());
         createBehaviorDescriptions();
     }
@@ -1159,19 +1179,19 @@ public final class AnalystReportModel extends MvcAbstractModel
         LOG.debug("JProgressBar set");
 
         captureEventGraphImages();
-        LOG.debug("Event Graphs captured");
+        LOG.debug("Event Graph image captured");
         captureAssemblyImage();
-        LOG.debug("Assembly captured");
-        captureLocationImage();
-        LOG.debug("Location Image captured");
+        LOG.debug("Assembly imagecaptured");
+        captureScenarioLocationImage();
+        LOG.debug("Scenario Location Image captured");
 
         progressBar.setIndeterminate(false);
         progressBar.setStringPainted(false);
     }
 
-    /** Utility method used here to invoke the capability to capture all Event
-     * Graph images of which are situated in a particular Assembly File.  These
-     * PNGs will be dropped into ${viskitProject}/AnalystReports/images/EventGraphs </p>
+    /** Utility method used here to invoke the capability to capture all
+     * Event Graph images of which are situated in a particular Assembly File.
+     * These PNGs will be dropped into ${viskitProject}/AnalystReports/images/EventGraphs </p>
      */
     private void captureEventGraphImages() 
     {
@@ -1181,7 +1201,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                 eventGraphCache.getEventGraphImageFilesList());
     }
 
-    /** Utility method used here to invoke the capability to capture the
+    /** Utility method to invoke the capability to capture the
      * Assembly image of the loaded Assembly File.  This PNG will be dropped
      * into ${viskitProject}/AnalystReports/images/Assemblies </p>
      */
@@ -1193,7 +1213,8 @@ public final class AnalystReportModel extends MvcAbstractModel
                  assemblyFilePath = assemblyFilePath.substring(assemblyFilePath.lastIndexOf("\\") + 1);
         else if (assemblyFilePath.contains("/"))
                  assemblyFilePath = assemblyFilePath.substring(assemblyFilePath.lastIndexOf("/")  + 1);
-        assemblyFilePath = "Assemblies/" + assemblyFilePath;
+        assemblyFilePath = ASSEMBLIES_DIRECTORY_NAME + "/" + assemblyFilePath;
+        
         File assemblyImageFile = new File(
                 ViskitGlobals.instance().getViskitProject().getAnalystReportImagesDirectory(),
                 assemblyFilePath + ".png"); // ends with .xml.png
@@ -1243,7 +1264,7 @@ public final class AnalystReportModel extends MvcAbstractModel
 //            message += // not working
 //                   "<p align='center'><a href='" + imageURL + "'><img src='" + imageURL + "'/></a></p><br />";
 
-        message += "<p align='center'>in Analyst Report menu to view results</p><br /></body></html>";
+        message += "<p align='center'>in Analyst Report menu to view results.</p><br /></body></html>";
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE, popupTitle, message);
         
         /* better not to present another decision, had thread-completion issues anyway
@@ -1273,20 +1294,21 @@ public final class AnalystReportModel extends MvcAbstractModel
     }
 
     /** If a 2D top town image was generated from SavageStudio, then point to
-     *  this location
+     *  this file location
      */
-    private void captureLocationImage() {
-        File locationImage = new File(
+    private void captureScenarioLocationImage() 
+    {
+        File scenarioLocationImage = new File(
                 ViskitGlobals.instance().getViskitProject().getAnalystReportImagesDirectory(),
                 assemblyFile.getName() + ".png");
 
-        LOG.debug(locationImage);
-        if (locationImage.exists()) {
+        LOG.debug("captureScenarioLocationImage() {}", scenarioLocationImage);
+        if (scenarioLocationImage.exists()) {
 
             // Set relative path only
-            setLocationImage(locationImage.getPath());
+            setLocationImage(scenarioLocationImage.getPath());
         }
-        LOG.debug(getLocationImage());
+        LOG.debug("captureScenarioLocationImage() {}", getLocationImage());
     }
 
     public void setAnalystReportFileName      (String newAnalystReportFileName) 
@@ -1297,17 +1319,18 @@ public final class AnalystReportModel extends MvcAbstractModel
                                               { this.statisticsReportDocument = newStatisticsReportDocument; }
     public void setStatisticsReportPath       (String filePath)           { this.statisticsReportPath = filePath; }
     public void setAuthor                     (String s) { rootElement.setAttribute(AUTHOR, s); };
-    public void setDocumentAccessLabel        (String s) { rootElement.setAttribute(ACCESS, s);}
+    public void setDocumentAccessRights       (String s) { rootElement.setAttribute(ACCESS_RIGHTS, s);}
     public void setDateOfReport               (String s) { rootElement.setAttribute(DATE, s);}
     public void setDebug                      (boolean value) { this.debug = value; }
     public void setReportName                 (String s) { rootElement.setAttribute(NAME, s); }
+    public void setVersion                    (String s) { rootElement.setAttribute(VISKIT_VERSION, s); }
 
     public boolean isShowRecommendationsConclusions() { return stringToBoolean(conclusionsRecommendationsElement.getAttributeValue(SHOW_DESCRIPTION)); }
     public String  getConclusions()                    { return unMakeCustomDescriptionElements(conclusionsRecommendationsElement);}
     public String  getRecommendations()                { return unMakeConclusions(conclusionsRecommendationsElement);}
     public void setShowRecommendationsConclusions(boolean value) { conclusionsRecommendationsElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value)); }
-    public void setConclusions                     (String s)     { makeCustomDescriptionElement(conclusionsRecommendationsElement,CONCLUSIONS_RECOMMENDATIONS, s); }   // watch the wording
-    public void setRecommendations                 (String s)     { makeConclusions(conclusionsRecommendationsElement,CONCLUSIONS_RECOMMENDATIONS, s); }
+    public void setConclusions                     (String s)     { makeDescriptionElement(conclusionsRecommendationsElement,CONCLUSIONS_RECOMMENDATIONS, s); }   // watch the wording
+    public void setRecommendations                 (String s)     { makeConclusionsElement(conclusionsRecommendationsElement,CONCLUSIONS_RECOMMENDATIONS, s); }
 
     // exec summary:
     public boolean isShowExecutiveSummary() 
@@ -1326,25 +1349,25 @@ public final class AnalystReportModel extends MvcAbstractModel
     }
     public void    setExecutiveSummary   (String s) 
     { 
-        makeCustomDescriptionElement(executiveSummaryElement,EXECUTIVE_SUMMARY, s);
+        makeDescriptionElement(executiveSummaryElement,EXECUTIVE_SUMMARY, s);
     }
 
     // sim-location:
-    public boolean isShowScenarioLocationDescription() {return stringToBoolean(simulationLocationElement.getAttributeValue(SHOW_DESCRIPTION));}
-    public void    setScenarioLocationIncluded  (boolean value) {simulationLocationElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value));}
-    public boolean isShowScenarioLocationImage()    {return stringToBoolean(simulationLocationElement.getAttributeValue(SHOW_IMAGE));}
-    public void    setShowScenarioLocationImage     (boolean value) {simulationLocationElement.setAttribute(SHOW_IMAGE, booleanToString(value));}
+    public boolean isShowScenarioLocationDescription() {return stringToBoolean(scenarioLocationElement.getAttributeValue(SHOW_DESCRIPTION));}
+    public void    setScenarioLocationIncluded  (boolean value) {scenarioLocationElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value));}
+    public boolean isShowScenarioLocationImage()    {return stringToBoolean(scenarioLocationElement.getAttributeValue(SHOW_IMAGE));}
+    public void    setShowScenarioLocationImage     (boolean value) {scenarioLocationElement.setAttribute(SHOW_IMAGE, booleanToString(value));}
 
-    public String  getScenarioLocationDescription()        {return unMakeCustomDescriptionElements(simulationLocationElement);}
-    public String  getScenarioLocationConclusions()     {return unMakeConclusions(simulationLocationElement);}
-    public String  getScenarioLocationProductionNotes() {return unMakeProductionNotes(simulationLocationElement);}
-    public String  getLocationImage()              {return unMakeImage(simulationLocationElement, SCENARIO_LOCATION);}
-    public String  getChartImage()                 {return unMakeImage(simulationLocationElement, CHART);}
-    public void setScenarioLocationDescription  (String s)    {makeCustomDescriptionElement(simulationLocationElement, "ScenarioLocation", s);}
-    public void setScenarioLocationConclusions  (String s)    {makeConclusions(simulationLocationElement, "ScenarioLocation", s);}
-    public void setScenarioLocationProductionNotes(String s)  {makeProductionNotes(simulationLocationElement, "ScenarioLocation", s);}
-    public void setLocationImage           (String s)    {replaceChildren(simulationLocationElement, makeImageElement(SCENARIO_LOCATION, s)); }
-    public void setChartImage              (String s)    {replaceChildren(simulationLocationElement, makeImageElement(CHART, s)); }
+    public String  getScenarioLocationDescription()        {return unMakeCustomDescriptionElements(scenarioLocationElement);}
+    public String  getScenarioLocationConclusions()     {return unMakeConclusions(scenarioLocationElement);}
+    public String  getScenarioLocationProductionNotes() {return unMakeProductionNotes(scenarioLocationElement);}
+    public String  getLocationImage()              {return unMakeImage(scenarioLocationElement, SCENARIO_LOCATION);}
+    public String  getChartImage()                 {return unMakeImage(scenarioLocationElement, CHART);}
+    public void setScenarioLocationDescription  (String s)    {makeDescriptionElement(scenarioLocationElement, "ScenarioLocation", s);}
+    public void setScenarioLocationConclusions  (String s)    {makeConclusionsElement(scenarioLocationElement, "ScenarioLocation", s);}
+    public void setScenarioLocationProductionNotes(String s)  {makeProductionNotesElement(scenarioLocationElement, "ScenarioLocation", s);}
+    public void setLocationImage           (String s)    {replaceChildren(scenarioLocationElement, makeImageElement(SCENARIO_LOCATION, s)); }
+    public void setChartImage              (String s)    {replaceChildren(scenarioLocationElement, makeImageElement(CHART, s)); }
 
     public boolean isShowEntityParametersOverview() { return stringToBoolean(entityParametersElement.getAttributeValue(SHOW_OVERVIEW));}
     public boolean isShowEntityParametersTables()        { return stringToBoolean(entityParametersElement.getAttributeValue(SHOW_PARAMETER_TABLES)); }
@@ -1354,8 +1377,8 @@ public final class AnalystReportModel extends MvcAbstractModel
     public String  getEntityParametersOverview()    { return unMakeCustomDescriptionElements(entityParametersElement);} // TODO check, apparent mismatch
     public String  getEntityParametersConclusions() { return unMakeConclusions(entityParametersElement);}               // TODO check, apparent mismatch
     public Vector<Object[]> getEntityParametersTables() {return unMakeParameterTables(entityParametersElement);}
-    public void setEntityParametersOverview         (String s){ makeCustomDescriptionElement(entityParametersElement,ENTITY_PARAMETERS, s); }
-    public void setEntityParametersConclusions      (String s){ makeConclusions(entityParametersElement,ENTITY_PARAMETERS, s); }
+    public void setEntityParametersOverview         (String s){ makeDescriptionElement(entityParametersElement,ENTITY_PARAMETERS, s); }
+    public void setEntityParametersConclusions      (String s){ makeConclusionsElement(entityParametersElement,ENTITY_PARAMETERS, s); }
 
     public boolean isShowBehaviorDesignAnalysisDescriptions()             { return stringToBoolean(behaviorDescriptionsElement.getAttributeValue(SHOW_DESCRIPTION));}
     public void   setShowBehaviorDesignAnalysisDescriptions(boolean value) { behaviorDescriptionsElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value)); }
@@ -1369,28 +1392,28 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     public String  getBehaviorDescription()             { return unMakeCustomDescriptionElements(behaviorDescriptionsElement); }
     public String  getBehaviorConclusions()          { return unMakeConclusions(behaviorDescriptionsElement); }
-    public void    setBehaviorDescription (String s) { makeCustomDescriptionElement(behaviorDescriptionsElement,BEHAVIOR_DESCRIPTIONS, s); }
-    public void    setBehaviorConclusions (String s) { makeConclusions(behaviorDescriptionsElement,BEHAVIOR_DESCRIPTIONS, s); }
+    public void    setBehaviorDescription (String s) { makeDescriptionElement(behaviorDescriptionsElement,BEHAVIOR_DESCRIPTIONS, s); }
+    public void    setBehaviorConclusions (String s) { makeConclusionsElement(behaviorDescriptionsElement,BEHAVIOR_DESCRIPTIONS, s); }
     public List    getBehaviorList()                 { return unMakeBehaviorList(behaviorDescriptionsElement); }
     
-    public boolean isShowAssemblyConfigurationDescription() { return stringToBoolean(assemblyConfigurationElement.getAttributeValue(SHOW_DESCRIPTION));}
-    public boolean isShowAssemblyEntityDefinitionsTable()       { return stringToBoolean(assemblyConfigurationElement.getAttributeValue(SHOW_ENTITY_TABLE));}
-    public boolean isShowAssemblyImage()             { return stringToBoolean(assemblyConfigurationElement.getAttributeValue(SHOW_IMAGE));}
-    public void    setShowSimulationConfiguration  (boolean value) { assemblyConfigurationElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value));}
-    public void    setShowSimulationConfigurationAssemblyEntityDefinitionsTable        (boolean value) { assemblyConfigurationElement.setAttribute(SHOW_ENTITY_TABLE, booleanToString(value)); }
-    public void    setShowSimulationConfigurationAssemblyImage      (boolean value) { assemblyConfigurationElement.setAttribute(SHOW_IMAGE, booleanToString(value)); }
+    public boolean isShowAssemblyConfigurationDescription() { return stringToBoolean(simulationConfigurationElement.getAttributeValue(SHOW_DESCRIPTION));}
+    public boolean isShowAssemblyEntityDefinitionsTable()       { return stringToBoolean(simulationConfigurationElement.getAttributeValue(SHOW_ENTITY_TABLE));}
+    public boolean isShowAssemblyImage()             { return stringToBoolean(simulationConfigurationElement.getAttributeValue(SHOW_IMAGE));}
+    public void    setShowSimulationConfiguration  (boolean value) { simulationConfigurationElement.setAttribute(SHOW_DESCRIPTION, booleanToString(value));}
+    public void    setShowSimulationConfigurationAssemblyEntityDefinitionsTable        (boolean value) { simulationConfigurationElement.setAttribute(SHOW_ENTITY_TABLE, booleanToString(value)); }
+    public void    setShowSimulationConfigurationAssemblyImage      (boolean value) { simulationConfigurationElement.setAttribute(SHOW_IMAGE, booleanToString(value)); }
 
-    public String     getConfigurationComments()        {return unMakeCustomDescriptionElements(assemblyConfigurationElement);}
+    public String     getConfigurationComments()        {return unMakeCustomDescriptionElements(simulationConfigurationElement);}
     public String[][] getAssemblyDesignEntityDefinitionsTable()     {return unMakeEntityTable();}
-    public String     getAssemblyConfigurationConclusions()     {return unMakeConclusions(assemblyConfigurationElement);}
-    public String     getAssemblyConfigurationProductionNotes() {return unMakeProductionNotes(assemblyConfigurationElement);}
-    public String     getAssemblyImageLocation()                  {return unMakeImage(assemblyConfigurationElement, "Assembly");}
+    public String     getAssemblyConfigurationConclusions()     {return unMakeConclusions(simulationConfigurationElement);}
+    public String     getAssemblyConfigurationProductionNotes() {return unMakeProductionNotes(simulationConfigurationElement);}
+    public String     getAssemblyImageLocation()                  {return unMakeImage(simulationConfigurationElement, "Assembly");}
 
-    public void    setSimulationConfigurationConsiderations  (String s) { makeCustomDescriptionElement(assemblyConfigurationElement, SIMULATION_CONFIGURATION, s); }
-    public void    setSimulationConfigurationEntityTable  (String s) { }; //todo//todo//todo//todo
-    public void    setSimulationConfigurationConclusions  (String s) { makeConclusions(assemblyConfigurationElement, SIMULATION_CONFIGURATION, s); }
-    public void    setSimulationConfigurationProductionNotes(String s) {makeProductionNotes(assemblyConfigurationElement, SIMULATION_CONFIGURATION, s);}
-    public void    setAssemblyImageLocation        (String s) {replaceChildren(assemblyConfigurationElement, makeImageElement("Assembly", s));}
+    public void    setSimulationConfigurationConsiderations  (String s) { makeDescriptionElement(simulationConfigurationElement, SIMULATION_CONFIGURATION, s); }
+    public void    setSimulationConfigurationEntityTable  (String s) { }; //todo//todo//todo//todo//todo//todo//todo//todo
+    public void    setSimulationConfigurationConclusions  (String s) { makeConclusionsElement(simulationConfigurationElement, SIMULATION_CONFIGURATION, s); }
+    public void    setSimulationConfigurationProductionNotes(String s) {makeProductionNotesElement(simulationConfigurationElement, SIMULATION_CONFIGURATION, s);}
+    public void    setAssemblyImageLocation        (String s) {replaceChildren(simulationConfigurationElement, makeImageElement("Assembly", s));}
 
     // stat results:
     // good
@@ -1407,8 +1430,8 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     public String  getStatisticsDescription()        { return unMakeCustomDescriptionElements(statisticalResultsElement);}
     public String  getStatisticsConclusions()     { return unMakeConclusions(statisticalResultsElement);}
-    public void setStatisticsDescription          (String s) { makeCustomDescriptionElement(statisticalResultsElement,STATISTICAL_RESULTS, s); }
-    public void setStatisticsConclusions          (String s) { makeConclusions(statisticalResultsElement,STATISTICAL_RESULTS, s); }
+    public void setStatisticsDescription          (String s) { makeDescriptionElement(statisticalResultsElement,STATISTICAL_RESULTS, s); }
+    public void setStatisticsConclusions          (String s) { makeConclusionsElement(statisticalResultsElement,STATISTICAL_RESULTS, s); }
     public String getStatisticsFilePath()         { return statisticalResultsElement.getAttributeValue("file"); }
     public List<Object>   getStatisticsReplicationsList() {return unMakeReplicationList(statisticalResultsElement);}
     public List<String[]> getStatisticsSummaryList()      {return unMakeStatisticsSummaryList(statisticalResultsElement);}

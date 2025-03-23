@@ -1,6 +1,6 @@
 package viskit.util;
 
-import edu.nps.util.Log4jUtilities;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,39 +24,45 @@ public class XsltUtility
     /**
      * Runs an XSL Transformation on an XML file and writes the result to another file
      *
-     * @param inFile XML file to be transformed
-     * @param outFile output file for transformation results
-     * @param xslFile XSLT to utilize for transformation
+     * @param inputFilePath XML file to be transformed
+     * @param outputFilePath output file for transformation results
+     * @param xsltStylesheetFilePath XSLT to utilize for transformation
      *
      * @return the resulting transformed XML file
      */
-    public static boolean runXslt(String inFile, String outFile, String xslFile) {
-
+    public static boolean runXsltStylesheet(String inputFilePath, String outputFilePath, String xsltStylesheetFilePath) 
+    {
+        File xsltStylesheetFile = new File(xsltStylesheetFilePath);
+        LOG.info("runXslt() commence stylesheet conversion\n      {}\n      {}\n      {}",
+                inputFilePath, outputFilePath,  // TODO actual absolute paths from File
+                xsltStylesheetFile.getAbsolutePath());
         try {
             // Force Xalan for this TransformerFactory
             System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
             TransformerFactory factory = TransformerFactory.newInstance();
 
             // Look in the viskit.jar file for this XSLT
-            Templates template = factory.newTemplates(new StreamSource(XsltUtility.class.getClassLoader().getResourceAsStream(xslFile)));
+            Templates template = factory.newTemplates(new StreamSource(XsltUtility.class.getClassLoader().getResourceAsStream(xsltStylesheetFilePath)));
             Transformer xFormer = template.newTransformer();
-            Source source = new StreamSource(new FileInputStream(inFile));
-            Result result = new StreamResult(new FileOutputStream(outFile));
+            Source source = new StreamSource(new FileInputStream(inputFilePath));
+            Result result = new StreamResult(new FileOutputStream(outputFilePath));
             xFormer.transform(source, result);
-        } catch (FileNotFoundException e) {
+        } 
+        catch (FileNotFoundException e) {
             LOG.error("Unable to load file for XSL Transformation\n" +
-                    "   Input file : " + inFile + "\n" +
-                    "   Output file: " + outFile + "\n" +
-                    "   XSLT file  : " + xslFile);
+                    "   Input file : " + inputFilePath + "\n" +
+                    "   Output file: " + outputFilePath + "\n" +
+                    "   XSLT file  : " + xsltStylesheetFilePath);
             return false;
-        } catch (TransformerConfigurationException e) {
+        }
+        catch (TransformerConfigurationException e) {
             LOG.error("Unable to configure transformer for XSL Transformation");
             return false;
-        } catch (TransformerException e) {
+        } 
+        catch (TransformerException e) {
             LOG.error("Exception during XSL Transformation");
             return false;
         }
         return true;
     }
-
 } // end class file XsltUtility.java

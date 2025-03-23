@@ -62,10 +62,12 @@ import viskit.view.dialog.ViskitUserPreferences;
  */
 public class ViskitProject 
 {
-    /** TODO FIX. This static variable will be set by the user upon first Viskit startup
+    /** These static variable might be set by the user upon first Viskit startup
      * to determine a project home space on the user's machine.  A default
      * home will be the user's working directory where Viskit is installed.
      */
+    
+    public static final String VISKIT_VERSION                         = "2.0 beta";
     public static final String DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME = "MyViskitProjects";
     public static final String DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH =
             System.getProperty("user.home").replaceAll("\\\\", "/") + "/" + DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME;
@@ -76,7 +78,7 @@ public class ViskitProject
 
     public static final String ANALYST_REPORTS_DIRECTORY_NAME = "AnalystReports";
     public static final String VISKIT_ICON_FILE_NAME = "Viskit.ico";
-    public static final String VISKIT_CONFIG_DIRECTORY = "configuration";
+    public static final String VISKIT_CONFIG_DIRECTORY = "config"; // this must match viskit.jar and many other places
     public static final String VISKIT_ICON_SOURCE = VISKIT_CONFIG_DIRECTORY + "/" + VISKIT_ICON_FILE_NAME;
     public static final String ANALYST_REPORT_IMAGES_DIRECTORY_NAME = "images";
     public static final String ANALYST_REPORT_CHARTS_DIRECTORY_PATH = ANALYST_REPORT_IMAGES_DIRECTORY_NAME + "/" + "charts";

@@ -243,7 +243,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         return (ViskitGraphAssemblyComponentWrapper) jSP.getViewport().getComponent(0);
     }
 
-    public Component getCurrentJgraphComponent() {
+    /** get JGraph from window system display.TODO: how to crop image?
+     * @return the component holding the JGraph image */
+    public Component getCurrentJgraphComponent() 
+    {
         ViskitGraphAssemblyComponentWrapper vcw = getCurrentViskitGraphAssemblyComponentWrapper();
         if (vcw == null || vcw.drawingSplitPane == null) {return null;}
         return vcw.drawingSplitPane.getRightComponent();

@@ -86,15 +86,15 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 {
     static final Logger LOG = LogManager.getLogger();
     private static int mutex = 0;
-    Class<?> simEvSrcClass, simEvLisClass, propChgSrcClass, propChgLisClass;
+    Class<?> simEventSourceClass, simEventListenerClass, propertyChangeSourceClass, propertyChangeListenerClass;
 
     /** The path to an assembly file if given from the command line */
-    private String initialAssemblyFile;
+    private String initialAssemblyFilePath;
     
     private static ViskitProject viskitProject;
 
     /** The handler to run an assembly */
-    private SimulationRunInterface runner;
+    private SimulationRunInterface runnerSimulationRunInterface;
     
     JTabbedPane mainTabbedPane;
     int mainTabbedPaneIndex;
@@ -107,13 +107,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /**
      * Sets an initial assembly file to open upon Viskit startup supplied by the
      * command line
-     * @param f the assembly file to initially open upon startup
+     * @param assemblyFilePath the assembly file to initially open upon startup
      */
-    public void setInitialAssemblyFile(String f) {
+    public void setInitialAssemblyFile(String assemblyFilePath) {
         if (viskit.ViskitStatics.debug) {
-            LOG.info("Initial file set: {}", f);
+            LOG.info("setInitialAssemblyFile: {}", assemblyFilePath);
         }
-        initialAssemblyFile = f;
+        initialAssemblyFilePath = assemblyFilePath;
     }
 
     /** 
@@ -122,8 +122,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      */
     private void compileAssembly(String assemblyPath) {
         LOG.debug("Compiling assembly: {}", assemblyPath);
-        File f = new File(assemblyPath);
-        _doOpen(f);
+        File assemblyFile = new File(assemblyPath);
+        _doOpen(assemblyFile);
         prepareSimulationRunner();
     }
 
@@ -132,40 +132,41 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         if (viskitProject == null)
             viskitProject = ViskitGlobals.instance().getViskitProject();
-        File projectPath =  viskitProject.getProjectDirectory();
+        File projectDirectory =  viskitProject.getProjectDirectory();
 
-        // The initialAssemblyFile is set if we have stated a file "arg" upon startup from the command line
+        // The initialAssemblyFilePath is set if we have stated a file "arg" upon startup from the command line
 
-        if (initialAssemblyFile != null && !initialAssemblyFile.isBlank() && !initialAssemblyFile.contains("$")) { // Check for $ makes sure that a property key isn't being used
-            LOG.debug("Loading initial file: {}", initialAssemblyFile);                             // pointing to a assembly path isn't commented
+        if (initialAssemblyFilePath != null && !initialAssemblyFilePath.isBlank() && !initialAssemblyFilePath.contains("$")) { // Check for $ makes sure that a property key isn't being used
+            LOG.debug("Loading initial file: {}", initialAssemblyFilePath);                             // pointing to a assembly path isn't commented
                                                                                                          // out
             // Switch to the project that this Assembly file is located in if paths do not coincide
-            if (!initialAssemblyFile.contains(projectPath.getPath())) {
+            if (!initialAssemblyFilePath.contains(projectDirectory.getPath())) 
+            {
                 doProjectCleanup();
-                projectPath = new File(initialAssemblyFile).getParentFile().getParentFile().getParentFile();
-                openProject(projectPath); // calls EventGraphViewFrame setTitleProjectName
+                projectDirectory = new File(initialAssemblyFilePath).getParentFile().getParentFile().getParentFile();
+                openProject(projectDirectory); // calls EventGraphViewFrame setTitleProjectName
 
                 // Add a new project EventGraphs for LEGO tree inclusion of our SimEntities
                 ViskitUserPreferences.RebuildLEGOTreePanelTask t = new ViskitUserPreferences.RebuildLEGOTreePanelTask();
                 t.execute();
             }
-            compileAssembly(initialAssemblyFile);
+            compileAssembly(initialAssemblyFilePath);
         } 
         else 
         {
-            openProject(projectPath); // calls AssemblyControllerImpl setTitleProjectName
+            openProject(projectDirectory); // calls AssemblyControllerImpl setTitleProjectName
             List<String> openAssemblyFileList = getOpenAssemblyFileList(false);
             LOG.debug("Inside begin() and openAssemblyFileList.size() is: {}", openAssemblyFileList.size());
             File openAssemblyFile;
-            for (String openAssemblyFilePath : openAssemblyFileList) {
+            for (String openAssemblyFilePath : openAssemblyFileList) 
+            {
                 openAssemblyFile = new File(openAssemblyFilePath);
                 // Prevent project mismatch
                 if (openAssemblyFile.exists())
                     _doOpen(openAssemblyFile);
             }
         }
-
-//        (ViskitGlobals.instance().getAssemblyViewFrame()).setTitleProjectName(); // unneeded
+//      (ViskitGlobals.instance().getAssemblyViewFrame()).setTitleProjectName(); // unneeded
         recordProjectFiles();
     }
 
@@ -752,7 +753,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         
         ViskitGlobals.instance().setTitleProjectName(ViskitGlobals.instance().getProjectName());
         
-        runner.resetSimulationRunPanel();
+        runnerSimulationRunInterface.resetSimulationRunPanel();
     }
 
     @Override
@@ -1098,18 +1099,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         // we don't know if the workClassLoader is the same instance
         // as it used to be when these were originally loaded
         // the tbd here is to see if there can be a shared root loader
-        simEvSrcClass = ViskitStatics.classForName("simkit.SimEventSource");
-        simEvLisClass = ViskitStatics.classForName("simkit.SimEventListener");
-        propChgSrcClass = ViskitStatics.classForName("simkit.PropertyChangeSource");
-        propChgLisClass = ViskitStatics.classForName("java.beans.PropertyChangeListener");
-        if (propChgSrcClass.isAssignableFrom(ca)) {
+        simEventSourceClass = ViskitStatics.classForName("simkit.SimEventSource");
+        simEventListenerClass = ViskitStatics.classForName("simkit.SimEventListener");
+        propertyChangeSourceClass = ViskitStatics.classForName("simkit.PropertyChangeSource");
+        propertyChangeListenerClass = ViskitStatics.classForName("java.beans.PropertyChangeListener");
+        if (propertyChangeSourceClass.isAssignableFrom(ca)) {
             obArr[0] = a;
-        } else if (propChgSrcClass.isAssignableFrom(cb)) {
+        } else if (propertyChangeSourceClass.isAssignableFrom(cb)) {
             obArr[0] = b;
         }
-        if (propChgLisClass.isAssignableFrom(cb)) {
+        if (propertyChangeListenerClass.isAssignableFrom(cb)) {
             obArr[1] = b;
-        } else if (propChgLisClass.isAssignableFrom(ca)) {
+        } else if (propertyChangeListenerClass.isAssignableFrom(ca)) {
             obArr[1] = a;
         }
 
@@ -1121,18 +1122,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     AssemblyNode[] orderSELSrcAndLis(AssemblyNode a, AssemblyNode b, Class<?> ca, Class<?> cb) {
         AssemblyNode[] obArr = new AssemblyNode[2];
-        simEvSrcClass = ViskitStatics.classForName("simkit.SimEventSource");
-        simEvLisClass = ViskitStatics.classForName("simkit.SimEventListener");
-        propChgSrcClass = ViskitStatics.classForName("simkit.PropertyChangeSource");
-        propChgLisClass = ViskitStatics.classForName("java.beans.PropertyChangeListener");
-        if (simEvSrcClass.isAssignableFrom(ca)) {
+        simEventSourceClass = ViskitStatics.classForName("simkit.SimEventSource");
+        simEventListenerClass = ViskitStatics.classForName("simkit.SimEventListener");
+        propertyChangeSourceClass = ViskitStatics.classForName("simkit.PropertyChangeSource");
+        propertyChangeListenerClass = ViskitStatics.classForName("java.beans.PropertyChangeListener");
+        if (simEventSourceClass.isAssignableFrom(ca)) {
             obArr[0] = a;
-        } else if (simEvSrcClass.isAssignableFrom(cb)) {
+        } else if (simEventSourceClass.isAssignableFrom(cb)) {
             obArr[0] = b;
         }
-        if (simEvLisClass.isAssignableFrom(cb)) {
+        if (simEventListenerClass.isAssignableFrom(cb)) {
             obArr[1] = b;
-        } else if (simEvLisClass.isAssignableFrom(ca)) {
+        } else if (simEventListenerClass.isAssignableFrom(ca)) {
             obArr[1] = a;
         }
 
@@ -1844,7 +1845,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 else
                 {
                     // Ensure a cleared Simulation panel upon every Assembly compile
-                    runner.resetSimulationRunPanel();
+                    runnerSimulationRunInterface.resetSimulationRunPanel();
 
                     // Ensure any changes to the Assembly Properties dialog get saved
                     save();
@@ -1861,7 +1862,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                             assemblyName); // "Simulation Run for " + 
                     
                     // Initializes a fresh class loader
-                    runner.exec(execStringArray);
+                    runnerSimulationRunInterface.exec(execStringArray);
 
                     // reset
                     execStringArray = null;
@@ -1955,23 +1956,23 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             return;
         }
 
-        final Timer captureWindowTimer = new Timer(100, new timerCallback(assemblyScreenCaptureFile, true));
+        final Timer captureWindowTimer = new Timer(100, new ImageCaptureTimerCallback(assemblyScreenCaptureFile, true));
         captureWindowTimer.setRepeats(false);
         captureWindowTimer.start();
 
         imageSaveCountString = "" + (++imageSaveCountInt);
     }
 
-    /** Provides an automatic capture of the currently loaded Assembly and stores
+    /** 
+     * Provides an automatic capture of the currently loaded Assembly and stores
      * it to a specified location for inclusion in the generated Analyst Report
-     *
      *@param assemblyImageFile assemblyImage an image file to write the .png
      */
     public void captureAssemblyImage(File assemblyImageFile)
     {
         ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
-        // Don't display an extra frame while taking snapshots
-        final Timer captureAssemblyImageTimer = new Timer(100, new timerCallback(assemblyImageFile, false));
+        // Don't displayCapture an extra frame while taking snapshots
+        final Timer captureAssemblyImageTimer = new Timer(100, new ImageCaptureTimerCallback(assemblyImageFile, false));
         captureAssemblyImageTimer.setRepeats(false);
         captureAssemblyImageTimer.start();
     }
@@ -1984,24 +1985,30 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         this.closeAll = closeAll;
     }
 
-    class timerCallback implements ActionListener {
-
-        File fil;
-        boolean display;
+    class ImageCaptureTimerCallback implements ActionListener 
+    {
+        File    imageFile;
+        boolean displayCapture;
 
         /**
          * Constructor for this timerCallBack
-         * @param f the file to write an image to
-         * @param b if true, display the image
+         * @param imageFile the file to write an image to
+         * @param displayCapture if true, displayCapture the image
          */
-        timerCallback(File f, boolean b) {
-            fil = f;
-            display = b;
+        ImageCaptureTimerCallback(File imageFile, boolean displayCapture)
+        {
+            if (imageFile == null)
+            {
+                LOG.error("ImageCaptureTimerCallback constructor: (imageFile is null, no capture performed");
+                return;
+            }
+            this.imageFile      = imageFile;
+            this.displayCapture = displayCapture;
         }
 
         @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-
+        public void actionPerformed(ActionEvent actionEvent) 
+        {
             // create and save the image
             AssemblyViewFrame assemblyViewFrame = ViskitGlobals.instance().getAssemblyViewFrame();
 
@@ -2013,30 +2020,33 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
             Rectangle rec = component.getBounds();
             Image image = new BufferedImage(rec.width, rec.height, BufferedImage.TYPE_3BYTE_BGR);
+            // TODO how to crop empty space?  perhaps alternative is to save image when constructed?
 
             // Tell the jgraph component to draw into memory
             component.paint(image.getGraphics());
 
             try {
-                ImageIO.write((RenderedImage)image, "png", fil);
-            } catch (IOException e) {
+                ImageIO.write((RenderedImage)image, "png", imageFile);
+            } 
+            catch (IOException e) {
                 LOG.error(e);
             }
 
-            // display a scaled version
-            if (display) {
-                final JFrame frame = new JFrame("Saved as " + fil.getName());
-                Icon ii = new ImageIcon(image);
-                JLabel lab = new JLabel(ii);
+            // displayCapture a scaled version
+            if (displayCapture)
+            {
+                final JFrame frame = new JFrame("Saved as " + imageFile.getName());
+                Icon imageIcon = new ImageIcon(image);
+                JLabel jLabel = new JLabel(imageIcon);
                 frame.getContentPane().setLayout(new BorderLayout());
-                frame.getContentPane().add(lab, BorderLayout.CENTER);
+                frame.getContentPane().add(jLabel, BorderLayout.CENTER);
                 frame.pack();
                 frame.setLocationRelativeTo((Component) getView());
 
-                Runnable r = () -> {
+                Runnable runnableImageDisplay = () -> {
                     frame.setVisible(true);
                 };
-                SwingUtilities.invokeLater(r);
+                SwingUtilities.invokeLater(runnableImageDisplay);
             }
         }
     }
@@ -2046,7 +2056,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param plug the SimulationRunInterface to set
      */
     public void setAssemblyRunner(SimulationRunInterface plug) {
-        runner = plug;
+        runnerSimulationRunInterface = plug;
     }
 
     /** Opens each Event Graph associated with this Assembly

@@ -102,7 +102,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JTextField titleTF = new JTextField();
     JTextField analystNameTF = new JTextField();
     // , "CONFIDENTIAL", "SECRET", "TOP SECRET"
-    JComboBox<String> documentAccessLabelTF = new JComboBox<>(new String[] {"","Informational"}); // ,"CONTROLLED UNCLASSIFIED INFORMATION (CUI)"
+    JComboBox<String> documentAccessRightsLabelTF = new JComboBox<>(new String[] {"","Informational"}); // ,"CONTROLLED UNCLASSIFIED INFORMATION (CUI)"
     JTextField analysisDateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssemblyFile;
 
@@ -239,10 +239,12 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
             String date = analystReportModel.getDateOfReport();
             if (date != null && date.length() > 0) {
                 analysisDateTF.setText(date);
-            } else {
+            } 
+            else 
+            {
                 analysisDateTF.setText(DateFormat.getDateInstance().format(new Date())); // now
             }
-            documentAccessLabelTF.setSelectedItem(analystReportModel.getDocumentAccessLabel());
+            documentAccessRightsLabelTF.setSelectedItem(analystReportModel.getDocumentAccessRights());
         }
         catch (Exception ex)
         {
@@ -255,7 +257,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         analystReportModel.setReportName(titleTF.getText());
         analystReportModel.setAuthor(analystNameTF.getText());
         analystReportModel.setDateOfReport(analysisDateTF.getText());
-        analystReportModel.setDocumentAccessLabel((String) documentAccessLabelTF.getSelectedItem());
+        analystReportModel.setDocumentAccessRights((String) documentAccessRightsLabelTF.getSelectedItem());
     }
 
     private void setLayout()
@@ -278,13 +280,13 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         JLabel documentAccessLabel = new JLabel("Document Access ");
         documentAccessLabel.setToolTipText("Document Access Label");
         headerPanel.add(documentAccessLabel);
-        headerPanel.add(documentAccessLabelTF);
+        headerPanel.add(documentAccessRightsLabelTF);
         
         Dimension d = new Dimension(Integer.MAX_VALUE, titleTF.getPreferredSize().height);
                 titleTF.setMaximumSize(new Dimension(d));
           analystNameTF.setMaximumSize(new Dimension(d));
          analysisDateTF.setMaximumSize(new Dimension(d));
-        documentAccessLabelTF.setMaximumSize(new Dimension(d));
+        documentAccessRightsLabelTF.setMaximumSize(new Dimension(d));
         SpringUtilities.makeCompactGrid(headerPanel, 4, 2, 10, 10, 5, 5);
         
         /* TODO not yet working, overlapping :(
@@ -651,8 +653,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
             Vector<Object[]> entityParametersTablesArray = analystReportModel.getEntityParametersTables();
             if (entityParametersTablesArray == null)
             {
-                // TODO expected?
-                LOG.error("fillEntityParametersTablesPanel() entityParametersTablesArray is null - expected?");
+                LOG.info("fillEntityParametersTablesPanel() entityParametersTablesArray is null - TODO expected?");
                 return;
             }
 
