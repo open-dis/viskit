@@ -119,12 +119,12 @@ public final class AnalystReportModel extends MvcAbstractModel
     public static final String HISTOGRAM_CHART             = "HistogramChart";
     public static final String IMAGE                       = "Image";
     public static final String LINEAR_REGRESSION_CHART     = "LinearRegressionChart";
-    public static final String LOCATION                    = "Location";
     public static final String MULTI_PARAMETER             = "MultiParameter";
     public static final String PARAMETER                   = "Parameter";
     public static final String PARAMETER_TABLES            = "ParameterTables";
     public static final String REPLICATION                 = "Replication";
     public static final String REPLICATION_REPORT          = "ReplicationReport";
+    public static final String SCENARIO_LOCATION           = "ScenarioLocation";
     public static final String SIM_ENTITY                  = "SimEntity";
     public static final String SIMULATION_CONFIGURATION    = "SimulationConfiguration";
     public static final String SUMMARY                     = "Summary";
@@ -304,7 +304,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         reportJdomDocument                = EventGraphCache.instance().loadXML(file);
         rootElement                       = reportJdomDocument.getRootElement();
         executiveSummaryElement           = rootElement.getChild(EXECUTIVE_SUMMARY);
-        simulationLocationElement         = rootElement.getChild(LOCATION);
+        simulationLocationElement         = rootElement.getChild(SCENARIO_LOCATION);
         assemblyConfigurationElement    = rootElement.getChild(SIMULATION_CONFIGURATION);
         entityParametersElement           = rootElement.getChild(ENTITY_PARAMETERS);
         behaviorDescriptionsElement       = rootElement.getChild(BEHAVIOR_DESCRIPTIONS);
@@ -337,12 +337,12 @@ public final class AnalystReportModel extends MvcAbstractModel
     /** Creates the SimulationLocation portion of the analyst report XML */
     public void createSimulationLocation()
     {
-        simulationLocationElement = new Element(LOCATION);
+        simulationLocationElement = new Element(SCENARIO_LOCATION);
         simulationLocationElement.setAttribute(SHOW_DESCRIPTION, "true");
         simulationLocationElement.setAttribute(SHOW_IMAGE,   "true");
-        makeCustomDescriptionElement(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
-        makeProductionNotes(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
-        makeConclusions(simulationLocationElement, "SL", ""); // TODO SL -> SimulationLocation
+        makeCustomDescriptionElement(simulationLocationElement, "ScenarioLocation", "");
+        makeProductionNotes(simulationLocationElement, "ScenarioLocation", "");
+        makeConclusions(simulationLocationElement, "ScenarioLocation", "");
         rootElement.addContent(simulationLocationElement);
     }
 
@@ -1330,12 +1330,12 @@ public final class AnalystReportModel extends MvcAbstractModel
     public String  getScenarioLocationDescription()        {return unMakeCustomDescriptionElements(simulationLocationElement);}
     public String  getScenarioLocationConclusions()     {return unMakeConclusions(simulationLocationElement);}
     public String  getScenarioLocationProductionNotes() {return unMakeProductionNotes(simulationLocationElement);}
-    public String  getLocationImage()              {return unMakeImage(simulationLocationElement, LOCATION);}
+    public String  getLocationImage()              {return unMakeImage(simulationLocationElement, SCENARIO_LOCATION);}
     public String  getChartImage()                 {return unMakeImage(simulationLocationElement, CHART);}
-    public void setScenarioLocationDescription  (String s)    {makeCustomDescriptionElement(simulationLocationElement, "SL", s);}
-    public void setScenarioLocationConclusions  (String s)    {makeConclusions(simulationLocationElement, "SL", s);}
-    public void setScenarioLocationProductionNotes(String s)  {makeProductionNotes(simulationLocationElement, "SL", s);}
-    public void setLocationImage           (String s)    {replaceChildren(simulationLocationElement, makeImageElement(LOCATION, s)); }
+    public void setScenarioLocationDescription  (String s)    {makeCustomDescriptionElement(simulationLocationElement, "ScenarioLocation", s);}
+    public void setScenarioLocationConclusions  (String s)    {makeConclusions(simulationLocationElement, "ScenarioLocation", s);}
+    public void setScenarioLocationProductionNotes(String s)  {makeProductionNotes(simulationLocationElement, "ScenarioLocation", s);}
+    public void setLocationImage           (String s)    {replaceChildren(simulationLocationElement, makeImageElement(SCENARIO_LOCATION, s)); }
     public void setChartImage              (String s)    {replaceChildren(simulationLocationElement, makeImageElement(CHART, s)); }
 
     public boolean isShowEntityParametersOverview() { return stringToBoolean(entityParametersElement.getAttributeValue(SHOW_OVERVIEW));}

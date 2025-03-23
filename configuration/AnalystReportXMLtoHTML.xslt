@@ -53,7 +53,7 @@
                     <p>
                         <font size="-1">
                             <a href="#ExecutiveSummary">Executive<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Summary</a> |
-                            <a href="#Location">Location</a> |
+                            <a href="#ScenarioLocation">Scenario Location</a> |
                             <a href="#SimulationConfiguration">Simulation<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Configuration</a> |
                             <a href="#EntityParameters">Entity<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Parameters</a> |
                             <a href="#BehaviorDescriptions">Behavior<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Descriptions</a> |
@@ -68,8 +68,8 @@
                 <p/>
                 <p/>
                 <hr/>
-                <!-- Simulation Location -->
-                <xsl:apply-templates select="//Location"/>
+                <!-- Scenario Location -->
+                <xsl:apply-templates select="//ScenarioLocation"/>
                 <p/>
                 <p/>
                 <hr/>
@@ -179,21 +179,21 @@
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
 
-    <!-- Simulation Location templates -->
-    <xsl:template match="SLComments">
+    <!-- Scenario Location templates -->
+    <xsl:template match="ScenarioLocationDescription">
         <p align="left">
             <font size="4">
-                <b><a name="Location">Location of Simulation</a></b>
+                <b><a name="ScenarioLocation">Scenario Location for the Simulation</a></b>
             </font>
         </p>
         <p align="left">
-            <i>Description of Location Features</i><br/>
+            <i>Description of Scenario Location Features</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
-    <xsl:template match="SLProductionNotes">
+    <xsl:template match="ScenarioLocationProductionNotes">
         <p align="left">
             <i>Production Notes</i>
             <p>All units are meters and degrees unless otherwise noted.</p>
@@ -202,15 +202,15 @@
             </font>
         </p>
     </xsl:template>
-    <xsl:template match="SLConclusions">
+    <xsl:template match="ScenarioLocationConclusions">
         <p align="left">
-            <i>Post-Experiment Analysis of Significant Location Features</i><br/>
+            <i>Post-Experiment Analysis of Significant Scenario Location Features</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
-    <xsl:template match="LocationImage">
+    <xsl:template match="ScenarioLocationImage">
         <div align="center">
             <xsl:element name="a">
                 <xsl:attribute name="href">
