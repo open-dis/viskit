@@ -226,7 +226,8 @@ public class AnalystReportController extends MvcAbstractController
         {
             String message1 = "Analyst Report results must first be available in order to generateHtmlReport()";
             String message2 = "<html><p align='center'>Analyst Report results must first be available</p><br />" +
-                                    "<p align='center'>in order to generate the HTML Analyst Report</p><br />";
+                                    "<p align='center'>in order to generate the HTML Analyst Report.</p><br />" +
+                                    "<p align='center'>Please run an assembly or load an Analyst Report.</p><br />";
             LOG.error(message1);
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Unable to show Analyst Report", message2);

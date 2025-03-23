@@ -80,7 +80,9 @@
                 <hr/>
                 <!-- Entity Parameters -->
                 <xsl:apply-templates select="//EntityParameters" mode="ParamHeader"/>
-                <xsl:apply-templates select="//EntityParameters/ParameterTables/EntityParameterTable"/>
+                <xsl:apply-templates select="//EntityParametersDescription" mode="ParamHeader"/>
+                <xsl:apply-templates select="//EntityParametersConclusions" mode="ParamHeader"/>
+                <xsl:apply-templates select="//ParameterTables"/>
                 <p/>
                 <p/>
                 <hr/>
@@ -118,7 +120,7 @@
         <p align="center">
             <font size="2">
                 <b>***</b>
-                THIS REPORT IS:
+                THIS REntityParametersORT IS:
                 <b>
                     <b>
                         <xsl:value-of select="@classification"/>
@@ -281,7 +283,7 @@
     </xsl:template>
 
     <!-- Simulation Configuration templates -->
-    <xsl:template match="SCComments" mode="ConfigHeader">
+    <xsl:template match="SimulationConfigurationDescription" mode="ConfigHeader">
         <p align="left">
             <font size="4">
                 <b>
@@ -298,24 +300,24 @@
             or statistical analysis of Measures of Effectiveness (MoEs).
         </p>
         <p align="left">
-            <i>Assembly Design Considerations</i><br/>
+            <i>Simulation Configuration Considerations</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
-    <xsl:template match="SCProductionNotes" mode="ConfigHeader">
+    <xsl:template match="SimulationConfigurationProductionNotes" mode="ConfigHeader">
         <p align="left">
-            <i>Production Notes</i>
+            <i>Simulation Configuration Production Notes</i>
             <p>All units are meters and degrees unless otherwise noted.</p>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
-    <xsl:template match="SCConclusions" mode="ConfigHeader">
+    <xsl:template match="SimulationConfigurationConclusions" mode="ConfigHeader">
         <p align="left">
-            <i>Post-Experiment Analysis of Simulation Assembly Design</i><br/>
+            <i>Post-Experiment Analysis of Simulation Configuration</i><br/>
             <font color="#000099">
                 <xsl:value-of select="@text"/>
             </font>
@@ -393,7 +395,7 @@
     </xsl:template>
 
     <!-- EntityParameter templates -->
-    <xsl:template match="EPComments" mode="ParamHeader">
+    <xsl:template match="EntityParametersDescription" mode="ParamHeader">
         <p align="left">
             <font size="4">
                 <b>
@@ -406,14 +408,18 @@
             Initialization parameters are applied to individualize generic
             behavior models.  These parameters customize the event-graph models.
         </p>
+    </xsl:template>
+        
+    <xsl:template match="EntityParametersConclusions" mode="ParamHeader">
         <p align="left">
-            <i>Entity Parameters Overview</i><br/>
+            <i>Entity Parameters Conclusions</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
-    <!-- xsl:template match="EPConclusions" mode="ParamHeader">
+    
+    <!-- xsl:template match="EntityParametersConclusions" mode="ParamHeader">
         <p align="left">
             <i>Post-Experiment Analysis of Entity Behaviors</i><br/>
             <font color="#00006C">
@@ -423,7 +429,7 @@
     </xsl:template-->
 
     <!-- Entity Parameter Tables -->
-    <xsl:template match="EntityParameterTable">
+    <xsl:template match="ParameterTables">
         <p/>
         <p/>
         <p/>
@@ -560,7 +566,7 @@
     </xsl:template>
 
     <!-- Behavior Description templates -->
-    <xsl:template match="BDComments" mode="BehaviorHeader">
+    <xsl:template match="BehaviorDescriptionsDescription" mode="BehaviorHeader"><!-- TODO fix name -->
         <p align="left">
             <font size="4">
                 <b><a name="BehaviorDescriptions">Behavior Descriptions</a></b>
@@ -573,7 +579,7 @@
             </font>
         </p>
     </xsl:template>
-    <xsl:template match="BDConclusions" mode="BehaviorHeader">
+    <xsl:template match="BehaviorDescriptionConclusions" mode="BehaviorHeader">
         <p align="left">
             <i>Post-Experiment Analysis of Entity Behaviors</i><br/>
             <font color="#00006C">
@@ -997,22 +1003,28 @@
     </xsl:template>
 
     <!-- Conclusions and Recommendations -->
-    <xsl:template match="CRComments">
+    <xsl:template match="ConclusionsRecommendations">
         <p align="left">
             <font size="4">
                 <b><a name="ConclusionsRecommendations">Conclusions and Recommendations</a></b>
             </font>
         </p>
+        <xsl:apply-templates select="*"/>
+    </xsl:template>
+    
+    <xsl:template match="ConclusionsRecommendationsDescription"><!-- TODO rename -->
         <p align="left">
-            <i>Conclusions</i><br/>
+            <a name="Conclusions"></a><i>Conclusions</i>
+            <br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
         </p>
     </xsl:template>
-    <xsl:template match="CRConclusions">
+    
+    <xsl:template match="ConclusionsRecommendationsConclusions"><!-- TODO rename -->
         <p align="left">
-            <i>Recommendations for Future Work</i><br/>
+            <a name="Recommendations"></a><i>Recommendations for Future Work</i><br/>
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
