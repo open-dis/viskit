@@ -626,10 +626,12 @@ their descpritions.
             depends="init"
             description="Run Viskit, don't check dependencies, don't rebuild">
 
+        <!-- looks good but is distracting because ot fails to time out, this is an Ant bug
         <splash imageurl="file:${basedir}/${splash.image}"
                 useproxy="true"
             showduration="5"
              displayText=" Visual Simkit for Discrete Event Simulation (DES) "/>
+         -->
 
         <java classname="${main.class}"
               classpathref="runtime.classpath"
@@ -675,7 +677,7 @@ their descpritions.
 
     </target>
 
-    <target depends="compile,quick.debug" description="Debug Viskit" name="debug"/>
+    <target depends="build,quick.debug" description="Debug Viskit" name="debug"/>
 
     <!-- TARGET: Quick Debug doesn't check dependencies, or compile -->
     <target name="quick.debug" depends="init" description="Debug Viskit, don't check dependencies, don't rebuild">
@@ -777,7 +779,8 @@ their descpritions.
         <delete dir="${dir.lib.ext}">
             <include name="*.jar"/>
         </delete>
-        <delete file="viskit-editor.jar"/>
+        <delete file="${dist.jar}" verbose="true"/>
+        <delete file="viskit-editor.jar" verbose="true"/>
 
         <!-- This one is scary -->
         <delete dir=".">
@@ -808,6 +811,8 @@ their descpritions.
                 <include name="**/*.png"/>
                 <include name="**/*.html"/>
                 <include name="**/*.xml"/>
+                <exclude name="Viskit.ico"/>
+                <exclude name="ViskitSplash2.png"/>
                 <exclude name="archive/**/*"/>
             </fileset>
         </delete>
@@ -927,7 +932,7 @@ their descpritions.
     <target name="javadoc.custom" description="Customized javadoc">
         <!-- adapted from opendis7java project -->
         <echo message="$javac.classpath=${javac.classpath}"/>
-        <mkdir dir="javadoc.dir"/>
+        <mkdir dir="${javadoc.dir}"/>
         <copy file="src/viskit/images/ViskitSplash2.png" todir="${javadoc.dir}"/>
         <javadoc     destdir="${javadoc.dir}"
                      author="${javadoc.author}"
