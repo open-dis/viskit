@@ -87,7 +87,7 @@ public class SimulationRunPanel extends JPanel
     public JLabel nowRunningLabel;
     public JLabel  viskitRunnerBannerLabel;
     private String viskitRunnerBannerString;
-    public JLabel npsLabel;
+    public JLabel iconLabel;
     private String title;
     private boolean hasLoadedAssembly = false;
 
@@ -143,17 +143,18 @@ public class SimulationRunPanel extends JPanel
         viskitRunnerBannerLabel.setVerticalTextPosition(JLabel.TOP);
         
         // https://stackoverflow.com/questions/6714045/how-to-resize-jlabel-imageicon
-        Icon npsIcon = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"));
-        String npsString = "";        
-        npsLabel = new JLabel(npsString, npsIcon, JLabel.CENTER);
-        npsLabel.setVerticalTextPosition(JLabel.TOP);
-        npsLabel.setHorizontalTextPosition(JLabel.CENTER);
-        npsLabel.setIconTextGap(20);
+        Icon    npsIcon = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/NPS-3clr-PMS-vrt-type.png"));
+        Icon viskitIcon = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/ViskitSplash2.png"));
+        String iconString = "";        
+        iconLabel = new JLabel(iconString, viskitIcon, JLabel.CENTER); // npsIcon, 
+        iconLabel.setVerticalTextPosition(JLabel.TOP);
+        iconLabel.setHorizontalTextPosition(JLabel.CENTER);
+        iconLabel.setIconTextGap(20);
 
         int w = Integer.parseInt(ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.APP_MAIN_BOUNDS_KEY + "[@w]"));
         int h = Integer.parseInt(ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.APP_MAIN_BOUNDS_KEY + "[@h]"));
 
-        leftSideHorizontalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), npsLabel);
+        leftSideHorizontalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, new JScrollPane(vcrPanel), iconLabel);
         
         // reduce magnitude of offset value (add positive increment) to provide more room in upper-left vcrPanel 
         leftSideHorizontalSplit.setDividerLocation((h/2) + 10);
