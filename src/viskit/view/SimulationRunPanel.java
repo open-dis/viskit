@@ -174,6 +174,83 @@ public class SimulationRunPanel extends JPanel
     private JPanel makeReplicationSettingsVCRPanel(boolean showIncompleteButtons)
     {
         JPanel upperLeftFlowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        
+        JPanel runLabelPanel = new JPanel();
+        JLabel runLabel = new JLabel("Run assembly simulation");
+        runLabel.setToolTipText("Run controls for assembly simulation");
+        runLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
+        runLabel.setBorder(new EmptyBorder(0,0,0,10));
+        runLabelPanel.setToolTipText("Run controls for assembly simulation");
+        runLabelPanel.add(runLabel);
+        upperLeftFlowPanel.add(runLabelPanel);
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
+//        upperLeftFlowPanel.add(Box.createHorizontalStrut(40)); // indent next button panel
+
+        JPanel runButtonsPanel = new JPanel();
+        runButtonsPanel.setLayout(new BoxLayout(runButtonsPanel, BoxLayout.X_AXIS));
+//        runButtonPanel.setBorder(new EmptyBorder(0,10,0,20));
+
+        vcrRewindButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Rewind24.gif")));
+        vcrRewindButton.setToolTipText("Reset the simulation run");
+        vcrRewindButton.setEnabled(false);
+        vcrRewindButton.setBorder(BorderFactory.createEtchedBorder());
+        vcrRewindButton.setText(null);
+        if (showIncompleteButtons) {
+            runButtonsPanel.add(vcrRewindButton);
+        }
+
+        vcrPlayButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
+        vcrPlayButton.setToolTipText("Run or resume the simulation run");
+        vcrPlayButton.setBorder(BorderFactory.createEtchedBorder());
+        vcrPlayButton.setText(null);
+        runButtonsPanel.add(vcrPlayButton);
+
+        vcrStepButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/StepForward24.gif")));
+        vcrStepButton.setToolTipText("Step the simulation");
+        vcrStepButton.setBorder(BorderFactory.createEtchedBorder());
+        vcrStepButton.setText(null);
+        vcrStepButton.setToolTipText("Single step");
+        vcrStepButton.setEnabled(false); // TODO
+        runButtonsPanel.add(vcrStepButton); // i.e. vcrPause
+
+        vcrStopButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
+        vcrStopButton.setToolTipText("Stop the simulation run");
+        vcrStopButton.setEnabled(false);
+        vcrStopButton.setBorder(BorderFactory.createEtchedBorder());
+        vcrStopButton.setText(null);
+        runButtonsPanel.add(vcrStopButton);
+        
+        JButton clearConsoleButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Delete24.gif"))); // Clear
+        
+        ViskitStatics.clampComponentSize(clearConsoleButton, vcrStopButton, vcrStopButton);
+        // https://stackoverflow.com/questions/1954674/can-i-make-swing-jbuttons-have-smaller-margins
+        clearConsoleButton.setMargin(new Insets(3, 4, 3, 4));
+        clearConsoleButton.setToolTipText("Clear all console text");
+        // https://stackoverflow.com/questions/9569700/java-call-method-via-jbutton
+        clearConsoleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                outputStreamTA.selectAll();
+                outputStreamTA.replaceSelection(""); // cleears
+            }
+        });
+        runButtonsPanel.add(clearConsoleButton);
+
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
+        upperLeftFlowPanel.add(runButtonsPanel);
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
+        
+        nowRunningLabel = new JLabel(new String(), JLabel.CENTER);
+        nowRunningLabel.setBorder(new EmptyBorder(0,1,0,10));
+        nowRunningLabel.setText(lineEnd);
+        // text value is set by propertyChange listener
+        upperLeftFlowPanel.add(Box.createVerticalBox()); // TODO which?
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
+        upperLeftFlowPanel.add(nowRunningLabel);
+        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
+
+        runButtonsPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
 
         JLabel replicationSettingsLabel = new JLabel("Replication Settings", JLabel.CENTER);
         replicationSettingsLabel.setToolTipText("These settings control simulation replications");
@@ -312,82 +389,7 @@ public class SimulationRunPanel extends JPanel
         // TODO: Expose at a later time when we have use for this
         resetSeedStateCB.setEnabled(false);
 //      flowPanel.add(resetSeedStateCB);
-        
-        JPanel runLabelPanel = new JPanel();
-        JLabel runLabel = new JLabel("Run assembly simulation:");
-        runLabel.setToolTipText("Run controls for assembly simulation");
-        // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
-        runLabel.setBorder(new EmptyBorder(0,0,0,10));
-        runLabelPanel.setToolTipText("Run controls for assembly simulation");
-        runLabelPanel.add(runLabel);
-        upperLeftFlowPanel.add(runLabelPanel);
-        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
-//        upperLeftFlowPanel.add(Box.createHorizontalStrut(40)); // indent next button panel
 
-        JPanel runButtonsPanel = new JPanel();
-        runButtonsPanel.setLayout(new BoxLayout(runButtonsPanel, BoxLayout.X_AXIS));
-//        runButtonPanel.setBorder(new EmptyBorder(0,10,0,20));
-
-        vcrRewindButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Rewind24.gif")));
-        vcrRewindButton.setToolTipText("Reset the simulation run");
-        vcrRewindButton.setEnabled(false);
-        vcrRewindButton.setBorder(BorderFactory.createEtchedBorder());
-        vcrRewindButton.setText(null);
-        if (showIncompleteButtons) {
-            runButtonsPanel.add(vcrRewindButton);
-        }
-
-        vcrPlayButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
-        vcrPlayButton.setToolTipText("Run or resume the simulation run");
-        vcrPlayButton.setBorder(BorderFactory.createEtchedBorder());
-        vcrPlayButton.setText(null);
-        runButtonsPanel.add(vcrPlayButton);
-
-        vcrStepButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/StepForward24.gif")));
-        vcrStepButton.setToolTipText("Step the simulation");
-        vcrStepButton.setBorder(BorderFactory.createEtchedBorder());
-        vcrStepButton.setText(null);
-        vcrStepButton.setToolTipText("Single step");
-        vcrStepButton.setEnabled(false); // TODO
-        runButtonsPanel.add(vcrStepButton); // i.e. vcrPause
-
-        vcrStopButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
-        vcrStopButton.setToolTipText("Stop the simulation run");
-        vcrStopButton.setEnabled(false);
-        vcrStopButton.setBorder(BorderFactory.createEtchedBorder());
-        vcrStopButton.setText(null);
-        runButtonsPanel.add(vcrStopButton);
-        
-        JButton clearConsoleButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Delete24.gif"))); // Clear
-        
-        ViskitStatics.clampComponentSize(clearConsoleButton, vcrStopButton, vcrStopButton);
-        // https://stackoverflow.com/questions/1954674/can-i-make-swing-jbuttons-have-smaller-margins
-        clearConsoleButton.setMargin(new Insets(3, 4, 3, 4));
-        clearConsoleButton.setToolTipText("Clear all console text");
-        // https://stackoverflow.com/questions/9569700/java-call-method-via-jbutton
-        clearConsoleButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                outputStreamTA.selectAll();
-                outputStreamTA.replaceSelection(""); // cleears
-            }
-        });
-        runButtonsPanel.add(clearConsoleButton);
-
-        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
-        upperLeftFlowPanel.add(runButtonsPanel);
-        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
-        
-        nowRunningLabel = new JLabel(new String(), JLabel.CENTER);
-        nowRunningLabel.setBorder(new EmptyBorder(0,1,0,10));
-        nowRunningLabel.setText(lineEnd);
-        // text value is set by propertyChange listener
-        upperLeftFlowPanel.add(Box.createVerticalBox()); // TODO which?
-        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
-        upperLeftFlowPanel.add(nowRunningLabel);
-        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
-
-        runButtonsPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         upperLeftFlowPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         upperLeftFlowPanel.setPreferredSize(new Dimension(vcrPlayButton.getPreferredSize()));
         

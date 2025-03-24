@@ -71,26 +71,29 @@ public class ViskitProject
     public static final String DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME = "MyViskitProjects";
     public static final String DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH =
             System.getProperty("user.home").replaceAll("\\\\", "/") + "/" + DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME;
-    public static final String VISKIT_ROOT_NAME = "ViskitProject";
-    public static final String PROJECT_FILE_NAME = "viskitProject.xml";
-    public static final String ASSEMBLIES_DIRECTORY_NAME = "Assemblies";
+    public static final String PROJECT_FILE_NAME           = "viskitProject.xml";
+    public static final String VISKIT_PROJECT_ROOT_ELEMENT_NAME       = "ViskitProject";
+    public static final String ASSEMBLIES_DIRECTORY_NAME   = "Assemblies";
     public static final String EVENT_GRAPHS_DIRECTORY_NAME = "EventGraphs";
 
-    public static final String ANALYST_REPORTS_DIRECTORY_NAME = "AnalystReports";
-    public static final String VISKIT_ICON_FILE_NAME = "Viskit.ico";
+    public static final String BUILD_DIRECTORY_NAME   = "build";
+    public static final String CLASSES_DIRECTORY_NAME = "classes";
+    public static final String DIST_DIRECTORY_NAME    = "dist";
+    public static final String IMAGES_DIRECTORY_NAME  = "images";
+    public static final String LIB_DIRECTORY_NAME     = "lib";
+    public static final String SOURCE_DIRECTORY_NAME  = "src";
+
     public static final String VISKIT_CONFIG_DIRECTORY = "config"; // this must match viskit.jar and many other places
-    public static final String VISKIT_ICON_SOURCE = VISKIT_CONFIG_DIRECTORY + "/" + VISKIT_ICON_FILE_NAME;
+    public static final String VISKIT_ICON_FILE_NAME   = "Viskit.ico";
+    public static final String VISKIT_SPLASH_FILE_NAME = "ViskitSplash2.png";
+    public static final String VISKIT_ICON_SOURCE      = VISKIT_CONFIG_DIRECTORY + "/" + IMAGES_DIRECTORY_NAME + "/" + VISKIT_ICON_FILE_NAME;
+    public static final String VISKIT_SPLASH_SOURCE    = VISKIT_CONFIG_DIRECTORY + "/" + IMAGES_DIRECTORY_NAME + "/" + VISKIT_SPLASH_FILE_NAME;
+    public static final String ANALYST_REPORTS_DIRECTORY_NAME = "AnalystReports";
     public static final String ANALYST_REPORT_IMAGES_DIRECTORY_NAME = "images";
     public static final String ANALYST_REPORT_CHARTS_DIRECTORY_PATH = ANALYST_REPORT_IMAGES_DIRECTORY_NAME + "/" + "charts";
     public static final String ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME = ASSEMBLIES_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_EVENT_GRAPH_IMAGES_DIRECTORY_NAME = EVENT_GRAPHS_DIRECTORY_NAME;
     public static final String ANALYST_REPORT_STATISTICS_DIRECTORY_NAME = "statistics";
-
-    public static final String BUILD_DIRECTORY_NAME   = "build";
-    public static final String CLASSES_DIRECTORY_NAME = "classes";
-    public static final String SOURCE_DIRECTORY_NAME  = "src";
-    public static final String DIST_DIRECTORY_NAME    = "dist";
-    public static final String LIB_DIRECTORY_NAME     = "lib";
 
     static final Logger LOG = LogManager.getLogger();
 
@@ -154,13 +157,16 @@ public class ViskitProject
         }
         setAnalystReportsDirectory(new File(projectDirectory, ANALYST_REPORTS_DIRECTORY_NAME));
         LOG.info("initializeProject() analystReportsDirectory=\n      " + getAnalystReportsDirectory());
-        if (!analystReportsDirectory.exists()) {
+        if (!analystReportsDirectory.exists())
+        {
             getAnalystReportsDirectory().mkdirs();
             try {
-                // copy icon file to AnalystsReport directory to support html report
-                Files.copy(new File(VISKIT_ICON_SOURCE).toPath(), new File(getAnalystReportsDirectory(), VISKIT_ICON_FILE_NAME).toPath());
-            } catch (IOException ex) {
-                LOG.error(ex);
+                // copy icon and splash files to AnalystsReport directory to support html report
+                Files.copy(new File(VISKIT_ICON_SOURCE).toPath(),   new File(getAnalystReportsDirectory(), VISKIT_ICON_FILE_NAME).toPath());
+                Files.copy(new File(VISKIT_SPLASH_SOURCE).toPath(), new File(getAnalystReportsDirectory(), VISKIT_SPLASH_FILE_NAME).toPath());
+            }
+            catch (IOException ex) {
+                LOG.error("initializeProject() exception when setting up analystReportsDirectory {}", ex);
             }
         }
 
@@ -252,7 +258,7 @@ public class ViskitProject
     private Document createProjectDocument() {
         Document document = new Document();
 
-        Element root = new Element(VISKIT_ROOT_NAME);
+        Element root = new Element(VISKIT_PROJECT_ROOT_ELEMENT_NAME);
         root.setAttribute("name", projectDirectory.getName());
         document.setRootElement(root);
 
@@ -318,7 +324,7 @@ public class ViskitProject
         try {
             projectDocument = FileHandler.unmarshallJdom(inputProjectFile);
             Element root = projectDocument.getRootElement();
-            if (!root.getName().equals(VISKIT_ROOT_NAME)) {
+            if (!root.getName().equals(VISKIT_PROJECT_ROOT_ELEMENT_NAME)) {
                 projectDocument = null;
                 throw new IllegalArgumentException("Not a Viskit Project File");
             }

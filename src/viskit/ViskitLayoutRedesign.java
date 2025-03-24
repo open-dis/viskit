@@ -156,7 +156,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         eventGraphEditorPanel.setLayout(eventGraphEditorPanelLayout);
         eventGraphEditorPanelLayout.setHorizontalGroup(
             eventGraphEditorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
+            .addGap(0, 830, Short.MAX_VALUE)
         );
         eventGraphEditorPanelLayout.setVerticalGroup(
             eventGraphEditorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -169,7 +169,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         assemblyEditorPanel.setLayout(assemblyEditorPanelLayout);
         assemblyEditorPanelLayout.setHorizontalGroup(
             assemblyEditorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
+            .addGap(0, 830, Short.MAX_VALUE)
         );
         assemblyEditorPanelLayout.setVerticalGroup(
             assemblyEditorPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -182,7 +182,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         localSimulationRunPanel.setLayout(localSimulationRunPanelLayout);
         localSimulationRunPanelLayout.setHorizontalGroup(
             localSimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
+            .addGap(0, 830, Short.MAX_VALUE)
         );
         localSimulationRunPanelLayout.setVerticalGroup(
             localSimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -195,7 +195,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         assembly2_SimulationRunPanel.setLayout(assembly2_SimulationRunPanelLayout);
         assembly2_SimulationRunPanelLayout.setHorizontalGroup(
             assembly2_SimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
+            .addGap(0, 830, Short.MAX_VALUE)
         );
         assembly2_SimulationRunPanelLayout.setVerticalGroup(
             assembly2_SimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -208,7 +208,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         assembly3_SimulationRunPanel.setLayout(assembly3_SimulationRunPanelLayout);
         assembly3_SimulationRunPanelLayout.setHorizontalGroup(
             assembly3_SimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
+            .addGap(0, 830, Short.MAX_VALUE)
         );
         assembly3_SimulationRunPanelLayout.setVerticalGroup(
             assembly3_SimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -217,7 +217,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         assemblySimulationRunTabbedPane.addTab("(Assembly 3 Simulation Run)", assembly3_SimulationRunPanel);
 
-        viskitTabbedPane.addTab("Simulation Run", assemblySimulationRunTabbedPane);
+        viskitTabbedPane.addTab("Simulation Run Manager", assemblySimulationRunTabbedPane);
 
         analystReportTabbedPane.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -225,7 +225,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         _1_HeaderPanel.setLayout(_1_HeaderPanelLayout);
         _1_HeaderPanelLayout.setHorizontalGroup(
             _1_HeaderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 788, Short.MAX_VALUE)
+            .addGap(0, 818, Short.MAX_VALUE)
         );
         _1_HeaderPanelLayout.setVerticalGroup(
             _1_HeaderPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -238,7 +238,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         _2_ExecutiveSummaryPanel.setLayout(_2_ExecutiveSummaryPanelLayout);
         _2_ExecutiveSummaryPanelLayout.setHorizontalGroup(
             _2_ExecutiveSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 788, Short.MAX_VALUE)
+            .addGap(0, 818, Short.MAX_VALUE)
         );
         _2_ExecutiveSummaryPanelLayout.setVerticalGroup(
             _2_ExecutiveSummaryPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -251,7 +251,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         _3_SimulationLocationPanel.setLayout(_3_SimulationLocationPanelLayout);
         _3_SimulationLocationPanelLayout.setHorizontalGroup(
             _3_SimulationLocationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 788, Short.MAX_VALUE)
+            .addGap(0, 818, Short.MAX_VALUE)
         );
         _3_SimulationLocationPanelLayout.setVerticalGroup(
             _3_SimulationLocationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -264,7 +264,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         _4_AssemblyConfirgurationPanel.setLayout(_4_AssemblyConfirgurationPanelLayout);
         _4_AssemblyConfirgurationPanelLayout.setHorizontalGroup(
             _4_AssemblyConfirgurationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 788, Short.MAX_VALUE)
+            .addGap(0, 818, Short.MAX_VALUE)
         );
         _4_AssemblyConfirgurationPanelLayout.setVerticalGroup(
             _4_AssemblyConfirgurationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -277,7 +277,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         _5_EntityParametersPanel.setLayout(_5_EntityParametersPanelLayout);
         _5_EntityParametersPanelLayout.setHorizontalGroup(
             _5_EntityParametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 788, Short.MAX_VALUE)
+            .addGap(0, 818, Short.MAX_VALUE)
         );
         _5_EntityParametersPanelLayout.setVerticalGroup(
             _5_EntityParametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -290,7 +290,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         _6_BehaviorDescriptionsPanel.setLayout(_6_BehaviorDescriptionsPanelLayout);
         _6_BehaviorDescriptionsPanelLayout.setHorizontalGroup(
             _6_BehaviorDescriptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 788, Short.MAX_VALUE)
+            .addGap(0, 818, Short.MAX_VALUE)
         );
         _6_BehaviorDescriptionsPanelLayout.setVerticalGroup(
             _6_BehaviorDescriptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -303,7 +303,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         _7_StatisticalResultsPanel.setLayout(_7_StatisticalResultsPanelLayout);
         _7_StatisticalResultsPanelLayout.setHorizontalGroup(
             _7_StatisticalResultsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 788, Short.MAX_VALUE)
+            .addGap(0, 818, Short.MAX_VALUE)
         );
         _7_StatisticalResultsPanelLayout.setVerticalGroup(
             _7_StatisticalResultsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -316,7 +316,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         _8_ConclusionsRecommendationsPanel.setLayout(_8_ConclusionsRecommendationsPanelLayout);
         _8_ConclusionsRecommendationsPanelLayout.setHorizontalGroup(
             _8_ConclusionsRecommendationsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 788, Short.MAX_VALUE)
+            .addGap(0, 818, Short.MAX_VALUE)
         );
         _8_ConclusionsRecommendationsPanelLayout.setVerticalGroup(
             _8_ConclusionsRecommendationsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -342,13 +342,13 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        viskitTabbedPane.addTab("Analyst Report", analystReportPanel);
+        viskitTabbedPane.addTab("Analyst Report Editor", analystReportPanel);
 
         javax.swing.GroupLayout designOfExperimentsPanelLayout = new javax.swing.GroupLayout(designOfExperimentsPanel);
         designOfExperimentsPanel.setLayout(designOfExperimentsPanelLayout);
         designOfExperimentsPanelLayout.setHorizontalGroup(
             designOfExperimentsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
+            .addGap(0, 830, Short.MAX_VALUE)
         );
         designOfExperimentsPanelLayout.setVerticalGroup(
             designOfExperimentsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -363,7 +363,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         cloudSimulationRunPanel.setLayout(cloudSimulationRunPanelLayout);
         cloudSimulationRunPanelLayout.setHorizontalGroup(
             cloudSimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
+            .addGap(0, 830, Short.MAX_VALUE)
         );
         cloudSimulationRunPanelLayout.setVerticalGroup(
             cloudSimulationRunPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

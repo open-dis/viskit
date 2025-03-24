@@ -714,7 +714,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="830" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -736,7 +736,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="830" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -749,8 +749,8 @@
         <Container class="javax.swing.JTabbedPane" name="assemblySimulationRunTabbedPane">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Simulation Run">
-                <Property name="tabTitle" type="java.lang.String" value="Simulation Run"/>
+              <JTabbedPaneConstraints tabName="Simulation Run Manager">
+                <Property name="tabTitle" type="java.lang.String" value="Simulation Run Manager"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -769,7 +769,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="830" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -791,7 +791,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="830" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -813,7 +813,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="830" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -828,8 +828,8 @@
         <Container class="javax.swing.JPanel" name="analystReportPanel">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Analyst Report">
-                <Property name="tabTitle" type="java.lang.String" value="Analyst Report"/>
+              <JTabbedPaneConstraints tabName="Analyst Report Editor">
+                <Property name="tabTitle" type="java.lang.String" value="Analyst Report Editor"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -876,7 +876,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="788" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="818" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -898,7 +898,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="788" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="818" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -920,7 +920,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="788" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="818" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -942,7 +942,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="788" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="818" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -964,7 +964,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="788" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="818" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -986,7 +986,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="788" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="818" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -1008,7 +1008,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="788" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="818" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -1030,7 +1030,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="788" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="818" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -1056,7 +1056,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="830" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
@@ -1092,7 +1092,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <EmptySpace min="0" pref="800" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="830" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">

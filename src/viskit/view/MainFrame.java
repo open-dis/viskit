@@ -98,7 +98,7 @@ public class MainFrame extends JFrame
     
     EventGraphViewFrame  eventGraphFrame;
     AssemblyViewFrame    assemblyFrame;
-    AnalystReportViewFrame analystReportPanel;
+    AnalystReportViewFrame analystReportEditorPanel;
     InternalAssemblyRunner internalSimulationRunner;
     JobLauncherTab2 runGridComponent;
 
@@ -257,7 +257,7 @@ public class MainFrame extends JFrame
         if (ViskitUserPreferences.isAssemblySimulationRunVisible()) {
             topTabbedPane.add(runTabbedPanePanel);
             assemblyPaneIndex = topTabbedPane.indexOfComponent(runTabbedPanePanel);
-            topTabbedPane.setTitleAt(assemblyPaneIndex, "Simulation Run");
+            topTabbedPane.setTitleAt(assemblyPaneIndex, "Simulation Run Manager");
             topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "first Prepare Assembly for Simulation Run");
             modalMenuBarList.add(null); // placeholder
             tabIndices[TAB0_SIMULATIONRUN_INDEX] = assemblyPaneIndex;
@@ -272,12 +272,12 @@ public class MainFrame extends JFrame
         boolean analystReportPanelVisible = ViskitUserPreferences.isAnalystReportVisible();
         if (analystReportPanelVisible)
         {
-            analystReportPanel = (AnalystReportViewFrame)ViskitGlobals.instance().buildAnalystReportFrame();
-            topTabbedPane.add(analystReportPanel.getContentPane());
-            assemblyPaneIndex = topTabbedPane.indexOfComponent(analystReportPanel.getContentPane());
-            topTabbedPane.setTitleAt(assemblyPaneIndex, "Analyst Report");
+            analystReportEditorPanel = (AnalystReportViewFrame)ViskitGlobals.instance().buildAnalystReportFrame();
+            topTabbedPane.add(analystReportEditorPanel.getContentPane());
+            assemblyPaneIndex = topTabbedPane.indexOfComponent(analystReportEditorPanel.getContentPane());
+            topTabbedPane.setTitleAt(assemblyPaneIndex, "Analyst Report Editor");
             topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Editor for analyst assessment and report generation");
-            mainFrameMenuBar = ((AnalystReportViewFrame) analystReportPanel).getMenus();
+            mainFrameMenuBar = ((AnalystReportViewFrame) analystReportEditorPanel).getMenus();
             modalMenuBarList.add(mainFrameMenuBar);
             doCommonHelp(mainFrameMenuBar);
             jamSettingsHandler(mainFrameMenuBar);
@@ -285,15 +285,15 @@ public class MainFrame extends JFrame
                 setJMenuBar(mainFrameMenuBar);
             }
             // TODO is this needed?
-            // analystReportPanel.setTitleListener(myTitleListener, assemblyPaneIndex);
+            // analystReportEditorPanel.setTitleListener(myTitleListener, assemblyPaneIndex);
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
             jamQuitHandler(null, myQuitAction, mainFrameMenuBar);
         }
             tabIndices[TAB0_ANALYSTREPORT_INDEX] = assemblyPaneIndex;
-            AnalystReportController analystReportController = (AnalystReportController) analystReportPanel.getController();
+            AnalystReportController analystReportController = (AnalystReportController) analystReportEditorPanel.getController();
             analystReportController.setMainTabbedPane(topTabbedPane, assemblyPaneIndex);
-            getAssemblyController().addAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportPanel);
+            getAssemblyController().addAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportEditorPanel);
         } 
         else
         {
@@ -589,7 +589,7 @@ public class MainFrame extends JFrame
                 }
                 if (tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] != -1) {
                     getAssemblyController().removeAssemblyFileListener(getAssemblyController().getAssemblyChangeListener());
-                    getAssemblyController().removeAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportPanel);
+                    getAssemblyController().removeAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportEditorPanel);
                     getAssemblyController().removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentAssemblyFileListener());
                     getAssemblyController().removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentProjectFileSetListener());
 
