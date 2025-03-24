@@ -51,6 +51,9 @@
                 <!-- Bookmarks for various sections of the report -->
                 <center>
                     <p>
+                        <img src="ViskitSplash2.png"/><!-- TODO link this image to website -->
+                    </p>
+                    <p>
                         <font size="-1">
                             <a href="#ExecutiveSummary">Executive<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Summary</a> |
                             <a href="#ScenarioLocation">Scenario Location</a> |
@@ -296,7 +299,7 @@
         <p align="left">
             <font size="4">
                 <b>
-                    <a name="SimulationConfiguration">Simulation Configuration: Viskit Assembly</a>
+                    <a name="SimulationConfiguration">Simulation Configuration: Viskit Assembly Preparation</a>
                     <xsl:if test="(string-length(@assemblyName)> 0)">
                         for
                         <xsl:value-of select="@assemblyName"/>
@@ -312,6 +315,7 @@
             simulation replications, either for visual validation of behavior
             or statistical analysis of Measures of Effectiveness (MoEs).
         </p>
+        <xsl:apply-templates select="//AssemblyImage"/>
         <xsl:apply-templates select="SimulationConfigurationDescription"/>
         <xsl:apply-templates select="SimulationConfigurationProductionNotes"/>
         <xsl:apply-templates select="SimulationConfigurationConclusions"/>
@@ -361,7 +365,8 @@
         <p/>
         <p/>
     </xsl:template>
-    <xsl:template match="AssemblyImage" mode="ConfigHeader">
+    
+    <xsl:template match="AssemblyImage">
         <div align="center">
             <xsl:element name="a">
                 <xsl:attribute name="href">
@@ -475,8 +480,6 @@
 
     <!-- Entity Parameter Tables -->
     <xsl:template match="ParameterTables">
-        <p/>
-        <p/>
         <p/>
         <xsl:text>Initialization Parameters for Simulation Entity </xsl:text>
         <b>
@@ -738,12 +741,25 @@
             </div>
         </xsl:if>
         <p/>
-        <p/>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
 
     <!-- Statistical Results -->
-    <xsl:template match="SRComments" mode="StatisticsHeader">
+    <xsl:template match="StatisticalResults" mode="StatisticsHeader">
+        <p align="left">
+            <font size="4">
+                <b><a name="StatisticalResults">Statistical Results for the Simulation</a></b>
+            </font>
+        </p>
+        <p>
+            Statistical results are produced by Property Change Listener (PCL) definitions
+            in the Assembly model.
+        </p>
+        <xsl:apply-templates select="StatisticalResultsDescription"/>
+        <xsl:apply-templates select="StatisticalResultsConclusions"/>
+    </xsl:template>
+    
+    <xsl:template match="StatisticalResultsDescription" mode="StatisticsHeader">
         <font size="4">
             <p align="left">
                 <font size="4">
@@ -758,7 +774,7 @@
             </font>
         </p>
     </xsl:template>
-    <xsl:template match="SRConclusions" mode="StatisticsHeader">
+    <xsl:template match="StatisticalResultsConclusions" mode="StatisticsHeader">
         <p align="left">
             <i>Analysis of Experimental Results</i><br/>
             <font color="#00006C">
@@ -769,6 +785,7 @@
             <b><u>Summary Statistics section</u>: Primary Measures of Effectiveness (MoEs) / Measures of Performance (MoPs) and corresponding statistical plots</b>
         </p>
     </xsl:template>
+    
     <xsl:template match="SimEntity" mode="ReplicationStatistics">
 
         <!-- Capture this Entity's name for its Figure Caption -->
