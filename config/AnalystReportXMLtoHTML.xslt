@@ -292,7 +292,7 @@
     </xsl:template>
 
     <!-- Simulation Configuration templates -->
-    <xsl:template match="SimulationConfigurationDescription" mode="ConfigHeader">
+    <xsl:template match="SimulationConfiguration" mode="ConfigHeader">
         <p align="left">
             <font size="4">
                 <b>
@@ -306,9 +306,9 @@
             </font>
         </p>
         <p align="left">
-            The simulation is defined by the Viskit Assembly which collects,
-            lists, initializes and connects all participating entitiy models
-            within a single scenario.  The assembly is then ready for repeated
+            Simulation configuration is defined by the Viskit Assembly which collects,
+            lists, initializes, and connects all  Event Graphs for participating entity models
+            within a single scenario.  The runnable assembly is then ready for repeated
             simulation replications, either for visual validation of behavior
             or statistical analysis of Measures of Effectiveness (MoEs).
         </p>
@@ -316,6 +316,7 @@
         <xsl:apply-templates select="SimulationConfigurationProductionNotes"/>
         <xsl:apply-templates select="SimulationConfigurationConclusions"/>
         <!-- ... which launches EntityTable templates -->
+        <xsl:apply-templates select="EntityTable"/>
     </xsl:template>
     
     <xsl:template match="SimulationConfigurationDescription" mode="ConfigHeader">
@@ -392,6 +393,7 @@
         </div>
         <a href="#top"><font size="-1" color="#990000">Back to top</font></a>
     </xsl:template>
+    
     <xsl:template match="SimEntity" mode="EntitiesTable">
         <tr>
             <td>
@@ -418,13 +420,30 @@
     </xsl:template>
 
     <!-- EntityParameter templates -->
+    <xsl:template match="EntityParameters" mode="ParamHeader">
+        <p align="left">
+            <font size="4">
+                <b>
+                    <a name="EntityParameters">Entity Parameters for configuring Event Graphs</a>
+                </b>
+                <br/>
+            </font>
+        </p>
+        <p align="left">
+            Entity parameters configure the behaviors of connected event graphs.
+        </p>
+        
+        <xsl:apply-templates select="EntityParametersDescription"/>
+        <xsl:apply-templates select="ParameterTables"/>
+        <xsl:apply-templates select="EntityParametersConclusions"/>
+    </xsl:template>
+
     <xsl:template match="EntityParametersDescription" mode="ParamHeader">
         <p align="left">
             <font size="4">
                 <b>
                     <a name="EntityParameters">Entity Initialization Parameters for this Simulation Assembly</a>
                 </b>
-                <br/>
             </font>
         </p>
         <p align="left">
@@ -435,7 +454,10 @@
         
     <xsl:template match="EntityParametersConclusions" mode="ParamHeader">
         <p align="left">
-            <i>Entity Parameters Conclusions</i><br/>
+            <i>Entity Parameters Conclusions:
+               Post-Experiment Analysis of Entity Behaviors</i>
+        </p>
+        <p align="left">
             <font color="#00006C">
                 <xsl:value-of select="@text"/>
             </font>
@@ -619,7 +641,7 @@
         <p/>
         <p/>
         <p align="left">
-            <b>Behavior: </b>
+            <b>Event Graph Behavior: </b>
             <xsl:element name="a">
                 <xsl:attribute name="name">
                     <xsl:value-of select="@name"/>
@@ -753,7 +775,7 @@
         <xsl:variable name="entityProperty" select="@property"/>
         <p/>
         <p align="left">
-            <b>Replication Report</b>
+            <b>Assembly Simulation Replication Report</b>
         </p>
         <p align="left">
             <b>Measure of Effectiveness (MoE)</b>
