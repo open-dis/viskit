@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project>
+	<Folder FolderName="XML Files" ExtStr="xml;cml;math;rdf;smil;svg;wml">
+		<Folder FolderName="configuration files">
+			<File FilePath="config\c_app.xml" HomeFolder="Yes"/>
+			<File FilePath="config\c_gui.xml" HomeFolder="Yes"/>
+			<File FilePath="config\log4j2.xml" HomeFolder="Yes"/>
+			<File FilePath="config\viskitProject.xml" HomeFolder="Yes"/>
+		</Folder>
+		<Folder FolderName="Assemblies">
+			<File FilePath="MyViskitProjects\DefaultProject\Assemblies\examples\ArrayTesterAssembly.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\Assemblies\examples\InventoryModelAssembly.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\Assemblies\examples\ServerAssembly3.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\Assemblies\examples\ServerWithRenegesAssembly.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\Assemblies\examples\TestServerGenericAssembly.xml" HomeFolder="Yes"/>
+		</Folder>
+		<Folder FolderName="Event Graphs">
+			<File FilePath="MyViskitProjects\DefaultProject\EventGraphs\examples\ArrayTester.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\EventGraphs\examples\ArrivalProcess.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\EventGraphs\examples\Creator.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\EventGraphs\examples\EntityCreator.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\EventGraphs\examples\InventoryModel.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\EventGraphs\examples\ServerGeneric.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\EventGraphs\examples\ServerWithReneges.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\EventGraphs\examples\SimpleInventory.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\EventGraphs\examples\SimpleMachineFailure.xml" HomeFolder="Yes"/>
+			<File FilePath="MyViskitProjects\DefaultProject\EventGraphs\examples\SimpleServer.xml" HomeFolder="Yes"/>
+		</Folder>
+	</Folder>
+	<Folder FolderName="XSLT stylesheets" ExtStr="xsl;xslt">
+		<File FilePath="config\AnalystReportXMLtoHTML.xslt" HomeFolder="Yes"/>
+	</Folder>
+	<Folder FolderName="Analyst Report archives" ExtStr="html;htm;xhtml;asp">
+		<File FilePath="MyViskitProjects\DefaultProject\AnalystReports\archive\ServerAssembly3_AnalystReport.html" HomeFolder="Yes"/>
+		<File FilePath="MyViskitProjects\DefaultProject\AnalystReports\archive\ServerAssembly3_AnalystReport.xml" HomeFolder="Yes"/>
+	</Folder>
+	<Folder FolderName="XML Schemas" ExtStr="dtd;dcd;xdr;biz;xsd">
+		<File FilePath="Schemas\assembly.xsd" HomeFolder="Yes"/>
+		<File FilePath="Schemas\cli.xsd" HomeFolder="Yes"/>
+		<File FilePath="Schemas\qstat.xsd" HomeFolder="Yes"/>
+		<File FilePath="Schemas\simkit.xsd" HomeFolder="Yes"/>
+		<File FilePath="Schemas\statistics.xsd" HomeFolder="Yes"/>
+		<File FilePath="Schemas\viskit.xsd" HomeFolder="Yes"/>
+	</Folder>
+</Project>
