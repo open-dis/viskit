@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="EntityCreator" package="examples" version="$Id: EntityCreator.xml 1590 2007-10-07 05:41:19Z tdnorbra $" author="ahbuss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="http://diana.nps.edu/Simkit/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="EntityCreator" package="examples" version="$Id: EntityCreator.xml 1590 2007-10-07 05:41:19Z tdnorbra $" author="ahbuss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Event name="Arrival">
         <Comment></Comment>
         <Schedule delay="0.0" event="EntityArrival" condition="true" priority="DEFAULT">
