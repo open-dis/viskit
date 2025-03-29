@@ -4,6 +4,7 @@
             targetNamespace="http://xml.netbeans.org/examples/targetNS"
             xmlns="http://xml.netbeans.org/examples/targetNS"
             elementFormDefault="qualified">
+<!-- TODO this schema has numerous errors, use XmlSpy to debug and resolve. Schema changes may require changes to source code as well. -->
 
   
 <!--
