@@ -5,7 +5,6 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" ref="head"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Parameter"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="StateVariable"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Event"/>
@@ -33,16 +32,15 @@
       <xs:attribute name="content"/>
     </xs:complexType>
   </xs:element>
+  <!-- Comment element is obsolete with version 2.0, use description attribute on parent element instead
   <xs:element name="Comment" type="xs:string">
     <xs:annotation>
       <xs:documentation>Comment is actually a Description field.  JAXB already uses 'Description' so the name can't be overloaded, ouch.</xs:documentation>
     </xs:annotation>
   </xs:element>
+  -->
   <xs:element name="Parameter">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
-      </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:ID"/>
       <xs:attribute name="type" use="required"/>
       <xs:attribute name="description"/>
@@ -51,7 +49,6 @@
   <xs:element name="StateVariable">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:ID"/>
@@ -62,7 +59,6 @@
   <xs:element name="Event">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Argument"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="LocalVariable"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="StateTransition"/>
@@ -83,7 +79,6 @@
   <xs:element name="Argument">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="type" use="required"/>
@@ -93,7 +88,6 @@
   <xs:element name="LocalVariable">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
@@ -159,7 +153,6 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="EdgeParameter"/>
       </xs:sequence>
       <xs:attribute name="delay" default="0.0"/>
@@ -185,7 +178,6 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="EdgeParameter"/>
       </xs:sequence>
       <xs:attribute name="event" use="required" type="xs:IDREF"/>
