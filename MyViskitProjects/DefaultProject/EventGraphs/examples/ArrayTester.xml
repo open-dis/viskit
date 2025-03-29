@@ -1,29 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="ArrayTester" package="examples" version="1.0" author="Terry D. Norbraten" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>Test Viskit's capability to create primitive type arrays</Comment>
-    <Parameter name="param_0" type="int[]">
-        <Comment>example parameter</Comment>
-    </Parameter>
-    <StateVariable name="state_0" type="int[param_0.length]">
-        <Comment>example state variable</Comment>
-    </StateVariable>
-    <Event name="Run">
-        <Comment>The run event is started automatically by Simkit when execution starts.</Comment>
-        <Schedule delay="0.0" event="Init" condition="true" priority="DEFAULT">
-            <Comment>always schedule event to initialize index at 0</Comment>
+<SimEntity name="ArrayTester" package="examples" version="1.0" author="Terry D. Norbraten" description="Test Viskit's capability to create primitive type arrays" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="param_0" type="int[]" description="example parameter"/>
+    <StateVariable name="state_0" type="int[param_0.length]" description="example state variable"/>
+    <Event name="Run" description="The run event is started automatically by Simkit when execution starts.">
+        <Schedule delay="0.0" event="Init" condition="true" priority="DEFAULT" description="always schedule event to initialize index at 0">
             <EdgeParameter value="0"/>
         </Schedule>
         <Code></Code>
         <Coordinate x="30.0" y="30.0"/>
     </Event>
-    <Event name="Init">
-        <Comment>Initialize the event graph</Comment>
+    <Event name="Init" description="Initialize the event graph">
         <Argument name="i" type="int"/>
         <StateTransition state="state_0" index="i">
             <Assignment value="param_0[i]"/>
         </StateTransition>
-        <Schedule delay="0.0" event="Init" condition="i &lt; (param_0.length - 1)" priority="DEFAULT">
-            <Comment>Continue looping until array length reached</Comment>
+        <Schedule delay="0.0" event="Init" condition="i &lt; (param_0.length - 1)" priority="DEFAULT" description="Continue looping until array length reached">
             <EdgeParameter value="i + 1"/>
         </Schedule>
         <Code></Code>

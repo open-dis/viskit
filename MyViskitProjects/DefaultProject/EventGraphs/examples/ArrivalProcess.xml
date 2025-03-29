@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="ArrivalProcess" package="examples" version="0.2" author="Arnie Buss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>Getting started: producing customers at random intervals.</Comment>
-    <Parameter name="interarrivalTime" type="simkit.random.RandomVariate">
-        <Comment>typical time duration between arrivals</Comment>
-    </Parameter>
-    <StateVariable name="numberArrivals" type="int">
-        <Comment>how many customers have arrived</Comment>
-    </StateVariable>
-    <Event name="Run">
-        <Comment>This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity</Comment>
+<SimEntity name="ArrivalProcess" package="examples" version="0.2" author="Arnie Buss" extend="SimEntityBase" description="Getting started: producing customers at random intervals." xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Parameter name="interarrivalTime" type="simkit.random.RandomVariate" description="typical time duration between arrivals"/>
+    <StateVariable name="numberArrivals" type="int" description="how many customers have arrived"/>
+    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
         <StateTransition state="numberArrivals">
             <Assignment value="0"/>
         </StateTransition>

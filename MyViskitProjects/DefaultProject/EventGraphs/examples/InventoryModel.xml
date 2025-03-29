@@ -1,44 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="InventoryModel" package="examples" version="1.0" author="terry" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>Implementation of an Event Graph for an Inventory Model employing an (s, S) ordering policy depicted on page 4-6 of the Discrete Event Simulation (DES) Modeling guide by Arnie Buss.</Comment>
-    <Parameter name="D" type="simkit.random.RandomVariate">
-        <Comment>Number of Parts demanded by a customer</Comment>
-    </Parameter>
-    <Parameter name="tL" type="simkit.random.RandomVariate">
-        <Comment>Lead time for orders received by the company</Comment>
-    </Parameter>
-    <Parameter name="tR" type="simkit.random.RandomVariate">
-        <Comment>Deterministic time between company reviews</Comment>
-    </Parameter>
-    <Parameter name="I0" type="int">
-        <Comment>Initial inventory of Parts</Comment>
-    </Parameter>
-    <Parameter name="bigS" type="int">
-        <Comment>Order up to amount (S)</Comment>
-    </Parameter>
-    <Parameter name="littleS" type="int">
-        <Comment>Order trigger amount (s)</Comment>
-    </Parameter>
-    <StateVariable name="I" type="int">
-        <Comment>Amount of Parts on hand</Comment>
-    </StateVariable>
-    <StateVariable name="B" type="int">
-        <Comment>Amount of Parts on backorder</Comment>
-    </StateVariable>
-    <StateVariable name="T" type="int">
-        <Comment>Total amount of Parts on order</Comment>
-    </StateVariable>
-    <StateVariable name="N" type="int">
-        <Comment>Number of Parts ordered</Comment>
-    </StateVariable>
-    <StateVariable name="NO" type="int">
-        <Comment>Number of orders placed</Comment>
-    </StateVariable>
-    <StateVariable name="immediatelyServedCustomers" type="int">
-        <Comment>Customers immediately served</Comment>
-    </StateVariable>
+<SimEntity name="InventoryModel" package="examples" version="1.0" author="terry" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" description="Implementation of an Event Graph for an Inventory Model employing an (s, S) ordering policy depicted on page 4-6 of the Discrete Event Simulation (DES) Modeling guide by Arnie Buss.">
+    <Parameter name="D" type="simkit.random.RandomVariate" description="Number of Parts demanded by a customer"/>
+    <Parameter name="tL" type="simkit.random.RandomVariate" description="Lead time for orders received by the company"/>
+    <Parameter name="tR" type="simkit.random.RandomVariate" description="Deterministic time between company reviews"/>
+    <Parameter name="I0" type="int" description="Initial inventory of Parts"/>
+    <Parameter name="bigS" type="int" description="Order up to amount (S)"/>
+    <Parameter name="littleS" type="int" description="Order trigger amount (s)"/>
+    <StateVariable name="I" type="int" description="Amount of Parts on hand"/>
+    <StateVariable name="B" type="int" description="Amount of Parts on backorder"/>
+    <StateVariable name="T" type="int" description="Total amount of Parts on order"/>
+    <StateVariable name="N" type="int" description="Number of Parts ordered"/>
+    <StateVariable name="NO" type="int" description="Number of orders placed"/>
+    <StateVariable name="immediatelyServedCustomers" type="int" description="Customers immediately served"/>
     <Event name="Run" description="This event is fired first to facilitate initialization of all simulation state variables">
-        <Comment></Comment>
         <StateTransition state="I">
             <Assignment value="I0"/>
         </StateTransition>
@@ -57,28 +31,16 @@
         <StateTransition state="immediatelyServedCustomers">
             <Assignment value="0"/>
         </StateTransition>
-        <Schedule delay="tR.generate()" event="Review" priority="DEFAULT">
-            <Comment></Comment>
-        </Schedule>
-        <Code></Code>
+        <Schedule delay="tR.generate()" event="Review" priority="DEFAULT"/>
         <Coordinate x="40.0" y="200.0"/>
     </Event>
-    <Event name="Arrival">
-        <Comment>Feeder event for schedulling the Demand event via Arrivals from the Arrival Process</Comment>
-        <Schedule delay="0.0" event="Demand" priority="DEFAULT">
-            <Comment>Passing along tA</Comment>
-        </Schedule>
-        <Code></Code>
+    <Event name="Arrival" description="Feeder event for schedulling the Demand event via Arrivals from the Arrival Process">
+        <Schedule delay="0.0" event="Demand" priority="DEFAULT" description="Passing along tA"/>
         <Coordinate x="40.0" y="100.0"/>
     </Event>
-    <Event name="Demand">
-        <Comment></Comment>
-        <LocalVariable name="demand" type="int" value="((DiscreteRandomVariate) D).generateInt()">
-            <Comment></Comment>
-        </LocalVariable>
-        <LocalVariable name="net" type="int" value="I-B-demand">
-            <Comment></Comment>
-        </LocalVariable>
+    <Event name="Demand" description="">
+        <LocalVariable name="demand" type="int" value="((DiscreteRandomVariate) D).generateInt()"/>
+        <LocalVariable name="net" type="int" value="I-B-demand"/>
         <StateTransition state="I">
             <Assignment value="Math.max(0, net)"/>
         </StateTransition>
@@ -95,19 +57,13 @@ if (net &gt;= 0) {
         <Coordinate x="150.0" y="100.0"/>
     </Event>
     <Event name="Review">
-        <Comment></Comment>
         <Schedule delay="0.0" event="PlaceOrder" condition="(I-B+T) &lt; littleS" priority="DEFAULT">
-            <Comment></Comment>
             <EdgeParameter value="bigS - I + B - T"/>
         </Schedule>
-        <Schedule delay="tR.generate()" event="Review" priority="DEFAULT">
-            <Comment></Comment>
-        </Schedule>
-        <Code></Code>
+        <Schedule delay="tR.generate()" event="Review" priority="DEFAULT"/>
         <Coordinate x="140.0" y="290.0"/>
     </Event>
     <Event name="PlaceOrder">
-        <Comment></Comment>
         <Argument name="A" type="int"/>
         <StateTransition state="T">
             <Assignment value="T+A"/>
@@ -119,18 +75,14 @@ if (net &gt;= 0) {
             <Assignment value="NO + 1"/>
         </StateTransition>
         <Schedule delay="tL.generate()" event="OrderArrives" priority="DEFAULT">
-            <Comment></Comment>
             <EdgeParameter value="A"/>
         </Schedule>
         <Code></Code>
         <Coordinate x="280.0" y="300.0"/>
     </Event>
     <Event name="OrderArrives">
-        <Comment></Comment>
         <Argument name="A" type="int"/>
-        <LocalVariable name="net" type="int" value="I - B + A">
-            <Comment></Comment>
-        </LocalVariable>
+        <LocalVariable name="net" type="int" value="I - B + A"/>
         <StateTransition state="T">
             <Assignment value="T - A"/>
         </StateTransition>

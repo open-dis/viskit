@@ -1,25 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="ServerGeneric" package="examples" version="$Id: ServerGeneric.xml 1590 2007-10-07 05:41:19Z tdnorbra $" author="ahbuss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter name="totalNumberServers" type="int">
-        <Comment>total number of servers available to serve customers</Comment>
-    </Parameter>
-    <Parameter name="serviceTimeGenerator" type="simkit.random.RandomVariate">
-        <Comment>random value for latest time duration to serve customer</Comment>
-    </Parameter>
-    <StateVariable name="numberAvailableServers" type="int">
-        <Comment>how many servers can serve customers</Comment>
-    </StateVariable>
-    <StateVariable name="queue" type="java.util.LinkedList&lt;simkit.Entity&gt;">
-        <Comment>the queue holds customers who are waiting in line</Comment>
-    </StateVariable>
-    <StateVariable name="delayInQueue" type="double">
-        <Comment>any fixed waiting time that all customers encounter</Comment>
-    </StateVariable>
-    <StateVariable name="timeInSystem" type="double">
-        <Comment>how much time did the current customer need</Comment>
-    </StateVariable>
-    <Event name="Run">
-        <Comment></Comment>
+    <Parameter name="totalNumberServers" type="int" description="total number of servers available to serve customers"/>
+    <Parameter name="serviceTimeGenerator" type="simkit.random.RandomVariate" description="random value for latest time duration to serve customer"/>
+    <StateVariable name="numberAvailableServers" type="int" description="how many servers can serve customers"/>
+    <StateVariable name="queue" type="java.util.LinkedList&lt;simkit.Entity&gt;" description="the queue holds customers who are waiting in line"/>
+    <StateVariable name="delayInQueue" type="double" description="any fixed waiting time that all customers encounter"/>
+    <StateVariable name="timeInSystem" type="double" description="how much time did the current customer need"/>
+    <Event name="Run" description="">
         <StateTransition state="numberAvailableServers">
             <Assignment value="totalNumberServers"/>
         </StateTransition>
@@ -30,19 +17,15 @@
         <Coordinate x="30.0" y="30.0"/>
     </Event>
     <Event name="Arrival">
-        <Comment></Comment>
         <Argument name="customer" type="simkit.Entity"/>
         <StateTransition state="queue">
             <Operation method="add(customer)"/>
         </StateTransition>
-        <Schedule delay="0.0" event="StartService" condition="numberAvailableServers &gt; 0" priority="HIGH">
-            <Comment></Comment>
-        </Schedule>
+        <Schedule delay="0.0" event="StartService" condition="numberAvailableServers &gt; 0" priority="HIGH"/>
         <Code>customer.stampTime();</Code>
         <Coordinate x="30.0" y="170.0"/>
     </Event>
     <Event name="StartService">
-        <Comment></Comment>
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers - 1"/>
         </StateTransition>
@@ -53,14 +36,12 @@
             <Assignment value="customer.getElapsedTime()"/>
         </StateTransition>
         <Schedule delay="serviceTimeGenerator.generate()" event="EndService" condition="true" priority="DEFAULT">
-            <Comment></Comment>
             <EdgeParameter value="customer"/>
         </Schedule>
         <Code>Entity customer = queue.getFirst();</Code>
         <Coordinate x="170.0" y="160.0"/>
     </Event>
     <Event name="EndService">
-        <Comment></Comment>
         <Argument name="customer" type="simkit.Entity"/>
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers + 1"/>
@@ -69,7 +50,6 @@
             <Assignment value="customer.getElapsedTime()"/>
         </StateTransition>
         <Schedule delay="0.0" event="StartService" condition="queue.size() &gt; 0" priority="HIGH">
-            <Comment></Comment>
         </Schedule>
         <Code></Code>
         <Coordinate x="290.0" y="160.0"/>
