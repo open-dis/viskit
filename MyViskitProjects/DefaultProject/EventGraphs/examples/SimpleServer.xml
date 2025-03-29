@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="SimpleServer" package="examples" version="0.1" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Comment>One of the most fundamental examples, a simple server that handles client customers</Comment>
-    <Parameter name="serviceTime" type="simkit.random.RandomVariate">
-        <Comment>time duration to perform service</Comment>
-    </Parameter>
-    <Parameter name="totalNumberServers" type="int">
-        <Comment>how many servers are provided</Comment>
-    </Parameter>
-    <StateVariable name="numberInQueue" type="int">
-        <Comment>number of customers in queue</Comment>
-    </StateVariable>
-    <StateVariable name="numberAvailableServers" type="int">
-        <Comment>number of available servers at a given time</Comment>
-    </StateVariable>
-    <Event name="Run">
-        <Comment>testing 1 2 3</Comment>
+<SimEntity name="SimpleServer" package="examples" version="0.1" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" description="One of the most fundamental examples, a simple server that handles client customers">
+    <Parameter name="serviceTime" type="simkit.random.RandomVariate" description="time duration to perform service"/>
+    <Parameter name="totalNumberServers" type="int" description="how many servers are provided"/>
+    <StateVariable name="numberInQueue" type="int" description="number of customers in queue"/>
+    <StateVariable name="numberAvailableServers" type="int" description="number of available servers at a given time"/>
+    <Event name="Run" description="testing 1 2 3">
         <StateTransition state="numberInQueue">
             <Assignment value="0"/>
         </StateTransition>
@@ -28,13 +18,11 @@
             <Assignment value="numberInQueue + 1"/>
         </StateTransition>
         <Schedule delay="0.0" event="StartService" condition="numberAvailableServers &gt; 0" priority="DEFAULT">
-            <Comment></Comment>
             <EdgeParameter value="numberAvailableServers"/>
         </Schedule>
         <Coordinate x="20.0" y="130.0"/>
     </Event>
-    <Event name="StartService">
-        <Comment>Begin operations, server handling customer</Comment>
+    <Event name="StartService" description="Begin operations, server handling customer">
         <Argument name="arg_0" type="int"/>
         <StateTransition state="numberInQueue">
             <Assignment value="numberInQueue - 1"/>
@@ -46,8 +34,7 @@
         <Code>System.out.println("numberAvailableServers"+arg_0);</Code>
         <Coordinate x="160.0" y="130.0"/>
     </Event>
-    <Event name="EndService">
-        <Comment>server has completed serving its customer</Comment>
+    <Event name="EndService" description="server has completed serving its customer">
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers + 1"/>
         </StateTransition>
