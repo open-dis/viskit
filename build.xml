@@ -252,7 +252,7 @@ their descpritions.
     </target>
 
     <!-- @deprecated - Now a legacy target as we are no longer building schema from DTD -->
-    <target name="build.schema"
+    <target name="build.DTD.deprecated"
             depends="init"
             description="Create xsd Schemas from dtd @deprecated">
         <trang failonerror="true" input="${simkit.dtd}" output="${simkit.xsd}" schemaIn="dtd" schemaOut="xsd"/>
