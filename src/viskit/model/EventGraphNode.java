@@ -1,7 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import viskit.xsd.bindings.assembly.SimEntity;
 
 /**
@@ -16,16 +14,17 @@ import viskit.xsd.bindings.assembly.SimEntity;
  *
  * An event as seen by the model (not the view)
  */
-public class EventGraphNode extends AssemblyNode {
-
+public class EventGraphNode extends AssemblyNode
+{
     protected boolean outputMarked = false;
     protected boolean verboseMarked = false;
-    private List<String> descriptionArray = new ArrayList<>();
+//    private String comment; // obsolete
+//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
+    private String description;
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
     private String value;
-    private String comment;
 
     EventGraphNode(String name, String type) // package access on constructor
     {
@@ -68,16 +67,6 @@ public class EventGraphNode extends AssemblyNode {
     }
 
     @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
-    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
@@ -88,9 +77,25 @@ public class EventGraphNode extends AssemblyNode {
     }
 
     @Override
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
+
+    @Override
+    public void setDescription(String newDescription) {
+        description = newDescription;
+    }
+
+    // obsolete
+//    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
 
     @Override
     public String getOperationOrAssignment() {
@@ -100,5 +105,10 @@ public class EventGraphNode extends AssemblyNode {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !operation;
     }
 }

@@ -12,15 +12,16 @@ import java.util.List;
  * 
  * TODO: Not currently used
  */
-public class ConstructorArgument extends ViskitElement {
-
-    private List<String> descriptionArray = new ArrayList<>();
+public class ConstructorArgument extends ViskitElement 
+{
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
     private String value;
     private List<String> comments = new ArrayList<>();
-    private String comment;
+//    private String comment; // obsolete
+//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
+    private String description;
 
     public List getComments() {
         return comments;
@@ -40,24 +41,30 @@ public class ConstructorArgument extends ViskitElement {
     }
 
     @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
-    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
 
     @Override
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
+
+    @Override
+    public void setDescription(String newDescription) {
+        description = newDescription;
+    }
+
+    // obsolete
+//    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
 
     @Override
     public String getOperationOrAssignment() {
@@ -67,5 +74,10 @@ public class ConstructorArgument extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !operation;
     }
 }

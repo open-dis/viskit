@@ -1,7 +1,6 @@
 package viskit.model;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -48,12 +47,13 @@ public class SchedulingEdge extends Edge {
              "(\\.("+DIGITS+")("+EXP+")?)" +
              "[\\x00-\\x20]*))))";   // Optional leading "whitespace"
 
-    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
     private String value;
-    private String comment;
+//    private String comment; // obsolete
+//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
+    private String description;
 
     /** package-limited constructor */
     SchedulingEdge() {
@@ -62,28 +62,17 @@ public class SchedulingEdge extends Edge {
 
     @Override
     Object copyShallow() {
-        SchedulingEdge se = new SchedulingEdge();
-        se.opaqueViewObject = opaqueViewObject;
-        se.to = to;
-        se.from = from;
-        se.parameters = parameters;
-        se.delay = delay;
-        se.conditional = conditional;
-        se.conditionalDescription = conditionalDescription;
-        se.priority = priority;
-        return se;
+        SchedulingEdge newSchedulingEdge = new SchedulingEdge();
+        newSchedulingEdge.opaqueViewObject = opaqueViewObject;
+        newSchedulingEdge.to = to;
+        newSchedulingEdge.from = from;
+        newSchedulingEdge.parameters = parameters;
+        newSchedulingEdge.delay = delay;
+        newSchedulingEdge.conditional = conditional;
+        newSchedulingEdge.conditionalDescription = conditionalDescription;
+        newSchedulingEdge.priority = priority;
+        return newSchedulingEdge;
     }
-
-    @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
     @Override
     public String getIndexingExpression() {
         return indexingExpression;
@@ -95,9 +84,29 @@ public class SchedulingEdge extends Edge {
     }
 
     @Override
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
+
+    @Override
+    public void setDescription(String newDescription) {
+        this.description = newDescription;
+    }
+
+
+    // obsolete
+//    @Override
+//    public String getDescription() {
+//        return description;
+//    }    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
 
     @Override
     public String getOperationOrAssignment() {
@@ -107,5 +116,10 @@ public class SchedulingEdge extends Edge {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !operation;
     }
 }

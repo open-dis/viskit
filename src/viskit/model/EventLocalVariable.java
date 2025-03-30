@@ -11,12 +11,13 @@ import viskit.ViskitGlobals;
  * @since 3:59:01 PM
  * @version $Id$
  */
-public class EventLocalVariable extends ViskitElement {
-
+public class EventLocalVariable extends ViskitElement 
+{
     private String value;
-    private String comment = EMPTY;
     private String[] arraySize;
-    private List<String> descriptionArray = new ArrayList<>();
+//    private String description = EMPTY; // obsolete
+//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
+    private String description = EMPTY;
     private String indexingExpression;
     private boolean operation;
     private String operationOrAssignment;
@@ -33,13 +34,25 @@ public class EventLocalVariable extends ViskitElement {
     }
 
     @Override
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setDescription(String newDescription) {
+        this.description = newDescription;
     }
+
+     // obsolete
+//    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
+
 
     @Override
     public String getValue() {
@@ -59,17 +72,6 @@ public class EventLocalVariable extends ViskitElement {
     public String[] getArraySize() {
         return arraySize;
     }
-
-    @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
    @Override
     public String getIndexingExpression() {
         return indexingExpression;
@@ -83,5 +85,10 @@ public class EventLocalVariable extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !operation;
     }
 }

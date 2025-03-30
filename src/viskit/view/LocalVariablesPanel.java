@@ -42,7 +42,7 @@ public class LocalVariablesPanel extends ViskitTablePanel
     sa[0] = e.getName();
     sa[1] = e.getType();
     sa[2] = e.getValue();
-    sa[3] = e.getComment();
+    sa[3] = e.getDescription();
     return sa;
   }
 

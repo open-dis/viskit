@@ -1,8 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -13,15 +10,16 @@ import java.util.List;
  * @since 9:04:09 AM
  * @version $Id$
  */
-public class PropertyChangeEdge extends AssemblyEdge {
-
+public class PropertyChangeEdge extends AssemblyEdge
+{
     protected String property;
-    private List<String> descriptionArray = new ArrayList<>();
+//    private String comment; // obsolete
+//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
+    private String description;
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
     private String value;
-    private String comment;
 
     PropertyChangeEdge() // package-limited
     {
@@ -34,17 +32,6 @@ public class PropertyChangeEdge extends AssemblyEdge {
     public void setProperty(String p) {
         property = p;
     }
-
-    @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
     @Override
     public String getIndexingExpression() {
         return indexingExpression;
@@ -56,9 +43,25 @@ public class PropertyChangeEdge extends AssemblyEdge {
     }
 
     @Override
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
+
+    @Override
+    public void setDescription(String newDescription) {
+        description = newDescription;
+    }
+
+    // obsolete
+//    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
 
     @Override
     public String getOperationOrAssignment() {
@@ -68,5 +71,10 @@ public class PropertyChangeEdge extends AssemblyEdge {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !operation;
     }
 }

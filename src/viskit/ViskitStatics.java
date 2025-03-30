@@ -35,7 +35,6 @@ package viskit;
 
 import edu.nps.util.FindFile;
 import edu.nps.util.GenericConversion;
-import edu.nps.util.Log4jUtilities;
 
 import java.awt.Component;
 import java.awt.Desktop;
@@ -131,7 +130,7 @@ public class ViskitStatics
 
     public static boolean      debug = false;
 
-    public static String DESCRIPTION_HINT = "Good descriptions reveal model meaning and author intent";
+    public static String DESCRIPTION_HINT = "A good description reveals model meaning and author intent";
 
     /**
      * Convert a class name array type to human readable form.
@@ -567,7 +566,9 @@ public class ViskitStatics
      * @return a List of parameter map object arrays
      */
     @SuppressWarnings("unchecked")
-    public static List<Object>[] resolveParameters(Class<?> type) {
+    public static List<Object>[] resolveParameters(Class<?> type)
+    {
+        viskit.xsd.bindings.eventgraph.ObjectFactory jaxbEventGraphObjectFactory = new viskit.xsd.bindings.eventgraph.ObjectFactory();
 
         // nulls can occur when staring Viskit pointing to an assembly in another
         // project space. In this case we can be silent
@@ -590,12 +591,12 @@ public class ViskitStatics
                 return null;
             }
             List<Object>[] plist = GenericConversion.newListObjectTypeArray(List.class, constr.length);
-            ObjectFactory of = new ObjectFactory();
-            Field f = null;
+            Field field = null;
 
             try {
-                f = type.getField("parameterMap");
-            } catch (SecurityException ex) {
+                field = type.getField("parameterMap");
+            }
+            catch (SecurityException ex) {
                 LOG.error(ex);
 //                ex.printStackTrace();
             } catch (NoSuchFieldException ex) {}
@@ -634,7 +635,7 @@ public class ViskitStatics
                             throw new RuntimeException("ParameterMap names and types length mismatch"); // TODO: harsh
 
                         for (int k = 0; k < names.length; k++) {
-                            pt = of.createParameter();
+                            pt = jaxbEventGraphObjectFactory.createParameter();
                             pt.setName(names[k]);
                             pt.setType(types[k]);
 
@@ -642,9 +643,9 @@ public class ViskitStatics
                         }
                     }
 
-                } else if (f != null) {
+                } else if (field != null) {
                     if (viskit.ViskitStatics.debug)
-                        LOG.debug("{} is a parameterMap", f);
+                        LOG.debug("{} is a parameterMap", field);
 
                     try {
                         // parameters are in the following order
@@ -653,7 +654,7 @@ public class ViskitStatics
                         //  { "type0","name0", ... },
                         //  ...
                         // }
-                        pMap = (String[][]) (f.get(new String[0][0]));
+                        pMap = (String[][]) (field.get(new String[0][0]));
                         numConstrs = pMap.length;
 
                         for (int n = 0; n < numConstrs; n++) { // tbd: check that numConstrs == constr.length
@@ -662,7 +663,7 @@ public class ViskitStatics
                                 plist[n] = new ArrayList<>();
                                 for (int k = 0; k < params.length; k += 2) {
                                     try {
-                                        p = of.createParameter();
+                                        p = jaxbEventGraphObjectFactory.createParameter();
                                         ptype = params[k];
                                         pname = params[k + 1];
 
@@ -689,7 +690,7 @@ public class ViskitStatics
                     int k = 0;
                     for (Class<?> ptyp : ptypes) {
                         try {
-                            p = of.createParameter();
+                            p = jaxbEventGraphObjectFactory.createParameter();
                             ptType = ViskitStatics.convertClassName(ptyp.getName());
                             if (ptType.indexOf(".class") > 0) { //??
                                 ptType = ptType.split("\\.")[0];

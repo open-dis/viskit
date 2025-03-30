@@ -23,33 +23,33 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  *
  * @author DMcG
  */
-public class EventArgumentDialog extends JDialog {
-
+public class EventArgumentDialog extends JDialog 
+{
     private final JTextField nameField;    // Text field that holds the parameter name
     private final JTextField descriptionField;          // Text field that holds the description
     private final JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type
-    private static EventArgumentDialog dialog;
+    private static EventArgumentDialog eventArgumentDialog;
     private static boolean modified = false;
-    private EventArgument myEA;
+    private EventArgument myEventArgument;
     private final JButton okButton;
-    private JButton canButt;
-    public static String newName,  newType,  newDescription;
+    private final JButton cancelButton;
+    public static String newName,  newType,  newDescription; // TODO what happens with these??
 
-    public static boolean showDialog(JFrame f, EventArgument parm) {
-        if (dialog == null) {
-            dialog = new EventArgumentDialog(f, parm);
+    public static boolean showDialog(JFrame frame, EventArgument parm) {
+        if (eventArgumentDialog == null) {
+            eventArgumentDialog = new EventArgumentDialog(frame, parm);
         } else {
-            dialog.setParams(f, parm);
+            eventArgumentDialog.setParams(frame, parm);
         }
 
-        dialog.setVisible(true);
+        eventArgumentDialog.setVisible(true);
         // above call blocks
         return modified;
     }
 
     private EventArgumentDialog(JFrame parent, EventArgument param) {
         super(parent, "Event Argument", true);
-        this.myEA = param;
+        this.myEventArgument = param;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
@@ -87,17 +87,17 @@ public class EventArgumentDialog extends JDialog {
 
         JPanel buttPan = new JPanel();
         buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
+        cancelButton = new JButton("Cancel");
         okButton = new JButton("Apply changes");
         buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
         buttPan.add(okButton);
-        buttPan.add(canButt);
+        buttPan.add(cancelButton);
         panel.add(buttPan);
         panel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
         cont.add(panel);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
         okButton.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener listener = new enableApplyButtonListener();
@@ -115,25 +115,27 @@ public class EventArgumentDialog extends JDialog {
     }
 
     public final void setParams(Component c, EventArgument p) {
-        myEA = p;
+        myEventArgument = p;
 
         fillWidgets();
 
         modified = (p == null);
         okButton.setEnabled(p == null);
 
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
         pack();
         setLocationRelativeTo(c);
     }
 
-    private void fillWidgets() {
-        if (myEA != null) {
-            nameField.setText(myEA.getName());
-            parameterTypeCombo.setSelectedItem(myEA.getType());
-            if (!myEA.getDescription().isEmpty()) {
-                descriptionField.setText(myEA.getDescription().get(0));
-            } else {
+    private void fillWidgets() 
+    {
+        if (myEventArgument != null) {
+            nameField.setText(myEventArgument.getName());
+            parameterTypeCombo.setSelectedItem(myEventArgument.getType());
+            if (!myEventArgument.getDescription().isEmpty()) {
+                descriptionField.setText(myEventArgument.getDescription()); // .get(0));
+            } 
+            else {
                 descriptionField.setText("");
             }
         } else {
@@ -142,29 +144,34 @@ public class EventArgumentDialog extends JDialog {
         }
     }
 
-    private void unloadWidgets() {
-        String ty = (String) parameterTypeCombo.getSelectedItem();
-        ty = ViskitGlobals.instance().typeChosen(ty);
-        String nm = nameField.getText();
-        nm = nm.replaceAll("\\s", "");
+    private void unloadWidgets() 
+    {
+        String name = nameField.getText();
+        name = name.replaceAll("\\s", ""); // ensure no spaces
+        String type = (String) parameterTypeCombo.getSelectedItem();
+        type = ViskitGlobals.instance().typeChosen(type);
 
-        if (myEA != null) {
-            myEA.setName(nm);
-            myEA.setType(ty);
-            myEA.getDescription().clear();
-            String cs = descriptionField.getText().trim();
-            if (cs.length() > 0) {
-                myEA.getDescription().add(0, cs);
-            }
-        } else {
-            newName = nm;
-            newType = ty;
+        if (myEventArgument != null) 
+        {
+            myEventArgument.setName(name);
+            myEventArgument.setType(type);
+            // obsolete
+//            myEventArgument.getDescriptionArray().clear();
+//            String cs = descriptionField.getText().trim();
+//            if (cs.length() > 0) {
+//                myEventArgument.getDescriptionArray().add(0, cs);
+//            }
+            myEventArgument.setDescription(descriptionField.getText().trim());
+        } 
+        else { // TODO what happens with these??
+            newName = name;
+            newType = type;
             newDescription = descriptionField.getText().trim();
         }
     }
 
-    class cancelButtonListener implements ActionListener {
-
+    class cancelButtonListener implements ActionListener 
+    {
         @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller
@@ -208,10 +215,10 @@ public class EventArgumentDialog extends JDialog {
                 if (ret == JOptionPane.YES_OPTION) {
                     okButton.doClick();
                 } else {
-                    canButt.doClick();
+                    cancelButton.doClick();
                 }
             } else {
-                canButt.doClick();
+                cancelButton.doClick();
             }
         }
     }

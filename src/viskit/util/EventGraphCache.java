@@ -58,7 +58,6 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package viskit.util;
 
-import edu.nps.util.Log4jUtilities;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +73,8 @@ import org.jdom.JDOMException;
 
 import viskit.ViskitGlobals;
 import viskit.doe.FileHandler;
+import static viskit.model.AnalystReportModel.NAME;
+import static viskit.model.AnalystReportModel.TYPE;
 
 /**
  * Set of utility methods for caching a List&lt;File&gt; of EventGraph paths
@@ -118,14 +119,16 @@ public class EventGraphCache
     private Document assemblyDocument;
     private Element entityTable;
 
-    public static synchronized EventGraphCache instance() {
+    public static synchronized EventGraphCache instance() 
+    {
         if (me == null) {
             me = new EventGraphCache();
         }
         return me;
     }
 
-    private EventGraphCache() {
+    private EventGraphCache() 
+    {
         eventGraphNamesList      = new LinkedList<>();
         eventGraphFilesList      = new LinkedList<>();
         eventGraphImageFilesList = new LinkedList<>();
@@ -175,9 +178,9 @@ public class EventGraphCache
             entityParams = temp.getChildren("MultiParameter");
 
             for (Element param : entityParams) {
-                if (param.getAttributeValue("type").equals("diskit.SMAL.EntityDefinition")) {
-                    tableEntry.setAttribute("name", temp.getAttributeValue("name"));
-                    tableEntry.setAttribute("fullyQualifiedName", temp.getAttributeValue("type"));
+                if (param.getAttributeValue(TYPE).equals("diskit.SMAL.EntityDefinition")) {
+                    tableEntry.setAttribute(NAME, temp.getAttributeValue(NAME));
+                    tableEntry.setAttribute("fullyQualifiedName", temp.getAttributeValue(TYPE)); // TODO ???
                     getEntityTable().addContent(tableEntry);
                 }
             }
@@ -260,7 +263,7 @@ public class EventGraphCache
 
                 // Check all names against the simEntityList obtained from the Assembly
                 for (Element entity : simEntityList) {
-                    eventGraphName = entity.getAttributeValue("type");
+                    eventGraphName = entity.getAttributeValue(TYPE);
 
                     position = eventGraphName.lastIndexOf(".");
                     eventGraphName = eventGraphName.substring(position + 1, eventGraphName.length());

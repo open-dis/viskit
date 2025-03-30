@@ -134,7 +134,7 @@ public interface Model {
      * @param en the event node that changed
      * @return true if a change occurred
      */
-    boolean changeEvent(EventNode en);
+    boolean changeEventNode(EventNode en);
 
     void newStateVariable(String name, String type, String initVal, String comment);
 

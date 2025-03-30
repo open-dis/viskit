@@ -145,14 +145,15 @@ public final class AnalystReportModel extends MvcAbstractModel
     public static final String ENTITY                      = "entity";
     public static final String PROPERTY                    = "property";
     public static final String REPLICATION_STATISTICS      = "replicationStatistics";
-    public static final String SUMMARY_STATISTICS          = "summaryStatistics";
     public static final String SHOW_DESCRIPTION            = "showDescription";
     public static final String SHOW_ENTITY_TABLE           = "showEntityTable";
     public static final String SHOW_PARAMETER_TABLES       = "showParameterTables"; //  TODO duplicative?
     public static final String SHOW_IMAGE                  = "showImage";
     public static final String SHOW_IMAGES                 = "images"; // TODO
     public static final String SHOW_OVERVIEW               = "showOverview";
+    public static final String SUMMARY_STATISTICS          = "summaryStatistics";
     public static final String TEXT                        = "text";
+    public static final String TYPE                        = "type";
     public static final String VERSION                     = "version";
     
     public static final String NO_DESCRIPTION_PROVIDED     = "no description found in Event Graph";
@@ -372,7 +373,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         simulationConfigurationElement.setAttribute(SHOW_DESCRIPTION,  "true");
         simulationConfigurationElement.setAttribute(SHOW_IMAGE,        "true");
         simulationConfigurationElement.setAttribute(SHOW_ENTITY_TABLE, "true");
-        makeDescriptionElement(simulationConfigurationElement, SIMULATION_CONFIGURATION, "");
+//        simulationConfigurationElement.setAttribute(DESCRIPTION, getAssembly TODO ?
         makeProductionNotesElement   (simulationConfigurationElement, SIMULATION_CONFIGURATION, "");
         makeConclusionsElement       (simulationConfigurationElement, SIMULATION_CONFIGURATION, "");
         if (assemblyFile != null) {
@@ -553,7 +554,9 @@ public final class AnalystReportModel extends MvcAbstractModel
                 localRootElement = tmpDocument.getRootElement();
 
                 // prevent returning a null if there was no attribute value
-                descriptionString = (localRootElement.getChildText(DESCRIPTION) == null) ? NO_DESCRIPTION_PROVIDED : localRootElement.getChildText(DESCRIPTION);
+                if  (localRootElement.getAttribute(DESCRIPTION) != null)
+                     descriptionString = localRootElement.getAttribute(DESCRIPTION).getValue();
+                else descriptionString = NO_DESCRIPTION_PROVIDED;
 
                 descriptionElement = new Element(DESCRIPTION);
                 descriptionElement.setAttribute(TEXT, descriptionString);
@@ -562,20 +565,21 @@ public final class AnalystReportModel extends MvcAbstractModel
                 if (showAllDetails) 
                 {
                     localRootElementParameters = localRootElement.getChildren(PARAMETER);
-                    for (Element temp : localRootElementParameters) {
+                    for (Element nextParameter : localRootElementParameters)
+                    {
                         parameterElement = new Element(PARAMETER);
-                        parameterElement.setAttribute(NAME, temp.getAttributeValue(NAME));
-                        parameterElement.setAttribute("type", temp.getAttributeValue("type"));
+                        parameterElement.setAttribute(NAME, nextParameter.getAttributeValue(NAME));
+                        parameterElement.setAttribute(TYPE, nextParameter.getAttributeValue(TYPE));
 
                         // The data "null" is not legal for a JDOM attribute
-                        parameterElement.setAttribute(DESCRIPTION_ATTRIBUTE, (temp.getChildText(DESCRIPTION) == null) ? NO_DESCRIPTION_PROVIDED : temp.getChildText(DESCRIPTION));
+                        parameterElement.setAttribute(DESCRIPTION_ATTRIBUTE, (nextParameter.getChildText(DESCRIPTION) == null) ? NO_DESCRIPTION_PROVIDED : nextParameter.getChildText(DESCRIPTION));
                         behaviorElement.addContent(parameterElement);
                     }
                     lre2 = localRootElement.getChildren("StateVariable");
                     for (Element temp : lre2) {
                         stateVariable = new Element("stateVariable");
                         stateVariable.setAttribute(NAME, temp.getAttributeValue(NAME));
-                        stateVariable.setAttribute("type", temp.getAttributeValue("type"));
+                        stateVariable.setAttribute(TYPE, temp.getAttributeValue(TYPE));
 
                         // The data "null" is not legal for a JDOM attribute
                         stateVariable.setAttribute(DESCRIPTION_ATTRIBUTE, (temp.getChildText(DESCRIPTION) == null) ? NO_DESCRIPTION_PROVIDED : temp.getChildText(DESCRIPTION));
@@ -630,7 +634,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                 parameterArrayList = new ArrayList<>();
                 for (Element parameterElement : parameterElementList) {
                     parameterName = parameterElement.getAttributeValue(NAME);
-                    parameterType = parameterElement.getAttributeValue("type");
+                    parameterType = parameterElement.getAttributeValue(TYPE);
                     parameterDescription = parameterElement.getAttributeValue(DESCRIPTION_ATTRIBUTE);
                     parameterStringArray = new String[]{parameterName, parameterType, parameterDescription};
                     parameterArrayList.add(parameterStringArray);
@@ -643,7 +647,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                 for (Element stateVariableElement : stateVariableElementList) 
                 {
                     stateVariableElementName        = stateVariableElement.getAttributeValue(NAME);
-                    stateVariableElementType        = stateVariableElement.getAttributeValue("type");
+                    stateVariableElementType        = stateVariableElement.getAttributeValue(TYPE);
                     stateVariableElementDescriotion = stateVariableElement.getAttributeValue(DESCRIPTION_ATTRIBUTE);
                     stateVariableStringArray = new String[]{stateVariableElementName, 
                                                             stateVariableElementType, 
@@ -718,7 +722,7 @@ public final class AnalystReportModel extends MvcAbstractModel
             entityName = temp.getAttributeValue(NAME);
             entityParametersElementList = temp.getChildren(MULTI_PARAMETER);
             for (Element parameterElement : entityParametersElementList) {
-                if (parameterElement.getAttributeValue("type").equals("diskit.SMAL.EntityDefinition")) {
+                if (parameterElement.getAttributeValue(TYPE).equals("diskit.SMAL.EntityDefinition")) {
                     table.addContent(extractSMAL(entityName, parameterElement));
                 }
             }
@@ -746,7 +750,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         String category;
         while (itr.hasNext()) {
             temp = itr.next();
-            category = temp.getAttributeValue("type");
+            category = temp.getAttributeValue(TYPE);
             if (category.equals("diskit.SMAL.Classification")) {
                 table.addContent(makeTableEntry("Classification", temp));
             }

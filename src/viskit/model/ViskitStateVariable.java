@@ -11,15 +11,16 @@ import viskit.ViskitGlobals;
  * @author DMcG
  * @version $Id$
  */
-public class ViskitStateVariable extends ViskitElement {
-
+public class ViskitStateVariable extends ViskitElement
+{
     /** array size, for (multi-dim) array */
     private String[] arraySize;
 
     /** Object that represents its current value */
     private Object currentValue;
-    private String comment = EMPTY;
-    private List<String> descriptionArray = new ArrayList<>();
+//    private String comment = EMPTY; // obsolete
+//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
+    private String description = EMPTY;
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
@@ -27,18 +28,24 @@ public class ViskitStateVariable extends ViskitElement {
 
     /**
      * Constructor
-     * @param pVariableName
-     * @param pVariableType
+     * @param name of state variable
+     * @param type of state variable
      */
-    ViskitStateVariable(String pVariableName, String pVariableType) {
-        name = pVariableName;
-        setType(pVariableType);
+    ViskitStateVariable(String name, String type) {
+        this.name = name;
+        this.type = type;
         currentValue = null;
     }
 
-    public ViskitStateVariable(String nm, String typ, String comment) {
-        this(nm, typ);
-        this.comment = comment;
+    /**
+     * Constructor
+     * @param name of state variable
+     * @param type of state variable
+     * @param description of state variable
+     */
+    public ViskitStateVariable(String name, String type, String description) {
+        this(name, type);
+        this.description = description;
     }
 
     @Override
@@ -47,9 +54,9 @@ public class ViskitStateVariable extends ViskitElement {
     }
 
     @Override
-    public final void setType(String pVariableType) {
-        type = pVariableType;
-        arraySize = ViskitGlobals.instance().getArraySize(pVariableType);
+    public final void setType(String newType) {
+        type = newType;
+        arraySize = ViskitGlobals.instance().getArraySize(newType);
     }
 
     public String[] getArraySize() {
@@ -73,23 +80,29 @@ public class ViskitStateVariable extends ViskitElement {
     }
 
     @Override
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
+    public String getDescription() {
+        return description;
     }
 
     @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
+    public void setDescription(String newDescription) {
+        description = newDescription;
     }
 
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
+    // obsolete
+//    public void setComment(String comment) {
+//        this.comment = comment;
+//    }
+//
+//    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
 
     @Override
     public String getIndexingExpression() {
@@ -109,5 +122,10 @@ public class ViskitStateVariable extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !operation;
     }
 }

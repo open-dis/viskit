@@ -1,7 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import viskit.ViskitGlobals;
 
 /**
@@ -12,12 +10,13 @@ import viskit.ViskitGlobals;
  * @author DMcG
  * @version $Id$
  */
-public class ViskitParameter extends ViskitElement {
-
+public class ViskitParameter extends ViskitElement
+{
     private String value = EMPTY;
-    private String comment = EMPTY;
+//    private String comment = EMPTY; // obsolete
+//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
+    private String description = EMPTY;
     private String[] arraySize;
-    private List<String> descriptionArray = new ArrayList<>();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
@@ -28,10 +27,10 @@ public class ViskitParameter extends ViskitElement {
         setType(pType);
     }
 
-    public ViskitParameter(String pName, String pType, String comment) //todo make package-accessible
+    public ViskitParameter(String pName, String pType, String description) //todo make package-accessible
     {
         this(pName, pType);
-        this.comment = comment;
+        this.description = description;
     }
 
     @Override
@@ -49,13 +48,25 @@ public class ViskitParameter extends ViskitElement {
     }
 
     @Override
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
 
-    public void setComment(String cmt) {
-        this.comment = cmt;
+    @Override
+    public void setDescription(String newDescription) {
+        description = newDescription;
     }
+
+    // obsolete
+//    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
 
     @Override
     public final void setType(String pType) {
@@ -65,16 +76,6 @@ public class ViskitParameter extends ViskitElement {
 
     public String[] getArraySize() {
         return arraySize;
-    }
-
-    @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
     }
 
     @Override
@@ -90,5 +91,10 @@ public class ViskitParameter extends ViskitElement {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !operation;
     }
 }

@@ -1103,7 +1103,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             done = true;
             modified = ((EventGraphView) getView()).doEditNode(node);
             if (modified) {
-                done = ((viskit.model.Model) getModel()).changeEvent(node);
+                done = ((viskit.model.Model) getModel()).changeEventNode(node);
             }
         } while (!done);
     }

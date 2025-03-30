@@ -30,55 +30,59 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  * @since 9:19:41 AM
  * @version $Id$
  */
-public class LocalVariableDialog extends JDialog {
-
-    public static String newName,  newType,  newValue,  newComment;
+public class LocalVariableDialog extends JDialog 
+{
+    public static String newName,  newType,  newValue,  newDescription;
     
     private final JTextField nameField;    // Text field that holds the parameter name
     private final JTextField valueField;       // Text field that holds the expression
     private final JTextField descriptionField;          // Text field that holds the description
-    private final JComboBox typeCombo;    // Editable combo box that lets us select a type
-    private static LocalVariableDialog dialog;
+    private final JComboBox typeComboBox;    // Editable combo box that lets us select a type
+    private static LocalVariableDialog localVariableDialog;
     private static boolean modified = false;
-    private EventLocalVariable locVar;
+    private EventLocalVariable eventLocalVariable;
     private final JButton okButton;
-    private final JButton canButt;
+    private final JButton cancelButton;
 
-    public static boolean showDialog(JFrame f, EventLocalVariable parm) {
-        if (dialog == null) {
-            dialog = new LocalVariableDialog(f, parm);
-        } else {
-            dialog.setParams(f, parm);
+    public static boolean showDialog(JFrame parentFrame, EventLocalVariable parameter) 
+    {
+        if (localVariableDialog == null) {
+            localVariableDialog = new LocalVariableDialog(parentFrame, parameter);
+        } 
+        else 
+        {
+            localVariableDialog.setParameters(parentFrame, parameter);
         }
 
-        dialog.setVisible(true);
+        localVariableDialog.setVisible(true);
         // above call blocks
         return modified;
     }
 
-    private LocalVariableDialog(JFrame parent, EventLocalVariable lv) {
-        super(parent, "Local Variable Inspector", true);
-        this.locVar = lv;
+    private LocalVariableDialog(JFrame parentFrame, EventLocalVariable eventLocalVariable) 
+    {
+        super(parentFrame, "Local Variable Inspector", true);
+        this.eventLocalVariable = eventLocalVariable;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        Container cont = getContentPane();
-        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
+        Container contentPanelContainer = getContentPane();
+        contentPanelContainer.setLayout(new BoxLayout(contentPanelContainer, BoxLayout.Y_AXIS));
 
-        JPanel con = new JPanel();
-        con.setLayout(new BoxLayout(con, BoxLayout.Y_AXIS));
-        con.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
 
-        con.add(Box.createVerticalStrut(5));
+        panel.add(Box.createVerticalStrut(5));
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
 
-        JLabel nameLab = new JLabel("name");
-        JLabel initLab = new JLabel("initial value");
-        JLabel typeLab = new JLabel("type");
+        JLabel nameLabel = new JLabel("name");
+        JLabel initialValueLabel = new JLabel("initial value");
+        JLabel typeLabel = new JLabel("type");
         JLabel descriptionLabel = new JLabel("description");
         descriptionLabel.setToolTipText(DESCRIPTION_HINT);
-        int w = OneLinePanel.maxWidth(new JComponent[]{nameLab, initLab, typeLab, descriptionLabel});
+        int w = OneLinePanel.maxWidth(new JComponent[]{nameLabel, initialValueLabel, typeLabel, descriptionLabel});
 
         nameField = new JTextField(15);
         setMaxHeight(nameField);
@@ -87,38 +91,38 @@ public class LocalVariableDialog extends JDialog {
         descriptionField = new JTextField(25);
         descriptionField.setToolTipText(DESCRIPTION_HINT);
         setMaxHeight(descriptionField);
-        typeCombo = ViskitGlobals.instance().getViskitTypeComboBox();
-        setMaxHeight(typeCombo);
+        typeComboBox = ViskitGlobals.instance().getViskitTypeComboBox();
+        setMaxHeight(typeComboBox);
 
-        fieldsPanel.add(new OneLinePanel(nameLab, w, nameField));
-        fieldsPanel.add(new OneLinePanel(typeLab, w, typeCombo));
-        fieldsPanel.add(new OneLinePanel(initLab, w, valueField));
+        fieldsPanel.add(new OneLinePanel(nameLabel, w, nameField));
+        fieldsPanel.add(new OneLinePanel(typeLabel, w, typeComboBox));
+        fieldsPanel.add(new OneLinePanel(initialValueLabel, w, valueField));
         fieldsPanel.add(new OneLinePanel(descriptionLabel, w, descriptionField));
-        con.add(fieldsPanel);
-        con.add(Box.createVerticalStrut(5));
+        panel.add(fieldsPanel);
+        panel.add(Box.createVerticalStrut(5));
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
-        canButt = new JButton("Cancel");
-        okButton = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
-        buttPan.add(okButton);
-        buttPan.add(canButt);
-        con.add(buttPan);
-        con.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
-        cont.add(con);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        cancelButton = new JButton("Cancel");
+            okButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());     // takes up space when dialog is expanded horizontally
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
+        panel.add(buttonPanel);
+        panel.add(Box.createVerticalGlue());    // takes up space when dialog is expanded vertically
+        contentPanelContainer.add(panel);
 
         // attach listeners
-        canButt.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new cancelButtonListener());
+            okButton.addActionListener(new applyButtonListener());
 
         enableApplyButtonListener lis = new enableApplyButtonListener();
         this.nameField.addCaretListener(lis);
         this.descriptionField.addCaretListener(lis);
         this.valueField.addCaretListener(lis);
-        this.typeCombo.addActionListener(lis);
+        this.typeComboBox.addActionListener(lis);
 
-        setParams(parent, lv);
+        setParameters(parentFrame, eventLocalVariable);
     }
 
     private void setMaxHeight(JComponent c) {
@@ -127,53 +131,62 @@ public class LocalVariableDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public final void setParams(Component c, EventLocalVariable p) {
-        locVar = p;
+    public final void setParameters(Component component, EventLocalVariable eventLocalVariable) {
+        eventLocalVariable = eventLocalVariable;
 
         fillWidgets();
 
-        modified = (p == null);
-        okButton.setEnabled(p == null);
+        modified = (eventLocalVariable == null);
+        okButton.setEnabled(eventLocalVariable == null);
 
-        getRootPane().setDefaultButton(canButt);
+        getRootPane().setDefaultButton(cancelButton);
         pack();
-        setLocationRelativeTo(c);
+        setLocationRelativeTo(component);
     }
 
-    private void fillWidgets() {
-        if (locVar != null) {
-            nameField.setText(locVar.getName());
-            typeCombo.setSelectedItem(locVar.getType());
-            valueField.setText(locVar.getValue());
-            descriptionField.setText(locVar.getComment());
-        } else {
-            nameField.setText("locVar name");
-            descriptionField.setText("comments here");
+    private void fillWidgets() 
+    {
+        if (eventLocalVariable != null) 
+        {
+            nameField.setText(eventLocalVariable.getName());
+            typeComboBox.setSelectedItem(eventLocalVariable.getType());
+            valueField.setText(eventLocalVariable.getValue());
+            descriptionField.setText(eventLocalVariable.getDescription());
+            descriptionField.setToolTipText(DESCRIPTION_HINT);
+        } 
+        else 
+        {
+            nameField.setText("local variable name");
+            descriptionField.setText("description");
+            
         }
     }
 
-    private void unloadWidgets() {
-        String ty = (String) typeCombo.getSelectedItem();
-        ty = ViskitGlobals.instance().typeChosen(ty);
-        String nm = nameField.getText();
-        nm = nm.replaceAll("\\s", "");
-        if (locVar != null) {
-            locVar.setName(nm);
-            locVar.setType(ty);
-            locVar.setValue(valueField.getText().trim());
-            locVar.setComment(descriptionField.getText().trim());
+    private void unloadWidgets() 
+    {
+        String type = (String) typeComboBox.getSelectedItem();
+        type = ViskitGlobals.instance().typeChosen(type);
+        String name = nameField.getText();
+        name = name.replaceAll("\\s", ""); // remove spaces from name
+        if (eventLocalVariable != null) 
+        {
+            eventLocalVariable.setName(name);
+            eventLocalVariable.setType(type);
+            eventLocalVariable.setValue(valueField.getText().trim());
+            eventLocalVariable.setDescription(descriptionField.getText().trim());
         } else {
-            newName = nm;
-            newType = ty;
+            newName = name;
+            newType = type;
             newValue = valueField.getText().trim();
-            newComment = descriptionField.getText().trim();
+            newDescription = descriptionField.getText().trim();
         }
     }
 
-    class cancelButtonListener implements ActionListener {
-
+    class cancelButtonListener implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent event) {
+        public void actionPerformed(ActionEvent event) 
+        {
             modified = false;    // for the caller
             dispose();
         }
@@ -183,7 +196,8 @@ public class LocalVariableDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            if (modified) {
+            if (modified) 
+            {
                 unloadWidgets();
             }
             dispose();
@@ -205,20 +219,24 @@ public class LocalVariableDialog extends JDialog {
         }
     }
 
-    class myCloseListener extends WindowAdapter {
-
+    class myCloseListener extends WindowAdapter 
+    {
         @Override
-        public void windowClosing(WindowEvent e) {
-            if (modified) {
+        public void windowClosing(WindowEvent e) 
+        {
+            if (modified) 
+            {
                 int ret = JOptionPane.showConfirmDialog(LocalVariableDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
                     okButton.doClick();
-                } else {
-                    canButt.doClick();
+                } 
+                else {
+                    cancelButton.doClick();
                 }
-            } else {
-                canButt.doClick();
+            } 
+            else {
+                cancelButton.doClick();
             }
         }
     }

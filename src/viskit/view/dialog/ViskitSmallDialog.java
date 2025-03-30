@@ -53,7 +53,7 @@ public abstract class ViskitSmallDialog extends JDialog
                 LOG.error(e);
             }
         } else {
-            dialog.setParams(f, var);
+            dialog.setParameters(f, var);
         }
 
         dialog.setVisible(true);
@@ -61,7 +61,7 @@ public abstract class ViskitSmallDialog extends JDialog
         return modified;
     }
 
-    abstract void setParams(Component comp, Object o);
+    abstract void setParameters(Component comp, Object o);
 
     abstract void unloadWidgets();
 

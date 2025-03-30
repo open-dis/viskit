@@ -1,6 +1,5 @@
 package viskit.view.dialog;
 
-import edu.nps.util.Log4jUtilities;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.*;
@@ -37,9 +36,9 @@ public class EventNodeInspectorDialog extends JDialog
     static final Logger LOG = LogManager.getLogger();
 
     private static EventNodeInspectorDialog dialog;
-    private EventNode node;
+    private EventNode eventNode;
     private static boolean modified = false;
-    private final JTextField name;
+    private final JTextField eventNameTF;
     private final JTextField descriptionTF;
     private final JPanel descriptionPanel;
     private TransitionsPanel stateTransitionsPanel;
@@ -67,11 +66,15 @@ public class EventNodeInspectorDialog extends JDialog
      * @param node EventNode to edit
      * @return whether data was modified, or not
      */
-    public static boolean showDialog(JFrame f, EventNode node) {
-        if (dialog == null) {
+    public static boolean showDialog(JFrame f, EventNode node) 
+    {
+        if (dialog == null) 
+        {
             dialog = new EventNodeInspectorDialog(f, node);
-        } else {
-            dialog.setParams(f, node);
+        } 
+        else 
+        {
+            dialog.setParameters(f, node);
         }
 
         dialog.setVisible(true);
@@ -79,9 +82,10 @@ public class EventNodeInspectorDialog extends JDialog
         return modified;
     }
 
-    private EventNodeInspectorDialog(final JFrame frame, EventNode node) {
+    private EventNodeInspectorDialog(final JFrame frame, EventNode node) 
+    {
         super(frame, "Event Node Inspector: " + node.getName(), true);
-        this.node = node;
+        this.eventNode = node;
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -92,19 +96,19 @@ public class EventNodeInspectorDialog extends JDialog
         panel.setBorder(BorderFactory.createEmptyBorder(15, 10, 10, 10));
 
         // name
-        JPanel namePan = new JPanel();
-        namePan.setLayout(new BoxLayout(namePan, BoxLayout.X_AXIS));
-        namePan.setOpaque(false);
-        namePan.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event name")));
-        name = new JTextField(30); // This sets the "preferred width" when this dialog is packed
-        name.setOpaque(true);
-        name.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        namePan.add(name);
-        // make the field expand only horiz.
-        Dimension d = namePan.getPreferredSize();
+        JPanel eventNamePanel = new JPanel();
+        eventNamePanel.setLayout(new BoxLayout(eventNamePanel, BoxLayout.X_AXIS));
+        eventNamePanel.setOpaque(false);
+        eventNamePanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event name")));
+        eventNameTF = new JTextField(30); // This sets the "preferred width" when this dialog is packed
+        eventNameTF.setOpaque(true);
+        eventNameTF.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        eventNamePanel.add(eventNameTF);
+        // make the field only expand horizontally
+        Dimension d = eventNamePanel.getPreferredSize();
         d.width = Integer.MAX_VALUE;
-        namePan.setMaximumSize(new Dimension(d));
-        panel.add(namePan);
+        eventNamePanel.setMaximumSize(new Dimension(d));
+        panel.add(eventNamePanel);
 
         descriptionPanel = new JPanel();
         descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.X_AXIS));
@@ -123,7 +127,7 @@ public class EventNodeInspectorDialog extends JDialog
         JButton editDescriptionButton = new JButton(" ... ");
         editDescriptionButton.setToolTipText(DESCRIPTION_HINT);
         editDescriptionButton.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        editDescriptionButton.setToolTipText("Click to edit a long description");
+        editDescriptionButton.setToolTipText("Select to edit a long description");
         Dimension dd = editDescriptionButton.getPreferredSize();
         dd.height = d.height;
         editDescriptionButton.setMaximumSize(new Dimension(dd));
@@ -213,9 +217,9 @@ public class EventNodeInspectorDialog extends JDialog
 
         myChangeActionListener myChangeListener = new myChangeActionListener();
         //name.addActionListener(chlis);
-        KeyListener klis = new myKeyListener();
-        name.addKeyListener(klis);
-        descriptionTF.addKeyListener(klis);
+        KeyListener keyListener = new myKeyListener();
+        eventNameTF.addKeyListener(keyListener);
+        descriptionTF.addKeyListener(keyListener);
         editDescriptionButton.addActionListener(new commentListener());
 
         arguments.addPlusListener(myChangeListener);
@@ -233,40 +237,42 @@ public class EventNodeInspectorDialog extends JDialog
 
         localVariablesPanel.addPlusListener(myChangeListener);
         localVariablesPanel.addMinusListener(myChangeListener);
-        localVariablesPanel.addDoubleClickedListener((ActionEvent e) -> {
-            EventLocalVariable elv = (EventLocalVariable) e.getSource();
-            boolean modified1 = LocalVariableDialog.showDialog(frame, elv);
+        localVariablesPanel.addDoubleClickedListener((ActionEvent actionEvent) -> {
+            EventLocalVariable eventLocalVariable = (EventLocalVariable) actionEvent.getSource();
+            boolean modified1 = LocalVariableDialog.showDialog(frame, eventLocalVariable);
             if (modified1) {
-                localVariablesPanel.updateRow(elv);
+                localVariablesPanel.updateRow(eventLocalVariable);
                 setModified(modified1);
             }
         });
 
         stateTransitionsPanel.addPlusListener(myChangeListener);
         stateTransitionsPanel.addMinusListener(myChangeListener);
-        stateTransitionsPanel.addDoubleClickedListener(new MouseAdapter() {
-
+        stateTransitionsPanel.addDoubleClickedListener(new MouseAdapter() 
+        {
             // EventStateTransitionDialog: State transition
             // bug fix 1183
             @Override
-            public void mouseClicked(MouseEvent e) {
-                EventStateTransition est = (EventStateTransition) e.getSource();
+            public void mouseClicked(MouseEvent mouseEvent) 
+            {
+                EventStateTransition eventStateTransition = (EventStateTransition) mouseEvent.getSource();
 
                 // modified comes back true even if a caret was placed in a
                 // text box
                 boolean modified = EventStateTransitionDialog.showDialog(
                         frame,
-                        est,
+                        eventStateTransition,
                         arguments,
                         localVariablesPanel);
-                if (modified) {
-                    stateTransitionsPanel.updateTransition(est);
+                if (modified)
+                {
+                    stateTransitionsPanel.updateTransition(eventStateTransition);
                     setModified(modified);
                 }
             }
         });
 
-        setParams(frame, node);
+        setParameters(frame, node);
     }
 
     private void setModified(boolean f) {
@@ -285,8 +291,8 @@ public class EventNodeInspectorDialog extends JDialog
         setLocationRelativeTo(c);
     }
 
-    public final void setParams(Component c, EventNode eventNode) {
-        node = eventNode;
+    public final void setParameters(Component c, EventNode newEventNode) {
+        eventNode = newEventNode;
 
         fillWidgets();
         sizeAndPosition(c);
@@ -294,13 +300,14 @@ public class EventNodeInspectorDialog extends JDialog
 
     private void fillWidgets() 
     {
-        String nodeName = node.getName();
+        String nodeName = eventNode.getName();
         nodeName = nodeName.replace(' ', '_');
         setTitle("Event Node Inspector: " + nodeName);
-        name.setText(nodeName);
+        eventNameTF.setText(nodeName);
 
         Dimension d = descriptionTF.getPreferredSize();
-        String s = fillString(node.getComments());
+//        String s = fillString(eventNode.getDescription());
+        String s = eventNode.getDescription();
         descriptionTF.setText(s);
         descriptionTF.setCaretPosition(0);
         descriptionTF.setPreferredSize(d);
@@ -308,19 +315,19 @@ public class EventNodeInspectorDialog extends JDialog
 //      hideShowDescription(s != null && !s.isEmpty());
         hideShowDescription(true); // always show
 
-        s = node.getCodeBlock();
+        s = eventNode.getCodeBlock();
         localCodeBlockPanel.setData(s);
         localCodeBlockPanel.setVisibleLines(1);
         hideShowCodeBlock(s != null && !s.isEmpty());
 
-        stateTransitionsPanel.setTransitions(node.getTransitions());
+        stateTransitionsPanel.setTransitions(eventNode.getTransitions());
         s = stateTransitionsPanel.getString();
         hideShowStateTransitions(s != null && !s.isEmpty());
 
-        arguments.setData(node.getArguments());
+        arguments.setData(eventNode.getArguments());
         hideShowArguments(!arguments.isEmpty());
 
-        localVariablesPanel.setData(node.getLocalVariables());
+        localVariablesPanel.setData(eventNode.getLocalVariables());
         hideShowLocals(!localVariablesPanel.isEmpty());
 
         setModified(false);
@@ -330,7 +337,7 @@ public class EventNodeInspectorDialog extends JDialog
     private void unloadWidgets(EventNode eventNode)
     {
         if (modified) {
-            eventNode.setName(name.getText().trim().replace(' ', '_'));
+            eventNode.setName(eventNameTF.getText().trim().replace(' ', '_'));
 
             eventNode.setTransitions(stateTransitionsPanel.getTransitions());
 
@@ -374,13 +381,15 @@ public class EventNodeInspectorDialog extends JDialog
                 }
             }
             eventNode.setLocalVariables(localVariablesPanel.getData());
-            eventNode.getComments().clear();
-            eventNode.getComments().add(descriptionTF.getText().trim());
+//            eventNode.getComments().clear();
+//            eventNode.getComments().add(descriptionTF.getText().trim());
+            eventNode.setDescription(descriptionTF.getText().trim());
             eventNode.setCodeBLock(localCodeBlockPanel.getData());
         }
     }
 
-    private String fillString(List<String> stringList) {
+    private String fillString(List<String> stringList)
+    {
         if (stringList == null) {
             return "";
         }
@@ -446,7 +455,7 @@ public class EventNodeInspectorDialog extends JDialog
 //                    }
 //                }
 
-                unloadWidgets(node);
+                unloadWidgets(eventNode);
             }
             dispose();
         }

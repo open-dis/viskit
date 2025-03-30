@@ -1,8 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by IntelliJ IDEA.
  * @author Mike Bailey
@@ -10,37 +7,18 @@ import java.util.List;
  * @since 3:57:26 PM
  * @version $Id$
  */
-public class EventArgument extends ViskitElement {
-
-    private List<String> descriptionArray = new ArrayList<>();
-    private List<String> comments = new ArrayList<>();
+public class EventArgument extends ViskitElement
+{
+    private String description;
+//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
     private String value;
-    private boolean operation;
-    private String operationOrAssignment;
+    private boolean isOperation;
+    private String operationOrAssignmentString;
     private String indexingExpression;
-    private String comment;
 
     @Override
     public String toString() {
         return "(" + type + ") " + name;
-    }
-
-    public List<String> getDescription() {
-        return comments;
-    }
-
-    public void setComments(List<String> comments) {
-        this.comments = comments;
-    }
-
-    @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
     }
 
     @Override
@@ -54,17 +32,38 @@ public class EventArgument extends ViskitElement {
     }
 
     @Override
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
 
     @Override
+    public void setDescription(String newDescription) {
+        description = newDescription;
+    }
+
+    // obsolete
+//    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
+
+    @Override
     public String getOperationOrAssignment() {
-        return operationOrAssignment;
+        return operationOrAssignmentString;
     }
 
     @Override
     public boolean isOperation() {
-        return operation;
+        return isOperation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !isOperation;
     }
 }

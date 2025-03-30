@@ -59,8 +59,9 @@ public class XMLValidationTool
 {
     static final Logger LOG = LogManager.getLogger();
 
-    public static final String ASSEMBLY_SCHEMA = "http://diana.nps.edu/Simkit/assembly.xsd";
-    public static final String EVENT_GRAPH_SCHEMA = "http://diana.nps.edu/Simkit/simkit.xsd";
+    // currently tuned for DefaultProject, TODO update to online address when available
+    public static final String ASSEMBLY_SCHEMA    = "../../../../Schemas/assembly.xsd";
+    public static final String EVENT_GRAPH_SCHEMA = "../../../../Schemas/simkit.xsd";
 
     /** The locally resolved location for assembly schema */
     public static final String LOCAL_ASSEMBLY_SCHEMA = "xsd/assembly.xsd";

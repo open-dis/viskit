@@ -35,8 +35,8 @@ import viskit.model.Edge;
  * @since 2:54:31 PM
  * @version $Id$
  */
-public class ViskitGraphComponent extends JGraph implements GraphModelListener {
-
+public class ViskitGraphComponent extends JGraph implements GraphModelListener
+{
     ViskitGraphModel vGModel; // local copy for convenience
     EventGraphViewFrame parent;
 
@@ -205,13 +205,14 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
     @Override
-    public void graphChanged(GraphModelEvent e) {
+    public void graphChanged(GraphModelEvent graphModelEvent) 
+    {
         if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEW_MODEL) {
             return;
         } // this came in from outside, we don't have to inform anybody..prevent reentry
 
         // TODO: confirm any other events that should cause us to bail here
-        GraphModelEvent.GraphModelChange c = e.getChange();
+        GraphModelEvent.GraphModelChange c = graphModelEvent.getChange();
         Object[] ch = c.getChanged();
 
         // bounds (position) might have changed:
@@ -228,234 +229,248 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
                     if (r != null) {
                         en = (EventNode) cc.getUserObject();
                         en.setPosition(new Point2D.Double(r.x, r.y));
-                        ((Model) parent.getModel()).changeEvent(en);
+                        ((Model) parent.getModel()).changeEventNode(en);
                         m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
                     }
                 }
             }
         }
     }
-
-    private String escapeLTGT(String s) {
-        s = s.replaceAll("<", "&lt;");
-        s = s.replaceAll(">", "&gt;");
-        return s;
+    /** escape less-than and greater-than HTML characters */
+    private String escapeLTGT(String htmlString) 
+    {
+        htmlString = htmlString.replaceAll("<", "&lt;");
+        htmlString = htmlString.replaceAll(">", "&gt;");
+        return htmlString;
     }
 
     @Override
-    public String getToolTipText(MouseEvent event) {
-        if (event != null) {
-            Object c = this.getFirstCellForLocation(event.getX(), event.getY());
-            if (c != null) {
-                StringBuilder sb = new StringBuilder("<html>");
-                if (c instanceof vEdgeCell) {
-                    vEdgeCell vc = (vEdgeCell) c;
+    public String getToolTipText(MouseEvent mouseEvent) 
+    {
+        if (mouseEvent != null) {
+            Object firstCell = this.getFirstCellForLocation(mouseEvent.getX(), mouseEvent.getY());
+            if (firstCell != null) 
+            {
+                StringBuilder htmlBuilder = new StringBuilder("<html>");
+                if (firstCell instanceof vEdgeCell) 
+                {
+                    vEdgeCell vc = (vEdgeCell) firstCell;
                     Edge se = (Edge) vc.getUserObject();
 
                     if (se instanceof SchedulingEdge) {
 
-                        if (vc instanceof vSelfEdgeCell)
-                            sb.append("<center>Self Scheduling Edge</center>");
-                        else
-                            sb.append("<center>Scheduling Edge</center>");
+                        if  (vc instanceof vSelfEdgeCell)
+                             htmlBuilder.append("<center>Self Scheduling Edge</center>");
+                        else htmlBuilder.append("<center>Scheduling Edge</center>");
 
                         double priority;
                         String s;
 
                         // Assume numeric comes in, avoid NumberFormatException via Regex check
-                        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) se).priority)) {
+                        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) se).priority))
+                        {
                             priority = Double.parseDouble(((SchedulingEdge) se).priority);
-                            NumberFormat df = DecimalFormat.getNumberInstance();
-                            df.setMaximumFractionDigits(3);
-                            df.setMaximumIntegerDigits(3);
+                            NumberFormat decimalFormat = DecimalFormat.getNumberInstance();
+                            decimalFormat.setMaximumFractionDigits(3);
+                            decimalFormat.setMaximumIntegerDigits(3);
                             if (Double.compare(priority, Double.MAX_VALUE) >= 0) {
                                 s = "MAX";
                             } else if (Double.compare(priority, -Double.MAX_VALUE) <= 0) {
                                 s = "MIN";
                             } else {
-                                s = df.format(priority);
+                                s = decimalFormat.format(priority);
                             }
                         } else {
                             s = ((SchedulingEdge) se).priority;
                         }
 
-                        sb.append("<u>priority</u><br>&nbsp;");
-                        sb.append(s);
-                        sb.append("<br>");
+                        htmlBuilder.append("<u>priority</u><br>&nbsp;");
+                        htmlBuilder.append(s);
+                        htmlBuilder.append("<br>");
 
                         if (se.delay != null) {
                             String dly = se.delay.trim();
                             if (dly.length() > 0) {
-                                sb.append("<u>delay</u><br>&nbsp;");
-                                sb.append(dly);
-                                sb.append("<br>");
+                                htmlBuilder.append("<u>delay</u><br>&nbsp;");
+                                htmlBuilder.append(dly);
+                                htmlBuilder.append("<br>");
                             }
                         }
 
                         int idx = 1;
                         if (!se.parameters.isEmpty()) {
 
-                            sb.append("<u>edge parameters</u><br>");
+                            htmlBuilder.append("<u>edge parameters</u><br>");
                             ViskitEdgeParameter ep;
                             for (ViskitElement e : se.parameters) {
                                 ep = (ViskitEdgeParameter) e;
-                                sb.append("&nbsp;");
-                                sb.append(idx++);
-                                sb.append(" ");
-                                sb.append(ep.getValue());
+                                htmlBuilder.append("&nbsp;");
+                                htmlBuilder.append(idx++);
+                                htmlBuilder.append(" ");
+                                htmlBuilder.append(ep.getValue());
 
                                 if (ep.getType() != null && !ep.getType().isEmpty()) {
-                                    sb.append(" ");
-                                    sb.append("(");
-                                    sb.append(ep.getType());
-                                    sb.append(")");
+                                    htmlBuilder.append(" ");
+                                    htmlBuilder.append("(");
+                                    htmlBuilder.append(ep.getType());
+                                    htmlBuilder.append(")");
                                 }
-                                sb.append("<br>");
+                                htmlBuilder.append("<br>");
                             }
                         }
 
-                    } else {
-
-                        if (vc instanceof vSelfEdgeCell)
-                            sb.append("<center>Self Canceling Edge</center>");
-                        else
-                            sb.append("<center>Canceling Edge</center>");
+                    } 
+                    else 
+                    {
+                        if  (vc instanceof vSelfEdgeCell)
+                             htmlBuilder.append("<center>Self Canceling Edge</center>");
+                        else htmlBuilder.append("<center>Canceling Edge</center>");
                     }
 
                     if (se != null && se.conditionalDescription != null) {
-                        String cmt = se.conditionalDescription.trim();
-                        if (cmt.length() > 0) {
-                            sb.append("<br><u>description</u><br>");
-                            sb.append(wrapAtPos(escapeLTGT(cmt), 60));
-                            sb.append("<br>");
+                        String newDescription = se.conditionalDescription.trim();
+                        if (newDescription.length() > 0) 
+                        {
+                            htmlBuilder.append("<br><u>description</u><br>");
+                            htmlBuilder.append(wrapStringAtPosition(escapeLTGT(newDescription), 60));
+                            htmlBuilder.append("<br>");
                         }
                     }
 
                     if (se != null && se.conditional != null) {
                         String cond = se.conditional.trim();
                         if (cond.length() > 0) {
-                            sb.append("<u>condition</u><br>&nbsp;if( ");
-                            sb.append(escapeLTGT(cond));
-                            sb.append(" )<br>");
+                            htmlBuilder.append("<u>condition</u><br>&nbsp;if( ");
+                            htmlBuilder.append(escapeLTGT(cond));
+                            htmlBuilder.append(" )<br>");
                         }
                     }
 
                     // Strip out the last <br>
-                    if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br>")) {
-                        sb.setLength(sb.length() - 4);
+                    if (htmlBuilder.substring(htmlBuilder.length() - 4).equalsIgnoreCase("<br>")) {
+                        htmlBuilder.setLength(htmlBuilder.length() - 4);
                     }
-                    sb.append("</html>");
-                    return sb.toString();
-
-                } else if (c instanceof vCircleCell) {
-                    vCircleCell cc = (vCircleCell) c;
-                    EventNode en = (EventNode) cc.getUserObject();
-                    sb.append("<center>");
+                    htmlBuilder.append("</html>");
+                    return htmlBuilder.toString();
+                }
+                else if (firstCell instanceof vCircleCell) 
+                {
+                    vCircleCell circleCell = (vCircleCell) firstCell;
+                    EventNode eventNode = (EventNode) circleCell.getUserObject();
+                    htmlBuilder.append("<center>");
 
                     // Show event node names w/ corresponding parameters if any
-                    String nodeName = en.getName();
+                    String nodeName = eventNode.getName();
                     String[] arr = nodeName.split("_");
 
                     if (arr.length > 1) {
-                        sb.append(arr[0]);
-                        sb.append("<br>");
-                        sb.append("(");
-                        sb.append(arr[1]);
-                        sb.append(")");
-                        sb.append("<br>");
+                        htmlBuilder.append(arr[0]);
+                        htmlBuilder.append("<br>");
+                        htmlBuilder.append("(");
+                        htmlBuilder.append(arr[1]);
+                        htmlBuilder.append(")");
+                        htmlBuilder.append("<br>");
                     } else {
-                        sb.append(nodeName);
+                        htmlBuilder.append(nodeName);
                     }
-                    sb.append("</center>");
+                    htmlBuilder.append("</center>");
 
-                    if (!en.getComments().isEmpty()) {
-                        String stripBrackets = en.getComments().get(0).trim();
+//                    if (!eventNode.getComments().isEmpty()) {
+//                        String stripBrackets = eventNode.getComments().get(0).trim();
+//                        if (stripBrackets.length() > 0) {
+//                            htmlBuilder.append("<u>description</u><br>");
+//                            htmlBuilder.append(wrapStringAtPosition(escapeLTGT(stripBrackets), 60));
+//                            htmlBuilder.append("<br>");
+//                        }
+//                    }
+                    if (!eventNode.getDescription().isEmpty()) {
+                        String stripBrackets = eventNode.getDescription().trim();
                         if (stripBrackets.length() > 0) {
-                            sb.append("<u>description</u><br>");
-                            sb.append(wrapAtPos(escapeLTGT(stripBrackets), 60));
-                            sb.append("<br>");
+                            htmlBuilder.append("<u>description</u><br>");
+                            htmlBuilder.append(wrapStringAtPosition(escapeLTGT(stripBrackets), 60));
+                            htmlBuilder.append("<br>");
                         }
                     }
 
-                    List<ViskitElement> argLis = en.getArguments();
+                    List<ViskitElement> argLis = eventNode.getArguments();
                     if (!argLis.isEmpty()) {
 
-                        sb.append("<u>arguments</u><br>");
+                        htmlBuilder.append("<u>arguments</u><br>");
                         int n = 0;
                         EventArgument eventArgument;
                         String as;
                         for (ViskitElement viskitElement : argLis) {
                             eventArgument = (EventArgument) viskitElement;
                             as = eventArgument.getName() + " (" + eventArgument.getType() + ")";
-                            sb.append("&nbsp;");
-                            sb.append(++n);
-                            sb.append(" ");
-                            sb.append(as);
-                            sb.append("<br>");
+                            htmlBuilder.append("&nbsp;");
+                            htmlBuilder.append(++n);
+                            htmlBuilder.append(" ");
+                            htmlBuilder.append(as);
+                            htmlBuilder.append("<br>");
                         }
                     }
 
-                    List<ViskitElement> localVariableList = en.getLocalVariables();
+                    List<ViskitElement> localVariableList = eventNode.getLocalVariables();
                     if (!localVariableList.isEmpty()) {
 
-                        sb.append("<u>Local variables</u><br>");
+                        htmlBuilder.append("<u>Local variables</u><br>");
                         EventLocalVariable lv;
                         String val;
                         for (ViskitElement ve : localVariableList) {
                             lv = (EventLocalVariable) ve;
-                            sb.append("&nbsp;");
-                            sb.append(lv.getName());
-                            sb.append(" (");
-                            sb.append(lv.getType());
-                            sb.append(") = ");
+                            htmlBuilder.append("&nbsp;");
+                            htmlBuilder.append(lv.getName());
+                            htmlBuilder.append(" (");
+                            htmlBuilder.append(lv.getType());
+                            htmlBuilder.append(") = ");
                             val = lv.getValue();
-                            sb.append(val.isEmpty() ? "<i><default></i>" : val);
-                            sb.append("<br>");
+                            htmlBuilder.append(val.isEmpty() ? "<i><default></i>" : val);
+                            htmlBuilder.append("<br>");
                         }
                     }
 
-                    String codeBlock = en.getCodeBlock();
+                    String codeBlock = eventNode.getCodeBlock();
                     if (codeBlock != null && !codeBlock.isEmpty()) {
-                        sb.append("<u>code block</u><br>");
+                        htmlBuilder.append("<u>code block</u><br>");
 
                         String[] sa = codeBlock.split("\\n");
                         for (String s : sa) {
-                            sb.append("&nbsp;");
-                            sb.append(s);
-                            sb.append("<br>");
+                            htmlBuilder.append("&nbsp;");
+                            htmlBuilder.append(s);
+                            htmlBuilder.append("<br>");
                         }
                     }
 
-                    List<ViskitElement> st = en.getTransitions();
+                    List<ViskitElement> st = eventNode.getTransitions();
                     if (!st.isEmpty()) {
 
-                        sb.append("<u>state transitions</u><br>");
+                        htmlBuilder.append("<u>state transitions</u><br>");
                         EventStateTransition est;
                         String[] sa;
                         for (ViskitElement ve : st) {
                             est = (EventStateTransition) ve;
                             sa = est.toString().split("\\n");
                             for (String s : sa) {
-                                sb.append("&nbsp;");
-                                sb.append(s);
-                                sb.append("<br>");
+                                htmlBuilder.append("&nbsp;");
+                                htmlBuilder.append(s);
+                                htmlBuilder.append("<br>");
                             }
                         }
                     }
 
                     // Strip out the last <br>
-                    if (sb.substring(sb.length() - 4).equalsIgnoreCase("<br>")) {
-                        sb.setLength(sb.length() - 4);
+                    if (htmlBuilder.substring(htmlBuilder.length() - 4).equalsIgnoreCase("<br>")) {
+                        htmlBuilder.setLength(htmlBuilder.length() - 4);
                     }
-                    sb.append("</html>");
-                    return sb.toString();
+                    htmlBuilder.append("</html>");
+                    return htmlBuilder.toString();
                 }
             }
         }
         return null;
     }
 
-    private String wrapAtPos(String s, int len) {
+    private String wrapStringAtPosition(String s, int length) {
         String[] sa = s.split(" ");
         StringBuilder sb = new StringBuilder();
         int idx = 0;
@@ -467,7 +482,7 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener {
                 ll += sa[idx].length() + 1;
                 sb.append(sa[idx++]);
                 sb.append(" ");
-            } while (idx < sa.length && ll < len);
+            } while (idx < sa.length && ll < length);
             sb.append("<br>");
         } while (idx < sa.length);
 

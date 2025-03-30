@@ -467,7 +467,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 replicationsTimeOut.setText(s);
             }
         } else {
-            exp = OpenAssembly.inst().jaxbFactory.createExperiment();
+            exp = OpenAssembly.inst().jaxbAssemblyObjectFactory.createExperiment();
 
             jaxbRoot.setExperiment(exp);
 
@@ -509,10 +509,10 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         Experiment exp = jaxbRoot.getExperiment();
         Schedule sch = jaxbRoot.getSchedule();
         if (exp == null) {
-            exp = OpenAssembly.inst().jaxbFactory.createExperiment();
+            exp = OpenAssembly.inst().jaxbAssemblyObjectFactory.createExperiment();
         }
         if (sch == null) {
-            sch = OpenAssembly.inst().jaxbFactory.createSchedule();
+            sch = OpenAssembly.inst().jaxbAssemblyObjectFactory.createSchedule();
         }
 
         String replications = numberReplicationsTF.getText().trim();

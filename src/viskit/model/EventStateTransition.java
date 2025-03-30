@@ -1,7 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import viskit.ViskitGlobals;
 
 /**
@@ -11,15 +9,17 @@ import viskit.ViskitGlobals;
  * @since 4:00:29 PM
  * @version $Id$
  */
-public class EventStateTransition extends ViskitElement {
-
-    private List<String> descriptionArray = new ArrayList<>();
+public class EventStateTransition extends ViskitElement 
+{
     private String operationOrAssignment = EMPTY;
     private boolean isOperation = false;
-    private List<String> comments = new ArrayList<>();
     private String indexingExpression = EMPTY;
     private String value;
-    private String comment;
+    // obsolete
+//    private String comment;
+//    private List<String> descriptionArray = new ArrayList<>();
+//    private List<String> comments = new ArrayList<>();
+    private String description;
     private String localVariableAssignment;
     private String localVariableInvocation;
 
@@ -65,14 +65,6 @@ public class EventStateTransition extends ViskitElement {
         }
     }
 
-    public List<String> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<String> comments) {
-        this.comments = comments;
-    }
-
     @Override
     public boolean isOperation() {
         return isOperation;
@@ -80,6 +72,11 @@ public class EventStateTransition extends ViskitElement {
 
     public void setOperation(boolean operation) {
         isOperation = operation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !isOperation;
     }
 
     @Override
@@ -101,24 +98,39 @@ public class EventStateTransition extends ViskitElement {
     }
 
     @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
-    @Override
     public String getValue() {
         return value;
     }
 
     @Override
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
+
+    @Override
+    public void setDescription(String newDescription) {
+        this.description = newDescription;
+    }
+
+    // obsolete
+//    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
+//
+//    public List<String> getComments() {
+//        return comments;
+//    }
+//
+//    public void setComments(List<String> comments) {
+//        this.comments = comments;
+//    }
+    
     /**
      * @return the localVariableAssignment
      */

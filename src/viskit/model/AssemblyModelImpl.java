@@ -19,7 +19,6 @@ import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.control.AssemblyControllerImpl;
-import static viskit.model.ViskitModelInstantiator.LOG;
 import viskit.mvc.MvcAbstractModel;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.assembly.*;
@@ -40,7 +39,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     static final Logger LOG = LogManager.getLogger();
     
     private static JAXBContext jaxbContext;
-    private ObjectFactory objectFactory;
+    private viskit.xsd.bindings.assembly.ObjectFactory jaxbAssemblyObjectFactory;
     private SimkitAssembly jaxbRoot;
     private String currentAssemblyModelName = new String();
     private File   currentAssemblyModelFile;
@@ -67,8 +66,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         try {
             if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
                 jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
-            objectFactory = new ObjectFactory();
-            jaxbRoot = objectFactory.createSimkitAssembly(); // to start with empty graph
+            jaxbAssemblyObjectFactory = new viskit.xsd.bindings.assembly.ObjectFactory();
+            jaxbRoot = jaxbAssemblyObjectFactory.createSimkitAssembly(); // to start with empty graph
         } 
         catch (JAXBException e) {
             assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
@@ -114,7 +113,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         if (newAssemblyModelFile == null)
         {
-            jaxbRoot = objectFactory.createSimkitAssembly(); // to start with empty graph
+            jaxbRoot = jaxbAssemblyObjectFactory.createSimkitAssembly(); // to start with empty graph
         } 
         else 
         {
@@ -219,7 +218,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             jaxbRoot.setPackage(nIe(graphMetadata.packageName));
 
             if (jaxbRoot.getSchedule() == null) {
-                jaxbRoot.setSchedule(objectFactory.createSchedule());
+                jaxbRoot.setSchedule(jaxbAssemblyObjectFactory.createSchedule());
             }
             if (!graphMetadata.stopTime.equals("")) {
                 jaxbRoot.getSchedule().setStopTime(graphMetadata.stopTime);
@@ -347,7 +346,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             node.setPosition(p);
         }
 
-        SimEntity jaxbEventGraph = objectFactory.createSimEntity();
+        SimEntity jaxbEventGraph = jaxbAssemblyObjectFactory.createSimEntity();
 
         jaxbEventGraph.setName(nIe(widgetName));
         jaxbEventGraph.setType(className);
@@ -369,7 +368,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     @Override
     public void redoEventGraph(EventGraphNode node) {
-        SimEntity jaxbEventGraph = objectFactory.createSimEntity();
+        SimEntity jaxbEventGraph = jaxbAssemblyObjectFactory.createSimEntity();
 
         jaxbEventGraph.setName(node.getName());
         node.opaqueModelObject = jaxbEventGraph;
@@ -410,7 +409,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         else
             propertyChangeListenerNode.setPosition(p);
 
-        PropertyChangeListener pcl = objectFactory.createPropertyChangeListener();
+        PropertyChangeListener pcl = jaxbAssemblyObjectFactory.createPropertyChangeListener();
 
         pcl.setName(nIe(widgetName));
         pcl.setType(className);
@@ -435,7 +434,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     @Override
     public void redoPropertyChangeListener(PropertyChangeListenerNode propertyChangeListenerNode) {
 
-        PropertyChangeListener jaxbPCL = objectFactory.createPropertyChangeListener();
+        PropertyChangeListener jaxbPCL = jaxbAssemblyObjectFactory.createPropertyChangeListener();
 
         jaxbPCL.setName(propertyChangeListenerNode.getName());
         jaxbPCL.setType(propertyChangeListenerNode.getType());
@@ -472,7 +471,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         src.getConnections().add(ae);
         target.getConnections().add(ae);
 
-        Adapter jaxbAdapter = objectFactory.createAdapter();
+        Adapter jaxbAdapter = jaxbAssemblyObjectFactory.createAdapter();
 
         ae.opaqueModelObject = jaxbAdapter;
         jaxbAdapter.setTo(target.getName());
@@ -495,7 +494,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         src = (AssemblyNode) ae.getFrom();
         target = (AssemblyNode) ae.getTo();
 
-        Adapter jaxbAdapter = objectFactory.createAdapter();
+        Adapter jaxbAdapter = jaxbAssemblyObjectFactory.createAdapter();
         ae.opaqueModelObject = jaxbAdapter;
         jaxbAdapter.setTo(target.getName());
         jaxbAdapter.setFrom(src.getName());
@@ -517,7 +516,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         src.getConnections().add(pce);
         target.getConnections().add(pce);
 
-        PropertyChangeListenerConnection pclc = objectFactory.createPropertyChangeListenerConnection();
+        PropertyChangeListenerConnection pclc = jaxbAssemblyObjectFactory.createPropertyChangeListenerConnection();
 
         pce.opaqueModelObject = pclc;
 
@@ -539,7 +538,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         source = (AssemblyNode) propertyChangeEdge.getFrom();
         target = (AssemblyNode) propertyChangeEdge.getTo();
 
-        PropertyChangeListenerConnection pclc = objectFactory.createPropertyChangeListenerConnection();
+        PropertyChangeListenerConnection pclc = jaxbAssemblyObjectFactory.createPropertyChangeListenerConnection();
         propertyChangeEdge.opaqueModelObject = pclc;
         pclc.setListener(target.getName());
         pclc.setSource(source.getName());
@@ -559,7 +558,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         sourceAssemblyNode.getConnections().add(simEventListenerEdge);
         targetAssemblyNode.getConnections().add(simEventListenerEdge);
 
-        SimEventListenerConnection simEventListenerConnection = objectFactory.createSimEventListenerConnection();
+        SimEventListenerConnection simEventListenerConnection = jaxbAssemblyObjectFactory.createSimEventListenerConnection();
 
         simEventListenerEdge.opaqueModelObject = simEventListenerConnection;
 
@@ -579,7 +578,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         src = (AssemblyNode) sele.getFrom();
         target = (AssemblyNode) sele.getTo();
 
-        SimEventListenerConnection selc = objectFactory.createSimEventListenerConnection();
+        SimEventListenerConnection selc = jaxbAssemblyObjectFactory.createSimEventListenerConnection();
         sele.opaqueModelObject = selc;
         selc.setListener(target.getName());
         selc.setSource(src.getName());
@@ -703,7 +702,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         double x = pclNode.getPosition().getX();
         double y = pclNode.getPosition().getY();
-        Coordinate coor = objectFactory.createCoordinate();
+        Coordinate coor = jaxbAssemblyObjectFactory.createCoordinate();
         coor.setX("" + x);
         coor.setY("" + y);
         pclNode.getPosition().setLocation(x, y);
@@ -747,7 +746,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         double x = evNode.getPosition().getX();
         double y = evNode.getPosition().getY();
-        Coordinate coor = objectFactory.createCoordinate();
+        Coordinate coor = jaxbAssemblyObjectFactory.createCoordinate();
         coor.setX("" + x);
         coor.setY("" + y);
         evNode.getPosition().setLocation(x, y);
@@ -815,7 +814,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 return;
             }
         }
-        Output op = objectFactory.createOutput();
+        Output op = jaxbAssemblyObjectFactory.createOutput();
         op.setEntity(se.getName());
         outTL.add(op);
     }
@@ -827,7 +826,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 return;
             }
         }
-        Verbose op = objectFactory.createVerbose();
+        Verbose op = jaxbAssemblyObjectFactory.createVerbose();
         op.setEntity(se.getName());
         vTL.add(op);
     }
@@ -941,7 +940,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private TerminalParameter buildParamFromFreeF(ViskitModelInstantiator.FreeF viff) {
-        TerminalParameter tp = objectFactory.createTerminalParameter();
+        TerminalParameter tp = jaxbAssemblyObjectFactory.createTerminalParameter();
 
         tp.setType(viff.getType());
         tp.setValue(viff.getValue());
@@ -950,7 +949,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private MultiParameter buildParamFromConstr(ViskitModelInstantiator.Constr vicon) {
-        MultiParameter mp = objectFactory.createMultiParameter();
+        MultiParameter mp = jaxbAssemblyObjectFactory.createMultiParameter();
 
         mp.setType(vicon.getType());
         for (Object vi : vicon.getArgs()) {
@@ -960,7 +959,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private FactoryParameter buildParamFromFactory(ViskitModelInstantiator.Factory vifact) {
-        FactoryParameter fp = objectFactory.createFactoryParameter();
+        FactoryParameter fp = jaxbAssemblyObjectFactory.createFactoryParameter();
 
         fp.setType(vifact.getType());
         fp.setFactory(vifact.getFactoryClass());
@@ -972,7 +971,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     private MultiParameter buildParamFromArray(ViskitModelInstantiator.Array viarr) {
-        MultiParameter mp = objectFactory.createMultiParameter();
+        MultiParameter mp = jaxbAssemblyObjectFactory.createMultiParameter();
 
         mp.setType(viarr.getType());
         for (Object vi : viarr.getInstantiators()) {

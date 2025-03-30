@@ -18,21 +18,21 @@ import viskit.xsd.bindings.eventgraph.Event;
  *
  * An event as seen by the model (not the view)
  */
-public class EventNode extends ViskitElement {
-
+public class EventNode extends ViskitElement 
+{
     private Vector<ViskitElement> connections = new Vector<>();
     private List<ViskitElement> localVariables = new ArrayList<>();
-    private List<String> comments = new ArrayList<>();
     private List<ViskitElement> transitions = new ArrayList<>();
     private List<ViskitElement> arguments = new ArrayList<>();
-    private List<String> descriptionArray = new ArrayList<>();
+//    private List<String> comments = new ArrayList<>(); // obsolete
+//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
+    private String description = new String();
     private Point2D position = new Point2D.Double(0.d, 0.d);
     private String codeblock = EMPTY;
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
     private String value;
-    private String comment;
 
     EventNode(String name) // package access on constructor
     {
@@ -44,15 +44,18 @@ public class EventNode extends ViskitElement {
         return name;
     }
 
-    public EventNode shallowCopy() {
-        EventNode en = (EventNode) super.shallowCopy(new EventNode(name + "-copy"));
-        en.connections = connections;
-        en.comments = comments;
-        en.transitions = transitions;
-        en.localVariables = localVariables;
-        en.arguments = arguments;
-        en.codeblock = codeblock;
-        return en;
+    public EventNode shallowCopy()
+    {
+        EventNode newEventNode = (EventNode) super.shallowCopy(new EventNode(name + "-copy"));
+        newEventNode.connections = connections;
+//        eventNode.comments = comments; // obsolete
+//        eventNode.descriptionArray = descriptionArray; // obsolete
+        newEventNode.description = description;
+        newEventNode.transitions = transitions;
+        newEventNode.localVariables = localVariables;
+        newEventNode.arguments = arguments;
+        newEventNode.codeblock = codeblock;
+        return newEventNode;
     }
 
     @Override
@@ -71,13 +74,13 @@ public class EventNode extends ViskitElement {
         this.arguments = arguments;
     }
 
-    public List<String> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<String> comments) {
-        this.comments = comments;
-    }
+//    public List<String> getComments() {
+//        return comments;
+//    }
+//
+//    public void setComments(List<String> comments) {
+//        this.comments = comments;
+//    }
 
     public void setCodeBLock(String s) {
         this.codeblock = s;
@@ -120,16 +123,6 @@ public class EventNode extends ViskitElement {
     }
 
     @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
-    @Override
     public String getIndexingExpression() {
         return indexingExpression;
     }
@@ -139,18 +132,46 @@ public class EventNode extends ViskitElement {
         return value;
     }
 
+    // obsolete
+//    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
+
     @Override
-    public String getComment() {
-        return comment;
+    public String getDescription()
+    {
+        if ((description == null) || (description == "null"))
+            description = "";
+        return description;
     }
 
     @Override
-    public String getOperationOrAssignment() {
+    public void setDescription(String newDescription)
+    {
+        if ((description == null) || (description == "null"))
+             description = "";
+        else description = newDescription;
+    }
+
+    @Override
+    public String getOperationOrAssignment()
+    {
         return operationOrAssignment;
     }
 
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !operation;
     }
 }

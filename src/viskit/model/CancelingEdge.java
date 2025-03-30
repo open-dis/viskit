@@ -1,7 +1,6 @@
 package viskit.model;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -13,14 +12,15 @@ import java.util.List;
  * @since 9:04:09 AM
  * @version $Id$
  */
-public class CancelingEdge extends Edge {
-
-    private List<String> descriptionArray = new ArrayList<>();
+public class CancelingEdge extends Edge // TODO fix spelling
+{
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
     private String value;
-    private String comment;
+//    private String comment; // obsolete
+//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
+    private String description;
 
     CancelingEdge() //package-limited
     {
@@ -38,17 +38,6 @@ public class CancelingEdge extends Edge {
         ce.delay = delay;
         return ce;
     }
-
-    @Override
-    public List<String> getDescriptionArray() {
-        return descriptionArray;
-    }
-
-    @Override
-    public void setDescriptionArray(List<String> descriptionArray) {
-        this.descriptionArray = descriptionArray;
-    }
-
     @Override
     public String getIndexingExpression() {
         return indexingExpression;
@@ -60,9 +49,26 @@ public class CancelingEdge extends Edge {
     }
 
     @Override
-    public String getComment() {
-        return comment;
+    public String getDescription() {
+        return description;
     }
+
+    @Override
+    public void setDescription(String newDescription) {
+        description = newDescription;
+    }
+
+    // obsolete
+//    @Override
+//    public List<String> getDescriptionArray() {
+//        return descriptionArray;
+//    }
+//
+//    @Override
+//    public void setDescriptionArray(List<String> descriptionArray) {
+//        this.descriptionArray = descriptionArray;
+//    }
+
 
     @Override
     public String getOperationOrAssignment() {
@@ -72,5 +78,10 @@ public class CancelingEdge extends Edge {
     @Override
     public boolean isOperation() {
         return operation;
+    }
+
+    @Override
+    public boolean isAssignment() {
+        return !operation;
     }
 }

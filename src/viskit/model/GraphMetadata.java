@@ -13,8 +13,8 @@ import viskit.xsd.bindings.eventgraph.SimEntity;
  * @since 3:50:28 PM
  * @version $Id$
  */
-public class GraphMetadata {
-
+public class GraphMetadata 
+{
     public String name = "";
     public String packageName = "";
     public String author = "";
@@ -30,35 +30,38 @@ public class GraphMetadata {
         this(null);
     }
 
-    public GraphMetadata(Object caller) {
-        author = System.getProperty("user.name");
-        packageName = "test";
+    public GraphMetadata(Object caller) 
+    {
+        author = System.getProperty("user.name"); // TODO make this a viskit user property
+        packageName = "test"; // default
         
         if (caller instanceof AssemblyModelImpl) 
         {
             name = "NewAssembly";
-            viskit.xsd.bindings.assembly.ObjectFactory of =
+            viskit.xsd.bindings.assembly.ObjectFactory jaxbAssemblyObjectFactory = 
                     new viskit.xsd.bindings.assembly.ObjectFactory();
-            SimkitAssembly tmp = of.createSimkitAssembly();
-            extendsPackageName = tmp.getExtend();
-            implementsPackageName = tmp.getImplement();
-
-        } else {
+            SimkitAssembly tempAssembly = jaxbAssemblyObjectFactory.createSimkitAssembly();
+            extendsPackageName = tempAssembly.getExtend();
+            implementsPackageName = tempAssembly.getImplement();
+        } 
+        else
+        {
             name = "NewEventGraphName";
-            viskit.xsd.bindings.eventgraph.ObjectFactory of =
+            viskit.xsd.bindings.eventgraph.ObjectFactory jaxbEventGraphObjectFactory =
                     new viskit.xsd.bindings.eventgraph.ObjectFactory();
-            SimEntity tmp = of.createSimEntity();
-            extendsPackageName = tmp.getExtend();
-            implementsPackageName = tmp.getImplement();
+            SimEntity tempSimEntity = jaxbEventGraphObjectFactory.createSimEntity();
+            extendsPackageName = tempSimEntity.getExtend();
+            implementsPackageName = tempSimEntity.getImplement();
         }
     }
 
-    public GraphMetadata(String n, String p, String a, String v, String e, String i) {
-        name = n;
-        packageName = p;
-        author = a;
-        version = v;
-        extendsPackageName = e;
-        implementsPackageName = i;
+    public GraphMetadata(String newName, String newPackageName, String newAuthor, String newVersion, 
+                         String newExtendsPackageName, String newImplementsPackageName) {
+        name = newName;
+        packageName = newPackageName;
+        author = newAuthor;
+        version = newVersion;
+        extendsPackageName = newExtendsPackageName;
+        implementsPackageName = newImplementsPackageName;
     }
 }

@@ -95,7 +95,7 @@ public class CodeBlockPanel extends JPanel {
         }
         editButton = new JButton(" ... ");
         editButton.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        editButton.setToolTipText("Click to edit a long code block");
+        editButton.setToolTipText("Select to edit a long code block");
         Dimension dd = new Dimension(editButton.getPreferredSize());
         if (!multilined) {
             dd.height = getPreferredSize().height;

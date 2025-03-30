@@ -1,7 +1,5 @@
 package viskit.model;
 
-import java.util.List;
-
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -14,8 +12,8 @@ import java.util.List;
  *
  * Base class for the objects that get passed around between M, V and C.
  */
-abstract public class ViskitElement implements Comparable<ViskitElement> {
-
+abstract public class ViskitElement implements Comparable<ViskitElement> 
+{
     public Object opaqueViewObject;       // for private use of V
     public Object opaqueModelObject;      // for private use of M
 
@@ -27,8 +25,8 @@ abstract public class ViskitElement implements Comparable<ViskitElement> {
     protected String name = EMPTY;
 
     /** every node or edge has a unique key */
-    private static int seqID = 0;
-    private Object modelKey = EMPTY + (seqID++);
+    private static int sequenceID = 0;
+    private Object modelKey = EMPTY + (sequenceID++);
 
     protected ViskitElement shallowCopy(ViskitElement newVe) {
         newVe.opaqueControllerObject = this.opaqueControllerObject;
@@ -91,15 +89,19 @@ abstract public class ViskitElement implements Comparable<ViskitElement> {
 
     public abstract String getValue();
 
-    public abstract String getComment();
+    public abstract String getDescription();
 
-    public abstract List<String> getDescriptionArray();
-
-    public abstract void setDescriptionArray(List<String> descriptionArray);
+    public abstract void   setDescription(String newDescription);
+    
+    // obsolete
+//    public abstract List<String> getDescriptionArray();
+//    public abstract void setDescriptionArray(List<String> descriptionArray);
 
     public abstract String getOperationOrAssignment();
 
     public abstract boolean isOperation();
+
+    public abstract boolean isAssignment();
     
     @Override
     public String toString() {

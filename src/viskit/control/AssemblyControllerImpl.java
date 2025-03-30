@@ -207,14 +207,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 return false;
             }
         }
-        boolean ret = true;
+        boolean returnValue = true;
         AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
         if (assemblyModel != null) {
             if (assemblyModel.isDirty()) {
-                return askToSaveAndContinue();
+                return askToSaveAndContinue(); // blocks
             }
         }
-        return ret;  // proceed
+        return returnValue;  // proceed
     }
 
     @Override

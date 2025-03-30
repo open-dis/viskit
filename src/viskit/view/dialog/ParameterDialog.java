@@ -25,36 +25,37 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  *
  * @author DMcG
  */
-public class ParameterDialog extends JDialog {
-
+public class ParameterDialog extends JDialog
+{
     private static ParameterDialog dialog;
     private static boolean modified = false;
-    public static String newName,  newType,  newComment;
+    public static String newName, newType, newComment; // TODO what happens to these?
     private static int count = 0;
 
     private final JTextField parameterNameField;    // Text field that holds the parameter name
     private final JTextField expressionField;       // Text field that holds the expression
     private final JTextField descriptionField;      // Text field that holds the description
     private final JComboBox parameterTypeCombo;     // Editable combo box that lets us select a type
-    private ViskitParameter param;
+    private ViskitParameter parameter;
     private final JButton okButton;
-    private JButton cancelButton;
+    private final JButton cancelButton;
 
-    public static boolean showDialog(JFrame f, ViskitParameter parm) {
+    public static boolean showDialog(JFrame f, ViskitParameter newParameter) 
+    {
         if (dialog == null) {
-            dialog = new ParameterDialog(f, parm);
-        } else {
-            dialog.setParams(f, parm);
+            dialog = new ParameterDialog(f, newParameter);
+        } 
+        else {
+            dialog.setParameters(f, newParameter);
         }
-
         dialog.setVisible(true);
         // above call blocks
 
         return modified;
     }
 
-    private ParameterDialog(JFrame parent, ViskitParameter param) {
-        super(parent, "Simulation Parameter Inspector", true);
+    private ParameterDialog(JFrame parentFrame, ViskitParameter newParameter) {
+        super(parentFrame, "Simulation Parameter Inspector", true);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new myCloseListener());
 
@@ -115,7 +116,7 @@ public class ParameterDialog extends JDialog {
         expressionField.addCaretListener(lis);
         parameterTypeCombo.addActionListener(lis);
 
-        setParams(parent, param);
+        setParameters(parentFrame, newParameter);
     }
 
     private void setMaxHeight(JComponent c) {
@@ -124,51 +125,60 @@ public class ParameterDialog extends JDialog {
         c.setMaximumSize(d);
     }
 
-    public final void setParams(Component c, ViskitParameter p) {
-        param = p;
+    public final void setParameters(Component component, ViskitParameter newParameter)
+    {
+        parameter = newParameter;
 
         fillWidgets();
 
-        okButton.setEnabled((p == null));
+        okButton.setEnabled((newParameter == null));
 
         getRootPane().setDefaultButton(cancelButton);
         pack();
-        setLocationRelativeTo(c);
+        setLocationRelativeTo(component);
     }
 
-    private void fillWidgets() {
-        if (param != null) {
-            parameterNameField.setText(param.getName());
-            parameterTypeCombo.setSelectedItem(param.getType());
-            descriptionField.setText(param.getComment());
-        } else {
+    private void fillWidgets() 
+    {
+        if (parameter != null)
+        {
+            parameterNameField.setText(parameter.getName());
+            parameterTypeCombo.setSelectedItem(parameter.getType());
+            descriptionField.setText(parameter.getDescription());
+        }
+        else 
+        {
             parameterNameField.setText("param_" + count++);
+            parameterTypeCombo.setSelectedIndex(-1); // TODO correct default?
             descriptionField.setText("");
         }
     }
 
-    private void unloadWidgets() {
-        String ty = (String) parameterTypeCombo.getSelectedItem();
-        ty = ViskitGlobals.instance().typeChosen(ty);
-        String nm = parameterNameField.getText();
-        nm = nm.replaceAll("\\s", "");
-        if (param != null) {
-            param.setName(nm);
+    private void unloadWidgets()
+    {
+        String type = (String) parameterTypeCombo.getSelectedItem();
+        type = ViskitGlobals.instance().typeChosen(type);
+        String name = parameterNameField.getText();
+        name = name.replaceAll("\\s", ""); // no embedded whitespace
+        if (parameter != null) {
+            parameter.setName(name);
             //
-            if (ty.equals("String") || ty.equals("Double") || ty.equals("Integer")) {
-                ty = "java.lang." + ty;
+            if (type.equals("String") || type.equals("Double") || type.equals("Integer")) {
+                type = "java.lang." + type;
             }
-            param.setType(ty);
-            param.setComment(descriptionField.getText());
-        } else {
-            newName = nm;
-            newType = ty;
+            parameter.setType(type);
+            parameter.setDescription(descriptionField.getText());
+        } 
+        else // TODO what happens to these?
+        {
+            newName = name;
+            newType = type;
             newComment = descriptionField.getText().trim();
         }
     }
 
-    class cancelButtonListener implements ActionListener {
-
+    class cancelButtonListener implements ActionListener
+    {
         @Override
         public void actionPerformed(ActionEvent event) {
             modified = false;    // for the caller

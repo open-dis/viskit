@@ -72,7 +72,7 @@ public class OpenAssembly {
 
     public File file;
     public SimkitAssembly jaxbRoot;
-    public ObjectFactory jaxbFactory;
+    public ObjectFactory jaxbAssemblyObjectFactory;
 
     /** Singleton class */
     private OpenAssembly() {}
@@ -84,7 +84,7 @@ public class OpenAssembly {
         if (newFile != null) {
             this.file = newFile;
             jaxbRoot = jaxb;
-            jaxbFactory = new ObjectFactory();
+            jaxbAssemblyObjectFactory = new ObjectFactory();
 
             // This is crucial for Viskit being able to open associated Event Graphs for
             // this Assembly
