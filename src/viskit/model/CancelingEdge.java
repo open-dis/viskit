@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
  * @since 9:04:09 AM
  * @version $Id$
  */
-public class CancelingEdge extends Edge // TODO fix spelling
+public class CancelingEdge extends Edge // single "l" is preferred American spelling
 {
     static final Logger LOG = LogManager.getLogger();
     private boolean operation;
