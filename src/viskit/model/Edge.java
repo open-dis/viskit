@@ -1,6 +1,8 @@
 package viskit.model;
 
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -12,7 +14,9 @@ import java.util.List;
  * @since 2:57:37 PM
  * @version $Id$
  */
-public abstract class Edge extends ViskitElement {
+public abstract class Edge extends ViskitElement
+{
+    static final Logger LOG = LogManager.getLogger();
 
     public EventNode to;
     public EventNode from;

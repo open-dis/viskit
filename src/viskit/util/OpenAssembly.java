@@ -36,6 +36,8 @@ package viskit.util;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
@@ -51,7 +53,9 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
  * This is a singleton class to coordinate opening of and modifications to
  * Assembly files
  */
-public class OpenAssembly {
+public class OpenAssembly
+{
+    static final Logger LOG = LogManager.getLogger();
 
     private static OpenAssembly instance;
     private static final Object SYNCHER = new Object();

@@ -1,6 +1,5 @@
 package viskit;
 
-import edu.nps.util.Log4jUtilities;
 
 import java.io.File;
 import java.io.IOException;

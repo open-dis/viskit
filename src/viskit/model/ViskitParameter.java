@@ -1,5 +1,7 @@
 package viskit.model;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 
 /**
@@ -12,6 +14,8 @@ import viskit.ViskitGlobals;
  */
 public class ViskitParameter extends ViskitElement
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     private String value = EMPTY;
 //    private String comment = EMPTY; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete

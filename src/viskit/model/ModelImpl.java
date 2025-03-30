@@ -18,6 +18,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
 import viskit.control.EventGraphControllerImpl;
@@ -47,6 +49,8 @@ import viskit.mvc.MvcController;
  */
 public class ModelImpl extends MvcAbstractModel implements Model
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     private static JAXBContext jaxbContext;
     ObjectFactory jaxbEventGraphObjectFactory;
     SimEntity jaxbRoot;
@@ -263,7 +267,10 @@ public class ModelImpl extends MvcAbstractModel implements Model
             try {
                 if (fileWriter != null)
                     fileWriter.close();
-            } catch (IOException ioe) {}
+            } 
+            catch (IOException ioe) {
+                LOG.error("{} saveModel() error closing FileWriter\n      {}\n{}", this.getClass().getSimpleName(), currentFile.toPath(), ioe);
+            }
         }
         return returnValue;
     }

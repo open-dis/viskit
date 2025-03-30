@@ -2,6 +2,8 @@ package viskit.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 
 /**
@@ -13,6 +15,8 @@ import viskit.ViskitGlobals;
  */
 public class EventLocalVariable extends ViskitElement 
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     private String value;
     private String[] arraySize;
 //    private String description = EMPTY; // obsolete

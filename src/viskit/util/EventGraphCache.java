@@ -105,6 +105,7 @@ import static viskit.model.AnalystReportModel.TYPE;
 public class EventGraphCache 
 {
     static final Logger LOG = LogManager.getLogger();;
+    
     private static EventGraphCache me;
 
     /**

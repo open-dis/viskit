@@ -15,7 +15,6 @@ import java.util.Vector;
 import java.util.ArrayList;
 
 import edu.nps.util.BoxLayoutUtils;
-import edu.nps.util.Log4jUtilities;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import org.apache.logging.log4j.LogManager;

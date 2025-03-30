@@ -1,5 +1,7 @@
 package viskit.model;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.eventgraph.SimEntity;
 
@@ -15,6 +17,8 @@ import viskit.xsd.bindings.eventgraph.SimEntity;
  */
 public class GraphMetadata 
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     public String name = "";
     public String packageName = "";
     public String author = "";

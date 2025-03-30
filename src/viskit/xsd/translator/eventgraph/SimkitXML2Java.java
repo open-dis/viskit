@@ -1,6 +1,5 @@
 package viskit.xsd.translator.eventgraph;
 
-import edu.nps.util.Log4jUtilities;
 
 import java.io.*;
 import java.lang.reflect.Constructor;

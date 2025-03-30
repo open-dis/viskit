@@ -1,6 +1,8 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -14,6 +16,7 @@ import java.util.ArrayList;
  */
 public class CancelingEdge extends Edge // TODO fix spelling
 {
+    static final Logger LOG = LogManager.getLogger();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;

@@ -4,6 +4,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.xsd.bindings.eventgraph.Event;
 
 /**
@@ -20,6 +22,8 @@ import viskit.xsd.bindings.eventgraph.Event;
  */
 public class EventNode extends ViskitElement 
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     private Vector<ViskitElement> connectionsVector  = new Vector<>();
     private List<ViskitElement> localVariablesList   = new ArrayList<>();
     private List<ViskitElement> stateTransitionsList = new ArrayList<>();

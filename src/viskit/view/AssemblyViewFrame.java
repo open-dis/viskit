@@ -36,7 +36,6 @@ package viskit.view;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 
-import edu.nps.util.Log4jUtilities;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;

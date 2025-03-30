@@ -13,6 +13,8 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.control.EventGraphController;
@@ -36,6 +38,8 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  */
 public class EventStateTransitionDialog extends JDialog 
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     private static EventStateTransitionDialog dialog;
     private static boolean modified = false;
     private static boolean allGood;

@@ -13,6 +13,8 @@ import javax.accessibility.AccessibleContext;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.undo.UndoManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
@@ -37,6 +39,8 @@ import viskit.model.Edge;
  */
 public class ViskitGraphComponent extends JGraph implements GraphModelListener
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     ViskitGraphModel vGModel; // local copy for convenience
     EventGraphViewFrame parent;
 
@@ -358,9 +362,9 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                     if (edge != null && edge.conditional != null) {
                         String conditional = edge.conditional.trim();
                         if (conditional.length() > 0) {
-                            htmlBuilder.append("<u>condition</u><br>&nbsp;if ( ");
+                            htmlBuilder.append("<u>condition</u><br>&nbsp;if ( <b>");
                             htmlBuilder.append(escapeLTGT(conditional));
-                            htmlBuilder.append(" )<br>");
+                            htmlBuilder.append("</b> )<br>");
                         }
                     }
 

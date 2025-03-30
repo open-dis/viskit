@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import static viskit.ViskitStatics.DESCRIPTION_HINT;
 
@@ -25,6 +27,8 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  */
 public class EventArgumentDialog extends JDialog 
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     private final JTextField nameField;    // Text field that holds the parameter name
     private final JTextField descriptionField;          // Text field that holds the description
     private final JComboBox parameterTypeCombo;    // Editable combo box that lets us select a type

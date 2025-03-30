@@ -1,5 +1,7 @@
 package viskit.view;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.model.EventArgument;
 import viskit.model.ViskitElement;
 
@@ -15,6 +17,8 @@ import viskit.model.ViskitElement;
  */
 public class ArgumentsPanel extends ViskitTablePanel
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     private final String[] mytitles = {"name", "type", "description"};
     private static int count = 0;
 

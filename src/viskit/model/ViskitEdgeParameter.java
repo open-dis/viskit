@@ -1,5 +1,8 @@
 package viskit.model;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * @author Mike Bailey
@@ -9,6 +12,8 @@ package viskit.model;
  */
 public class ViskitEdgeParameter extends ViskitElement 
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     public String bogus; // TODO fix usages
 
     private String value;

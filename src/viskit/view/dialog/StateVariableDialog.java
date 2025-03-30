@@ -12,6 +12,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
 import viskit.ViskitUserConfiguration;
@@ -28,7 +30,9 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  * @author Mike Bailey
  * @version $Id$
  */
-public class StateVariableDialog extends ViskitSmallDialog {
+public class StateVariableDialog extends ViskitSmallDialog
+{
+    static final Logger LOG = LogManager.getLogger();
 
     private final JTextField stateVariableNameField;    // Text field that holds the parameter name
     private final JTextField descriptionField;          // Text field that holds the comment

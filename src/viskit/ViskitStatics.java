@@ -68,7 +68,6 @@ import org.apache.logging.log4j.Logger;
 
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
-import viskit.xsd.bindings.eventgraph.ObjectFactory;
 import viskit.xsd.bindings.eventgraph.Parameter;
 
 /** 
@@ -109,6 +108,8 @@ public class ViskitStatics
     }
         // private static int            viskitGlobalsCreationCount = 0; // singleton safety check
         // private static int ViskitUserConfigurationCreationCount = 0; // singleton safety check
+
+    static final Logger LOG = LogManager.getLogger();
     
     /* Commonly used class names */
     public static final String RANDOM_NUMBER_CLASS                   = "simkit.random.RandomNumber";
@@ -125,8 +126,6 @@ public class ViskitStatics
     public static final String CLEAR_PATH_FLAG = "<<clearPath>>";
 
     public static final String OPERATING_SYSTEM = System.getProperty("os.name");
-
-    static final Logger LOG = LogManager.getLogger();
 
     public static boolean      debug = false;
 

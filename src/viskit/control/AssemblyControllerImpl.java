@@ -85,6 +85,7 @@ import viskit.view.SimulationRunPanel;
 public class AssemblyControllerImpl extends MvcAbstractController implements AssemblyController, OpenAssembly.AssemblyChangeListener 
 {
     static final Logger LOG = LogManager.getLogger();
+    
     private static int mutex = 0;
     Class<?> simEventSourceClass, simEventListenerClass, propertyChangeSourceClass, propertyChangeListenerClass;
 

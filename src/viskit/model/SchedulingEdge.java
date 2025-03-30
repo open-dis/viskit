@@ -1,6 +1,8 @@
 package viskit.model;
 
 import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -12,7 +14,9 @@ import java.util.ArrayList;
  * @since 9:04:09 AM
  * @version $Id$
  */
-public class SchedulingEdge extends Edge {
+public class SchedulingEdge extends Edge 
+{
+    static final Logger LOG = LogManager.getLogger();
 
     public String priority;
 

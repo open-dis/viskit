@@ -1,5 +1,7 @@
 package viskit.model;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.xsd.bindings.assembly.SimEntity;
 
 /**
@@ -16,6 +18,8 @@ import viskit.xsd.bindings.assembly.SimEntity;
  */
 public class EventGraphNode extends AssemblyNode
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     protected boolean outputMarked = false;
     protected boolean verboseMarked = false;
 //    private String comment; // obsolete

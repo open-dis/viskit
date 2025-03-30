@@ -1,5 +1,7 @@
 package viskit.model;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 
 /**
@@ -11,6 +13,8 @@ import viskit.ViskitGlobals;
  */
 public class EventStateTransition extends ViskitElement 
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     private String operationOrAssignment = EMPTY;
     private boolean isOperation = false;
     private String indexingExpression = EMPTY;

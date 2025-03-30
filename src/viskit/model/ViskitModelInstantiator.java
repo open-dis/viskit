@@ -1,6 +1,5 @@
 package viskit.model;
 
-import edu.nps.util.Log4jUtilities;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -35,6 +34,7 @@ import viskit.xsd.bindings.eventgraph.Parameter;
 public abstract class ViskitModelInstantiator
 {
     static final Logger LOG = LogManager.getLogger();
+    
     private String type;
     private String name = "";
     private String description = "";

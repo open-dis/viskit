@@ -3,6 +3,8 @@ package viskit.model;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.Vector;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -14,7 +16,9 @@ import java.util.Vector;
  * @since 1:43:07 PM
  * @version $Id$
  */
-public interface Model {
+public interface Model
+{
+    static final Logger LOG = LogManager.getLogger();
 
     /**
      * Separate initialization from object construction.

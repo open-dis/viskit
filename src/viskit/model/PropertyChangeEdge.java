@@ -1,5 +1,8 @@
 package viskit.model;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -12,6 +15,8 @@ package viskit.model;
  */
 public class PropertyChangeEdge extends AssemblyEdge
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     protected String property;
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
