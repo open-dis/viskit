@@ -254,22 +254,40 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                 StringBuilder htmlBuilder = new StringBuilder("<html>");
                 if (firstCell instanceof vEdgeCell) 
                 {
-                    vEdgeCell vc = (vEdgeCell) firstCell;
-                    Edge se = (Edge) vc.getUserObject();
+                    vEdgeCell edgeCell = (vEdgeCell) firstCell;
+                    Edge edge = (Edge) edgeCell.getUserObject();
 
-                    if (se instanceof SchedulingEdge) {
+                    if (edge instanceof SchedulingEdge) {
 
-                        if  (vc instanceof vSelfEdgeCell)
-                             htmlBuilder.append("<center>Self Scheduling Edge</center>");
-                        else htmlBuilder.append("<center>Scheduling Edge</center>");
+                        if  (edgeCell instanceof vSelfEdgeCell)
+                             htmlBuilder.append("<p align='center'>Self Scheduling Edge</p>");
+                        else htmlBuilder.append("<p align='center'>Scheduling Edge</p>");
+
+                        if (!edge.getDescription().isBlank() || (edge.conditionalDescription != null))
+                        {
+                            String newDescription = edge.getDescription().trim();
+                            if (edge.conditionalDescription != null)
+                            {
+                                if (!newDescription.isBlank() && !newDescription.endsWith(".") && 
+                                    !edge.conditionalDescription.isBlank())
+                                    newDescription += ".";
+                                newDescription += " " + edge.conditionalDescription.trim();                                
+                            }
+                            if (newDescription.length() > 0) 
+                            {
+                                htmlBuilder.append("<u>description</u><br>");
+                                htmlBuilder.append(wrapStringAtPosition(escapeLTGT(newDescription), 60));
+                                htmlBuilder.append("<br>");
+                            }
+                        }
 
                         double priority;
                         String s;
 
                         // Assume numeric comes in, avoid NumberFormatException via Regex check
-                        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) se).priority))
+                        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) edge).priority))
                         {
-                            priority = Double.parseDouble(((SchedulingEdge) se).priority);
+                            priority = Double.parseDouble(((SchedulingEdge) edge).priority);
                             NumberFormat decimalFormat = DecimalFormat.getNumberInstance();
                             decimalFormat.setMaximumFractionDigits(3);
                             decimalFormat.setMaximumIntegerDigits(3);
@@ -281,15 +299,15 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                                 s = decimalFormat.format(priority);
                             }
                         } else {
-                            s = ((SchedulingEdge) se).priority;
+                            s = ((SchedulingEdge) edge).priority;
                         }
 
                         htmlBuilder.append("<u>priority</u><br>&nbsp;");
                         htmlBuilder.append(s);
                         htmlBuilder.append("<br>");
 
-                        if (se.delay != null) {
-                            String dly = se.delay.trim();
+                        if (edge.delay != null) {
+                            String dly = edge.delay.trim();
                             if (dly.length() > 0) {
                                 htmlBuilder.append("<u>delay</u><br>&nbsp;");
                                 htmlBuilder.append(dly);
@@ -298,11 +316,11 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                         }
 
                         int idx = 1;
-                        if (!se.parameters.isEmpty()) {
+                        if (!edge.parameters.isEmpty()) {
 
                             htmlBuilder.append("<u>edge parameters</u><br>");
                             ViskitEdgeParameter ep;
-                            for (ViskitElement e : se.parameters) {
+                            for (ViskitElement e : edge.parameters) {
                                 ep = (ViskitEdgeParameter) e;
                                 htmlBuilder.append("&nbsp;");
                                 htmlBuilder.append(idx++);
@@ -319,29 +337,29 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                             }
                         }
 
-                    } 
+                    }
                     else 
                     {
-                        if  (vc instanceof vSelfEdgeCell)
-                             htmlBuilder.append("<center>Self Canceling Edge</center>");
-                        else htmlBuilder.append("<center>Canceling Edge</center>");
+                        if  (edgeCell instanceof vSelfEdgeCell)
+                             htmlBuilder.append("<p align='center'>Self-Canceling Edge</p>");
+                        else htmlBuilder.append("<p align='center'>Canceling Edge</p>");
                     }
 
-                    if (se != null && se.conditionalDescription != null) {
-                        String newDescription = se.conditionalDescription.trim();
+                    if (edge != null && edge.conditionalDescription != null) {
+                        String newDescription = edge.conditionalDescription.trim();
                         if (newDescription.length() > 0) 
                         {
-                            htmlBuilder.append("<br><u>description</u><br>");
+                            htmlBuilder.append("<u>description</u><br>");
                             htmlBuilder.append(wrapStringAtPosition(escapeLTGT(newDescription), 60));
                             htmlBuilder.append("<br>");
                         }
                     }
 
-                    if (se != null && se.conditional != null) {
-                        String cond = se.conditional.trim();
-                        if (cond.length() > 0) {
-                            htmlBuilder.append("<u>condition</u><br>&nbsp;if( ");
-                            htmlBuilder.append(escapeLTGT(cond));
+                    if (edge != null && edge.conditional != null) {
+                        String conditional = edge.conditional.trim();
+                        if (conditional.length() > 0) {
+                            htmlBuilder.append("<u>condition</u><br>&nbsp;if ( ");
+                            htmlBuilder.append(escapeLTGT(conditional));
                             htmlBuilder.append(" )<br>");
                         }
                     }
@@ -357,7 +375,7 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                 {
                     vCircleCell circleCell = (vCircleCell) firstCell;
                     EventNode eventNode = (EventNode) circleCell.getUserObject();
-                    htmlBuilder.append("<center>");
+                    htmlBuilder.append("<p align='center'>");
 
                     // Show event node names w/ corresponding parameters if any
                     String nodeName = eventNode.getName();
@@ -370,10 +388,12 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                         htmlBuilder.append(arr[1]);
                         htmlBuilder.append(")");
                         htmlBuilder.append("<br>");
-                    } else {
+                    } 
+                    else {
                         htmlBuilder.append(nodeName);
+                        htmlBuilder.append(" Event Node");
                     }
-                    htmlBuilder.append("</center>");
+                    htmlBuilder.append("</p>");
 
 //                    if (!eventNode.getComments().isEmpty()) {
 //                        String stripBrackets = eventNode.getComments().get(0).trim();
@@ -392,20 +412,20 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                         }
                     }
 
-                    List<ViskitElement> argLis = eventNode.getArguments();
-                    if (!argLis.isEmpty()) {
+                    List<ViskitElement> argumentsList = eventNode.getArguments();
+                    if (!argumentsList.isEmpty()) {
 
                         htmlBuilder.append("<u>arguments</u><br>");
                         int n = 0;
                         EventArgument eventArgument;
-                        String as;
-                        for (ViskitElement viskitElement : argLis) {
+                        String value;
+                        for (ViskitElement viskitElement : argumentsList) {
                             eventArgument = (EventArgument) viskitElement;
-                            as = eventArgument.getName() + " (" + eventArgument.getType() + ")";
+                            value = eventArgument.getName() + " (" + eventArgument.getType() + ")";
                             htmlBuilder.append("&nbsp;");
                             htmlBuilder.append(++n);
                             htmlBuilder.append(" ");
-                            htmlBuilder.append(as);
+                            htmlBuilder.append(value);
                             htmlBuilder.append("<br>");
                         }
                     }
@@ -414,26 +434,26 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                     if (!localVariableList.isEmpty()) {
 
                         htmlBuilder.append("<u>Local variables</u><br>");
-                        EventLocalVariable lv;
-                        String val;
-                        for (ViskitElement ve : localVariableList) {
-                            lv = (EventLocalVariable) ve;
+                        EventLocalVariable eventLocalVariable;
+                        String value;
+                        for (ViskitElement nextLocalVariable : localVariableList) {
+                            eventLocalVariable = (EventLocalVariable) nextLocalVariable;
                             htmlBuilder.append("&nbsp;");
-                            htmlBuilder.append(lv.getName());
+                            htmlBuilder.append(eventLocalVariable.getName());
                             htmlBuilder.append(" (");
-                            htmlBuilder.append(lv.getType());
+                            htmlBuilder.append(eventLocalVariable.getType());
                             htmlBuilder.append(") = ");
-                            val = lv.getValue();
-                            htmlBuilder.append(val.isEmpty() ? "<i><default></i>" : val);
+                            value = eventLocalVariable.getValue();
+                            htmlBuilder.append(value.isEmpty() ? "<i><default></i>" : value);
                             htmlBuilder.append("<br>");
                         }
                     }
 
-                    String codeBlock = eventNode.getCodeBlock();
-                    if (codeBlock != null && !codeBlock.isEmpty()) {
+                    String codeBlockString = eventNode.getCodeBlockString();
+                    if (codeBlockString != null && !codeBlockString.isEmpty()) {
                         htmlBuilder.append("<u>code block</u><br>");
 
-                        String[] sa = codeBlock.split("\\n");
+                        String[] sa = codeBlockString.split("\\n");
                         for (String s : sa) {
                             htmlBuilder.append("&nbsp;");
                             htmlBuilder.append(s);
@@ -441,13 +461,13 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                         }
                     }
 
-                    List<ViskitElement> st = eventNode.getTransitions();
-                    if (!st.isEmpty()) {
+                    List<ViskitElement> stateTransitionsList = eventNode.getStateTransitions();
+                    if (!stateTransitionsList.isEmpty()) {
 
                         htmlBuilder.append("<u>state transitions</u><br>");
                         EventStateTransition est;
                         String[] sa;
-                        for (ViskitElement ve : st) {
+                        for (ViskitElement ve : stateTransitionsList) {
                             est = (EventStateTransition) ve;
                             sa = est.toString().split("\\n");
                             for (String s : sa) {

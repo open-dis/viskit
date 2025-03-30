@@ -394,8 +394,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
                 eventNode.getLocalVariables().add(eventLocalVariable);
             }
         }
-        eventNode.setCodeBLock(event.getCode());
-        eventNode.getTransitions().clear();
+        eventNode.setCodeBlockString(event.getCode());
+        eventNode.getStateTransitions().clear();
 
         EventStateTransition eventStateTransition;
         LocalVariableAssignment localVariableAssignment;
@@ -444,7 +444,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             eventStateTransition.setDescription(stateVariable.getDescription());
 
             eventStateTransition.opaqueModelObject = stateTransition;
-            eventNode.getTransitions().add(eventStateTransition);
+            eventNode.getStateTransitions().add(eventStateTransition);
         }
 
         Coordinate coor = event.getCoordinate();
@@ -897,7 +897,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
                     return false;
                 }
             }
-            for (ViskitElement transition : event.getTransitions()) {
+            for (ViskitElement transition : event.getStateTransitions()) {
                 ie = transition.getIndexingExpression();
                 if (ie != null && ie.equals(nm)) {
                     return false;
@@ -1066,9 +1066,9 @@ public class ModelImpl extends MvcAbstractModel implements Model
         cloneArguments(jaxbEvent.getArgument(), eventNode.getArguments());
         cloneLocalVariables(jaxbEvent.getLocalVariable(), eventNode.getLocalVariables());
         // following must follow above
-        cloneTransitions(jaxbEvent.getStateTransition(), eventNode.getTransitions());
+        cloneTransitions(jaxbEvent.getStateTransition(), eventNode.getStateTransitions());
 
-        jaxbEvent.setCode(eventNode.getCodeBlock());
+        jaxbEvent.setCode(eventNode.getCodeBlockString());
 
         setDirty(true);
         notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENT_CHANGED, "Event changed"));

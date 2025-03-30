@@ -408,16 +408,16 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     @SuppressWarnings("unchecked")
     private void recordEventGraphFiles() {
-        if (historyConfig == null) {initConfig();}
+        if (historyXMLConfiguration == null) {initConfig();}
         openEventGraphs = new ArrayList<>(4);
-        List<Object> valueAr = historyConfig.getList(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
+        List<Object> valueAr = historyXMLConfiguration.getList(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
         int idx = 0;
         String op;
         String eventGraphFile;
         for (Object s : valueAr) {
             eventGraphFile = (String) s;
             if (recentEventGraphFileSet.add(eventGraphFile)) {
-                op = historyConfig.getString(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]");
+                op = historyXMLConfiguration.getString(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true")))
                     openEventGraphs.add(eventGraphFile);
@@ -429,15 +429,15 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     private void saveEventGraphHistoryXML(Set<String> recentFiles) {
-        historyConfig.clearTree(ViskitUserConfiguration.RECENT_EVENTGRAPH_CLEAR_KEY);
+        historyXMLConfiguration.clearTree(ViskitUserConfiguration.RECENT_EVENTGRAPH_CLEAR_KEY);
         int idx = 0;
 
         // The value's path is already delimited with "/"
         for (String value : recentFiles) {
-            historyConfig.setProperty(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
+            historyXMLConfiguration.setProperty(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@value]", value); // set relative path if available
             idx++;
         }
-        historyConfig.getDocument().normalize();
+        historyXMLConfiguration.getDocument().normalize();
     }
 
     @Override
@@ -554,7 +554,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         int idx = 0;
         for (String key : recentEventGraphFileSet) {
             if (key.contains(f.getName()))
-                historyConfig.setProperty(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "false");
+                historyXMLConfiguration.setProperty(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "false");
 
             idx++;
         }
@@ -566,7 +566,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         int idx = 0;
         for (String key : recentEventGraphFileSet) {
             if (key.contains(f.getName()))
-                historyConfig.setProperty(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+                historyXMLConfiguration.setProperty(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "true");
 
             idx++;
         }
@@ -576,12 +576,13 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void save()
     {
         ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
-        Model mod = (Model) getModel();
-        File localLastFile = mod.getLastFile();
+        Model model = (Model) getModel();
+        File localLastFile = model.getLastFile();
         if (localLastFile == null) {
             saveAs();
-        } else {
-            handleCompileAndSave(mod, localLastFile);
+        } 
+        else {
+            handleCompileAndSave(model, localLastFile);
         }
     }
 
@@ -589,19 +590,19 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void saveAs()
     {
         ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
-        Model mod = (Model) getModel();
-        EventGraphView view = (EventGraphView) getView();
-        GraphMetadata graphMetadata = mod.getMetadata();
-        if (graphMetadata.description.equals(DESCRIPTION_HINT))
+        Model model = (Model) getModel();
+        EventGraphView eventGraphView = (EventGraphView) getView();
+        GraphMetadata graphMetadata = model.getMetadata();
+        if ((graphMetadata.description == null) || graphMetadata.description.equals(DESCRIPTION_HINT))
             graphMetadata.description = "";
 
         // Allow the user to type specific package names
         String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
-        File saveFile = view.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false,
+        File saveFile = eventGraphView.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false,
                                          "Save Event Graph as...");
 
         if (saveFile != null) {
-            File localLastFile = mod.getLastFile();
+            File localLastFile = model.getLastFile();
             if (localLastFile != null) {
                 fileWatchClose(localLastFile);
             }
@@ -611,35 +612,31 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 n = n.substring(0, n.length() - 4);
             }
             graphMetadata.name = n;
-            view.setSelectedEventGraphName(graphMetadata.name);
-            mod.changeMetadata(graphMetadata); // might have renamed
+            eventGraphView.setSelectedEventGraphName(graphMetadata.name);
+            model.changeMetadata(graphMetadata); // might have renamed
 
-            handleCompileAndSave(mod, saveFile);
+            handleCompileAndSave(model, saveFile);
             adjustRecentEventGraphFileSet(saveFile);
             markEventGraphFilesAsOpened();
         }
     }
 
     /**
-     * Handles whether an XML Event Graph file gets its java source compiled and watched
-     *
-     * @param m the model of the XML Event Graph
-     * @param f the XML file name to save to
+     * Handles whether an XML Event Graph file gets its java source compiled and watchedmodel@param m the model of the XML Event Graph
+     * @param file the XML file name to save to
      */
-    private void handleCompileAndSave(Model m, File f)
+    private void handleCompileAndSave(Model model, File file)
     {
         ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
-        if (m.saveModel(f)) {
-
+        if (model.saveModel(file))
+        {
             // We don't need to recurse since we know this is a file, but make sure
-            // it's re-compiled and re-validated. model.isDirty will be set from
-            // this call.
-            ViskitGlobals.instance().getAssemblyViewFrame().addEventGraphsToLegoTree(f, false);
+            // it is re-compiled and re-validated. model.isDirty will be set from this call.
+            ViskitGlobals.instance().getAssemblyViewFrame().addEventGraphsToLegoTree(file, false);
         }
-
         // Don't watch an XML file whose source couldn't be compiled correctly
-        if (!m.isDirty()) {
-            fileWatchSave(f);
+        if (!model.isDirty()) {
+            fileWatchSave(file);
         }
     }
 
@@ -664,15 +661,15 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void codeBlockEdit(String s) {
-        ((viskit.model.Model) getModel()).changeCodeBlock(s);
+    public void codeBlockEdit(String codeBlockString) {
+        ((viskit.model.Model) getModel()).changeCodeBlock(codeBlockString);
     }
 
     @Override
-    public void stateVariableEdit(ViskitStateVariable var) {
-        boolean modified = ((EventGraphView) getView()).doEditStateVariable(var);
+    public void stateVariableEdit(ViskitStateVariable stateVariable) {
+        boolean modified = ((EventGraphView) getView()).doEditStateVariable(stateVariable);
         if (modified) {
-            ((viskit.model.Model) getModel()).changeStateVariable(var);
+            ((viskit.model.Model) getModel()).changeStateVariable(stateVariable);
         }
     }
 
@@ -692,42 +689,42 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private Vector<Object> copyVector = new Vector<>();
 
     @Override
-    public void selectNodeOrEdge(Vector<Object> v) //------------------------------------
+    public void selectNodeOrEdge(Vector<Object> objectVector) //------------------------------------
     {
-        selectionVector = v;
-        boolean selected = nodeOrEdgeSelected(v);
+        selectionVector = objectVector;
+        boolean selected = nodeOrEdgeSelected(objectVector);
 
         // Cut not supported
         ActionIntrospector.getAction(this, "cut").setEnabled(false);
         ActionIntrospector.getAction(this, "remove").setEnabled(selected);
         ActionIntrospector.getAction(this, "copy").setEnabled(nodeSelected());
-        ActionIntrospector.getAction(this, "newSelfRefSchedulingEdge").setEnabled(selected);
-        ActionIntrospector.getAction(this, "newSelfRefCancelingEdge").setEnabled(selected);
+        ActionIntrospector.getAction(this, "newSelfReferentialSchedulingEdge").setEnabled(selected);
+        ActionIntrospector.getAction(this, "newSelfReferentialCancelingEdge").setEnabled(selected);
     }
 
     private boolean nodeCopied() {
-        return nodeInVector(copyVector);
+        return isNodeInVector(copyVector);
     }
 
     private boolean nodeSelected() {
-        return nodeInVector(selectionVector);
+        return isNodeInVector(selectionVector);
     }
 
-    private boolean nodeOrEdgeSelected(Vector v) {
-        if (nodeInVector(v)) {
+    private boolean nodeOrEdgeSelected(Vector vectorOfInterest) {
+        if (isNodeInVector(vectorOfInterest)) {
             return true;
         }
-        for (Object o : v) {
-            if (o instanceof Edge) {
+        for (Object nextObject : vectorOfInterest) {
+            if (nextObject instanceof Edge) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean nodeInVector(Vector v) {
-        for (Object o : v) {
-            if (o instanceof EventNode) {
+    private boolean isNodeInVector(Vector vectorOfInterest) {
+        for (Object nextObject : vectorOfInterest) {
+            if (nextObject instanceof EventNode) {
                 return true;
             }
         }
@@ -737,27 +734,28 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private boolean doRemove = false;
 
     @Override
-    public void remove() {
+    public void remove() 
+    {
         if (!selectionVector.isEmpty()) {
             // first ask:
-            String s, msg = "";
+            String foundObjectName, message = "";
             int localNodeCount = 0;  // different msg for edge delete
-            for (Object o : selectionVector) {
-                if (o != null && o instanceof EventNode) {
+            for (Object nextObject : selectionVector) {
+                if (nextObject != null && nextObject instanceof EventNode) {
                     localNodeCount++;
-                    s = o.toString();
-                    s = s.replace('\n', ' ');
-                    msg += ", \n" + s;
+                    foundObjectName = nextObject.toString();
+                    foundObjectName = foundObjectName.replace('\n', ' ');
+                    message += ", \n" + foundObjectName;
                 }
             }
-            if (msg.length() > 3) {
-                msg = msg.substring(3);
+            if (message.length() > 3) {
+                message = message.substring(3);
             } // remove leading stuff
 
-            String specialNodeMsg = (localNodeCount > 0 ? "\n(All unselected, but attached edges are permanently removed.)" : "");
-            doRemove = ViskitGlobals.instance().getMainFrame().genericAskYesNo("Remove element(s)?", "Confirm remove " + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
+            String specialNodeMessage = (localNodeCount > 0 ? "\n(All unselected, but attached edges are permanently removed.)" : "");
+            doRemove = ViskitGlobals.instance().getMainFrame().genericAskYesNo("Remove element(s)?", "Confirm remove " + message + "?" + specialNodeMessage) == JOptionPane.YES_OPTION;
             if (doRemove) {
-                // do edges first?
+                // TODO do edges first?
                 delete();
             }
         }
@@ -776,7 +774,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (!nodeSelected()) {
             messageUser(JOptionPane.WARNING_MESSAGE,
                     "Unsupported Action",
-                    "Edges cannot be copied.");
+                    "Edges cannot be copied, only nodes.");
             return;
         }
         copyVector = (Vector<Object>) selectionVector.clone();
@@ -799,16 +797,16 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
         int x = 100, y = 100;
         int offset = 20;
-        String nm;
+        String name;
         // We only paste un-attached nodes (at first)
-        for (Object o : copyVector) {
-            if (o instanceof Edge) {
+        for (Object nextObject : copyVector) {
+            if (nextObject instanceof Edge) {
                 continue;
             }
 
-            if (o != null) {
-                nm = ((ViskitElement) o).getName();
-                buildNewNode(new Point(x + (offset * bias), y + (offset * bias)), nm + "-copy");
+            if (nextObject != null) {
+                name = ((ViskitElement) nextObject).getName();
+                buildNewNode(new Point(x + (offset * bias), y + (offset * bias)), name + "-copy");
                 bias++;
             }
         }
@@ -816,20 +814,22 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     /** Permanently delete, or undo selected nodes and attached edges from the cache */
     @SuppressWarnings("unchecked")
-    private void delete() {
-        EventNode en;
+    private void delete() 
+    {
+        EventNode eventNode;
 
         // Prevent concurrent modification
-        Vector<Object> v = (Vector<Object>) selectionVector.clone();
-        for (Object elem : v) {
-            if (elem instanceof Edge) {
-                removeEdge((Edge) elem);
-            } else if (elem instanceof EventNode) {
-                en = (EventNode) elem;
-                for (ViskitElement ed : en.getConnections()) {
-                    removeEdge((Edge) ed);
+        Vector<Object> selectionObjectVector = (Vector<Object>) selectionVector.clone();
+        for (Object nextObject : selectionObjectVector) {
+            if (nextObject instanceof Edge) {
+                removeEdge((Edge) nextObject);
+            } 
+            else if (nextObject instanceof EventNode) {
+                eventNode = (EventNode) nextObject;
+                for (ViskitElement nextEdge : eventNode.getConnections()) {
+                    removeEdge((Edge) nextEdge);
                 }
-                ((Model) getModel()).deleteEvent(en);
+                ((Model) getModel()).deleteEvent(eventNode);
             }
         }
 
@@ -840,13 +840,13 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     /** Removes the JAXB (XML) binding from the model for this edge
      *
-     * @param e the edge to remove
+     * @param edge the edge to remove
      */
-    private void removeEdge(Edge e) {
-        if (e instanceof SchedulingEdge) {
-            ((Model) getModel()).deleteSchedulingEdge(e);
+    private void removeEdge(Edge edge) {
+        if (edge instanceof SchedulingEdge) {
+            ((Model) getModel()).deleteSchedulingEdge(edge);
         } else {
-            ((Model) getModel()).deleteCancelingEdge(e);
+            ((Model) getModel()).deleteCancelingEdge(edge);
         }
     }
 
@@ -883,14 +883,16 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 break;
         }
 
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+        ViskitGraphUndoManager graphUndoManager = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
         try {
 
             // This will clear the selectionVector via callbacks
-            undoMgr.undo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache());
-        } catch (CannotUndoException ex) {
+            graphUndoManager.undo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache());
+        } 
+        catch (CannotUndoException ex) {
             LOG.error("Unable to undo: {}", ex);
-        } finally {
+        } 
+        finally {
             updateUndoRedoStatus();
         }
     }
@@ -908,58 +910,64 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (redoGraphCell instanceof org.jgraph.graph.Edge) {
 
             // Handles both arcs and self-referential arcs
-            if (redoGraphCell.getUserObject() instanceof SchedulingEdge) {
-                SchedulingEdge ed = (SchedulingEdge) redoGraphCell.getUserObject();
-                ((Model) getModel()).redoSchedulingEdge(ed);
-            } else if (redoGraphCell.getUserObject() instanceof CancelingEdge) {
-                CancelingEdge ed = (CancelingEdge) redoGraphCell.getUserObject();
-                ((Model) getModel()).redoCancelingEdge(ed);
+            if (redoGraphCell.getUserObject() instanceof SchedulingEdge) 
+            {
+                SchedulingEdge schedulingEdge = (SchedulingEdge) redoGraphCell.getUserObject();
+                ((Model) getModel()).redoSchedulingEdge(schedulingEdge);
+            } 
+            else if (redoGraphCell.getUserObject() instanceof CancelingEdge) {
+                CancelingEdge cancelingEdge = (CancelingEdge) redoGraphCell.getUserObject();
+                ((Model) getModel()).redoCancelingEdge(cancelingEdge);
             }
-        } else {
-            EventNode node = (EventNode) redoGraphCell.getUserObject();
-            ((Model) getModel()).redoEvent(node);
+        } 
+        else {
+            EventNode eventNode = (EventNode) redoGraphCell.getUserObject();
+            ((Model) getModel()).redoEvent(eventNode);
         }
-
-        EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+        EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
+        ViskitGraphUndoManager graphUndoManager = (ViskitGraphUndoManager) eventGraphViewFrame.getCurrentVgraphComponentWrapper().getUndoManager();
+        
         try {
-            undoMgr.redo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache());
-        } catch (CannotRedoException ex) {
+            graphUndoManager.redo(eventGraphViewFrame.getCurrentVgraphComponentWrapper().getGraphLayoutCache());
+        } 
+        catch (CannotRedoException ex) {
             LOG.error("Unable to redo: {}", ex);
-        } finally {
+        } 
+        finally {
             updateUndoRedoStatus();
         }
     }
 
     /** Toggles the undo/redo Edit menu items on/off */
     public void updateUndoRedoStatus() {
-        EventGraphViewFrame view = (EventGraphViewFrame) getView();
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) view.getCurrentVgraphComponentWrapper().getUndoManager();
+        EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
+        ViskitGraphUndoManager graphUndoManager = (ViskitGraphUndoManager) eventGraphViewFrame.getCurrentVgraphComponentWrapper().getUndoManager();
 
-        ActionIntrospector.getAction(this, "undo").setEnabled(undoMgr.canUndo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache()));
-        ActionIntrospector.getAction(this, "redo").setEnabled(undoMgr.canRedo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "undo").setEnabled(graphUndoManager.canUndo(eventGraphViewFrame.getCurrentVgraphComponentWrapper().getGraphLayoutCache()));
+        ActionIntrospector.getAction(this, "redo").setEnabled(graphUndoManager.canRedo(eventGraphViewFrame.getCurrentVgraphComponentWrapper().getGraphLayoutCache()));
 
         isUndo = false;
     }
 
     @Override
-    public void deleteSimParameter(ViskitParameter p) {
-        ((Model) getModel()).deleteSimParameter(p);
+    public void deleteSimParameter(ViskitParameter simParameter) {
+        ((Model) getModel()).deleteSimParameter(simParameter);
     }
 
     @Override
-    public void deleteStateVariable(ViskitStateVariable var) {
-        ((Model) getModel()).deleteStateVariable(var);
+    public void deleteStateVariable(ViskitStateVariable stateVariable) {
+        ((Model) getModel()).deleteStateVariable(stateVariable);
     }
 
-    private boolean checkSave() {
-        Model mod = (Model) getModel();
-        if (mod == null) {return false;}
-        if (mod.isDirty() || mod.getLastFile() == null) {
-            String msg = "The model will be saved.\nContinue?";
+    private boolean checkSave() 
+    {
+        Model model = (Model) getModel();
+        if (model == null) {return false;}
+        if (model.isDirty() || model.getLastFile() == null) {
+            String message = "The model will be saved.\nContinue?";
             String title = "Confirm";
-            int ret = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, msg);
-            if (ret != JOptionPane.YES_OPTION) {
+            int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
+            if (returnValue != JOptionPane.YES_OPTION) {
                 return false;
             }
             save();
@@ -978,19 +986,19 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             return;
         }
 
-        SimkitXML2Java x2j = null;
+        SimkitXML2Java xml2Java = null;
         try {
-            x2j = new SimkitXML2Java(localLastFile);
-            x2j.unmarshal();
+            xml2Java = new SimkitXML2Java(localLastFile);
+            xml2Java.unmarshal();
         } catch (FileNotFoundException fnfe) {
             LOG.error(fnfe);
         }
 
-        String source = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(x2j);
-        LOG.debug(source);
-        if (source != null && source.length() > 0) {
+        String sourceString = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(xml2Java);
+        LOG.debug(sourceString);
+        if (sourceString != null && sourceString.length() > 0) {
             String className = model.getMetadata().packageName + "." + model.getMetadata().name;
-            ViskitGlobals.instance().getAssemblyViewFrame().showAndSaveSource(className, source, localLastFile.getName());
+            ViskitGlobals.instance().getAssemblyViewFrame().showAndSaveSource(className, sourceString, localLastFile.getName());
         }
     }
 
@@ -1050,23 +1058,24 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     /** Handles the menu selection for a new self-referential scheduling edge */
-    public void newSelfRefSchedulingEdge() //--------------------------
+    public void newSelfReferentialSchedulingEdge() //--------------------------
     {
         if (selectionVector != null) {
-            for (Object o : selectionVector) {
-                if (o instanceof EventNode) {
-                    ((Model) getModel()).newSchedulingEdge((EventNode) o, (EventNode) o);
+            for (Object nextObject : selectionVector) {
+                if (nextObject instanceof EventNode) {
+                    ((Model) getModel()).newSchedulingEdge((EventNode) nextObject, (EventNode) nextObject);
                 }
             }
         }
     }
 
     /** Handles the menu selection for a new self-referential canceling edge */
-    public void newSelfRefCancelingEdge() {  //--------------------------
+    public void newSelfReferentialCancelingEdge() {  //--------------------------
         if (selectionVector != null) {
-            for (Object o : selectionVector) {
-                if (o instanceof EventNode) {
-                    ((Model) getModel()).newCancelingEdge((EventNode) o, (EventNode) o);
+            for (Object nextObject : selectionVector) 
+            {
+                if (nextObject instanceof EventNode) {
+                    ((Model) getModel()).newCancelingEdge((EventNode) nextObject, (EventNode) nextObject);
                 }
             }
         }
@@ -1094,37 +1103,37 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void nodeEdit(EventNode node) // shouldn't be required
+    public void nodeEdit(EventNode eventNode) // shouldn't be required?
     //----------------------------------
     {
         boolean done;
         boolean modified;
         do {
             done = true;
-            modified = ((EventGraphView) getView()).doEditNode(node);
+            modified = ((EventGraphView) getView()).doEditNode(eventNode);
             if (modified) {
-                done = ((viskit.model.Model) getModel()).changeEventNode(node);
+                done = ((viskit.model.Model) getModel()).changeEventNode(eventNode);
             }
         } while (!done);
     }
 
     @Override
-    public void schedulingArcEdit(Edge ed) {
-        boolean modified = ((EventGraphView) getView()).doEditEdge(ed);
+    public void schedulingArcEdit(Edge edge) {
+        boolean modified = ((EventGraphView) getView()).doEditEdge(edge);
         if (modified) {
-            ((viskit.model.Model) getModel()).changeSchedulingEdge(ed);
+            ((viskit.model.Model) getModel()).changeSchedulingEdge(edge);
         }
     }
 
     @Override
-    public void cancellingArcEdit(Edge ed) {
-        boolean modified = ((EventGraphView) getView()).doEditCancelEdge(ed);
+    public void cancellingArcEdit(Edge edge) {
+        boolean modified = ((EventGraphView) getView()).doEditCancelEdge(edge);
         if (modified) {
-            ((viskit.model.Model) getModel()).changeCancelingEdge(ed);
+            ((viskit.model.Model) getModel()).changeCancelingEdge(edge);
         }
     }
-    private String imgSaveCount = "";
-    private int imgSaveInt = -1;
+    private String imageSaveCount = "";
+    private int    imageSaveInt = -1;
 
     @Override
     public void captureWindow()
@@ -1143,7 +1152,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             fileName = localLastFile.getName();
         }
 
-        String imageFileName = ViskitGlobals.instance().getActiveAssemblyModel().getName() + fileName + imgSaveCount + ".png";
+        String imageFileName = ViskitGlobals.instance().getActiveAssemblyModel().getName() + fileName + imageSaveCount + ".png";
         File imageFile = ((EventGraphView) getView()).saveFileAsk(imageFileName, false,
                 "Save Image, Event Graph Diagram...");
 
@@ -1155,7 +1164,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         timer.setRepeats(false);
         timer.start();
 
-        imgSaveCount = "" + (++imgSaveInt);
+        imageSaveCount = "" + (++imageSaveInt);
     }
 
     @Override
@@ -1208,13 +1217,13 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     class TimerCallback implements ActionListener {
 
-        File fil;
+        File file;
         boolean display;
         JFrame frame;
         Component component;
 
         TimerCallback(File file, boolean whetherToDisplay, Component component) {
-            fil = file;
+            this.file = file;
             display = whetherToDisplay;
             this.component = component;
         }
@@ -1226,8 +1235,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 component = ((JScrollPane) component).getViewport().getView();
                 LOG.debug("CurrentJgraphComponent is a JScrollPane: " + component);
             }
-            Rectangle rec = component.getBounds();
-            Image image = new BufferedImage(rec.width, rec.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+            Rectangle rectangle = component.getBounds();
+            Image image = new BufferedImage(rectangle.width, rectangle.height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
 
             // Tell the jgraph component to draw into memory
             try {
@@ -1238,14 +1247,14 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             // NPEs are happening in JGraph
 
             try {
-                ImageIO.write((RenderedImage)image, "png", fil);
+                ImageIO.write((RenderedImage)image, "png", file);
             } catch (IOException e) {
                 LOG.error(e);
             }
 
             // display a scaled version
             if (display) {
-                frame = new JFrame("Saved as " + fil.getName());
+                frame = new JFrame("Saved as " + file.getName());
                 Icon ii = new ImageIcon(image);
                 JLabel lab = new JLabel(ii);
                 frame.getContentPane().setLayout(new BorderLayout());
@@ -1260,17 +1269,17 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             }
         }
     }
-    XMLConfiguration historyConfig;
+    XMLConfiguration historyXMLConfiguration;
 
     /** This is the very first caller for getViskitAppConfiguration() upon Viskit startup */
     private void initConfig() {
         try {
-            historyConfig = ViskitUserConfiguration.instance().getViskitAppConfiguration();
+            historyXMLConfiguration = ViskitUserConfiguration.instance().getViskitAppConfiguration();
         } 
         catch (Exception e) {
             LOG.error("Error loading history file: {}", e);
             LOG.warn("Recent file saving disabled");
-            historyConfig = null;
+            historyXMLConfiguration = null;
         }
     }
 }

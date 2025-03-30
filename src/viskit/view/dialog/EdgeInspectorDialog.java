@@ -73,7 +73,7 @@ public class EdgeInspectorDialog extends JDialog
     private final JLabel cancellingLabel;
     private final JButton addConditionalButton;
     private final JButton addDescriptionButton;
-    private JTextArea descriptionJta;
+    private JTextArea descriptionTextArea;
     private final JScrollPane descriptionJsp;
     private final JLabel dotLabel;
 
@@ -169,9 +169,10 @@ public class EdgeInspectorDialog extends JDialog
         edgeInspectorPanel.add(sourceTargetPanel);
         edgeInspectorPanel.add(Box.createVerticalStrut(5));
 
-        descriptionJta = new JTextArea(2, 25);
-        descriptionJta.setToolTipText(DESCRIPTION_HINT);
-        descriptionJsp = new JScrollPane(descriptionJta);
+        descriptionTextArea = new JTextArea(2, 25);
+        descriptionTextArea.setText("");
+        descriptionTextArea.setToolTipText(DESCRIPTION_HINT);
+        descriptionJsp = new JScrollPane(descriptionTextArea);
         descriptionJsp.setToolTipText(DESCRIPTION_HINT);
         descriptionJsp.setBorder(new CompoundBorder(
                 new EmptyBorder(0, 0, 5, 0),
@@ -181,9 +182,9 @@ public class EdgeInspectorDialog extends JDialog
         Dimension descriptionJspDimension = descriptionJsp.getPreferredSize();
         descriptionJsp.setMinimumSize(descriptionJspDimension);
 
-        descriptionJta.addCaretListener((CaretEvent e) -> {
+        descriptionTextArea.addCaretListener((CaretEvent e) -> {
             if (changeListener != null) {
-                changeListener.stateChanged(new ChangeEvent(descriptionJta));
+                changeListener.stateChanged(new ChangeEvent(descriptionTextArea));
             }
         });
 
@@ -284,7 +285,7 @@ public class EdgeInspectorDialog extends JDialog
         okButton.addActionListener(new applyButtonListener());
 
         final myChangeListener chlis = new myChangeListener();
-        descriptionJta.addKeyListener(chlis);
+        descriptionTextArea.addKeyListener(chlis);
         conditionalExpressionPanel.addChangeListener(chlis);
         priorityCB.addActionListener(chlis);
         timeDelayVarsCB.addActionListener(chlis);
@@ -760,14 +761,16 @@ public class EdgeInspectorDialog extends JDialog
         return descriptionJsp.isVisible();
     }
 
-    public void setDescription(String s) {
-        descriptionJta.setText(s);
+    public void setDescription(String description) {
+        if (description == null)
+            description = "";
+        descriptionTextArea.setText(description);
         modified = true;
         okButton.setEnabled(true);
     }
 
     public String getDescription() {
-        return descriptionJta.getText().trim();
+        return descriptionTextArea.getText().trim();
     }
     private ChangeListener changeListener;
 

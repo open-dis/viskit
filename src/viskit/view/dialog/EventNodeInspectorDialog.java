@@ -315,12 +315,12 @@ public class EventNodeInspectorDialog extends JDialog
 //      hideShowDescription(s != null && !s.isEmpty());
         hideShowDescription(true); // always show
 
-        s = eventNode.getCodeBlock();
+        s = eventNode.getCodeBlockString();
         localCodeBlockPanel.setData(s);
         localCodeBlockPanel.setVisibleLines(1);
         hideShowCodeBlock(s != null && !s.isEmpty());
 
-        stateTransitionsPanel.setTransitions(eventNode.getTransitions());
+        stateTransitionsPanel.setTransitions(eventNode.getStateTransitions());
         s = stateTransitionsPanel.getString();
         hideShowStateTransitions(s != null && !s.isEmpty());
 
@@ -339,7 +339,7 @@ public class EventNodeInspectorDialog extends JDialog
         if (modified) {
             eventNode.setName(eventNameTF.getText().trim().replace(' ', '_'));
 
-            eventNode.setTransitions(stateTransitionsPanel.getTransitions());
+            eventNode.setStateTransitions(stateTransitionsPanel.getTransitions());
 
             // Bug 1373: This is how an EventNode will have knowledge
             // of edge parameter additions, or removals
@@ -384,7 +384,7 @@ public class EventNodeInspectorDialog extends JDialog
 //            eventNode.getComments().clear();
 //            eventNode.getComments().add(descriptionTF.getText().trim());
             eventNode.setDescription(descriptionTF.getText().trim());
-            eventNode.setCodeBLock(localCodeBlockPanel.getData());
+            eventNode.setCodeBlockString(localCodeBlockPanel.getData());
         }
     }
 
@@ -433,7 +433,7 @@ public class EventNodeInspectorDialog extends JDialog
 //
 //                // Parse the state transitions
 //                StringBuilder parseThis = new StringBuilder();
-//                for (ViskitElement transition : transitions.getTransitions()) {
+//                for (ViskitElement transition : transitions.getStateTransitions()) {
 //                    EventStateTransition est = (EventStateTransition) transition;
 //                    parseThis.append(est.toString());
 //                    parseThis.append(";");

@@ -20,15 +20,15 @@ import viskit.xsd.bindings.eventgraph.Event;
  */
 public class EventNode extends ViskitElement 
 {
-    private Vector<ViskitElement> connections = new Vector<>();
-    private List<ViskitElement> localVariables = new ArrayList<>();
-    private List<ViskitElement> transitions = new ArrayList<>();
-    private List<ViskitElement> arguments = new ArrayList<>();
+    private Vector<ViskitElement> connectionsVector  = new Vector<>();
+    private List<ViskitElement> localVariablesList   = new ArrayList<>();
+    private List<ViskitElement> stateTransitionsList = new ArrayList<>();
+    private List<ViskitElement> argumentsList        = new ArrayList<>();
 //    private List<String> comments = new ArrayList<>(); // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
     private String description = new String();
     private Point2D position = new Point2D.Double(0.d, 0.d);
-    private String codeblock = EMPTY;
+    private String codeBlockString = EMPTY;
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
@@ -47,14 +47,14 @@ public class EventNode extends ViskitElement
     public EventNode shallowCopy()
     {
         EventNode newEventNode = (EventNode) super.shallowCopy(new EventNode(name + "-copy"));
-        newEventNode.connections = connections;
+        newEventNode.connectionsVector = connectionsVector;
 //        eventNode.comments = comments; // obsolete
 //        eventNode.descriptionArray = descriptionArray; // obsolete
         newEventNode.description = description;
-        newEventNode.transitions = transitions;
-        newEventNode.localVariables = localVariables;
-        newEventNode.arguments = arguments;
-        newEventNode.codeblock = codeblock;
+        newEventNode.stateTransitionsList = stateTransitionsList;
+        newEventNode.localVariablesList = localVariablesList;
+        newEventNode.argumentsList = argumentsList;
+        newEventNode.codeBlockString = codeBlockString;
         return newEventNode;
     }
 
@@ -67,11 +67,11 @@ public class EventNode extends ViskitElement
     }
 
     public List<ViskitElement> getArguments() {
-        return arguments;
+        return argumentsList;
     }
 
     public void setArguments(List<ViskitElement> arguments) {
-        this.arguments = arguments;
+        this.argumentsList = arguments;
     }
 
 //    public List<String> getComments() {
@@ -82,36 +82,36 @@ public class EventNode extends ViskitElement
 //        this.comments = comments;
 //    }
 
-    public void setCodeBLock(String s) {
-        this.codeblock = s;
+    public void setCodeBlockString(String newCodeBlockString) {
+        this.codeBlockString = newCodeBlockString;
     }
 
-    public String getCodeBlock() {
-        return codeblock;
+    public String getCodeBlockString() {
+        return codeBlockString;
     }
 
     public Vector<ViskitElement> getConnections() {
-        return connections;
+        return connectionsVector;
     }
 
-    public void setConnections(Vector<ViskitElement> connections) {
-        this.connections = connections;
+    public void setConnections(Vector<ViskitElement> newConnectionsVector) {
+        this.connectionsVector = newConnectionsVector;
     }
 
     public List<ViskitElement> getLocalVariables() {
-        return localVariables;
+        return localVariablesList;
     }
 
-    public void setLocalVariables(List<ViskitElement> localVariables) {
-        this.localVariables = localVariables;
+    public void setLocalVariables(List<ViskitElement> newLocalVariablesList) {
+        this.localVariablesList = newLocalVariablesList;
     }
 
-    public List<ViskitElement> getTransitions() {
-        return transitions;
+    public List<ViskitElement> getStateTransitions() {
+        return stateTransitionsList;
     }
 
-    public void setTransitions(List<ViskitElement> transitions) {
-        this.transitions = transitions;
+    public void setStateTransitions(List<ViskitElement> newStateTransitionsList) {
+        this.stateTransitionsList = newStateTransitionsList;
     }
 
     public Point2D getPosition() {

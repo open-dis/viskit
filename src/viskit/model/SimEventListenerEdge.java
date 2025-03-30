@@ -18,7 +18,7 @@ public class SimEventListenerEdge extends AssemblyEdge
     private String value;
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description;
+    private String description = new String();
 
     SimEventListenerEdge() // package-limited
     {
@@ -42,6 +42,8 @@ public class SimEventListenerEdge extends AssemblyEdge
     @Override
     public void setDescription(String newDescription) {
         description = newDescription;
+        if (description == null)
+            description = "";
     }
 
     // obsolete

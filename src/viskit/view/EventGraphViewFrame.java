@@ -688,12 +688,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         editMenu.add(buildMenuItem(eventGraphController, "newNode", "Add a new Event Node", KeyEvent.VK_A, null));
         editMenu.add(buildMenuItem(eventGraphController, "newSimulationParameter", "Add a new Simulation Parameter", KeyEvent.VK_S, null));
         editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add a new State Variable", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newSelfReferentialSchedulingEdge", "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, "newSelfReferentialCancelingEdge", "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
 
         // Thess start off being disabled, until something is selected
-        ActionIntrospector.getAction(eventGraphController, "newSelfRefSchedulingEdge").setEnabled(false);
-        ActionIntrospector.getAction(eventGraphController, "newSelfRefCancelingEdge").setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, "newSelfReferentialSchedulingEdge").setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, "newSelfReferentialCancelingEdge").setEnabled(false);
         editMenu.addSeparator();
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
@@ -748,12 +748,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newNode", "Add a new Event Node", KeyEvent.VK_A, null));
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSimulationParameter", "Add a new Simulation Parameter", KeyEvent.VK_A, null));
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add a new State Variable", KeyEvent.VK_A, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefSchedulingEdge", "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfRefCancelingEdge", "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfReferentialSchedulingEdge", "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfReferentialCancelingEdge", "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
 
         // Thess start off being disabled, until something is selected
-        ActionIntrospector.getAction(eventGraphController, "newSelfRefSchedulingEdge").setEnabled(false);
-        ActionIntrospector.getAction(eventGraphController, "newSelfRefCancelingEdge").setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, "newSelfReferentialSchedulingEdge").setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, "newSelfReferentialCancelingEdge").setEnabled(false);
         
         // TODO "disable" both of these if no Event Graph is active
         eventGraphMenu.add(editEventGraphSubMenu);

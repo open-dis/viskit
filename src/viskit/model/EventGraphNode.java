@@ -20,7 +20,7 @@ public class EventGraphNode extends AssemblyNode
     protected boolean verboseMarked = false;
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description;
+    private String description = new String();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
@@ -84,6 +84,8 @@ public class EventGraphNode extends AssemblyNode
     @Override
     public void setDescription(String newDescription) {
         description = newDescription;
+        if (description == null)
+            description = "";
     }
 
     // obsolete

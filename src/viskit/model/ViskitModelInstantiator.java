@@ -55,8 +55,10 @@ public abstract class ViskitModelInstantiator
         return name;
     }
 
-    public void setDescription(String desc) {
-        description = desc;
+    public void setDescription(String newDescription) {
+        description = newDescription;
+        if (description == null)
+            description = "";
     }
 
     public String getDescription() {

@@ -38,8 +38,11 @@ public class EventLocalVariable extends ViskitElement
         return description;
     }
 
+    @Override
     public void setDescription(String newDescription) {
         this.description = newDescription;
+        if (description == null)
+            description = "";
     }
 
      // obsolete

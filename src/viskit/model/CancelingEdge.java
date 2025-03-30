@@ -20,7 +20,7 @@ public class CancelingEdge extends Edge // TODO fix spelling
     private String value;
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description;
+    private String description = new String();
 
     CancelingEdge() //package-limited
     {
@@ -56,6 +56,8 @@ public class CancelingEdge extends Edge // TODO fix spelling
     @Override
     public void setDescription(String newDescription) {
         description = newDescription;
+        if (description == null)
+            description = "";
     }
 
     // obsolete

@@ -53,7 +53,7 @@ public class SchedulingEdge extends Edge {
     private String value;
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description;
+    private String description = new String();
 
     /** package-limited constructor */
     SchedulingEdge() {
@@ -90,7 +90,9 @@ public class SchedulingEdge extends Edge {
 
     @Override
     public void setDescription(String newDescription) {
-        this.description = newDescription;
+        description = newDescription;
+        if (description == null)
+            description = "";
     }
 
 

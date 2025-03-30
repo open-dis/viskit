@@ -274,12 +274,12 @@ public class ViskitUserConfiguration
         xmlConfigurationsMap.remove("proj");
     }
 
-    /** @return the XMLConfiguration for Viskit app */
+    /** @return the c_app.cml XMLConfiguration for Viskit app */
     public XMLConfiguration getViskitAppConfiguration() {
         return (XMLConfiguration) projectCombinedConfiguration.getConfiguration("app");
     }
 
-    /** @return the XMLConfiguration for Viskit gui */
+    /** @return the c_gui.xml XMLConfiguration for Viskit gui */
     public XMLConfiguration getViskitGuiConfiguration() {
         return (XMLConfiguration) projectCombinedConfiguration.getConfiguration("gui");
     }

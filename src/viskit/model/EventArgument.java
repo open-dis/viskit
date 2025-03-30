@@ -9,7 +9,7 @@ package viskit.model;
  */
 public class EventArgument extends ViskitElement
 {
-    private String description;
+    private String description = new String();
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
     private String value;
     private boolean isOperation;
@@ -39,6 +39,8 @@ public class EventArgument extends ViskitElement
     @Override
     public void setDescription(String newDescription) {
         description = newDescription;
+        if (description == null)
+            description = "";
     }
 
     // obsolete

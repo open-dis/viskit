@@ -87,6 +87,8 @@ public class ViskitStateVariable extends ViskitElement
     @Override
     public void setDescription(String newDescription) {
         description = newDescription;
+        if (description == null)
+            description = "";
     }
 
     // obsolete
