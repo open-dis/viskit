@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="SimpleServer" package="examples" version="0.1" extend="SimEntityBase" description="One of the most fundamental examples, a simple server that handles client customers" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="SimpleServer" package="examples" version="0.1" author="Arnie Buss" extend="SimEntityBase" description="One of the most fundamental examples, a simple server that handles client customers" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="serviceTime" type="simkit.random.RandomVariate" description="time duration to perform service"/>
     <Parameter name="totalNumberServers" type="int" description="how many servers are provided"/>
     <StateVariable name="numberInQueue" type="int" description="number of customers in queue"/>
@@ -25,7 +25,7 @@
         <Coordinate x="20.0" y="130.0"/>
     </Event>
     <Event name="StartService" description="Begin operations, server handling customer">
-        <Argument name="arg_0" type="int"/>
+        <Argument name="arg_0" type="int" description=""/>
         <StateTransition state="numberInQueue">
             <Assignment value="numberInQueue - 1"/>
         </StateTransition>
