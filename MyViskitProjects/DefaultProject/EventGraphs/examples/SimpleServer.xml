@@ -14,7 +14,7 @@
         <Code></Code>
         <Coordinate x="20.0" y="30.0"/>
     </Event>
-    <Event name="Arrival">
+    <Event name="Arrival" description="Upon getting activated by a scheduling event, Arrival adds a customer to the queue and schedules a server to handle it">
         <StateTransition state="numberInQueue">
             <Assignment value="numberInQueue + 1"/>
         </StateTransition>
@@ -32,7 +32,7 @@
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers - 1"/>
         </StateTransition>
-        <Schedule delay="serviceTime.generate()" event="EndService" priority="DEFAULT"/>
+        <Schedule delay="serviceTime.generate()" event="EndService" priority="DEFAULT" description="schedule next server to handle customer over a precise random duration"/>
         <Code>System.out.println("numberAvailableServers"+arg_0);</Code>
         <Coordinate x="150.0" y="130.0"/>
     </Event>
