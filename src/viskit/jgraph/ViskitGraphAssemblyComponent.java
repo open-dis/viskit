@@ -309,7 +309,7 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                         sb.append(".");
                         sb.append(prop);
                     }
-                    String desc = se.getDescriptionString();
+                    String desc = se.getDescription();
                     if (desc != null) {
                         desc = desc.trim();
                         if (desc.length() > 0) {
@@ -330,13 +330,13 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                         EventGraphNode en = (EventGraphNode) cc.getUserObject();
                         typ = en.getType();
                         name = en.getName();
-                        desc = en.getDescriptionString();
+                        desc = en.getDescription();
                     } else /*if (c instanceof vAssemblyPropListCell)*/ {
                         vAssemblyPropListCell cc = (vAssemblyPropListCell) c;
                         PropertyChangeListenerNode pcln = (PropertyChangeListenerNode) cc.getUserObject();
                         typ = pcln.getType();
                         name = pcln.getName();
-                        desc = pcln.getDescriptionString();
+                        desc = pcln.getDescription();
                     }
 
                     sb.append("<center><u>");

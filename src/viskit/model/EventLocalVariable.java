@@ -1,7 +1,5 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
@@ -19,9 +17,6 @@ public class EventLocalVariable extends ViskitElement
     
     private String value;
     private String[] arraySize;
-//    private String description = EMPTY; // obsolete
-//    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description = EMPTY;
     private String indexingExpression;
     private boolean operation;
     private String operationOrAssignment;
@@ -36,19 +31,6 @@ public class EventLocalVariable extends ViskitElement
     public String toString() {
         return (type.isEmpty() && name.isEmpty()) ? EMPTY : "(" + type + ") " + name;
     }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        this.description = newDescription;
-        if (description == null)
-            description = "";
-    }
-
      // obsolete
 //    @Override
 //    public List<String> getDescriptionArray() {

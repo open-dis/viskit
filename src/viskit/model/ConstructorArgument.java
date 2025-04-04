@@ -25,7 +25,6 @@ public class ConstructorArgument extends ViskitElement
     private List<String> comments = new ArrayList<>();
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description = new String();
 
     public List getComments() {
         return comments;
@@ -47,18 +46,6 @@ public class ConstructorArgument extends ViskitElement
     @Override
     public String getIndexingExpression() {
         return indexingExpression;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        description = newDescription;
-        if (description == null)
-            description = "";
     }
 
     // obsolete

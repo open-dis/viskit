@@ -28,7 +28,6 @@ public class PropertyChangeListenerNode extends AssemblyNode
     private String value;
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description = new String();
     private boolean getMean = false;
     private boolean getCount = false;
 
@@ -96,18 +95,6 @@ public class PropertyChangeListenerNode extends AssemblyNode
     @Override
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        description = newDescription;
-        if (description == null)
-            description = "";
     }
 
     // obsolete

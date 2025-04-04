@@ -22,8 +22,6 @@ public class ViskitEdgeParameter extends ViskitElement
     private String indexingExpression;
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description = new String();
-
     public ViskitEdgeParameter(String value) {
         this.value = value;
     }
@@ -41,19 +39,6 @@ public class ViskitEdgeParameter extends ViskitElement
     public String getIndexingExpression() {
         return indexingExpression;
     }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        description = newDescription;
-        if (description == null)
-            description = "";
-    }
-
 
     // obsolete
 //    @Override

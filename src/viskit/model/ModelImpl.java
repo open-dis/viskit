@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.control.EventGraphControllerImpl;
 import viskit.mvc.MvcAbstractModel;
 import viskit.util.XMLValidationTool;
@@ -221,13 +222,13 @@ public class ModelImpl extends MvcAbstractModel implements Model
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbRoot.setName(nullIfEmpty(graphMetadata.name));
-            jaxbRoot.setVersion(nullIfEmpty(graphMetadata.version));
-            jaxbRoot.setAuthor(nullIfEmpty(graphMetadata.author));
-            jaxbRoot.setPackage(nullIfEmpty(graphMetadata.packageName));
-            jaxbRoot.setExtend(nullIfEmpty(graphMetadata.extendsPackageName));
-            jaxbRoot.setImplement(nullIfEmpty(graphMetadata.implementsPackageName));
-            jaxbRoot.setDescription(nullIfEmpty(graphMetadata.description));
+            jaxbRoot.setName(ViskitStatics.nullIfEmpty(graphMetadata.name));
+            jaxbRoot.setVersion(ViskitStatics.nullIfEmpty(graphMetadata.version));
+            jaxbRoot.setAuthor(ViskitStatics.nullIfEmpty(graphMetadata.author));
+            jaxbRoot.setPackage(ViskitStatics.nullIfEmpty(graphMetadata.packageName));
+            jaxbRoot.setExtend(ViskitStatics.nullIfEmpty(graphMetadata.extendsPackageName));
+            jaxbRoot.setImplement(ViskitStatics.nullIfEmpty(graphMetadata.implementsPackageName));
+            jaxbRoot.setDescription(ViskitStatics.nullIfEmpty(graphMetadata.description));
             
             // obsolete
 //            List<String> clis = jaxbRoot.getComment();
@@ -676,8 +677,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         //parameter.setValue(initVal);
         Parameter parameter = this.jaxbEventGraphObjectFactory.createParameter();
-        parameter.setName(nullIfEmpty(name));
-        parameter.setType(nullIfEmpty(type));
+        parameter.setName(ViskitStatics.nullIfEmpty(name));
+        parameter.setType(ViskitStatics.nullIfEmpty(type));
 //        parameter.getComment().add(description);
         parameter.setDescription(description);
 
@@ -722,9 +723,9 @@ public class ModelImpl extends MvcAbstractModel implements Model
         }
         // fill out jaxb variable
         Parameter parameter = (Parameter) newParameter.opaqueModelObject;
-        parameter.setName(nullIfEmpty(newParameter.getName()));
+        parameter.setName(ViskitStatics.nullIfEmpty(newParameter.getName()));
         //p.setShortName(vp.getName());
-        parameter.setType(nullIfEmpty(newParameter.getType()));
+        parameter.setType(ViskitStatics.nullIfEmpty(newParameter.getType()));
         // obsolete
 //        parameter.getComment().clear();
 //        parameter.getComment().add(newParameter.getDescription());
@@ -747,9 +748,9 @@ public class ModelImpl extends MvcAbstractModel implements Model
             mangleName(newStateVariable);
         }
         StateVariable jaxbStateVariable = this.jaxbEventGraphObjectFactory.createStateVariable();
-        jaxbStateVariable.setName(nullIfEmpty(name));
+        jaxbStateVariable.setName(ViskitStatics.nullIfEmpty(name));
         //s.setShortName(nIe(name));
-        jaxbStateVariable.setType(nullIfEmpty(type));
+        jaxbStateVariable.setType(ViskitStatics.nullIfEmpty(type));
         jaxbStateVariable.setDescription(description);
 
         newStateVariable.opaqueModelObject = jaxbStateVariable;
@@ -785,8 +786,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
         }
         // fill out jaxb variable
         StateVariable stateVariable = (StateVariable) newStateVariable.opaqueModelObject;
-        stateVariable.setName(nullIfEmpty(newStateVariable.getName()));
-        stateVariable.setType(nullIfEmpty(newStateVariable.getType()));
+        stateVariable.setName(ViskitStatics.nullIfEmpty(newStateVariable.getName()));
+        stateVariable.setType(ViskitStatics.nullIfEmpty(newStateVariable.getType()));
 //        stateVariable.getComment().clear();
 //        stateVariable.getComment().add(vsv.getDescription());
         stateVariable.setDescription(newStateVariable.getDescription());
@@ -815,9 +816,9 @@ public class ModelImpl extends MvcAbstractModel implements Model
             mangleName(node);
         }
 
-        jaxbEv.setName(nullIfEmpty(nodeName));
+        jaxbEv.setName(ViskitStatics.nullIfEmpty(nodeName));
 
-        if ("Run".equals(nullIfEmpty(nodeName))) {
+        if ("Run".equals(ViskitStatics.nullIfEmpty(nodeName))) {
             jaxbEv.setDescription("This event is fired first to facilitate "
                     + "initialization of all simulation state variables");
         }
@@ -1019,8 +1020,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
         for (ViskitElement eventArgumentElement : originalEventArgumentList) 
         {
             tempArgument = jaxbEventGraphObjectFactory.createArgument();
-            tempArgument.setName(nullIfEmpty(eventArgumentElement.getName()));
-            tempArgument.setType(nullIfEmpty(eventArgumentElement.getType()));
+            tempArgument.setName(ViskitStatics.nullIfEmpty(eventArgumentElement.getName()));
+            tempArgument.setType(ViskitStatics.nullIfEmpty(eventArgumentElement.getType()));
 //            argument.getComment().clear();
 //            argument.getComment().addAll(eventArgumentElement.getDescriptionArray());
             tempArgument.setDescription(eventArgumentElement.getDescription());
@@ -1036,9 +1037,9 @@ public class ModelImpl extends MvcAbstractModel implements Model
         for (ViskitElement newLocalVariable : originalLocalVariableList) 
         {
             tempLocalVariable = jaxbEventGraphObjectFactory.createLocalVariable();
-            tempLocalVariable.setName(nullIfEmpty(newLocalVariable.getName()));
-            tempLocalVariable.setType(nullIfEmpty(newLocalVariable.getType()));
-            tempLocalVariable.setValue(nullIfEmpty(newLocalVariable.getValue()));
+            tempLocalVariable.setName(ViskitStatics.nullIfEmpty(newLocalVariable.getName()));
+            tempLocalVariable.setType(ViskitStatics.nullIfEmpty(newLocalVariable.getType()));
+            tempLocalVariable.setValue(ViskitStatics.nullIfEmpty(newLocalVariable.getValue()));
 //            tempLocalVariable.getComment().clear();
 //            tempLocalVariable.getComment().add(newLocalVariable.getDescription());
             tempLocalVariable.setDescription(newLocalVariable.getDescription());
@@ -1250,7 +1251,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         for (ViskitElement nextEdgeParameter : schedulingEdge.parameters)
         {
             edgeParameter = jaxbEventGraphObjectFactory.createEdgeParameter();
-            edgeParameter.setValue(nullIfEmpty(nextEdgeParameter.getValue()));
+            edgeParameter.setValue(ViskitStatics.nullIfEmpty(nextEdgeParameter.getValue()));
             schedule.getEdgeParameter().add(edgeParameter);
         }
         setDirty(true);
@@ -1271,25 +1272,11 @@ public class ModelImpl extends MvcAbstractModel implements Model
         EdgeParameter edgeParameter;
         for (ViskitElement nextEdgeParameter : newCancellingEdge.parameters) {
             edgeParameter = jaxbEventGraphObjectFactory.createEdgeParameter();
-            edgeParameter.setValue(nullIfEmpty(nextEdgeParameter.getValue()));
+            edgeParameter.setValue(ViskitStatics.nullIfEmpty(nextEdgeParameter.getValue()));
             cancel.getEdgeParameter().add(edgeParameter);
         }
         setDirty(true);
         notifyChanged(new ModelEvent(newCancellingEdge, ModelEvent.CANCELING_EDGE_CHANGED, "Canceling edge changed"));
-    }
-
-    /**
-     * "nullIfEmpty" returns the passed string if non-zero length, else null
-     * @param inputString the string to evaluate for nullity
-     * @return the passed string if non-zero length, else null
-     */
-    private String nullIfEmpty(String inputString) {
-        if (inputString != null) {
-            if (inputString.isEmpty()) {
-                inputString = null;
-            }
-        }
-        return inputString;
     }
 
 } // end class file ModelImpl.java

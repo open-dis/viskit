@@ -172,7 +172,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         if (eventGraphNode != null) {
             handleField.setText(eventGraphNode.getName());
             outputCheck.setSelected(eventGraphNode.isOutputMarked());
-            descriptionField.setText(eventGraphNode.getDescriptionString());
+            descriptionField.setText(eventGraphNode.getDescription());
             instantiationPanel.setData(eventGraphNode.getInstantiator());
         } else {
             handleField.setText("eventGraphNode name");
@@ -186,7 +186,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         newName = newName.replaceAll("\\s", "");
         if (eventGraphNode != null) {
             eventGraphNode.setName(newName);
-            eventGraphNode.setDescriptionString(descriptionField.getText().trim());
+            eventGraphNode.setDescription(descriptionField.getText().trim());
             eventGraphNode.setInstantiator(instantiationPanel.getData());
             eventGraphNode.setOutputMarked(outputCheck.isSelected());
         } else {

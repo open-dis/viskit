@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import static viskit.ViskitStatics.emptyIfNull;
 import viskit.xsd.bindings.assembly.FactoryParameter;
 import viskit.xsd.bindings.assembly.MultiParameter;
 import viskit.xsd.bindings.assembly.ObjectFactory;
@@ -35,8 +36,8 @@ public abstract class ViskitModelInstantiator
 {
     static final Logger LOG = LogManager.getLogger();
     
-    private String type;
     private String name = "";
+    private String type = "";
     private String description = "";
 
     public ViskitModelInstantiator(String typ) {
@@ -55,14 +56,12 @@ public abstract class ViskitModelInstantiator
         return name;
     }
 
-    public void setDescription(String newDescription) {
-        description = newDescription;
-        if (description == null)
-            description = "";
+    public String getDescription() {
+        return emptyIfNull(description);
     }
 
-    public String getDescription() {
-        return description;
+    public void setDescription(String newDescription) {
+        description = emptyIfNull(newDescription);
     }
 
     abstract public ViskitModelInstantiator vcopy();

@@ -759,9 +759,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         // https://commons.apache.org/proper/commons-configuration/userguide/quick_start.html
         Configurations configurations = new Configurations();
         
-        String PROJECT_HOME_CLEAR_KEY = "app.projecthome";
-        String PROJECT_PATH_KEY = PROJECT_HOME_CLEAR_KEY + ".path[@dir]";
-        String PROJECT_NAME_KEY = PROJECT_HOME_CLEAR_KEY + ".name[@value]";
+        String PROJECT_HOME_CLEAR_KEY_PREFIX = "app.projecthome";
+        String PROJECT_PATH_KEY = PROJECT_HOME_CLEAR_KEY_PREFIX + ".path[@dir]";
+        String PROJECT_NAME_KEY = PROJECT_HOME_CLEAR_KEY_PREFIX + ".name[@value]";
         try
         {
             Configuration config = configurations.properties(C_APP_FILE);

@@ -213,9 +213,9 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             assemblyMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             assemblyMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbRoot.setName(nIe(graphMetadata.name));
-            jaxbRoot.setVersion(nIe(graphMetadata.version));
-            jaxbRoot.setPackage(nIe(graphMetadata.packageName));
+            jaxbRoot.setName(ViskitStatics.nullIfEmpty(graphMetadata.name));
+            jaxbRoot.setVersion(ViskitStatics.nullIfEmpty(graphMetadata.version));
+            jaxbRoot.setPackage(ViskitStatics.nullIfEmpty(graphMetadata.packageName));
 
             if (jaxbRoot.getSchedule() == null) {
                 jaxbRoot.setSchedule(jaxbAssemblyObjectFactory.createSchedule());
@@ -348,7 +348,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         SimEntity jaxbEventGraph = jaxbAssemblyObjectFactory.createSimEntity();
 
-        jaxbEventGraph.setName(nIe(widgetName));
+        jaxbEventGraph.setName(ViskitStatics.nullIfEmpty(widgetName));
         jaxbEventGraph.setType(className);
         node.opaqueModelObject = jaxbEventGraph;
 
@@ -411,7 +411,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         PropertyChangeListener pcl = jaxbAssemblyObjectFactory.createPropertyChangeListener();
 
-        pcl.setName(nIe(widgetName));
+        pcl.setName(ViskitStatics.nullIfEmpty(widgetName));
         pcl.setType(className);
         propertyChangeListenerNode.opaqueModelObject = pcl;
 
@@ -634,7 +634,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     public void changePclEdge(PropertyChangeEdge pclEdge) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pclEdge.opaqueModelObject;
         pclc.setProperty(pclEdge.getProperty());
-        pclc.setDescription(pclEdge.getDescriptionString());
+        pclc.setDescription(pclEdge.getDescription());
 
         modelDirty = true;
         notifyChanged(new ModelEvent(pclEdge, ModelEvent.PCL_EDGE_CHANGED, "PCL edge changed"));
@@ -654,7 +654,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         jaxbAE.setEventSent(ae.getTargetEvent());
 
         jaxbAE.setName(ae.getName());
-        jaxbAE.setDescription(ae.getDescriptionString());
+        jaxbAE.setDescription(ae.getDescription());
 
         modelDirty = true;
         notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTER_EDGE_CHANGED, "Adapter edge changed"));
@@ -668,7 +668,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         selc.setListener(targ.getName());
         selc.setSource(src.getName());
-        selc.setDescription(seEdge.getDescriptionString());
+        selc.setDescription(seEdge.getDescription());
 
         modelDirty = true;
         notifyChanged(new ModelEvent(seEdge, ModelEvent.SIM_EVENT_LISTENER_EDGE_CHANGED, "SimEventListenerener edge changed"));
@@ -684,7 +684,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         PropertyChangeListener jaxBPcl = (PropertyChangeListener) pclNode.opaqueModelObject;
         jaxBPcl.setName(pclNode.getName());
         jaxBPcl.setType(pclNode.getType());
-        jaxBPcl.setDescription(pclNode.getDescriptionString());
+        jaxBPcl.setDescription(pclNode.getDescription());
 
         // Modes should be singular.  All new Assemblies will be with singular mode
         if (pclNode.isSampleStats()) {
@@ -742,7 +742,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbSE.setName(evNode.getName());
         jaxbSE.setType(evNode.getType());
-        jaxbSE.setDescription(evNode.getDescriptionString());
+        jaxbSE.setDescription(evNode.getDescription());
 
         double x = evNode.getPosition().getX();
         double y = evNode.getPosition().getY();
@@ -990,7 +990,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         for (PropertyChangeListenerConnection pclc : pcconnsList) {
             pce = new PropertyChangeEdge();
             pce.setProperty(pclc.getProperty());
-            pce.setDescriptionString(pclc.getDescription());
+            pce.setDescription(pclc.getDescription());
             toNode = getNodeCache().get(pclc.getListener());
             frNode = getNodeCache().get(pclc.getSource());
             pce.setTo(toNode);
@@ -1014,7 +1014,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             sele.setTo(toNode);
             sele.setFrom(frNode);
             sele.opaqueModelObject = selc;
-            sele.setDescriptionString(selc.getDescription());
+            sele.setDescription(selc.getDescription());
 
             toNode.getConnections().add(sele);
             frNode.getConnections().add(sele);
@@ -1045,7 +1045,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             ae.setTargetEvent(event);
 
             ae.setName(jaxbAdapter.getName());
-            ae.setDescriptionString(jaxbAdapter.getDescription());
+            ae.setDescription(jaxbAdapter.getDescription());
             ae.opaqueModelObject = jaxbAdapter;
 
             toNode.getConnections().add(ae);
@@ -1098,7 +1098,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         pNode.setClearStatsAfterEachRun(pcl.getMode().contains("replicationStat"));
         pNode.setGetMean(Boolean.parseBoolean(pcl.getMeanStatistics()));
         pNode.setGetCount(Boolean.parseBoolean(pcl.getCountStatistics()));
-        pNode.setDescriptionString(pcl.getDescription());
+        pNode.setDescription(pcl.getDescription());
         Coordinate coor = pcl.getCoordinate();
         if (coor == null) {
             pNode.setPosition(pointLess);
@@ -1141,7 +1141,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                     Double.parseDouble(coor.getY())));
         }
 
-        en.setDescriptionString(se.getDescription());
+        en.setDescription(se.getDescription());
         en.setOutputMarked(isOutputNode);
         en.setVerboseMarked(isVerboseNode);
 
@@ -1162,19 +1162,20 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return en;
     }
 
-    /**
-     * "nullIfEmpty" Return the passed string if non-zero length, else null
-     * @param s the string to check for non-zero length
-     * @return the passed string if non-zero length, else null
-     */
-    private String nIe(String s) {
-        if (s != null) {
-            if (s.length() == 0) {
-                s = null;
-            }
-        }
-        return s;
-    }
+    // replaced, see ViskitStatics.nullIfEmpty
+//    /**
+//     * "nullIfEmpty" Return the passed string if non-zero length, else null
+//     * @param s the string to check for non-zero length
+//     * @return the passed string if non-zero length, else null
+//     */
+//    private String nIe(String s) {
+//        if (s != null) {
+//            if (s.length() == 0) {
+//                s = null;
+//            }
+//        }
+//        return s;
+//    }
 
     public Map<String, AssemblyNode> getNodeCache() {
         return nodeCache;

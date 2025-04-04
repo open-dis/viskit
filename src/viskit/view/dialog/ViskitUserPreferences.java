@@ -34,7 +34,6 @@ POSSIBILITY OF SUCH DAMAGE.
 package viskit.view.dialog;
 
 import static edu.nps.util.BoxLayoutUtils.clampWidth;
-import edu.nps.util.Log4jUtilities;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -66,6 +65,7 @@ import viskit.ViskitUserConfiguration;
 import static viskit.ViskitUserConfiguration.tabVisibilityUserPreferenceKeyList;
 import viskit.ViskitProject;
 import viskit.ViskitStatics;
+import static viskit.ViskitUserConfiguration.USER_SYSTEM;
 import viskit.control.AssemblyControllerImpl;
 
 /**
@@ -98,7 +98,10 @@ public class ViskitUserPreferences extends JDialog
     private JRadioButton defaultLafRB;
     private JRadioButton platformLafRB;
     private JRadioButton otherLafRB;
-    private JTextField otherLafTF;
+    private JTextField   otherLafTF;
+    private JTextField   author_nameTF;
+    private JTextField   author_emailTF;
+    private JTextField   author_websiteTF;
 
     /** 
      * Display preferences panel
@@ -176,8 +179,45 @@ public class ViskitUserPreferences extends JDialog
     private void buildWidgets() 
     {
         JPanel authorPanel = new JPanel(); // TODO
+        authorPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        authorPanel.setLayout(new BoxLayout(authorPanel, BoxLayout.Y_AXIS));
+        JLabel authorLabel = new JLabel ("Author entries");
+        authorLabel.setToolTipText("Author information for use in Analyst Report");
+        authorLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        authorPanel.add(Box.createVerticalStrut(10));
+        authorPanel.add(authorLabel);
+        authorPanel.add(Box.createVerticalStrut(10));
+        
+        JLabel author_nameLabel = new JLabel("Author name");
+        author_nameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        authorPanel.add(Box.createHorizontalGlue());
+        author_nameTF    = new JTextField();
+        author_nameTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        authorPanel.add(author_nameLabel);
+        authorPanel.add(author_nameTF);
+        authorPanel.add(Box.createVerticalStrut(10));
+        
+        JLabel author_emailLabel = new JLabel("Author email");
+        author_emailLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        author_emailTF   = new JTextField();
+        author_emailTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        authorPanel.add(author_emailLabel);
+        authorPanel.add(Box.createHorizontalGlue());
+        authorPanel.add(author_emailTF);
+        authorPanel.add(Box.createVerticalStrut(10));
+        
+        JLabel author_websiteLabel = new JLabel("Author website");
+        author_websiteLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        author_websiteTF = new JTextField();
+        author_websiteTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        authorPanel.add(author_websiteLabel);
+        authorPanel.add(Box.createHorizontalGlue());
+        authorPanel.add(author_websiteTF);
+        authorPanel.add(Box.createVerticalStrut(10));
         
         // name, affilation, email; where does this information get saved? .viskit somewhere?
+
+        tabbedPane.addTab("Author", authorPanel);
         
 //        tabbedPane.addTab("Author", authorPanel);
               
@@ -317,7 +357,7 @@ public class ViskitUserPreferences extends JDialog
         bg.add(defaultLafRB);
         bg.add(platformLafRB);
         bg.add(otherLafRB);
-        ActionListener lis = new lafListener();
+        ActionListener lis = new LookAndFeelListener();
         platformLafRB.addActionListener(lis);
         defaultLafRB.addActionListener(lis);
         otherLafRB.addActionListener(lis);
@@ -327,7 +367,7 @@ public class ViskitUserPreferences extends JDialog
         tabbedPane.setSelectedIndex(3); // Tab visibility pane
      }
 
-    class lafListener implements ActionListener {
+    class LookAndFeelListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -366,9 +406,11 @@ public class ViskitUserPreferences extends JDialog
             JCheckBox src = (JCheckBox) e.getSource();
             if (src == eventGraphCB) {
                 appXMLConfiguration.setProperty(ViskitUserConfiguration.EVENTGRAPH_EDITOR_VISIBLE_KEY, eventGraphCB.isSelected());
-            } else if (src == assemblyCB) {
+            } 
+            else if (src == assemblyCB) {
                 appXMLConfiguration.setProperty(ViskitUserConfiguration.ASSEMBLY_EDITOR_VISIBLE_KEY, assemblyCB.isSelected());
-            } else if (src == simulationRunCB) {
+            } 
+            else if (src == simulationRunCB) {
                 if (simulationRunCB.isSelected()) {
                     // if we turn on the assembly runner, we also need the assembly editor
                     if (!assemblyCB.isSelected()) {
@@ -376,14 +418,18 @@ public class ViskitUserPreferences extends JDialog
                     } // reenter here
                 }
                 appXMLConfiguration.setProperty(ViskitUserConfiguration.SIMULATION_RUN_VISIBLE_KEY, simulationRunCB.isSelected());
-            } else if (src == dverboseDebugMessagesCB) {
+            } 
+            else if (src == dverboseDebugMessagesCB) {
                 appXMLConfiguration.setProperty(ViskitUserConfiguration.VERBOSE_DEBUG_MESSAGES_KEY, dverboseDebugMessagesCB.isSelected());
                 ViskitStatics.debug = dverboseDebugMessagesCB.isSelected();
-            } else if (src == analystReportCB) {
+            } 
+            else if (src == analystReportCB) {
                 appXMLConfiguration.setProperty(ViskitUserConfiguration.ANALYST_REPORT_VISIBLE_KEY, analystReportCB.isSelected());
-            } else if (src == designOfExperimentsCB) {
-                appXMLConfiguration.setProperty(ViskitUserConfiguration.DESIGNOFEXPERIMENTS_DOE_EDITOR_VISIBLE_KEY, designOfExperimentsCB.isSelected());
-            } else if (src == cloudSimulationRunCB) {
+            } 
+            else if (src == designOfExperimentsCB) {
+                appXMLConfiguration.setProperty(ViskitUserConfiguration.DOE_EDITOR_VISIBLE_KEY, designOfExperimentsCB.isSelected());
+            } 
+            else if (src == cloudSimulationRunCB) {
                 appXMLConfiguration.setProperty(ViskitUserConfiguration.CLOUD_SIMULATION_RUN_VISIBLE_KEY, cloudSimulationRunCB.isSelected());
             }
         }
@@ -462,7 +508,12 @@ public class ViskitUserPreferences extends JDialog
         }
     }
 
-    private void fillWidgets() {
+    private void fillWidgets() 
+    {
+        // author
+        author_nameTF.setText(getUserName());
+        
+        
         DefaultListModel<String> mod = (DefaultListModel<String>) classpathJList.getModel();
         mod.clear();
         if (getExtraClassPathArray() != null) {
@@ -474,18 +525,19 @@ public class ViskitUserPreferences extends JDialog
             classpathJList.setModel(mod);
         }
 
-        eventGraphCB.setSelected(isEventGraphEditorVisible());
-        assemblyCB.setSelected(isAssemblyEditorVisible());
-        simulationRunCB.setSelected(isAssemblySimulationRunVisible());
-        designOfExperimentsCB.setSelected(isDesignOfExperimentsVisible());
-        cloudSimulationRunCB.setSelected(isCloudSimulationRunVisible());
-        analystReportCB.setSelected(isAnalystReportVisible());
+                   eventGraphCB.setSelected(isEventGraphEditorVisible());
+                     assemblyCB.setSelected(isAssemblyEditorVisible());
+                simulationRunCB.setSelected(isAssemblySimulationRunVisible());
+                analystReportCB.setSelected(isAnalystReportVisible());
+          designOfExperimentsCB.setSelected(isDesignOfExperimentsVisible());
+           cloudSimulationRunCB.setSelected(isCloudSimulationRunVisible());
         dverboseDebugMessagesCB.setSelected(ViskitStatics.debug = isVerboseDebug());
 
-        String laf = getLookAndFeel();
-        if(null == laf) {
+        String lookAndFeel = getLookAndFeel();
+        if(null == lookAndFeel) {
             platformLafRB.setSelected(true);
-        } else switch (laf) {
+        } 
+        else switch (lookAndFeel) {
             case ViskitUserConfiguration.LOOK_AND_FEEL_PLATFORM:
                 platformLafRB.setSelected(true);
                 break;
@@ -495,7 +547,7 @@ public class ViskitUserPreferences extends JDialog
             default:
                 otherLafRB.setSelected(true);
                 otherLafTF.setEnabled(true);
-                otherLafTF.setText(laf);
+                otherLafTF.setText(lookAndFeel);
                 break;
         }
     }
@@ -762,6 +814,39 @@ public class ViskitUserPreferences extends JDialog
     }
 
     /**
+     * Return the user name, if available
+     * @return preferred user name
+     */
+    public static String getUserName()
+    {
+        String userName = new String(); // but might get null from configuration file
+        try // troubleshooting for threading issues, perhaps unneeded now
+        {
+            if (ViskitUserConfiguration.instance() != null)
+            {
+                userName = ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.USER_NAME_KEY);
+                // if null or "SYSTEM" then this field has not yet initialized by user
+                if ((userName == null) || (userName.equals(USER_SYSTEM)))
+                {
+                    userName = System.getProperty("user.name");
+                    ViskitUserConfiguration.instance().setValue(ViskitUserConfiguration.USER_NAME_KEY, userName);
+                }
+                return userName;
+            }
+            else 
+            {
+                LOG.error("getUserName() received null singleton ViskitUserConfiguration.instance()");
+                return "";
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.error("getUserName() exception: " + e.getMessage());
+            return ViskitStatics.emptyIfNull(userName); // if reached, then possibly invoked too soon
+        }
+    }
+
+    /**
      * Return if the Assembly Editor is to be visible
      * @return if the Assembly Editor is to be visible
      */
@@ -798,7 +883,7 @@ public class ViskitUserPreferences extends JDialog
      * @return if the Design of Experiments Editor is to be visible
      */
     public static boolean isDesignOfExperimentsVisible() {
-        return isUserPreferenceEnabled(ViskitUserConfiguration.DESIGNOFEXPERIMENTS_DOE_EDITOR_VISIBLE_KEY);
+        return isUserPreferenceEnabled(ViskitUserConfiguration.DOE_EDITOR_VISIBLE_KEY);
     }
 
     /**

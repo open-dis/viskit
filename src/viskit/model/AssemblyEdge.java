@@ -14,7 +14,6 @@ abstract public class AssemblyEdge extends ViskitElement {
 
     private Object to;
     private Object from;
-    private String description = "";
 
     public Object getTo() {
         return to;
@@ -30,13 +29,5 @@ abstract public class AssemblyEdge extends ViskitElement {
 
     public void setFrom(Object f) {
         from = f;
-    }
-
-    public String getDescriptionString() {
-        return description;
-    }
-
-    public void setDescriptionString(String d) {
-        description = d;
     }
 }

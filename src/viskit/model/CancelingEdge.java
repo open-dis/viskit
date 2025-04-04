@@ -23,7 +23,6 @@ public class CancelingEdge extends Edge // single "l" is preferred American spel
     private String value;
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description = new String();
 
     CancelingEdge() //package-limited
     {
@@ -49,18 +48,6 @@ public class CancelingEdge extends Edge // single "l" is preferred American spel
     @Override
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        description = newDescription;
-        if (description == null)
-            description = "";
     }
 
     // obsolete

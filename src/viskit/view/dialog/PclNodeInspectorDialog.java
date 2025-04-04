@@ -157,7 +157,7 @@ public class PclNodeInspectorDialog extends JDialog {
 
             nameField.setText(pclNode.getName());
             typeField.setText(pclNode.getType());
-            descriptionTF.setText(pclNode.getDescriptionString());
+            descriptionTF.setText(pclNode.getDescription());
 
             ip = new InstantiationPanel(this, lis, true);
             setupIP();
@@ -217,7 +217,7 @@ public class PclNodeInspectorDialog extends JDialog {
         nm = nm.replaceAll("\\s", "");
         if (pclNode != null) {
             pclNode.setName(nm);
-            pclNode.setDescriptionString(descriptionTF.getText().trim());
+            pclNode.setDescription(descriptionTF.getText().trim());
             pclNode.setInstantiator(ip.getData());
             if (pclNode.isSampleStats()) {
                 pclNode.setClearStatsAfterEachRun(clearStatsCB.isSelected());

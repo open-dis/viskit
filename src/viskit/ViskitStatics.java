@@ -920,4 +920,31 @@ public class ViskitStatics
         return todaysDate;
     }
 
+    /**
+     * "nullIfEmpty" returns the passed string if non-zero length, else null
+     * @param inputString the string to evaluate for nullity
+     * @return the passed string if non-zero length, else null
+     */
+    public static String nullIfEmpty(String inputString) {
+        if (inputString != null) {
+            if (inputString.isEmpty()) {
+                inputString = null;
+            }
+        }
+        return inputString;
+    }
+
+    /**
+     * "emptyIfNull" returns the passed string if non-zero length, else null
+     * @param inputString the string to evaluate for nullity
+     * @return the passed string if non-zero length, else null
+     */
+    public static String emptyIfNull(String inputString) {
+        if (inputString == null) 
+        {
+            inputString = new String();
+        }
+        return inputString;
+    }
+
 } // end class ViskitStatics.

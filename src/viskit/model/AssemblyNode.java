@@ -21,7 +21,6 @@ public abstract class AssemblyNode extends ViskitElement {
     private List<String> comments = new ArrayList<>();
     private Point2D position = new Point2D.Double(0d, 0d);
     private ViskitModelInstantiator instantiator;
-    private String descriptionString = EMPTY;  // instance information
 
     AssemblyNode(String name, String type) // package access on constructor
     {
@@ -59,13 +58,5 @@ public abstract class AssemblyNode extends ViskitElement {
 
     public void setInstantiator(ViskitModelInstantiator instantiator) {
         this.instantiator = instantiator;
-    }
-
-    public String getDescriptionString() {
-        return descriptionString;
-    }
-
-    public void setDescriptionString(String description) {
-        this.descriptionString = description;
     }
 }

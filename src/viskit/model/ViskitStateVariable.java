@@ -24,7 +24,6 @@ public class ViskitStateVariable extends ViskitElement
     private Object currentValue;
 //    private String comment = EMPTY; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description = EMPTY;
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;

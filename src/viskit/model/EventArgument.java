@@ -13,8 +13,7 @@ import org.apache.logging.log4j.Logger;
 public class EventArgument extends ViskitElement
 {
     static final Logger LOG = LogManager.getLogger();
-    
-    private String description = new String();
+   
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
     private String value;
     private boolean isOperation;
@@ -34,18 +33,6 @@ public class EventArgument extends ViskitElement
     @Override
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        description = newDescription;
-        if (description == null)
-            description = "";
     }
 
     // obsolete

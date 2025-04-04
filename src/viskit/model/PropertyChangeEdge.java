@@ -20,7 +20,6 @@ public class PropertyChangeEdge extends AssemblyEdge
     protected String property;
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description = new String();
     private boolean operation;
     private String operationOrAssignment;
     private String indexingExpression;
@@ -46,19 +45,6 @@ public class PropertyChangeEdge extends AssemblyEdge
     public String getValue() {
         return value;
     }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        description = newDescription;
-        if (description == null)
-            description = "";
-    }
-
     // obsolete
 //    @Override
 //    public List<String> getDescriptionArray() {

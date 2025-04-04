@@ -30,7 +30,6 @@ public class EventNode extends ViskitElement
     private List<ViskitElement> argumentsList        = new ArrayList<>();
 //    private List<String> comments = new ArrayList<>(); // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description = new String();
     private Point2D position = new Point2D.Double(0.d, 0.d);
     private String codeBlockString = EMPTY;
     private boolean operation;
@@ -146,22 +145,6 @@ public class EventNode extends ViskitElement
 //    public void setDescriptionArray(List<String> descriptionArray) {
 //        this.descriptionArray = descriptionArray;
 //    }
-
-    @Override
-    public String getDescription()
-    {
-        if ((description == null) || (description == "null"))
-            description = "";
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription)
-    {
-        if ((description == null) || (description == "null"))
-             description = "";
-        else description = newDescription;
-    }
 
     @Override
     public String getOperationOrAssignment()

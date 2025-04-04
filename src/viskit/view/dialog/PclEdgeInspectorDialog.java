@@ -159,7 +159,7 @@ public class PclEdgeInspectorDialog extends JDialog
             sourceTF.setText(pclEdge.getFrom().toString());
             targetTF.setText(pclEdge.getTo().toString());
             propertyTF.setText(pclEdge.getProperty());
-            descriptionTF.setText(pclEdge.getDescriptionString());
+            descriptionTF.setText(pclEdge.getDescription());
         } else {
             propertyTF.setText("listened-to property");
             sourceTF.setText("unset...shouldn't see this");
@@ -193,7 +193,7 @@ public class PclEdgeInspectorDialog extends JDialog
     private void unloadWidgets() {
         if (pclEdge != null) {
             pclEdge.setProperty(propertyTF.getText().trim());
-            pclEdge.setDescriptionString(descriptionTF.getText().trim());
+            pclEdge.setDescription(descriptionTF.getText().trim());
         }
     }
 

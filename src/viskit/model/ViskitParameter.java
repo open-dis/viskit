@@ -19,7 +19,6 @@ public class ViskitParameter extends ViskitElement
     private String value = EMPTY;
 //    private String comment = EMPTY; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private String description = EMPTY;
     private String[] arraySize;
     private boolean operation;
     private String operationOrAssignment;
@@ -49,18 +48,6 @@ public class ViskitParameter extends ViskitElement
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        description = newDescription;
-        if (description == null)
-            description = "";
     }
 
     // obsolete

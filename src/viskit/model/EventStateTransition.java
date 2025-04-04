@@ -23,7 +23,6 @@ public class EventStateTransition extends ViskitElement
 //    private String comment;
 //    private List<String> descriptionArray = new ArrayList<>();
 //    private List<String> comments = new ArrayList<>();
-    private String description = new String();
     private String localVariableAssignment;
     private String localVariableInvocation;
 
@@ -104,18 +103,6 @@ public class EventStateTransition extends ViskitElement
     @Override
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String newDescription) {
-        description = newDescription;
-        if (description == null)
-            description = "";
     }
 
     // obsolete

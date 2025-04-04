@@ -42,7 +42,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import edu.nps.util.DirectoryWatch;
-import edu.nps.util.FileFilterEx;
+import edu.nps.util.FileFilterExtension;
 import edu.nps.util.Log4jUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -322,9 +322,9 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-        FileFilterEx[] filter = {new FileFilterEx(".grd", "Doe files (*.grd)", true),
-                new FileFilterEx(".xml", "Assembly files (*.xml)", true)};
-        for (FileFilterEx filter1 : filter) {
+        FileFilterExtension[] filter = {new FileFilterExtension(".grd", "Doe files (*.grd)", true),
+                new FileFilterExtension(".xml", "Assembly files (*.xml)", true)};
+        for (FileFilterExtension filter1 : filter) {
             chooser.addChoosableFileFilter(filter1);
         }
 

@@ -2,6 +2,7 @@ package viskit.model;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import static viskit.ViskitStatics.emptyIfNull;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -26,8 +27,9 @@ abstract public class ViskitElement implements Comparable<ViskitElement>
     public Object opaqueControllerObject; // for private use of C
 
     protected static final String EMPTY = "";
-    protected String type = EMPTY;
-    protected String name = EMPTY;
+    protected String name        = EMPTY;
+    protected String type        = EMPTY;
+    protected String description = EMPTY;
 
     /** every node or edge has a unique key */
     private static int sequenceID = 0;
@@ -93,10 +95,6 @@ abstract public class ViskitElement implements Comparable<ViskitElement>
     public abstract String getIndexingExpression();
 
     public abstract String getValue();
-
-    public abstract String getDescription();
-
-    public abstract void   setDescription(String newDescription);
     
     // obsolete
 //    public abstract List<String> getDescriptionArray();
@@ -112,5 +110,14 @@ abstract public class ViskitElement implements Comparable<ViskitElement>
     public String toString() {
         return getName();
     }
+
+    public String getDescription() {
+        return emptyIfNull(description);
+    }
+
+    public void setDescription(String newDescription) {
+        description = emptyIfNull(newDescription);
+    }
+
             
 } // end class file ViskitElement.java
