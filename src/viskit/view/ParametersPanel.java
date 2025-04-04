@@ -25,7 +25,7 @@ public class ParametersPanel extends ViskitTablePanel {
 
     ParametersPanel(int wid, int numRows) {
         super(wid, numRows);             // separate constructor from initialization
-        init(true);
+        initialize(true);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ParametersPanel extends ViskitTablePanel {
     }
 
     @Override
-    public int getNumVisibleRows() {
+    public int getNumberVisibleRows() {
         return 3;
     }
 

@@ -320,7 +320,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         stateVariablesPanel.setMinimumSize(new Dimension(20, 20));
 
         // Wire handlers for stateVariable adds, deletes and edits and tell it we'll be doing adds and deletes
-        vp.doAddsAndDeletes(false);
+        vp.setEnableAddsAndDeletes(false);
         vp.addPlusListener(ActionIntrospector.getAction(getController(), "newStateVariable"));
 
         // Introspector can't handle a param to the method....?
@@ -384,7 +384,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         pp.setMinimumSize(new Dimension(20, 20));
 
         // Wire handlers for parameter adds, deletes and edits and tell it we'll be doing adds and deletes
-        pp.doAddsAndDeletes(false);
+        pp.setEnableAddsAndDeletes(false);
         pp.addPlusListener(ActionIntrospector.getAction(getController(), "newSimulationParameter"));
 
         // Introspector can't handle a param to the method....?

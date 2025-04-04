@@ -18,15 +18,15 @@ public class LocalVariablesPanel extends ViskitTablePanel
 {
   private final String[] mytitles = {"name","type","initial value","description"};
 
-  public LocalVariablesPanel(int wid)
+  public LocalVariablesPanel(int width)
   {
-    this(wid,0);
+    this(width,0);
   }
 
-  public LocalVariablesPanel(int wid, int numRows)
+  public LocalVariablesPanel(int width, int numberRows)
   {
-    super(wid,numRows);
-    init(true);            // separate constructor from initialization
+    super(width,numberRows);
+    initialize(true);            // separate constructor from initialization
   }
 
   @Override
@@ -36,7 +36,7 @@ public class LocalVariablesPanel extends ViskitTablePanel
   }
 
   @Override
-  public String[] getFields(ViskitElement e, int rowNum)
+  public String[] getFields(ViskitElement e, int rowNumber)
   {
     String[] sa = new String[4];
     sa[0] = e.getName();
@@ -57,7 +57,7 @@ public class LocalVariablesPanel extends ViskitTablePanel
   }
 
   @Override
-  public int getNumVisibleRows()
+  public int getNumberVisibleRows()
   {
     return 3;
   }

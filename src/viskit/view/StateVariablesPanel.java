@@ -21,7 +21,7 @@ public class StateVariablesPanel extends ViskitTablePanel {
 
     StateVariablesPanel(int wid, int height) {
         super(wid, height);            // separate constructor from initialization
-        init(true);
+        initialize(true);
     }
 
     @Override
@@ -45,8 +45,8 @@ public class StateVariablesPanel extends ViskitTablePanel {
     }
 
     @Override
-    public int getNumVisibleRows() {
-        return 3;  // not used if we init super with a height
+    public int getNumberVisibleRows() {
+        return 3;  // not used if we initialize super with a height
     }
 
     // Custom tooltips

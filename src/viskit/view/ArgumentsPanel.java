@@ -28,7 +28,7 @@ public class ArgumentsPanel extends ViskitTablePanel
 
     public ArgumentsPanel(int wid, int numRows) {
         super(wid, numRows);
-        init(true);                       // separate constructor from initialization
+        initialize(true);                       // separate constructor from initialization
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ArgumentsPanel extends ViskitTablePanel
     }
 
     @Override
-    public int getNumVisibleRows() {
+    public int getNumberVisibleRows() {
         return 3;
     }
 }

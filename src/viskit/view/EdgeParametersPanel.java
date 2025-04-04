@@ -28,10 +28,10 @@ public class EdgeParametersPanel extends ViskitTablePanel {
 
     public EdgeParametersPanel(int wid) {
         super(wid);            // separate constructor from initialization
-        init(false); // false b/c we need the receiving node to define the arguments first
+        initialize(false); // false b/c we need the receiving node to define the arguments first
 
         // Set the first column background to be the color of the panel (indicating r/o)
-        TableColumn tc = tab.getColumnModel().getColumn(0);
+        TableColumn tc = table.getColumnModel().getColumn(0);
         tc.setCellRenderer(new DifferentTableColumnBackgroundRenderer(getBackground()));
 
         super.addDoubleClickedListener(new myEditListener());
@@ -62,7 +62,7 @@ public class EdgeParametersPanel extends ViskitTablePanel {
     }
 
     @Override
-    public int getNumVisibleRows() {
+    public int getNumberVisibleRows() {
         return 3;
     }
 
