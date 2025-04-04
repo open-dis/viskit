@@ -77,11 +77,11 @@ import viskit.control.AssemblyControllerImpl;
  * @since 11:24:06 AM
  * @version $Id$
  */
-public class ViskitUserPreferences extends JDialog
+public class ViskitUserPreferencesDialog extends JDialog
 {
     static final Logger LOG = LogManager.getLogger();
 
-    private static ViskitUserPreferences settingsDialog;
+    private static ViskitUserPreferencesDialog settingsDialog;
     private static boolean modified = false;
     private final JButton cancelButton;
     private final JButton okButton;
@@ -111,7 +111,7 @@ public class ViskitUserPreferences extends JDialog
     public static boolean showDialog(JFrame parentFrame) 
     {
         if (settingsDialog == null) {
-            settingsDialog = new ViskitUserPreferences(parentFrame);
+            settingsDialog = new ViskitUserPreferencesDialog(parentFrame);
         } 
         else {
             settingsDialog.setParams();
@@ -121,7 +121,7 @@ public class ViskitUserPreferences extends JDialog
         return modified;
     }
 
-    private ViskitUserPreferences(JFrame parentFrame)
+    private ViskitUserPreferencesDialog(JFrame parentFrame)
     {
         super(parentFrame, "Viskit Preferences", true);
 
@@ -582,7 +582,7 @@ public class ViskitUserPreferences extends JDialog
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
-                int ret = JOptionPane.showConfirmDialog(ViskitUserPreferences.this, "Apply changes?",
+                int ret = JOptionPane.showConfirmDialog(ViskitUserPreferencesDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
                     okButton.doClick();
@@ -631,7 +631,7 @@ public class ViskitUserPreferences extends JDialog
                 });
             }
 
-            int retv = addChooser.showOpenDialog(ViskitUserPreferences.this);
+            int retv = addChooser.showOpenDialog(ViskitUserPreferencesDialog.this);
             if (retv == JFileChooser.APPROVE_OPTION) {
                 File selFile = addChooser.getSelectedFile();
                 String absPath = selFile.getAbsolutePath();
