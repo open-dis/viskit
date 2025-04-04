@@ -45,4 +45,5 @@
             <Account last="true"  server="wipeout.hpr.nps.edu" port="4444" username="" password=""/>
         </Cluster>
     </history>
+    <user name="SYSTEM" email="" website=""/><!-- SYSTEM is default, prompting user update -->
 </ViskitConfig>
