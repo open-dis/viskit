@@ -68,7 +68,7 @@ import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
 import static viskit.view.SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
 import static viskit.view.SimulationRunPanel.VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT;
-import viskit.view.dialog.ViskitUserPreferences;
+import viskit.view.dialog.ViskitUserPreferencesDialog;
 
 /** Controller for the Assembly RunSimulation panel, which
  * spawns the BasicAssembly thread
@@ -201,7 +201,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             /* in order to resolve the basicAssembly as a BasicAssembly, it must be
              * loaded using the the same ClassLoader as the one used to compile
              * it. Used in the verboseListener within the working Viskit ClassLoader */
-            // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
+            // the follow-on initializations using ViskitGlobals and ViskitUserPreferencesDialog
             // must occur prior to threading and new RunSimulationClassLoader
             basicAssembly = (BasicAssembly) simulationRunAssemblyInstance;
             basicAssembly.setWorkingClassLoader(priorWorkingClassLoaderNoReset);
@@ -230,7 +230,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     private void fillSimulationRunButtonsFromAssemblyInitialization(boolean verbose, boolean saveReplicationDataToXml, double stopTime) throws Throwable 
     {
         
-        setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
+        setClassPathUrlArray(ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray());
 
         Method getNumberReplicationsMethod     = simulationRunAssemblyClass.getMethod("getNumberReplications");
         Method isSaveReplicationData           = simulationRunAssemblyClass.getMethod("isSaveReplicationData"); // TODO hook this up
@@ -262,11 +262,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
         try // prepareAndStartAssemblySimulationRun()
         {
-            // the follow-on initializations using ViskitGlobals and ViskitUserPreferences
+            // the follow-on initializations using ViskitGlobals and ViskitUserPreferencesDialog
             // must occur prior to threading and new RunSimulationClassLoader
 ////            basicAssembly.resetRunSimulationClassLoader(); // TODO wrong place for this, likely out of place
             basicAssembly.setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory()); // TODO duplicate invocation?
-            setClassPathUrlArray(ViskitUserPreferences.getExtraClassPathArraytoURLArray());
+            setClassPathUrlArray(ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray());
             
             // originally VGlobals().instance().getFreshClassLoader(), then moved into this class
             priorRunSimulationClassLoader = getRunSimulationClassLoader(); 
@@ -742,7 +742,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
         getSimulationRunMenu().addSeparator();
-        getSimulationRunMenu().add(new JMenuItem("Viskit Preferences"));
+        getSimulationRunMenu().add(new JMenuItem("Viskit User Preferences"));
         }
         myMenuBar.add(getSimulationRunMenu());
 

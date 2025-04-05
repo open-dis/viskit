@@ -38,7 +38,6 @@ import bsh.Interpreter;
 import bsh.NameSpace;
 
 import edu.nps.util.GenericConversion;
-import edu.nps.util.Log4jUtilities;
 
 import java.awt.Component;
 import java.awt.Frame;
@@ -79,13 +78,14 @@ import viskit.view.MainFrame;
 import viskit.view.SimulationRunPanel;
 import viskit.view.ViskitProjectSelectionPanel;
 import viskit.view.dialog.ViskitProjectGenerationDialog3;
-import viskit.view.dialog.ViskitUserPreferences;
+import viskit.view.dialog.ViskitUserPreferencesDialog;
 import edu.nps.util.SystemExitHandler;
 import org.apache.logging.log4j.LogManager;
 import static viskit.ViskitProject.DEFAULT_PROJECT_NAME;
 
 /**
  * ViskitGlobals contains global methods and variables.
+ * @warning Not thread safe!
  * 
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
@@ -408,7 +408,7 @@ public class ViskitGlobals
             interpreter.setStrictJava(true);       // no loose typing
         }
 
-        String[] workCP = ViskitUserPreferences.getExtraClassPathArray();
+        String[] workCP = ViskitUserPreferencesDialog.getExtraClassPathArray();
         if (workCP != null && workCP.length > 0) {
             for (String path : workCP) {
                 try {
@@ -1030,7 +1030,7 @@ public class ViskitGlobals
 
         if (viskitProject.initializeProject()) 
         {
-            ViskitUserPreferences.saveExtraClasspathEntries(viskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
+            ViskitUserPreferencesDialog.saveExtraClasspathEntries(viskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
         } 
         else {
             LOG.error("Unable to create project directory for " + allProjectsBaseDirectory);
@@ -1053,7 +1053,7 @@ public class ViskitGlobals
     {
             if (viskitApplicationClassLoader == null) // workingClassLoader should only get created once
             {
-                URL[] urls = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
+                URL[] urls = ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray();
                 viskit.doe.LocalBootLoader localBootLoader = new LocalBootLoader(
                         urls,
                         Thread.currentThread().getContextClassLoader(),

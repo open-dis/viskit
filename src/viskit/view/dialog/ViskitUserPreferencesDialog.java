@@ -69,6 +69,7 @@ import static viskit.ViskitUserConfiguration.USER_SYSTEM;
 import viskit.control.AssemblyControllerImpl;
 
 /**
+ * Dialog panel for user to update preferences in dot-viskit home directory.
  * <p>MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
@@ -102,6 +103,12 @@ public class ViskitUserPreferencesDialog extends JDialog
     private JTextField   author_nameTF;
     private JTextField   author_emailTF;
     private JTextField   author_websiteTF;
+    
+    private static final int         AUTHOR_TAB_INDEX = 0;
+    private static final int      CLASSPATH_TAB_INDEX = 1;
+    private static final int    CLEAR_LISTS_TAB_INDEX = 2;
+    private static final int  LOOK_AND_FEEL_TAB_INDEX = 3;
+    private static final int TAB_VISIBILITY_TAB_INDEX = 4;
 
     /** 
      * Display preferences panel
@@ -114,7 +121,7 @@ public class ViskitUserPreferencesDialog extends JDialog
             settingsDialog = new ViskitUserPreferencesDialog(parentFrame);
         } 
         else {
-            settingsDialog.setParams();
+            settingsDialog.setParameters();
         }
         settingsDialog.setVisible(true);
         // above call blocks
@@ -123,7 +130,7 @@ public class ViskitUserPreferencesDialog extends JDialog
 
     private ViskitUserPreferencesDialog(JFrame parentFrame)
     {
-        super(parentFrame, "Viskit Preferences", true);
+        super(parentFrame, "Viskit User Preferences", true);
 
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
@@ -139,10 +146,13 @@ public class ViskitUserPreferencesDialog extends JDialog
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        cancelButton = new JButton("Cancel");
-        okButton = new JButton("Close");
+        cancelButton = new JButton("Cancel"); // not used
+        okButton     = new JButton("Close");
+        okButton.setToolTipText("Close dialog with changed values saved");
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(okButton);
+//      buttonPanel.add(Box.createHorizontalGlue());
+//      buttonPanel.add(cancelButton); // not used
 
         content.add(tabbedPane);
         content.add(Box.createVerticalStrut(5));
@@ -160,10 +170,10 @@ public class ViskitUserPreferencesDialog extends JDialog
         cloudSimulationRunCB.addActionListener(visibilityHandler);
         dverboseDebugMessagesCB.addActionListener(visibilityHandler);
 
-        setParams();
+        setParameters();
     }
 
-    private void setParams() {
+    private void setParameters() {
         fillWidgets();
         getRootPane().setDefaultButton(cancelButton);
 
@@ -188,6 +198,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         authorPanel.add(authorLabel);
         authorPanel.add(Box.createVerticalStrut(10));
         
+        // TODO add listeners to save values
         JLabel author_nameLabel = new JLabel("Author name");
         author_nameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         authorPanel.add(Box.createHorizontalGlue());
@@ -276,7 +287,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         recentListsPanel.add(Box.createVerticalGlue());
         clampWidth(clearRecentAssembliesListButton, clearRecentEventGraphListsButton); // TODO working?
 
-        tabbedPane.addTab("Clear recent-file lists", recentListsPanel);
+        tabbedPane.addTab("Clear recent lists", recentListsPanel);
 
         JPanel lookAndFeelPanel = new JPanel();
         lookAndFeelPanel.setLayout(new BoxLayout(lookAndFeelPanel, BoxLayout.Y_AXIS));
@@ -511,8 +522,9 @@ public class ViskitUserPreferencesDialog extends JDialog
     private void fillWidgets() 
     {
         // author
-        author_nameTF.setText(getUserName());
-        
+           author_nameTF.setText(getUserName());
+          author_emailTF.setText(getUserEmail());
+        author_websiteTF.setText(getUserWebsite());
         
         DefaultListModel<String> mod = (DefaultListModel<String>) classpathJList.getModel();
         mod.clear();
@@ -552,11 +564,22 @@ public class ViskitUserPreferencesDialog extends JDialog
         }
     }
 
-    private void unloadWidgets() {
-      // most everything gets instantly updated;  check for pending text entry
-      if(otherLafRB.isSelected()) {
-          guiXMLConfiguration.setProperty(ViskitUserConfiguration.LOOK_AND_FEEL_KEY, otherLafTF.getText().trim());
-      }
+    private void unloadWidgets() 
+    {
+        // immediately save value rather than waiting for eventual unfillWidgets()
+        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_NAME_KEY,    author_nameTF.getText());
+        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_NAME_KEY,    author_nameTF.getText());
+        
+        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_EMAIL_KEY,   author_emailTF.getText());
+        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_EMAIL_KEY,   author_emailTF.getText());
+        
+        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_WEBSITE_KEY, author_websiteTF.getText());
+        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_WEBSITE_KEY, author_websiteTF.getText());
+                    
+        // most everything gets instantly updated;  check for pending text entry
+        if(otherLafRB.isSelected()) {
+            guiXMLConfiguration.setProperty(ViskitUserConfiguration.LOOK_AND_FEEL_KEY, otherLafTF.getText().trim());
+        }
     }
 
     class cancelButtonListener implements ActionListener {
@@ -817,7 +840,7 @@ public class ViskitUserPreferencesDialog extends JDialog
      * Return the user name, if available
      * @return preferred user name
      */
-    public static String getUserName()
+    public String getUserName()
     {
         String userName = new String(); // but might get null from configuration file
         try // troubleshooting for threading issues, perhaps unneeded now
@@ -825,11 +848,25 @@ public class ViskitUserPreferencesDialog extends JDialog
             if (ViskitUserConfiguration.instance() != null)
             {
                 userName = ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.USER_NAME_KEY);
-                // if null or "SYSTEM" then this field has not yet initialized by user
-                if ((userName == null) || (userName.equals(USER_SYSTEM)))
+                // if null or "SYSTEM" then this field has not yet been saved after user initializion
+                if (userName == null)
                 {
-                    userName = System.getProperty("user.name");
-                    ViskitUserConfiguration.instance().setValue(ViskitUserConfiguration.USER_NAME_KEY, userName);
+                    LOG.error("getUserName() received null result from ViskitUserConfiguration.USER_NAME_KEY=" + ViskitUserConfiguration.USER_NAME_KEY);
+                    userName = USER_SYSTEM; // blunder ahead
+                }
+                else if (userName.equals(USER_SYSTEM)) // "SYSTEM"
+                {
+                    // initialize user metadata
+                    userName = System.getProperty("user.name"); // reset to logged-in user name
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            tabbedPane.setSelectedIndex(AUTHOR_TAB_INDEX);
+                            String message = "Please confirm your author entries";
+                            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                                    "Metadata initialization", message);
+                        }
+                    });
                 }
                 return userName;
             }
@@ -843,6 +880,70 @@ public class ViskitUserPreferencesDialog extends JDialog
         {
             LOG.error("getUserName() exception: " + e.getMessage());
             return ViskitStatics.emptyIfNull(userName); // if reached, then possibly invoked too soon
+        }
+    }
+
+    /**
+     * Return the user email address, if available
+     * @return preferred user name
+     */
+    public String getUserEmail()
+    {
+        String userEmail = new String(); // but might get null from configuration file
+        try // troubleshooting for threading issues, perhaps unneeded now
+        {
+            if (ViskitUserConfiguration.instance() != null)
+            {
+                userEmail = ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.USER_EMAIL_KEY);
+                // if null or "SYSTEM" then this field has not yet been saved after user initializion
+                if (userEmail == null)
+                {
+                    LOG.error("getUserEmail() received null result from ViskitUserConfiguration.USER_EMAIL_KEY=" + ViskitUserConfiguration.USER_EMAIL_KEY);
+                }
+                return userEmail;
+            }
+            else 
+            {
+                LOG.error("getUserEmail() received null singleton ViskitUserConfiguration.instance()");
+                return "";
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.error("getUserEmail() exception: " + e.getMessage());
+            return ViskitStatics.emptyIfNull(userEmail); // if reached, then possibly invoked too soon
+        }
+    }
+
+    /**
+     * Return the user website, if available
+     * @return preferred user name
+     */
+    public String getUserWebsite()
+    {
+        String userWebsite = new String(); // but might get null from configuration file
+        try // troubleshooting for threading issues, perhaps unneeded now
+        {
+            if (ViskitUserConfiguration.instance() != null)
+            {
+                userWebsite = ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.USER_WEBSITE_KEY);
+                // if null or "SYSTEM" then this field has not yet been saved after user initializion
+                if (userWebsite == null)
+                {
+                    LOG.error("getUserWebsite() received null result from ViskitUserConfiguration.USER_WEBSITE_KEY=" + ViskitUserConfiguration.USER_WEBSITE_KEY);
+                }
+                return userWebsite;
+            }
+            else 
+            {
+                LOG.error("getUserWebsite() received null singleton ViskitUserConfiguration.instance()");
+                return "";
+            }
+        }
+        catch (Exception e)
+        {
+            LOG.error("getUserEmail() exception: " + e.getMessage());
+            return ViskitStatics.emptyIfNull(userWebsite); // if reached, then possibly invoked too soon
         }
     }
 

@@ -60,7 +60,7 @@ import viskit.util.XMLValidationTool;
 import viskit.view.dialog.AssemblyMetadataDialog;
 import viskit.view.AssemblyViewFrame;
 import viskit.view.AssemblyView;
-import viskit.view.dialog.ViskitUserPreferences;
+import viskit.view.dialog.ViskitUserPreferencesDialog;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
@@ -148,7 +148,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 openProject(projectDirectory); // calls EventGraphViewFrame setTitleProjectName
 
                 // Add a new project EventGraphs for LEGO tree inclusion of our SimEntities
-                ViskitUserPreferences.RebuildLEGOTreePanelTask t = new ViskitUserPreferences.RebuildLEGOTreePanelTask();
+                ViskitUserPreferencesDialog.RebuildLEGOTreePanelTask t = new ViskitUserPreferencesDialog.RebuildLEGOTreePanelTask();
                 t.execute();
             }
             compileAssembly(initialAssemblyFilePath);
@@ -222,7 +222,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public void showViskitUserPreferences()
     {
         boolean modified; // TODO can we do anything with this notification?
-        modified = ViskitUserPreferences.showDialog(ViskitGlobals.instance().getMainFrame());
+        modified = ViskitUserPreferencesDialog.showDialog(ViskitGlobals.instance().getMainFrame());
     }
 
     @Override
@@ -1238,18 +1238,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         if (!selectionVector.isEmpty()) {
             // first ask:
-            String s, msg = "";
-            int nodeCount = 0;  // different msg for edge delete
+            String s, message = "";
+            int nodeCount = 0;  // different message for edge delete
             for (Object o : selectionVector) {
                 if (o instanceof AssemblyNode) {
                     nodeCount++;
                     s = o.toString();
                     s = s.replace('\n', ' ');
-                    msg += ", \n" + s;
+                    message += ", \n" + s;
                 }
             }
-            String specialNodeMsg = (nodeCount > 0) ? "\n(All unselected but attached edges will also be removed.)" : "";
-            doRemove = ViskitGlobals.instance().getMainFrame().genericAsk("Remove element(s)?", "Confirm remove" + msg + "?" + specialNodeMsg) == JOptionPane.YES_OPTION;
+            String specialNodeMessage = (nodeCount > 0) ? "\n(All unselected but attached edges will also be removed.)" : "";
+            doRemove = ViskitGlobals.instance().getMainFrame().genericAsk("Remove element(s)?", "Confirm remove" + message + "?" + specialNodeMessage) == JOptionPane.YES_OPTION;
             if (doRemove) {
                 // do edges first?
                 delete();
@@ -1715,18 +1715,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 return paf;
             }
 
-            String src = buildJavaEventGraphSource(x2j);
+            String sourceString = buildJavaEventGraphSource(x2j);
 
             /* We may have forgotten a parameter required for a super class */
-            if (src == null) {
-                String msg = xmlFile + " did not translate to source code.\n" +
+            if (sourceString == null) {
+                String message = xmlFile + " did not translate to source code.\n" +
                         "Manually compile to determine cause";
-                LOG.error(msg);
-                messageUser(JOptionPane.ERROR_MESSAGE, "Source code translation error", msg);
+                LOG.error(message);
+                messageUser(JOptionPane.ERROR_MESSAGE, "Source code translation error", message);
                 return null;
             }
 
-            paf = compileJavaClassAndSetPackage(src);
+            paf = compileJavaClassAndSetPackage(sourceString);
 
         } catch (FileNotFoundException e) {
             LOG.error("Error creating Java class file from {}: {}\n", xmlFile , e.getMessage());

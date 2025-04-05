@@ -67,7 +67,7 @@ import static viskit.view.MainFrame.TAB0_ASSEMBLY_EDITOR_INDEX;
 import static viskit.view.MainFrame.TAB0_EVENTGRAPH_EDITOR_INDEX;
 import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
 import static viskit.view.MainFrame.tabIndices;
-import viskit.view.dialog.ViskitUserPreferences;
+import viskit.view.dialog.ViskitUserPreferencesDialog;
 import static viskit.view.MainFrame.TAB0_SIMULATIONRUN_INDEX;
 
 /**
@@ -180,7 +180,7 @@ public class MainFrame extends JFrame
 
         // Tabbed event graph editor
         eventGraphFrame = ViskitGlobals.instance().buildEventGraphViewFrame();
-        if (ViskitUserPreferences.isEventGraphEditorVisible()) 
+        if (ViskitUserPreferencesDialog.isEventGraphEditorVisible()) 
         {
             topTabbedPane.add(((EventGraphViewFrame) eventGraphFrame).getContent());
             assemblyPaneIndex = topTabbedPane.indexOfComponent(((EventGraphViewFrame) eventGraphFrame).getContent());
@@ -209,7 +209,7 @@ public class MainFrame extends JFrame
 
         // Assembly editor
         assemblyFrame = ViskitGlobals.instance().buildAssemblyViewFrame();
-        if (ViskitUserPreferences.isAssemblyEditorVisible())
+        if (ViskitUserPreferencesDialog.isAssemblyEditorVisible())
         {
             topTabbedPane.add(((AssemblyViewFrame) assemblyFrame).getContent());
             assemblyPaneIndex = topTabbedPane.indexOfComponent(((AssemblyViewFrame) assemblyFrame).getContent());
@@ -254,7 +254,7 @@ public class MainFrame extends JFrame
         runTabbedPanePanel.add(getSimulationRunTabbedPane(), BorderLayout.CENTER);
 
         // Always selected as visible
-        if (ViskitUserPreferences.isAssemblySimulationRunVisible()) {
+        if (ViskitUserPreferencesDialog.isAssemblySimulationRunVisible()) {
             topTabbedPane.add(runTabbedPanePanel);
             assemblyPaneIndex = topTabbedPane.indexOfComponent(runTabbedPanePanel);
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Simulation Run Manager");
@@ -269,7 +269,7 @@ public class MainFrame extends JFrame
         }
 
         // Analyst report
-        boolean analystReportPanelVisible = ViskitUserPreferences.isAnalystReportVisible();
+        boolean analystReportPanelVisible = ViskitUserPreferencesDialog.isAnalystReportVisible();
         if (analystReportPanelVisible)
         {
             analystReportEditorPanel = (AnalystReportViewFrame)ViskitGlobals.instance().buildAnalystReportFrame();
@@ -329,7 +329,7 @@ public class MainFrame extends JFrame
 
         // Design of experiments
         DoeMainFrame doeFrame = null;
-        boolean isDOEVisible = ViskitUserPreferences.isDesignOfExperimentsVisible();
+        boolean isDOEVisible = ViskitUserPreferencesDialog.isDesignOfExperimentsVisible();
         if (isDOEVisible) {
             doeMain = DoeMain.main2();
             doeFrame = doeMain.getMainFrame();
@@ -351,7 +351,7 @@ public class MainFrame extends JFrame
         }
 
         // Grid run panel
-        if (ViskitUserPreferences.isCloudSimulationRunVisible() && isDOEVisible) {
+        if (ViskitUserPreferencesDialog.isCloudSimulationRunVisible() && isDOEVisible) {
             runGridComponent = new JobLauncherTab2(doeMain.getController(), null, null, this);
             if (doeFrame != null)
                 doeFrame.getController().setJobLauncher(runGridComponent);
@@ -507,7 +507,7 @@ public class MainFrame extends JFrame
     }
 
     ActionListener mySettingsHandler = (ActionEvent e) -> {
-        ViskitUserPreferences.showDialog(MainFrame.this);
+        ViskitUserPreferencesDialog.showDialog(MainFrame.this);
     };
 
     private void jamQuitHandler(JMenuItem mi, Action qa, JMenuBar mb) {

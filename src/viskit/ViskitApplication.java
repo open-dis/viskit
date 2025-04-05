@@ -52,7 +52,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import viskit.view.MainFrame;
-import viskit.view.dialog.ViskitUserPreferences;
+import viskit.view.dialog.ViskitUserPreferencesDialog;
 
 /**
  * MOVES Institute
@@ -186,7 +186,7 @@ public class ViskitApplication
 
     private static void setLookAndFeel()
     {
-        String userPreferencesLookAndFeel = ViskitUserPreferences.getLookAndFeel();
+        String userPreferencesLookAndFeel = ViskitUserPreferencesDialog.getLookAndFeel();
         try {
             if (userPreferencesLookAndFeel == null || userPreferencesLookAndFeel.isEmpty() || userPreferencesLookAndFeel.equalsIgnoreCase("default")) {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());

@@ -137,12 +137,12 @@ public class Splash2 extends JFrame
             LOG.info(System.getProperty("java.class.path"));
         }
 
-        final Splash2 spl = new Splash2();
+        final Splash2 splash2 = new Splash2();
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        spl.setLocation((d.width - spl.getWidth()) / 2, (d.height - spl.getHeight()) / 2);
+        splash2.setLocation((d.width - splash2.getWidth()) / 2, (d.height - splash2.getHeight()) / 2);
 
         SwingUtilities.invokeLater(() -> {
-            spl.setVisible(true);
+            splash2.setVisible(true);
         });
 
         // This is for the launch4j executable for Win & executable jar for Unix
@@ -180,7 +180,7 @@ public class Splash2 extends JFrame
         progressBar.setString("Complete");
 
         SwingUtilities.invokeLater(() -> {
-            spl.dispose();
+            splash2.dispose();
         });
     }
 

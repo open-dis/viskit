@@ -84,7 +84,7 @@ import viskit.util.AssemblyFileFilter;
 import viskit.view.dialog.EventGraphNodeInspectorDialog;
 import viskit.view.dialog.RecentFilesDialog;
 import viskit.view.dialog.SimEventListenerConnectionInspectorDialog;
-import viskit.view.dialog.ViskitUserPreferences;
+import viskit.view.dialog.ViskitUserPreferencesDialog;
 import viskit.view.dialog.PclNodeInspectorDialog;
 import viskit.view.dialog.AdapterConnectionInspectorDialog;
 import viskit.view.dialog.PclEdgeInspectorDialog;
@@ -566,7 +566,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
         assemblyMenu.addSeparator();
-        assemblyMenu.add(buildMenuItem(assemblyController, "showViskitUserPreferences", "Viskit Preferences", null, null));
+        assemblyMenu.add(buildMenuItem(assemblyController, "showViskitUserPreferences", "Viskit User Preferences", null, null));
         assemblyMenu.addSeparator();
 
         assemblyMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Quit", KeyEvent.VK_Q,
@@ -610,7 +610,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 null));
 
         projectMenu.addSeparator();
-        projectMenu.add(buildMenuItem(assemblyController, "showViskitUserPreferences", "Viskit Preferences", KeyEvent.VK_V, null));
+        projectMenu.add(buildMenuItem(assemblyController, "showViskitUserPreferences", "Viskit User Preferences", KeyEvent.VK_V, null));
 
         projectMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Quit", KeyEvent.VK_Q,
                 null));
@@ -960,7 +960,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         // Parse any extra/additional classpath for any required dependencies
         File file;
         try {
-            URL[] extraClassPathUrlArray = ViskitUserPreferences.getExtraClassPathArraytoURLArray();
+            URL[] extraClassPathUrlArray = ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray();
             for (URL path : extraClassPathUrlArray) { // tbd same for pcls
                 if (path == null)
                     continue; // can happen if extraClassPaths.path[@value] is null or erroneous

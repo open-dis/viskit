@@ -42,11 +42,12 @@ public class ViskitUserConfiguration
     // lazy loading, not immediate loading which can fail
     private static volatile ViskitUserConfiguration INSTANCE = null;
     
-    /** singleton pattern
+    /** singleton pattern from stackoverflow
      * @return singleton instance
      */
     public static ViskitUserConfiguration instance()
     {
+        @SuppressWarnings("LocalVariableHidesMemberVariable")
         ViskitUserConfiguration INSTANCE = ViskitUserConfiguration.INSTANCE;
         if (INSTANCE == null) { // Check 1
             synchronized (ViskitUserConfiguration.class) {
@@ -56,7 +57,7 @@ public class ViskitUserConfiguration
                 }
             }
         }
-        if (INSTANCE == null)
+        if (INSTANCE == null) // deliberate safety check due to threading/singleton vagaries
             LOG.warn ("initial instance creation failed! check logs afterwards for synchronized singleton safety check");
         return INSTANCE;
     }
@@ -121,7 +122,7 @@ public class ViskitUserConfiguration
     public static final String LOOK_AND_FEEL_DEFAULT  = "default";
     public static final String LOOK_AND_FEEL_PLATFORM = "platform";
     
-    public static final String USER_SYSTEM            = "SYSTEM"; // user name not yet defined by user
+    public static final String USER_SYSTEM            = "SYSTEM"; // default value in c_app.xml means that user name not yet defined by user
     public static final String USER_NAME_KEY          = "user[@name]";
     public static final String USER_EMAIL_KEY         = "user[@email]";
     public static final String USER_WEBSITE_KEY       = "user[@website]";
@@ -229,21 +230,28 @@ public class ViskitUserConfiguration
      */
     public void setValue(String key, String newValue) 
     {
-        String configurationKey = key.substring(0, key.indexOf('.'));
+        String configurationKey;
+        if  (key.contains("."))
+             configurationKey = key.substring(0, key.indexOf('.'));
+        else configurationKey = key.substring(0, key.indexOf('['));
         XMLConfiguration xmlConfiguration  = xmlConfigurationsMap.get(configurationKey);
-        xmlConfiguration .setProperty(key, newValue);
+        if  (xmlConfiguration != null)
+             xmlConfiguration.setProperty(key, newValue);
+        else LOG.error("xmlConfiguration null for setValue({}, {})", key, newValue);
     }
 
     public void setSessionValue(String key, String newValue) {
         sessionHashMap.put(key, newValue);
     }
 
-    public String getValue(String key) {
+    public String getValue(String key) 
+    {
         String returnString = sessionHashMap.get(key);
-        if (returnString != null && returnString.length() > 0) {
+        if (returnString != null && returnString.length() > 0) 
+        {
             return returnString;
         }
-        return projectCombinedConfiguration.getString(key);
+        else return projectCombinedConfiguration.getString(key);
     }
 
     public String[] getConfigurationValues(String key) {

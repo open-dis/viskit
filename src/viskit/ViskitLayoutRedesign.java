@@ -419,7 +419,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         projectMenu.add(jSeparator2);
 
         viskitUserPreferencesMI.setMnemonic(KeyEvent.VK_U);
-        viskitUserPreferencesMI.setText("Viskit Preferences");
+        viskitUserPreferencesMI.setText("Viskit User Preferences");
         viskitUserPreferencesMI.setToolTipText("User settings for Viskit application");
         viskitUserPreferencesMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

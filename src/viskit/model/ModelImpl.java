@@ -635,7 +635,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //                c += comment;
 //                c += " ";
 //            }
-            String description = nextParameter.getDescription();
+            String description = ViskitStatics.emptyIfNull(nextParameter.getDescription());
             parameter = new ViskitParameter(nextParameter.getName(), nextParameter.getType(), description.trim());
             parameter.opaqueModelObject = nextParameter;
 
