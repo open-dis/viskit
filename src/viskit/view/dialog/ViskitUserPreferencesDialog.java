@@ -188,20 +188,20 @@ public class ViskitUserPreferencesDialog extends JDialog
 
     private void buildWidgets() 
     {
-        JPanel authorPanel = new JPanel(); // TODO
+        JPanel authorPanel = new JPanel();
+        authorPanel.setToolTipText("Author information for use in Analyst Report");
         authorPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         authorPanel.setLayout(new BoxLayout(authorPanel, BoxLayout.Y_AXIS));
-        JLabel authorLabel = new JLabel ("Author entries");
-        authorLabel.setToolTipText("Author information for use in Analyst Report");
-        authorLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        authorPanel.add(Box.createVerticalStrut(10));
-        authorPanel.add(authorLabel);
+//        JLabel authorLabel = new JLabel ("Author entries");
+//        authorLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+//        authorPanel.add(Box.createVerticalStrut(10));
+//        authorPanel.add(authorLabel);
         authorPanel.add(Box.createVerticalStrut(10));
         
         // TODO add listeners to save values
         JLabel author_nameLabel = new JLabel("Author name");
         author_nameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        authorPanel.add(Box.createHorizontalGlue());
+//      authorPanel.add(Box.createHorizontalGlue());
         author_nameTF    = new JTextField();
         author_nameTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         authorPanel.add(author_nameLabel);
@@ -213,7 +213,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         author_emailTF   = new JTextField();
         author_emailTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         authorPanel.add(author_emailLabel);
-        authorPanel.add(Box.createHorizontalGlue());
+//      authorPanel.add(Box.createHorizontalGlue());
         authorPanel.add(author_emailTF);
         authorPanel.add(Box.createVerticalStrut(10));
         
@@ -222,7 +222,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         author_websiteTF = new JTextField();
         author_websiteTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         authorPanel.add(author_websiteLabel);
-        authorPanel.add(Box.createHorizontalGlue());
+//      authorPanel.add(Box.createHorizontalGlue());
         authorPanel.add(author_websiteTF);
         authorPanel.add(Box.createVerticalStrut(10));
         
