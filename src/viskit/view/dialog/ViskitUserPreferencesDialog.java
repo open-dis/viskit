@@ -322,7 +322,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         lookAndFeelPanel.add(Box.createVerticalStrut(3));
         
         // TODO fix, make changes immediate
-        JLabel whiningLabel = new JLabel("Panel visibility changes are in effect at next Viskit launch.", JLabel.CENTER);
+        JLabel whiningLabel = new JLabel("Panel display and visibility changes are in effect at next Viskit launch.", JLabel.CENTER);
         whiningLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         lookAndFeelPanel.add(whiningLabel);
         lookAndFeelPanel.add(Box.createVerticalGlue());
@@ -355,7 +355,7 @@ public class ViskitUserPreferencesDialog extends JDialog
 
         tabVisibilityPanel.add(innerPanel, BorderLayout.CENTER);
         tabVisibilityPanel.add(Box.createVerticalStrut(3));
-        whiningLabel = new JLabel("Panel visibility changes are in effect at next Viskit launch.", JLabel.CENTER);
+        whiningLabel = new JLabel("Panel display and visibility changes are in effect at next Viskit launch.", JLabel.CENTER);
         whiningLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         tabVisibilityPanel.add(whiningLabel);
         tabVisibilityPanel.add(Box.createVerticalGlue());
