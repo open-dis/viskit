@@ -5,35 +5,34 @@
 <!-- Programming note: the root element name is ignored when assembling keys -->
 <ViskitConfig>
   <gui>
-    <beanshellerrordialog>
-      <title>Warning</title>
-      <label>Java language error:</label>
-      <question>Ignore and continue?</question>
-      <sessioncheckbox>Hide warnings for current session</sessioncheckbox>
-      <preferencescheckbox>Hide warnings permanently</preferencescheckbox>
-      <preferencestooltip>A very primitive Java compile warning indicator</preferencestooltip>
-    </beanshellerrordialog>
-    <title>
-      <projecthome>
-        <generation>Viskit Project Generation Dialog</generation>
-      </projecthome>
-    </title>
-    <tooltip>
-      <projecthome>Select a location for a Viskit project home</projecthome>
-    </tooltip>
-    <button>
-      <projectgeneration>
-        <text>Generate Project</text>
-        <image>PlayGreen16.gif</image>
-        <tt>Generate your Viskit project</tt>
-      </projectgeneration>
-    </button>
-    <projecttitle>
-        <name value="DefaultProject"/>
-    </projecttitle>
-    <!-- macOS works best w/ the platform L&F -->
-    <lookandfeel>default</lookandfeel>
-    <!-- WIN machines work best w/ the default L&F in order to get a colorized
-         status of EG compilation outcomes -->
+  <beanshellerrordialog>
+    <title>Warning</title>
+    <label>Java language error:</label>
+    <question>Ignore and continue?</question>
+    <sessioncheckbox>Hide warnings for current session</sessioncheckbox>
+    <preferencescheckbox>Hide warnings permanently</preferencescheckbox>
+    <preferencestooltip>A simplistic Java compile warning indicator</preferencestooltip>
+  </beanshellerrordialog>
+  <title>
+    <projecthome>
+    <generation>Viskit Project Generation Dialog</generation>
+    </projecthome>
+  </title>
+  <tooltip>
+    <projecthome>Select a directory location for a Viskit project home</projecthome>
+  </tooltip>
+  <button>
+    <projectgeneration>
+    <text>Generate Project</text>
+    <image>PlayGreen16.gif</image>
+    <tt>Generate your Viskit project</tt>
+    </projectgeneration>
+  </button>
+  <projecttitle>
+    <name value="DefaultProject"/>
+  </projecttitle>
+  <lookandfeel>default</lookandfeel>
+  <!-- macOS machines work best with the platform lookandfeel -->
+  <!--   WIN machines work best with the default  lookandfeel in order to get a colorized status of Event Graph compilation outcomes -->
   </gui>
 </ViskitConfig>

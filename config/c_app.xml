@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Viskit application configuration file c_app.xml -->
 
-<!-- Programming note: values in this file are retrieved by keys such as 'app.beanshell.warning' -->
+<!-- Programming note: values in this file are retrieved by keys such as 'app.beanshell.warning' or 'user[@email]' -->
 <!-- Programming note: the root element name is ignored when assembling keys -->
 <ViskitConfig>
-    <app>
-        <beanshell>
-            <warning>true</warning>
-        </beanshell>
-        <mainframe>
-          <size h="680" w="930"/>
-        </mainframe>
-        <projecthome>
-            <!-- These two attributes MUST always be at least zero-length Strings -->
-            <!-- A default project path and name (DefaultProject) are included 
-                 in this template for convenience -->
-            <path dir="./MyViskitProjects"/>
-            <name value="DefaultProject"/>
-        </projecthome>
-        <tabs>
-            <EventGraphEditor visible="true"/>
-            <AssemblyEditor visible="true"/>
-            <AssemblyRun visible="true"/>
-            <AnalystReport visible="true"/>
-            <DesignOfExperiments visible="false"/>
-            <ClusterRun visible="false"/>
-        </tabs>
-        <debug>false</debug>
-    </app>
-    <history>
-        <ProjectEditor>
-            <Recent>
-            </Recent>
-        </ProjectEditor>
-        <EventGraphEditor>
-            <Recent>
-            </Recent>
-        </EventGraphEditor>
-        <AssemblyEditor>
-            <Recent>
-            </Recent>
-        </AssemblyEditor>
-        <Cluster>
-            <Account last="true"  server="wipeout.hpr.nps.edu" port="4444" username="" password=""/>
-        </Cluster>
-    </history>
-    <user name="SYSTEM" email="" website=""/><!-- SYSTEM is default, prompting user update -->
+  <app>
+    <beanshell>
+      <warning>true</warning>
+    </beanshell>
+    <mainframe>
+      <size h="680" w="930"/>
+    </mainframe>
+    <projecthome>
+      <!-- These two attributes MUST always be at least zero-length Strings -->
+      <!-- A default project path and name (DefaultProject) are included in this template for convenience -->
+      <path dir="./MyViskitProjects"/>
+      <name value="DefaultProject"/>
+    </projecthome>
+    <tabs>
+      <EventGraphEditor visible="true"/>
+      <AssemblyEditor visible="true"/>
+      <AssemblyRun visible="true"/>
+      <AnalystReport visible="true"/>
+      <DesignOfExperiments visible="false"/>
+      <ClusterRun visible="false"/>
+    </tabs>
+    <debug>false</debug>
+  </app>
+  <history>
+    <ProjectEditor>
+      <Recent>
+      </Recent>
+    </ProjectEditor>
+    <EventGraphEditor>
+      <Recent>
+      </Recent>
+    </EventGraphEditor>
+    <AssemblyEditor>
+      <Recent>
+      </Recent>
+    </AssemblyEditor>
+    <Cluster>
+      <Account last="true"  server="wipeout.hpr.nps.edu" port="4444" username="" password=""/>
+    </Cluster>
+  </history>
+  <user name="SYSTEM" email="" website=""/>
+  <!-- SYSTEM is default user name, prompting an update request by ViskitUserPreferencesDialog panel -->
 </ViskitConfig>
