@@ -521,7 +521,6 @@ public class ViskitUserPreferencesDialog extends JDialog
 
     private void fillWidgets() 
     {
-        // author
            author_nameTF.setText(getUserName());
           author_emailTF.setText(getUserEmail());
         author_websiteTF.setText(getUserWebsite());
