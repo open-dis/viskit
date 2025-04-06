@@ -94,8 +94,8 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         saveEventGraphMI = new javax.swing.JMenuItem();
         saveEventGraphAsMI = new javax.swing.JMenuItem();
         jSeparator7 = new javax.swing.JPopupMenu.Separator();
-        javaSourceEventGraphMI = new javax.swing.JMenuItem();
         imageSaveDiagramEventGraphMI = new javax.swing.JMenuItem();
+        javaSourceEventGraphMI = new javax.swing.JMenuItem();
         xmlViewEventGraphMI = new javax.swing.JMenuItem();
         assemblyMenu = new javax.swing.JMenu();
         editAssemblySubMenu = new javax.swing.JMenu();
@@ -120,8 +120,8 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         saveAssemblyMI = new javax.swing.JMenuItem();
         saveAssemblyAsMI = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JPopupMenu.Separator();
-        javaSourceAssemblyMI = new javax.swing.JMenuItem();
         imageSaveDiagramAssemblyMI = new javax.swing.JMenuItem();
+        javaSourceAssemblyMI = new javax.swing.JMenuItem();
         xmlViewAssemblyMI = new javax.swing.JMenuItem();
         jSeparator14 = new javax.swing.JPopupMenu.Separator();
         prepareAssemblyForSimulationRunMI = new javax.swing.JMenuItem();
@@ -546,9 +546,6 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         eventGraphMenu.add(saveEventGraphAsMI);
         eventGraphMenu.add(jSeparator7);
 
-        javaSourceEventGraphMI.setText("Java Source Generation of saved Event Graph");
-        eventGraphMenu.add(javaSourceEventGraphMI);
-
         imageSaveDiagramEventGraphMI.setText("Image Save for Event Graph Diagram");
         imageSaveDiagramEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -556,6 +553,9 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
             }
         });
         eventGraphMenu.add(imageSaveDiagramEventGraphMI);
+
+        javaSourceEventGraphMI.setText("Java Source Generation of saved Event Graph");
+        eventGraphMenu.add(javaSourceEventGraphMI);
 
         xmlViewEventGraphMI.setText("XML View of Saved Event Graph");
         xmlViewEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
@@ -669,14 +669,6 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         assemblyMenu.add(saveAssemblyAsMI);
         assemblyMenu.add(jSeparator6);
 
-        javaSourceAssemblyMI.setText("Java Source Generation");
-        javaSourceAssemblyMI.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                javaSourceAssemblyMIActionPerformed(evt);
-            }
-        });
-        assemblyMenu.add(javaSourceAssemblyMI);
-
         imageSaveDiagramAssemblyMI.setText("Image Save for Assembly Diagram");
         imageSaveDiagramAssemblyMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -684,6 +676,14 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
             }
         });
         assemblyMenu.add(imageSaveDiagramAssemblyMI);
+
+        javaSourceAssemblyMI.setText("Java Source Generation");
+        javaSourceAssemblyMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                javaSourceAssemblyMIActionPerformed(evt);
+            }
+        });
+        assemblyMenu.add(javaSourceAssemblyMI);
 
         xmlViewAssemblyMI.setText("XML View of Saved Assembly");
         xmlViewAssemblyMI.setToolTipText("");

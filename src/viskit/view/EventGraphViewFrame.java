@@ -795,10 +795,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphMenu.add(buildMenuItem(eventGraphController, "saveAs", "Save Event Graph as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, accelMod)));
         eventGraphMenu.addSeparator();
 
-        eventGraphMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Java Source Generation for saved Event Graph", KeyEvent.VK_J,
-                KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         eventGraphMenu.add(buildMenuItem(eventGraphController, "captureWindow", "Image Save for Event Graph Diagram", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "generateJavaSource", "Java Source Generation for saved Event Graph", KeyEvent.VK_J,
+                KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         eventGraphMenu.add(buildMenuItem(eventGraphController, "viewXML", "XML View of Saved Event Graph", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())

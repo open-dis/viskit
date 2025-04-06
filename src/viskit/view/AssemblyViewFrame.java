@@ -543,10 +543,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         assemblyMenu.addSeparator();
-        assemblyMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Java Source Generation for Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
-                KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "captureWindow", "Image Save for Assembly Diagram", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+        assemblyMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Java Source Generation for Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
+                KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         
         
