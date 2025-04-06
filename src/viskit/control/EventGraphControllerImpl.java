@@ -1133,14 +1133,14 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             ((viskit.model.Model) getModel()).changeCancelingEdge(edge);
         }
     }
-    private String imageSaveCount = "";
+    private String imageSaveCountString = "";
     private int    imageSaveInt = -1;
 
     @Override
     public void captureWindow()
     {
         ViskitGlobals.instance().getMainFrame().selectEventGraphTab();
-        String fileName = "ViskitScreenCapture";
+        String fileName = "EventGraphScreenCapture";
 
         // create and save the image
         EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
@@ -1148,24 +1148,26 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         // Get only the jgraph part
         Component component = eventGraphViewFrame.getCurrentJgraphComponent();
         if (component == null) {return;}
-        File localLastFile = ((Model) getModel()).getLastFile();
-        if (localLastFile != null) {
-            fileName = localLastFile.getName();
-        }
+//        File localLastFile = ((Model) getModel()).getLastFile();
+//        if (localLastFile != null) {
+//            fileName = localLastFile.getName();
+//        }
 
-        String imageFileName = ViskitGlobals.instance().getActiveAssemblyModel().getName() + fileName + imageSaveCount + ".png";
-        File imageFile = ((EventGraphView) getView()).saveFileAsk(imageFileName, false,
+        String imageFileName = ViskitGlobals.instance().getActiveEventGraphModel().getMetadata().name + imageSaveCountString + ".xml.png"; // fileName +
+        File eventGraphScreenCaptureFile = ((EventGraphView) getView()).saveFileAsk(imageFileName, false,
                 "Save Image, Event Graph Diagram...");
 
-        if (imageFile == null) {
+        if (eventGraphScreenCaptureFile == null) 
+        {
+            LOG.error("captureWindow() eventGraphScreenCaptureFile is null");
             return;
         }
 
-        final Timer timer = new Timer(100, new TimerCallback(imageFile, true, component));
+        final Timer timer = new Timer(100, new TimerCallback(eventGraphScreenCaptureFile, true, component));
         timer.setRepeats(false);
         timer.start();
 
-        imageSaveCount = "" + (++imageSaveInt);
+        imageSaveCountString = "" + (++imageSaveInt);
     }
 
     @Override

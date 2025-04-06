@@ -1949,18 +1949,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null)
             assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
-        String fileName = "AssemblyScreenCapture";
+        String imageFileName = "AssemblyScreenCapture";
         if ((assemblyModel != null) && (assemblyModel.getCurrentFile() != null))
         {
-            fileName = assemblyModel.getCurrentFile().getName();
+            imageFileName = assemblyModel.getCurrentFile().getName();
         }
         else
         {
             LOG.error("captureWindow() failed to find assemblyModel");
             return;
         }
-        fileName = fileName + imageSaveCountString + ".png";
-        File assemblyScreenCaptureFile = ViskitGlobals.instance().getAssemblyViewFrame().saveFileAsk(fileName, true);
+        imageFileName = imageFileName + imageSaveCountString + ".png";
+        File assemblyScreenCaptureFile = ViskitGlobals.instance().getAssemblyViewFrame().saveFileAsk(imageFileName, true);
         if (assemblyScreenCaptureFile == null) {
             LOG.error("captureWindow() assemblyScreenCaptureFile is null");
             return;

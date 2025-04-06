@@ -1255,7 +1255,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public File saveFileAsk(String suggestedPath, boolean showUniqueName) {
+    public File saveFileAsk(String suggestedPath, boolean showUniqueName)
+    {
         if (openSaveChooser == null)
             openSaveChooser = buildOpenSaveChooser();
 

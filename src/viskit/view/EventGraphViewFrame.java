@@ -36,7 +36,6 @@ package viskit.view;
 import actions.ActionIntrospector;
 import actions.ActionUtilities;
 
-import edu.nps.util.Log4jUtilities;
 
 import java.awt.*;
 import java.awt.dnd.DropTargetAdapter;
@@ -46,6 +45,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -1290,15 +1290,14 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         }
         openSaveChooser.setDialogTitle(title);
 
-        File fil = new File(ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory(), suggestedName);
-        if (!fil.getParentFile().isDirectory()) {
-            fil.getParentFile().mkdirs();
+        File suggestedFile = new File(ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory(), suggestedName);
+        if (!suggestedFile.getParentFile().isDirectory()) {
+            suggestedFile.getParentFile().mkdirs();
         }
         if (showUniqueName) {
-            fil = getUniqueName(suggestedName, fil.getParentFile());
+            suggestedFile = getUniqueName(suggestedName, suggestedFile.getParentFile());
         }
-
-        openSaveChooser.setSelectedFile(fil);
+        openSaveChooser.setSelectedFile(suggestedFile);
         int retv = openSaveChooser.showSaveDialog(this);
         if (retv == JFileChooser.APPROVE_OPTION) {
             if (openSaveChooser.getSelectedFile().exists()) {
@@ -1306,11 +1305,19 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                     return null;
                 }
             }
+            try {
+                LOG.info("Saved file as\n      {}", openSaveChooser.getSelectedFile().getCanonicalPath());
+            }
+            catch (IOException ioe)
+            {
+                // logic error, chooser indicated OK?
+                LOG.error("Saved file suggested path chooser problem for {}", suggestedName);
+            }
             return openSaveChooser.getSelectedFile();
         }
 
         // We canceled
-        deleteCanceledSave(fil.getParentFile());
+        deleteCanceledSave(suggestedFile.getParentFile());
         openSaveChooser = null;
         return null;
     }
