@@ -1467,6 +1467,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (assemblyModel == null)
+            assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
         if (!checkSaveForSourceCompile() || (assemblyModel == null) || (assemblyModel.getCurrentFile() == null)) 
         {
             LOG.error("viewXML() unable to retrieve assemblyModel");
@@ -1478,12 +1480,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private boolean checkSaveForSourceCompile()
     {
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (assemblyModel == null)
+            assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
 
         // Perhaps a cached file is no longer present in the path
         if (assemblyModel == null) {return false;}
         if (assemblyModel.isDirty() || assemblyModel.getCurrentFile() == null) {
-            int ret = ViskitGlobals.instance().getMainFrame().genericAskYesNo("Confirm", "The model will be saved.\nContinue?");
-            if (ret != JOptionPane.YES_OPTION) {
+            int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo("Confirm", "The model will be saved.\nContinue?");
+            if (returnValue != JOptionPane.YES_OPTION) {
                 return false;
             }
             this.saveAs();
@@ -1497,6 +1501,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         String source = produceJavaAssemblyClass();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (assemblyModel == null)
+            assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
         if (source != null && !source.isEmpty()) {
             String className = assemblyModel.getMetadata().packageName + "." + assemblyModel.getMetadata().name;
             ViskitGlobals.instance().getAssemblyViewFrame().showAndSaveSource(className, source, assemblyModel.getCurrentFile().getName());
@@ -1506,13 +1512,15 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private String produceJavaAssemblyClass() 
     {
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (assemblyModel == null)
+            assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
         if (!checkSaveForSourceCompile() || assemblyModel.getCurrentFile() == null) {
             return null;
         }
         if (assemblyModel.getCurrentFile().exists())
         {
             if  (assemblyModel.getMetadata() != null)
-                 LOG.info("Preparing assembly " + assemblyModel.getMetadata().name + "using Metadata file");
+                 LOG.info("Preparing assembly " + assemblyModel.getMetadata().name + " using Metadata file");
             else LOG.error("produceJavaAssemblyClass() assemblyModel modelMetadata is null");
             return buildJavaAssemblySource(assemblyModel.getCurrentFile());
         }
