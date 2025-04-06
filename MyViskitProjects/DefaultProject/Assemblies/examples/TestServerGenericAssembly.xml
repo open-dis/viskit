@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimkitAssembly name="TestServerGenericAssembly" version="$Id: TestServerGenericAssembly.xml 1590 2007-10-07 05:41:19Z tdnorbra $" package="examples" xsi:noNamespaceSchemaLocation="../../../../Schemas/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <SimEntity name="ServerGeneric_0" type="examples.ServerGeneric" description="">
+    <SimEntity name="ServerGeneric" type="examples.ServerGeneric" description="">
         <TerminalParameter name="totalNumberServers" value="1" type="int"/>
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter name="" value="Constant" type="java.lang.String"/>
@@ -8,18 +8,18 @@
         </FactoryParameter>
         <Coordinate x="390.0" y="200.0"/>
     </SimEntity>
-    <SimEntity name="ArrivalProcess_1" type="examples.ArrivalProcess" description="">
+    <SimEntity name="ArrivalProcess" type="examples.ArrivalProcess" description="Provide arriving customers">
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter name="" value="Exponential" type="java.lang.String"/>
             <TerminalParameter name="" value="1.2" type="double"/>
         </FactoryParameter>
         <Coordinate x="140.0" y="200.0"/>
     </SimEntity>
-    <SimEntity name="EntityCreator_2" type="examples.EntityCreator" description="">
+    <SimEntity name="EntityCreator" type="examples.EntityCreator" description="create entities">
         <Coordinate x="260.0" y="200.0"/>
     </SimEntity>
-    <SimEventListenerConnection listener="EntityCreator_2" source="ArrivalProcess_1"/>
-    <Adapter name="adptr_3" eventHeard="EntityArrival" eventSent="Arrival" from="EntityCreator_2" to="ServerGeneric_0" description=""/>
+    <SimEventListenerConnection listener="EntityCreator" source="ArrivalProcess"/>
+    <Adapter name="arrivalAdapter" eventHeard="EntityArrival" eventSent="Arrival" from="EntityCreator" to="ServerGeneric" description=""/>
     <Schedule stopTime="100." verbose="false" saveReplicationData="true"/>
     <Experiment replicationsPerDesignPoint="30" totalSamples="1" timeout="5000"/>
 </SimkitAssembly>
