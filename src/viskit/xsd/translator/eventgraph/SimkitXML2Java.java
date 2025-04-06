@@ -158,12 +158,12 @@ public class SimkitXML2Java
     }
 
     /** @return the XML to Java translated source as a string */
-    public String translate() {
-
+    public String translate() 
+    {
         StringBuilder source = new StringBuilder();
         StringWriter head = new StringWriter();
         StringWriter parameters = new StringWriter();
-        StringWriter stateVars = new StringWriter();
+        StringWriter stateVariables = new StringWriter();
         StringWriter accessorBlock = new StringWriter();
         StringWriter parameterMap = new StringWriter();
         StringWriter constructors = new StringWriter();
@@ -174,14 +174,14 @@ public class SimkitXML2Java
 
         buildHead(head);
         buildParameters(parameters, accessorBlock);
-        buildStateVariables(stateVars, accessorBlock);
+        buildStateVariables(stateVariables, accessorBlock);
         buildParameterMap(parameterMap);
         buildConstructors(constructors);
         buildEventBlock(runBlock, eventBlock);
         buildToString(toStringBlock);
         buildCodeBlock(codeBlock);
 
-        buildSource(source, head, parameters, stateVars, parameterMap,
+        buildSource(source, head, parameters, stateVariables, parameterMap,
                 constructors, runBlock, eventBlock, accessorBlock,
                 toStringBlock, codeBlock);
 
@@ -260,26 +260,28 @@ public class SimkitXML2Java
 //        pw.println();
         printWriter.println(SP_4 + "/* Simulation Parameters */");
         printWriter.println();
-        for (Parameter p : rootParameterList) {
-
-            if (!superParameterList.contains(p)) {
-                if (!p.getDescription().isEmpty()) {
+        for (Parameter nextParameter : rootParameterList) 
+        {
+            if (!superParameterList.contains(nextParameter)) 
+            {
+                String nextDescription = ViskitStatics.emptyIfNull(nextParameter.getDescription());
+                if (!nextDescription.isEmpty()) {
                     printWriter.print(SP_4 + JDO + SP);
 //                    for (String comment : p.getComment()) // obsolete
 //                        printWriter.print(comment);
-                    printWriter.print(p.getDescription());
+                    printWriter.print(nextDescription);
                     printWriter.println(SP + JDC);
                 }
-                printWriter.println(SP_4 + PRIVATE + SP + p.getType() + SP + p.getName() + SC);
+                printWriter.println(SP_4 + PRIVATE + SP + nextParameter.getType() + SP + nextParameter.getName() + SC);
             } else {
-                printWriter.println(SP_4 + "/* inherited parameter " + p.getType() + SP + p.getName() + " */");
+                printWriter.println(SP_4 + "/* inherited parameter " + nextParameter.getType() + SP + nextParameter.getName() + " */");
             }
             printWriter.println();
 
             if (extendz.contains(SIM_ENTITY_BASE))
-                buildParameterModifierAndAccessor(p, accessorBlock);
-            else if (!superParameterList.contains(p))
-                buildParameterModifierAndAccessor(p, accessorBlock);
+                buildParameterModifierAndAccessor(nextParameter, accessorBlock);
+            else if (!superParameterList.contains(nextParameter))
+                buildParameterModifierAndAccessor(nextParameter, accessorBlock);
         }
         if (rootParameterList.isEmpty()) {
             printWriter.println(SP_4 + "/* None */");
@@ -298,48 +300,52 @@ public class SimkitXML2Java
 
         Class<?> newClass;
         Constructor<?> constructor;
-        for (StateVariable stateVariable : stateVariableList) {
+        for (StateVariable nextStateVariable : stateVariableList) {
 
             // Non array type generics
-            if (isGeneric(stateVariable.getType())) {
-                if (!stateVariable.getDescription().isEmpty()) {
+            if (isGeneric(nextStateVariable.getType())) 
+            {
+                String nextDescription = ViskitStatics.emptyIfNull(nextStateVariable.getDescription());
+                if (!nextDescription.isEmpty()) {
                     pw.print(SP_4 + JDO + SP);
 //                    for (String comment : stateVariable.getComment()) {
 //                        pw.print(comment);
 //                    }
-                    pw.print(stateVariable.getDescription());
+                    pw.print(nextDescription);
                     pw.println(SP + JDC);
                 }
-                if (!isArray(stateVariable.getType()))
-                    pw.println(SP_4 + PROTECTED + SP + stateVariable.getType() + SP + stateVariable.getName() + SP + EQ + SP + "new" + SP + stripType(stateVariable.getType()) + LP + RP + SC);
+                if (!isArray(nextStateVariable.getType()))
+                    pw.println(SP_4 + PROTECTED + SP + nextStateVariable.getType() + SP + nextStateVariable.getName() + SP + EQ + SP + "new" + SP + stripType(nextStateVariable.getType()) + LP + RP + SC);
                 else
-                    pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC);
+                    pw.println(SP_4 + PROTECTED + SP + stripLength(nextStateVariable.getType()) + SP + nextStateVariable.getName() + SC);
             } else {
 
-                newClass = ViskitStatics.classForName(stateVariable.getType());
+                newClass = ViskitStatics.classForName(nextStateVariable.getType());
 
                 // Non-super type, primitive, primitive[] or another type array
-                if (newClass == null || ViskitGlobals.instance().isPrimitiveOrPrimitiveArray(stateVariable.getType())) {
-
-                    if (!stateVariable.getDescription().isEmpty()) {
+                if (newClass == null || ViskitGlobals.instance().isPrimitiveOrPrimitiveArray(nextStateVariable.getType())) 
+                {
+                    String nextDescription = ViskitStatics.emptyIfNull(nextStateVariable.getDescription());
+                    if (!nextDescription.isEmpty()) {
                         pw.print(SP_4 + JDO + SP);
 //                        for (String comment : stateVariable.getComment()) {
 //                            pw.print(comment);
 //                        }
-                        pw.print(stateVariable.getDescription());
+                        pw.print(nextDescription);
                         pw.println(SP + JDC);
                     }
 
-                    pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC);
+                    pw.println(SP_4 + PROTECTED + SP + stripLength(nextStateVariable.getType()) + SP + nextStateVariable.getName() + SC);
 
-                } else if (!isArray(stateVariable.getType())) {
-
-                    if (!stateVariable.getDescription().isEmpty()) {
+                } else if (!isArray(nextStateVariable.getType())) 
+                {
+                    String nextDescription = ViskitStatics.emptyIfNull(nextStateVariable.getDescription());
+                    if (!nextDescription.isEmpty()) {
                         pw.print(SP_4 + JDO + SP);
 //                        for (String comment : stateVariable.getComment()) {
 //                            pw.print(comment);
 //                        }
-                        pw.print(stateVariable.getDescription());
+                        pw.print(nextDescription);
                         pw.println(SP + JDC);
                     }
 
@@ -354,15 +360,15 @@ public class SimkitXML2Java
                     }
 
                     if (constructor != null) {
-                        pw.println(SP_4 + PROTECTED + SP + stateVariable.getType() + SP + stateVariable.getName() + SP + EQ + SP + "new" + SP + stateVariable.getType() + LP + RP + SC);
+                        pw.println(SP_4 + PROTECTED + SP + nextStateVariable.getType() + SP + nextStateVariable.getName() + SP + EQ + SP + "new" + SP + nextStateVariable.getType() + LP + RP + SC);
                     } else { // really not a bad case, most likely will be set by the reset()
-                        pw.println(SP_4 + PROTECTED + SP + stateVariable.getType() + SP + stateVariable.getName() + SP + EQ + SP + "null" + SC);
+                        pw.println(SP_4 + PROTECTED + SP + nextStateVariable.getType() + SP + nextStateVariable.getName() + SP + EQ + SP + "null" + SC);
                     }
                 } else
-                    pw.println(SP_4 + PROTECTED + SP + stripLength(stateVariable.getType()) + SP + stateVariable.getName() + SC);
+                    pw.println(SP_4 + PROTECTED + SP + stripLength(nextStateVariable.getType()) + SP + nextStateVariable.getName() + SC);
             }
 
-            buildStateVariableAccessor(stateVariable, accessorBlock);
+            buildStateVariableAccessor(nextStateVariable, accessorBlock);
             pw.println();
         }
         if (stateVariableList.isEmpty()) {
@@ -1295,10 +1301,10 @@ public class SimkitXML2Java
 
     /** Report and exit the JVM
      *
-     * @param desc a description of the encountered error
+     * @param errorDescription a description of the encountered error
      */
-    private void error(String desc) {
-        LOG.error(desc);
+    private void error(String errorDescription) {
+        LOG.error(errorDescription);
         System.exit(1);
     }
 
@@ -1308,8 +1314,8 @@ public class SimkitXML2Java
      *
      * @param args the command line arguments args[0] - XML file to translate
      */
-    public static void main(String[] args) {
-
+    public static void main(String[] args) 
+    {
         String xmlFile = args[0].replaceAll("\\\\", "/");
         LOG.info("EventGraph file is: {}", xmlFile);
         LOG.info("Generating Java Source...");

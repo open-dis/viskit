@@ -11,6 +11,8 @@ import javax.accessibility.AccessibleContext;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.undo.UndoManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.jgraph.JGraph;
 import org.jgraph.event.GraphModelEvent;
@@ -33,19 +35,22 @@ import viskit.model.*;
  * @since 2:54:31 PM
  * @version $Id: ViskitGraphAssemblyComponent.java 2323 2012-06-19 23:11:11Z tdnorbra$
  */
-public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelListener {
+public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelListener 
+{
+    static final Logger LOG = LogManager.getLogger();
 
     ViskitGraphAssemblyModel viskitGraphAssemblyModel;
-    AssemblyViewFrame parent;
-    private UndoManager undoManager;
+    AssemblyViewFrame        parentFrame;
+    private UndoManager      undoManager;
 
-    public ViskitGraphAssemblyComponent(ViskitGraphAssemblyModel model, AssemblyViewFrame frame) {
-        super(model);
-        parent = frame;
+    public ViskitGraphAssemblyComponent(ViskitGraphAssemblyModel graphAssemblyModel, AssemblyViewFrame assemblyViewFrame) 
+    {
+        super(graphAssemblyModel);
+        this.parentFrame = assemblyViewFrame;
 
         ViskitGraphAssemblyComponent instance = this;
         ToolTipManager.sharedInstance().registerComponent(instance);
-        this.viskitGraphAssemblyModel = model;
+        this.viskitGraphAssemblyModel = graphAssemblyModel;
         this.setSizeable(false);
         this.setGridVisible(true);
         this.setGridMode(JGraph.LINE_GRID_MODE);
@@ -64,10 +69,10 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         this.setJumpToDefaultPort(true);
 
          // Set up the cut/remove/paste/copy/undo/redo actions
-        undoManager = new ViskitGraphUndoManager(parent.getController());
+        undoManager = new ViskitGraphUndoManager(parentFrame.getController());
         this.addGraphSelectionListener((GraphSelectionListener) undoManager);
-        model.addUndoableEditListener(undoManager);
-        model.addGraphModelListener(instance);
+        graphAssemblyModel.addUndoableEditListener(undoManager);
+        graphAssemblyModel.addGraphModelListener(instance);
 
         // As of JGraph-5.2, custom cell rendering is
         // accomplished via this convention
@@ -75,48 +80,51 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
 
             // To use circles, from the tutorial
             @Override
-            protected VertexView createVertexView(Object v) {
-                VertexView view;
-                if (v instanceof ViskitAssemblyCircleCell) {
-                    view = new ViskitAssemblyCircleView(v);
-                } else if (v instanceof vAssemblyPropListCell) {
-                    view = new ViskitAssemblyPropListView(v);
+            protected VertexView createVertexView(Object viskitObject) 
+            {
+                VertexView vertexView;
+                if (viskitObject instanceof ViskitAssemblyCircleCell) {
+                    vertexView = new ViskitAssemblyCircleView(viskitObject);
+                } else if (viskitObject instanceof vAssemblyPropertyListCell) {
+                    vertexView = new ViskitAssemblyPropListView(viskitObject);
                 } else {
-                    view = super.createVertexView(v);
+                    vertexView = super.createVertexView(viskitObject);
                 }
-                return view;
+                return vertexView;
             }
 
             // To customize my edges
             @Override
-            protected EdgeView createEdgeView(Object e) {
-                EdgeView view = null;
+            protected EdgeView createEdgeView(Object e)
+            {
+                EdgeView edgeView = null;
                 if (e instanceof ViskitAssemblyEdgeCell) {
                     Object o = ((DefaultMutableTreeNode) e).getUserObject();
                     if (o instanceof PropertyChangeEdge) {
-                        view = new ViskitAssemblyPropertyChangeListenerEdgeView(e);
+                        edgeView = new ViskitAssemblyPropertyChangeListenerEdgeView(e);
                     }
                     if (o instanceof AdapterEdge) {
-                        view = new ViskitAssemblyAdapterEdgeView(e);
+                        edgeView = new ViskitAssemblyAdapterEdgeView(e);
                     }
                     if (o instanceof SimEventListenerEdge) {
-                        view = new ViskitAssemblySelEdgeView(e);
+                        edgeView = new ViskitAssemblySelEdgeView(e);
                     }
                 } else {
-                    view = super.createEdgeView(e);
+                    edgeView = super.createEdgeView(e);
                 }
-                return view;
+                return edgeView;
             }
 
             @Override
-            protected PortView createPortView(Object p) {
-                PortView view;
+            protected PortView createPortView(Object p)
+            {
+                PortView portView;
                 if (p instanceof ViskitAssemblyPortCell) {
-                    view = new ViskitAssemblyPortView(p);
+                    portView = new ViskitAssemblyPortView(p);
                 } else {
-                    view = super.createPortView(p);
+                    portView = super.createPortView(p);
                 }
-                return view;
+                return portView;
             }
         });
     }
@@ -130,15 +138,16 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
     
     @Override // Prevents the NPE on macOS
     public AccessibleContext getAccessibleContext() {
-        return parent.getCurrentJgraphComponent().getAccessibleContext();
+        return parentFrame.getCurrentJgraphComponent().getAccessibleContext();
     }
 
     private ModelEvent currentModelEvent = null;
 
-    public void viskitModelChanged(ModelEvent ev) {
-        currentModelEvent = ev;
+    public void viskitModelChanged(ModelEvent modelEvent) {
+        currentModelEvent = modelEvent;
 
-        switch (ev.getID()) {
+        switch (modelEvent.getID()) 
+        {
             case ModelEvent.NEW_ASSEMBLY_MODEL:
 
                 // Ensure we start fresh
@@ -147,55 +156,55 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
             case ModelEvent.EVENT_GRAPH_ADDED:
 
                 // Reclaimed from the viskitGraphAssemblyModel to here
-                insert((AssemblyNode) ev.getSource());
+                insert((AssemblyNode) modelEvent.getSource());
                 break;
             case ModelEvent.EVENT_GRAPH_CHANGED:
-                viskitGraphAssemblyModel.changeEventGraphNode((AssemblyNode) ev.getSource());
+                viskitGraphAssemblyModel.changeEventGraphNode((AssemblyNode) modelEvent.getSource());
                 break;
             case ModelEvent.EVENT_GRAPH_DELETED:
-                viskitGraphAssemblyModel.deleteEventGraphNode((AssemblyNode) ev.getSource());
+                viskitGraphAssemblyModel.deleteEventGraphNode((AssemblyNode) modelEvent.getSource());
                 break;
 
             case ModelEvent.PCL_ADDED:
 
                 // Reclaimed from the viskitGraphAssemblyModel to here
-                insert((AssemblyNode) ev.getSource());
+                insert((AssemblyNode) modelEvent.getSource());
                 break;
             case ModelEvent.PCL_CHANGED:
-                viskitGraphAssemblyModel.changePCLNode((AssemblyNode) ev.getSource());
+                viskitGraphAssemblyModel.changePCLNode((AssemblyNode) modelEvent.getSource());
                 break;
             case ModelEvent.PCL_DELETED:
-                viskitGraphAssemblyModel.deletePCLNode((AssemblyNode) ev.getSource());
+                viskitGraphAssemblyModel.deletePCLNode((AssemblyNode) modelEvent.getSource());
                 break;
 
             case ModelEvent.ADAPTER_EDGE_ADDED:
-                viskitGraphAssemblyModel.addAdapterEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.addAdapterEdge((AssemblyEdge) modelEvent.getSource());
                 break;
             case ModelEvent.ADAPTER_EDGE_CHANGED:
-                viskitGraphAssemblyModel.changeAdapterEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.changeAdapterEdge((AssemblyEdge) modelEvent.getSource());
                 break;
             case ModelEvent.ADAPTER_EDGE_DELETED:
-                viskitGraphAssemblyModel.deleteAdapterEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.deleteAdapterEdge((AssemblyEdge) modelEvent.getSource());
                 break;
 
             case ModelEvent.SIM_EVENT_LISTENER_EDGE_ADDED:
-                viskitGraphAssemblyModel.addSimEvListEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.addSimEvListEdge((AssemblyEdge) modelEvent.getSource());
                 break;
             case ModelEvent.SIM_EVENT_LISTENER_EDGE_CHANGED:
-                viskitGraphAssemblyModel.changeSimEvListEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.changeSimEvListEdge((AssemblyEdge) modelEvent.getSource());
                 break;
             case ModelEvent.SIM_EVENT_LISTENER_EDGE_DELETED:
-                viskitGraphAssemblyModel.deleteSimEvListEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.deleteSimEvListEdge((AssemblyEdge) modelEvent.getSource());
                 break;
 
             case ModelEvent.PCL_EDGE_ADDED:
-                viskitGraphAssemblyModel.addPclEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.addPclEdge((AssemblyEdge) modelEvent.getSource());
                 break;
             case ModelEvent.PCL_EDGE_DELETED:
-                viskitGraphAssemblyModel.deletePclEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.deletePclEdge((AssemblyEdge) modelEvent.getSource());
                 break;
             case ModelEvent.PCL_EDGE_CHANGED:
-                viskitGraphAssemblyModel.changePclEdge((AssemblyEdge) ev.getSource());
+                viskitGraphAssemblyModel.changePclEdge((AssemblyEdge) modelEvent.getSource());
                 break;
 
             // Deliberate fall-through for these b/c the JGraph internal model
@@ -221,44 +230,45 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
     // TODO: This version JGraph does not support generics
     @SuppressWarnings("unchecked")
     @Override
-    public void graphChanged(GraphModelEvent e) {
+    public void graphChanged(GraphModelEvent graphModelEvent) 
+    {
         if (currentModelEvent != null && currentModelEvent.getID() == ModelEvent.NEW_ASSEMBLY_MODEL) // bail if this came from outside
         {
             return;
         } // this came in from outside, we don't have to inform anybody..prevent reentry
 
         // TODO: confirm any other events that should cause us to bail here
-        GraphModelEvent.GraphModelChange c = e.getChange();
-        Object[] ch = c.getChanged();
+        GraphModelEvent.GraphModelChange graphModelChange = graphModelEvent.getChange();
+        Object[] changeArray = graphModelChange.getChanged();
 
         // bounds (position) might have changed:
-        if (ch != null) {
-            ViskitAssemblyCircleCell cc;
-            AttributeMap m;
+        if (changeArray != null) {
+            ViskitAssemblyCircleCell assemblyCircleCell;
+            AttributeMap attributeMap;
             Rectangle2D.Double r;
-            EventGraphNode en;
-            PropertyChangeListenerNode pcln;
-            for (Object cell : ch) {
-                if (cell instanceof ViskitAssemblyCircleCell) {
-                    cc = (ViskitAssemblyCircleCell) cell;
-                    m = cc.getAttributes();
-                    r = (Rectangle2D.Double) m.get("bounds");
+            EventGraphNode eventGraphNode;
+            PropertyChangeListenerNode propertyChangeListenerNode;
+            for (Object cellObject : changeArray) {
+                if (cellObject instanceof ViskitAssemblyCircleCell) {
+                    assemblyCircleCell = (ViskitAssemblyCircleCell) cellObject;
+                    attributeMap = assemblyCircleCell.getAttributes();
+                    r = (Rectangle2D.Double) attributeMap.get("bounds");
                     if (r != null) {
-                        en = (EventGraphNode) cc.getUserObject();
-                        en.setPosition(new Point2D.Double(r.x, r.y));
-                        ((AssemblyModel) parent.getModel()).changeEvGraphNode(en);
-                        m.put("bounds", m.createRect(en.getPosition().getX(), en.getPosition().getY(), r.width, r.height));
+                        eventGraphNode = (EventGraphNode) assemblyCircleCell.getUserObject();
+                        eventGraphNode.setPosition(new Point2D.Double(r.x, r.y));
+                        ((AssemblyModel) parentFrame.getModel()).changeEvGraphNode(eventGraphNode);
+                        attributeMap.put("bounds", attributeMap.createRect(eventGraphNode.getPosition().getX(), eventGraphNode.getPosition().getY(), r.width, r.height));
                     }
-                } else if (cell instanceof vAssemblyPropListCell) {
-                    vAssemblyPropListCell plc = (vAssemblyPropListCell) cell;
+                } else if (cellObject instanceof vAssemblyPropertyListCell) {
+                    vAssemblyPropertyListCell assemblyPropertyListCell = (vAssemblyPropertyListCell) cellObject;
 
-                    m = plc.getAttributes();
-                    r = (Rectangle2D.Double) m.get("bounds");
+                    attributeMap = assemblyPropertyListCell.getAttributes();
+                    r = (Rectangle2D.Double) attributeMap.get("bounds");
                     if (r != null) {
-                        pcln = (PropertyChangeListenerNode) plc.getUserObject();
-                        pcln.setPosition(new Point2D.Double(r.x, r.y));
-                        ((AssemblyModel) parent. getModel()).changePclNode(pcln);
-                        m.put("bounds", m.createRect(pcln.getPosition().getX(), pcln.getPosition().getY(), r.width, r.height));
+                        propertyChangeListenerNode = (PropertyChangeListenerNode) assemblyPropertyListCell.getUserObject();
+                        propertyChangeListenerNode.setPosition(new Point2D.Double(r.x, r.y));
+                        ((AssemblyModel) parentFrame. getModel()).changePclNode(propertyChangeListenerNode);
+                        attributeMap.put("bounds", attributeMap.createRect(propertyChangeListenerNode.getPosition().getX(), propertyChangeListenerNode.getPosition().getY(), r.width, r.height));
                     }
                 }
             }
@@ -272,83 +282,85 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
     }
 
     @Override
-    public String getToolTipText(MouseEvent event) {
-        if (event != null) {
-            Object c = this.getFirstCellForLocation(event.getX(), event.getY());
-            if (c != null) {
+    public String getToolTipText(MouseEvent mouseEvent) 
+    {
+        if (mouseEvent != null) {
+            Object cellObject = this.getFirstCellForLocation(mouseEvent.getX(), mouseEvent.getY());
+            if (cellObject != null) {
                 StringBuilder sb = new StringBuilder("<html>");
-                if (c instanceof ViskitAssemblyEdgeCell) {
-                    ViskitAssemblyEdgeCell vc = (ViskitAssemblyEdgeCell) c;
-                    AssemblyEdge se = (AssemblyEdge) vc.getUserObject();
-                    Object to = se.getTo();
-                    Object from = se.getFrom();
+                if (cellObject instanceof ViskitAssemblyEdgeCell) {
+                    ViskitAssemblyEdgeCell assemblyEdgeCell = (ViskitAssemblyEdgeCell) cellObject;
+                    AssemblyEdge  schedulingEdge = (AssemblyEdge) assemblyEdgeCell.getUserObject();
+                    Object to   = schedulingEdge.getTo();
+                    Object from = schedulingEdge.getFrom();
 
-                    if (se instanceof AdapterEdge) {
-                        Object toEv = ((AdapterEdge) se).getTargetEvent();
-                        Object frEv = ((AdapterEdge) se).getSourceEvent();
+                    if (schedulingEdge instanceof AdapterEdge) {
+                        Object   toTargetEvent = ((AdapterEdge) schedulingEdge).getTargetEvent();
+                        Object fromTargetEvent = ((AdapterEdge) schedulingEdge).getSourceEvent();
                         sb.append("<center>Adapter<br><u>");// +
                         sb.append(from);
                         sb.append(".");
-                        sb.append(frEv);
+                        sb.append(fromTargetEvent);
                         sb.append("</u> connected to <u>");
                         sb.append(to);
                         sb.append(".");
-                        sb.append(toEv);
-                    } else if (se instanceof SimEventListenerEdge) {
+                        sb.append(toTargetEvent);
+                    } else if (schedulingEdge instanceof SimEventListenerEdge) {
                         sb.append("<center>SimEvent Listener<br><u>");
                         sb.append(to);
                         sb.append("</u> listening to <u>");
                         sb.append(from);
                     } else {
-                        String prop = ((PropertyChangeEdge) se).getProperty();
-                        prop = (prop != null && prop.length() > 0) ? prop : "*all*";
+                        String propertyString = ((PropertyChangeEdge) schedulingEdge).getProperty();
+                        propertyString = (propertyString != null && propertyString.length() > 0) ? propertyString : "*all*";
                         sb.append("<center>Property Change Listener<br><u>");
                         sb.append(to);
                         sb.append("</u> listening to <u>");
                         sb.append(from);
                         sb.append(".");
-                        sb.append(prop);
+                        sb.append(propertyString);
                     }
-                    String desc = se.getDescription();
-                    if (desc != null) {
-                        desc = desc.trim();
-                        if (desc.length() > 0) {
+                    String description = schedulingEdge.getDescription();
+                    if (description != null) {
+                        description = description.trim();
+                        if (description.length() > 0) {
                             sb.append("<br>");
                             sb.append("<u> description: </u>");
-                            sb.append(wrapAtPos(escapeLTGT(desc), 60));
+                            sb.append(wrapAtPosition(escapeLTGT(description), 60));
                         }
                     }
                     sb.append("</center>");
                     sb.append("</html>");
                     return sb.toString();
-                } else if (c instanceof ViskitAssemblyCircleCell || c instanceof vAssemblyPropListCell) {
-                    String typ;
+                } 
+                else if (cellObject instanceof ViskitAssemblyCircleCell || cellObject instanceof vAssemblyPropertyListCell) {
+                    String type;
                     String name;
-                    String desc;
-                    if (c instanceof ViskitAssemblyCircleCell) {
-                        ViskitAssemblyCircleCell cc = (ViskitAssemblyCircleCell) c;
-                        EventGraphNode en = (EventGraphNode) cc.getUserObject();
-                        typ = en.getType();
-                        name = en.getName();
-                        desc = en.getDescription();
-                    } else /*if (c instanceof vAssemblyPropListCell)*/ {
-                        vAssemblyPropListCell cc = (vAssemblyPropListCell) c;
-                        PropertyChangeListenerNode pcln = (PropertyChangeListenerNode) cc.getUserObject();
-                        typ = pcln.getType();
-                        name = pcln.getName();
-                        desc = pcln.getDescription();
+                    String description;
+                    if (cellObject instanceof ViskitAssemblyCircleCell) {
+                        ViskitAssemblyCircleCell cc = (ViskitAssemblyCircleCell) cellObject;
+                        EventGraphNode eventGraphNode = (EventGraphNode) cc.getUserObject();
+                        type = eventGraphNode.getType();
+                        name = eventGraphNode.getName();
+                        description = eventGraphNode.getDescription();
+                    } else /*if (c instanceof vAssemblyPropertyListCell)*/ {
+                        vAssemblyPropertyListCell assemblyPropertyListCell = (vAssemblyPropertyListCell) cellObject;
+                        PropertyChangeListenerNode propertyChangeListenerNode = (PropertyChangeListenerNode) assemblyPropertyListCell.getUserObject();
+                        type = propertyChangeListenerNode.getType();
+                        name = propertyChangeListenerNode.getName();
+                        description = propertyChangeListenerNode.getDescription();
                     }
 
                     sb.append("<center><u>");
-                    sb.append(typ);
+                    sb.append(type);
                     sb.append("</u><br>");
                     sb.append(name);
-                    if (desc != null) {
-                        desc = desc.trim();
-                        if (desc.length() > 0) {
+                    if (description != null) {
+                        description = description.trim();
+                        if (description.length() > 0) {
                             sb.append("<br>");
                             sb.append("<u> description: </u>");
-                            sb.append(wrapAtPos(escapeLTGT(desc), 60));
+                            sb.append(wrapAtPosition(escapeLTGT(description), 60));
                         }
                     }
                     sb.append("</center>");
@@ -360,20 +372,20 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         return null;
     }
 
-    private String wrapAtPos(String s, int len) {
+    private String wrapAtPosition(String s, int position) {
         String[] sa = s.split(" ");
         StringBuilder sb = new StringBuilder();
-        int idx = 0;
+        int index = 0;
         do {
             int ll = 0;
             sb.append("&nbsp;");
             do {
-                ll += sa[idx].length() + 1;
-                sb.append(sa[idx++]);
+                ll += sa[index].length() + 1;
+                sb.append(sa[index++]);
                 sb.append(" ");
-            } while (idx < sa.length && ll < len);
+            } while (index < sa.length && ll < position);
             sb.append("<br>");
-        } while (idx < sa.length);
+        } while (index < sa.length);
 
         String st = sb.toString();
         if (st.endsWith("<br>")) {
@@ -384,15 +396,15 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
 
     @Override
     public String convertValueToString(Object value) {
-        CellView view = (value instanceof CellView)
+        CellView cellView = (value instanceof CellView)
                 ? (CellView) value
                 : getGraphLayoutCache().getMapping(value, false);
 
-        if (view instanceof ViskitAssemblyCircleView) {
-            ViskitAssemblyCircleCell cc = (ViskitAssemblyCircleCell) view.getCell();
-            Object en = cc.getUserObject();
-            if (en instanceof EventGraphNode) {
-                return ((ViskitElement) en).getName();
+        if (cellView instanceof ViskitAssemblyCircleView) {
+            ViskitAssemblyCircleCell assemblyCircleCell = (ViskitAssemblyCircleCell) cellView.getCell();
+            Object potentialEventGraphNode = assemblyCircleCell.getUserObject();
+            if (potentialEventGraphNode instanceof EventGraphNode) {
+                return ((ViskitElement) potentialEventGraphNode).getName();
             }    // label name is actually gotten in paintComponent
         }
         return null;
@@ -407,23 +419,25 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
 
     /** Insert a new Edge between source and target
      * @param source the "from" of the connection
-     * @param target the "to" of the connection
+     * @param targetPort the "to" of the connection
      */
-    public void connect(Port source, Port target) {
-        DefaultGraphCell src = (DefaultGraphCell) getModel().getParent(source);
-        DefaultGraphCell tar = (DefaultGraphCell) getModel().getParent(target);
-        Object[] oa = new Object[]{src, tar};
-        AssemblyController controller = (AssemblyControllerImpl) parent.getController();
+    public void connect(Port sourcePort, Port targetPort) 
+    {
+        DefaultGraphCell sourceGraphCell = (DefaultGraphCell) getModel().getParent(sourcePort);
+        DefaultGraphCell targetGraphCell = (DefaultGraphCell) getModel().getParent(targetPort);
+        Object[] objectArray = new Object[]{sourceGraphCell, targetGraphCell};
+        AssemblyController assemblyController = (AssemblyControllerImpl) parentFrame.getController();
 
-        switch (parent.getCurrentMode()) {
+        switch (parentFrame.getCurrentMode())
+        {
             case AssemblyViewFrame.ADAPTER_MODE:
-                controller.newAdapterArc(oa);
+                assemblyController.newAdapterArc(objectArray);
                 break;
-            case AssemblyViewFrame.SIMEVLIS_MODE:
-                controller.newSimEventListenerArc(oa);
+            case AssemblyViewFrame.SIMEVENT_LISTENER_MODE:
+                assemblyController.newSimEventListenerArc(objectArray);
                 break;
-            case AssemblyViewFrame.PCL_MODE:
-                controller.newPropertyChangeListenerArc(oa);
+            case AssemblyViewFrame.PROPERTY_CHANGE_LISTENER_MODE:
+                assemblyController.newPropertyChangeListenerArc(objectArray);
                 break;
             default:
                 break;
@@ -479,39 +493,40 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
 
     /**
      * Creates a DefaultGraphCell with a given name
-     * @param node the named AssemblyNode
+     * @param assemblyNode the named AssemblyNode
      * @return a DefaultGraphCell with a given name
      */
-    protected DefaultGraphCell createDefaultGraphCell(AssemblyNode node) {
-
-        DefaultGraphCell cell = null;
-        if (node != null) {
-            if (node instanceof EventGraphNode) {
-                cell = new ViskitAssemblyCircleCell(node);
+    protected DefaultGraphCell createDefaultGraphCell(AssemblyNode assemblyNode) 
+    {
+        DefaultGraphCell defaultGraphCell = null;
+        if (assemblyNode != null) {
+            if (assemblyNode instanceof EventGraphNode) {
+                defaultGraphCell = new ViskitAssemblyCircleCell(assemblyNode);
             } else {
-                cell = new vAssemblyPropListCell(node);
+                defaultGraphCell = new vAssemblyPropertyListCell(assemblyNode);
             }
 
-            node.opaqueViewObject = cell;
+            assemblyNode.opaqueViewObject = defaultGraphCell;
 
             // Add one Floating Port
-            cell.add(new ViskitAssemblyPortCell(node.getName() + "/Center"));
+            defaultGraphCell.add(new ViskitAssemblyPortCell(assemblyNode.getName() + "/Center"));
         }
-        return cell;
+        return defaultGraphCell;
     }
 
     /** Insert a new Vertex at point
      *
-     * @param node the AssemblyNode to insert
+     * @param assemblyNode the AssemblyNode to insert
      */
-    public void insert(AssemblyNode node) {
-        DefaultGraphCell vertex = createDefaultGraphCell(node);
+    public void insert(AssemblyNode assemblyNode) 
+    {
+        DefaultGraphCell vertexCell = createDefaultGraphCell(assemblyNode);
 
         // Create a Map that holds the attributes for the Vertex
-        vertex.getAttributes().applyMap(createCellAttributes(node));
+        vertexCell.getAttributes().applyMap(createCellAttributes(assemblyNode));
 
         // Insert the Vertex (including child port and attributes)
-        getGraphLayoutCache().insert(vertex);
+        getGraphLayoutCache().insert(vertexCell);
 
         viskitGraphAssemblyModel.reDrawNodes();
     }
@@ -562,9 +577,9 @@ class ViskitAssemblyPortView extends PortView {
 /**
  * To mark our nodes.
  */
-class vAssemblyPropListCell extends DefaultGraphCell {
+class vAssemblyPropertyListCell extends DefaultGraphCell {
 
-    public vAssemblyPropListCell(Object userObject) {
+    public vAssemblyPropertyListCell(Object userObject) {
         super(userObject);
     }
 }

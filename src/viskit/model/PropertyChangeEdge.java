@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class PropertyChangeEdge extends AssemblyEdge
 {
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     static final Logger LOG = LogManager.getLogger();
     
     protected String property;

@@ -217,7 +217,7 @@ public abstract class ViskitModelInstantiator
                                 LOG.info("setting name: {} ", ((Parameter) eparams[indx].get(j)).getName());
                             
                             ((ViskitModelInstantiator) args.get(j)).setName(((Parameter) eparams[indx].get(j)).getName());
-                            ((ViskitModelInstantiator) args.get(j)).setDescription(((Parameter) eparams[indx].get(j)).getDescription());
+                            ((ViskitModelInstantiator) args.get(j)).setDescription(ViskitStatics.emptyIfNull(((Parameter) eparams[indx].get(j)).getDescription()));
                         }
                     }
                 }

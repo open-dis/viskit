@@ -1566,33 +1566,33 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * Build the actual source code from the Event Graph XML after a successful
      * XML validation
      *
-     * @param x2j the Event Graph initialized translator to produce source with
+     * @param simkitXML2Java the Event Graph initialized translator to produce source with
      * @return a string of Event Graph source code
      */
-    public String buildJavaEventGraphSource(SimkitXML2Java x2j)
+    public String buildJavaEventGraphSource(SimkitXML2Java simkitXML2Java)
     {
         String eventGraphSource = null;
 
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xmlValidationTool = new XMLValidationTool(x2j.getEventGraphFile().getPath(),
+        XMLValidationTool xmlValidationTool = new XMLValidationTool(simkitXML2Java.getEventGraphFile().getPath(),
                 XMLValidationTool.LOCAL_EVENT_GRAPH_SCHEMA);
 
         if (!xmlValidationTool.isValidXML())
         {
             // TODO: implement a Dialog pointing to the validationErrors.LOG
-            LOG.error("{} is not valid XML!\n", x2j.getEventGraphFile().getAbsolutePath());
+            LOG.error("{} is not valid XML!\n", simkitXML2Java.getEventGraphFile().getAbsolutePath());
             return eventGraphSource;
         } 
         else 
         {
-            LOG.info("buildJavaEventGraphSource() found valid XML:\n      " + x2j.getEventGraphFile().getAbsolutePath());
+            LOG.info("buildJavaEventGraphSource() found valid XML:\n      " + simkitXML2Java.getEventGraphFile().getAbsolutePath());
         }
 
         try {
-            eventGraphSource = x2j.translate();
+            eventGraphSource = simkitXML2Java.translate();
         } 
         catch (Exception e) {
-            LOG.error("buildJavaEventGraphSource() error building Java from {}: {}, erroneous event-graph xml found", x2j.getFileBaseName(), e.getMessage());
+            LOG.error("buildJavaEventGraphSource() error building Java from {}: {}, erroneous event-graph xml found", simkitXML2Java.getFileBaseName(), e.getMessage());
         }
         return eventGraphSource;
     }
@@ -1947,13 +1947,22 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (assemblyModel == null)
+            assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
         String fileName = "AssemblyScreenCapture";
-        if (assemblyModel.getCurrentFile() != null) {
+        if ((assemblyModel != null) && (assemblyModel.getCurrentFile() != null))
+        {
             fileName = assemblyModel.getCurrentFile().getName();
         }
-
-        File assemblyScreenCaptureFile = ViskitGlobals.instance().getAssemblyViewFrame().saveFileAsk(fileName + imageSaveCountString + ".png", true);
+        else
+        {
+            LOG.error("captureWindow() failed to find assemblyModel");
+            return;
+        }
+        fileName = fileName + imageSaveCountString + ".png";
+        File assemblyScreenCaptureFile = ViskitGlobals.instance().getAssemblyViewFrame().saveFileAsk(fileName, true);
         if (assemblyScreenCaptureFile == null) {
+            LOG.error("captureWindow() assemblyScreenCaptureFile is null");
             return;
         }
 

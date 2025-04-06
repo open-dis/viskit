@@ -196,7 +196,7 @@ public class ViskitGraphRouting implements org.jgraph.graph.DefaultEdge.Routing
             return egn.getModelKey();
         } else if (o instanceof ViskitAssemblyPropListView) {
             ViskitAssemblyPropListView apv = (ViskitAssemblyPropListView) o;
-            vAssemblyPropListCell apc = (vAssemblyPropListCell) apv.getCell();
+            vAssemblyPropertyListCell apc = (vAssemblyPropertyListCell) apv.getCell();
             PropertyChangeListenerNode pn = (PropertyChangeListenerNode) apc.getUserObject();
             return pn.getModelKey();
         } else {

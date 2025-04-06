@@ -140,10 +140,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private String title = new String();
     
     /** Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc. */
-    public static final int SELECT_MODE = 0;
-    public static final int ADAPTER_MODE = 1;
-    public static final int SIMEVLIS_MODE = 2;
-    public static final int PCL_MODE = 3;
+    public static final int                   SELECT_MODE = 0;
+    public static final int                  ADAPTER_MODE = 1;
+    public static final int        SIMEVENT_LISTENER_MODE = 2;
+    public static final int PROPERTY_CHANGE_LISTENER_MODE = 3;
 
     // The controller needs access to this
     public JButton prepareAssemblyForSimulationRunButton;
@@ -152,7 +152,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     private final static String FRAME_DEFAULT_TITLE = "Assembly Editor";
 
-    private final String FULLPATH = ViskitStatics.FULL_PATH;
+    private final String FULLPATH      = ViskitStatics.FULL_PATH;
     private final String CLEARPATHFLAG = ViskitStatics.CLEAR_PATH_FLAG;
     private final Color background = new Color(0xFB, 0xFB, 0xE5);
 
@@ -672,9 +672,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         if (adapterMode.isSelected())
             return ADAPTER_MODE;
         if (simEventListenerMode.isSelected())
-            return SIMEVLIS_MODE;
+            return SIMEVENT_LISTENER_MODE;
         if (propertyChangeListenerMode.isSelected())
-            return PCL_MODE;
+            return PROPERTY_CHANGE_LISTENER_MODE;
         LOG.error("assert false : \"getCurrentMode()\"");
         return 0;
     }
@@ -1255,29 +1255,37 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public File saveFileAsk(String suggName, boolean showUniqueName) {
+    public File saveFileAsk(String suggestedPath, boolean showUniqueName) {
         if (openSaveChooser == null)
             openSaveChooser = buildOpenSaveChooser();
 
         openSaveChooser.setDialogTitle("Save Assembly File");
-        File fil = new File(ViskitGlobals.instance().getViskitProject().getAssembliesDirectory(), suggName);
-        if (!fil.getParentFile().isDirectory())
-            fil.getParentFile().mkdirs();
+        File suggestedFile = new File(ViskitGlobals.instance().getViskitProject().getAssembliesDirectory(), suggestedPath);
+        if (!suggestedFile.getParentFile().isDirectory())
+             suggestedFile.getParentFile().mkdirs();
         if (showUniqueName)
-            fil = getUniqueName(suggName);
+             suggestedFile = getUniqueName(suggestedPath);
 
-        openSaveChooser.setSelectedFile(fil);
-        int retv = openSaveChooser.showSaveDialog(this);
-        if (retv == JFileChooser.APPROVE_OPTION) {
+        openSaveChooser.setSelectedFile(suggestedFile);
+        int returnValue = openSaveChooser.showSaveDialog(this);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
             if (openSaveChooser.getSelectedFile().exists()) {
                 if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYesNo("File Exists",  "Overwrite? Confirm"))
                     return null;
+            }
+            try {
+                LOG.info("Saved file as\n      {}", openSaveChooser.getSelectedFile().getCanonicalPath());
+            }
+            catch (IOException ioe)
+            {
+                // logic error, chooser indicated OK?
+                LOG.error("Saved file suggested path chooser problem\n      {}", suggestedPath);
             }
             return openSaveChooser.getSelectedFile();
         }
 
         // We canceled
-        deleteCanceledSave(fil.getParentFile());
+        deleteCanceledSave(suggestedFile.getParentFile());
         openSaveChooser = null;
         return null;
     }

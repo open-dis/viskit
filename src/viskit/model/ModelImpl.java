@@ -148,7 +148,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //                    sb.append(" ");
 //                }
 //                myGraphMetadata.description = sb.toString().trim();
-                myGraphMetadata.description = jaxbRoot.getDescription();
+                myGraphMetadata.description = ViskitStatics.emptyIfNull(jaxbRoot.getDescription());
                 changeMetadata(myGraphMetadata);
 
                 buildEventsFromJaxb(jaxbRoot.getEvent());
@@ -472,7 +472,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             if (nextObject instanceof Schedule) {
                 buildScheduleEdgeFromJaxb(sourceEventNode, (Schedule) nextObject);
             } else {
-                buildCancelEdgeFromJaxb(sourceEventNode, (Cancel) nextObject);
+                buildCancelingEdgeFromJaxb(sourceEventNode, (Cancel) nextObject);
             }
         }
     }
@@ -537,9 +537,9 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //            }
 //            schedulingEdge.conditionalDescription = sb.toString().trim();
 //        }
-        schedulingEdge.setDescription(schedule.getDescription());
+        schedulingEdge.setDescription(ViskitStatics.emptyIfNull(schedule.getDescription()));
         schedulingEdge.delay = schedule.getDelay();
-        schedulingEdge.parameters = buildEdgeParmsFromJaxb(schedule.getEdgeParameter());
+        schedulingEdge.parameters = buildEdgeParametersFromJaxb(schedule.getEdgeParameter());
 
         edgeCache.put(schedule, schedulingEdge);
 
@@ -547,7 +547,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
         this.notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Edge added"));
     }
 
-    private void buildCancelEdgeFromJaxb(EventNode src, Cancel cancel) {
+    private void buildCancelingEdgeFromJaxb(EventNode sourceEventNode, Cancel cancel)
+    {
         CancelingEdge cancelingEdge = new CancelingEdge();
         cancelingEdge.opaqueModelObject = cancel;
         cancelingEdge.conditional = cancel.getCondition();
@@ -562,16 +563,16 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //            }
 //            cancelingEdge.conditionalDescription = sb.toString().trim();
 //        }
-        cancelingEdge.setDescription(cancel.getDescription());
+        cancelingEdge.setDescription(ViskitStatics.emptyIfNull(cancel.getDescription()));
 
-        cancelingEdge.parameters = buildEdgeParmsFromJaxb(cancel.getEdgeParameter());
+        cancelingEdge.parameters = buildEdgeParametersFromJaxb(cancel.getEdgeParameter());
 
-        cancelingEdge.from = src;
-        EventNode target = buildNodeFromJaxbEvent((Event) cancel.getEvent());
-        cancelingEdge.to = target;
+        cancelingEdge.from = sourceEventNode;
+        EventNode targetEventNode = buildNodeFromJaxbEvent((Event) cancel.getEvent());
+        cancelingEdge.to = targetEventNode;
 
-        src.getConnections().add(cancelingEdge);
-        target.getConnections().add(cancelingEdge);
+        sourceEventNode.getConnections().add(cancelingEdge);
+        targetEventNode.getConnections().add(cancelingEdge);
 
         edgeCache.put(cancel, cancelingEdge);
 
@@ -579,7 +580,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         notifyChanged(new ModelEvent(cancelingEdge, ModelEvent.CANCELING_EDGE_ADDED, "Canceling edge added"));
     }
 
-    private List<ViskitElement> buildEdgeParmsFromJaxb(List<EdgeParameter> lis) {
+    private List<ViskitElement> buildEdgeParametersFromJaxb(List<EdgeParameter> lis) {
         List<ViskitElement> alis = new ArrayList<>(3);
         ViskitEdgeParameter vep;
         for (EdgeParameter ep : lis) {
@@ -608,7 +609,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //                c += comment;
 //                c += " ";
 //            }
-            String description = nextStateVariable.getDescription();
+            String description = ViskitStatics.emptyIfNull(nextStateVariable.getDescription());
             stateVariable = new ViskitStateVariable(nextStateVariable.getName(), nextStateVariable.getType(), description.trim());
             stateVariable.opaqueModelObject = nextStateVariable;
 
@@ -790,7 +791,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         stateVariable.setType(ViskitStatics.nullIfEmpty(newStateVariable.getType()));
 //        stateVariable.getComment().clear();
 //        stateVariable.getComment().add(vsv.getDescription());
-        stateVariable.setDescription(newStateVariable.getDescription());
+        stateVariable.setDescription(ViskitStatics.emptyIfNull(newStateVariable.getDescription()));
 
         setDirty(true);
         notifyChanged(new ModelEvent(newStateVariable, ModelEvent.STATE_VARIABLE_CHANGED, "State variable changed"));

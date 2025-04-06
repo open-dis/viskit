@@ -58,7 +58,7 @@ public class ViskitGraphAssemblyUI extends BasicGraphUI {
             }
         } else if (cell instanceof ViskitAssemblyCircleCell) {
             cntl.eventGraphEdit((EventGraphNode) obj);
-        } else if (cell instanceof vAssemblyPropListCell) {
+        } else if (cell instanceof vAssemblyPropertyListCell) {
             cntl.propertyChangeListenerEdit((PropertyChangeListenerNode) obj);
         }
     }

@@ -2,6 +2,7 @@ package viskit.model;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import viskit.ViskitStatics;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.eventgraph.SimEntity;
 
@@ -47,6 +48,7 @@ public class GraphMetadata
             SimkitAssembly tempAssembly = jaxbAssemblyObjectFactory.createSimkitAssembly();
             extendsPackageName = tempAssembly.getExtend();
             implementsPackageName = tempAssembly.getImplement();
+            description = "";
         } 
         else
         {
@@ -56,16 +58,18 @@ public class GraphMetadata
             SimEntity tempSimEntity = jaxbEventGraphObjectFactory.createSimEntity();
             extendsPackageName = tempSimEntity.getExtend();
             implementsPackageName = tempSimEntity.getImplement();
+            description = "";
         }
     }
 
     public GraphMetadata(String newName, String newPackageName, String newAuthor, String newVersion, 
-                         String newExtendsPackageName, String newImplementsPackageName) {
+                         String newDescription, String newExtendsPackageName, String newImplementsPackageName) {
         name = newName;
         packageName = newPackageName;
         author = newAuthor;
         version = newVersion;
         extendsPackageName = newExtendsPackageName;
         implementsPackageName = newImplementsPackageName;
+        description = ViskitStatics.emptyIfNull(newDescription);
     }
 }

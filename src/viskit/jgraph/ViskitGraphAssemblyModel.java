@@ -99,7 +99,7 @@ public class ViskitGraphAssemblyModel extends DefaultGraphModel {
     public void deleteAll() {
         Object[] localRoots = getRoots(this);
         for (Object localRoot : localRoots) {
-            if (localRoot instanceof ViskitAssemblyCircleCell || localRoot instanceof vAssemblyPropListCell) {
+            if (localRoot instanceof ViskitAssemblyCircleCell || localRoot instanceof vAssemblyPropertyListCell) {
                 Object[] child = new Object[1];
                 child[0] = ((DefaultMutableTreeNode) localRoot).getFirstChild();
                 jGraph.getGraphLayoutCache().remove(child);

@@ -19,15 +19,15 @@ abstract public class AssemblyEdge extends ViskitElement {
         return to;
     }
 
-    public void setTo(Object t) {
-        to = t;
+    public void setTo(Object toObject) {
+        to = toObject;
     }
 
     public Object getFrom() {
         return from;
     }
 
-    public void setFrom(Object f) {
-        from = f;
+    public void setFrom(Object fromObject) {
+        from = fromObject;
     }
 }

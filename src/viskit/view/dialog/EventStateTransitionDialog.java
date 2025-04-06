@@ -36,7 +36,7 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  * @author DMcG, Mike Bailey
  * @version $Id$
  */
-public class EventStateTransitionDialog extends JDialog 
+public class EventStateTransitionDialog extends JDialog
 {
     static final Logger LOG = LogManager.getLogger();
     
@@ -231,7 +231,7 @@ public class EventStateTransitionDialog extends JDialog
         stateVariablesCB.addActionListener((ActionEvent e) -> {
             JComboBox cb = (JComboBox) e.getSource();
             ViskitStateVariable stateVariable = (ViskitStateVariable) cb.getSelectedItem();
-            descriptionField.setText(stateVariable.getDescription());
+            descriptionField.setText(ViskitStatics.emptyIfNull(stateVariable.getDescription()));
             okButton.setEnabled(true);
             indexPanel.setVisible(ViskitGlobals.instance().isArray(stateVariable.getType()));
             modified = true;

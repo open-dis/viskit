@@ -20,9 +20,6 @@ public class AssemblyMetadataDialog extends MetadataDialog {
     
     public static boolean showDialog(JFrame f, GraphMetadata graphMetadata) 
     {
-        if ((graphMetadata.description != null) && !graphMetadata.description.isBlank())
-             graphMetadata.description = "NOTE: The description field for this Assembly is not" +
-                " currently implemented... any text typed in this area is not yet saved to XML.";
         if (dialog == null) {
             dialog = new AssemblyMetadataDialog(f, graphMetadata);
         } else {

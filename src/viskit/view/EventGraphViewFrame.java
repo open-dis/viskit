@@ -288,7 +288,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             GraphMetadata graphMetadata = ((Model) getModel()).getMetadata();
             if (graphMetadata != null) {
                 setSelectedEventGraphName(graphMetadata.name);
-                setSelectedEventGraphDescription(graphMetadata.description);
+                setSelectedEventGraphDescription(ViskitStatics.emptyIfNull(graphMetadata.description));
             } 
             else if (viskit.ViskitStatics.debug) {
                 LOG.error("error: EventGraphViewFrame metadata is null");

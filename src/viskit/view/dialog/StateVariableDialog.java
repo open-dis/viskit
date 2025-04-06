@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import viskit.ViskitUserConfiguration;
 import viskit.control.EventGraphController;
 import viskit.model.Model;
@@ -188,7 +189,7 @@ public class StateVariableDialog extends ViskitSmallDialog
             type = stateVariable.getType();
             stateVariableTypeCombo.setSelectedItem(stripArraySize(type));
             arraySizeField.setText(getArraySize(type));
-            descriptionField.setText(stateVariable.getDescription());
+            descriptionField.setText(ViskitStatics.emptyIfNull(stateVariable.getDescription()));
             isArray = ViskitGlobals.instance().isArray(stateVariable.getType());
         } 
         else {

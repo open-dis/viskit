@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import static viskit.ViskitStatics.DESCRIPTION_HINT;
 
 /**
@@ -180,7 +181,7 @@ abstract public class MetadataDialog extends JDialog {
         packageTf.setText          (graphMetadata.packageName);
         authorTf.setText           (graphMetadata.author);
         versionTf.setText          (graphMetadata.version);
-        descriptionTextArea.setText(graphMetadata.description);
+        descriptionTextArea.setText(ViskitStatics.emptyIfNull(graphMetadata.description));
         extendsTf.setText          (graphMetadata.extendsPackageName);
         implementsTf.setText       (graphMetadata.implementsPackageName);
         stopTimeTf.setText         (graphMetadata.stopTime);

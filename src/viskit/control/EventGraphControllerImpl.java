@@ -151,7 +151,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
             // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name);
-            ((EventGraphView) getView()).setSelectedEventGraphDescription(graphMetadata.description);
+            ((EventGraphView) getView()).setSelectedEventGraphDescription(ViskitStatics.emptyIfNull(graphMetadata.description));
 
             // Bugfix 1398
             String msg =
@@ -259,6 +259,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             }
 
             eventGraphView.setSelectedEventGraphName(modelImplementation.getMetadata().name);
+            modelImplementation.getMetadata().description = ViskitStatics.emptyIfNull(modelImplementation.getMetadata().description);
             if  (modelImplementation.getMetadata().description.isBlank())
                  eventGraphView.setSelectedEventGraphDescription(DESCRIPTION_HINT);
             else eventGraphView.setSelectedEventGraphDescription(modelImplementation.getMetadata().description);
@@ -1098,7 +1099,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
             // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name);
-            ((EventGraphView) getView()).setSelectedEventGraphDescription(graphMetadata.description);
+            ((EventGraphView) getView()).setSelectedEventGraphDescription(ViskitStatics.emptyIfNull(graphMetadata.description));
         }
     }
 
