@@ -1381,11 +1381,11 @@ public class ViskitGlobals
     }
     public void selectEventGraphTab()
     {
-        mainFrame.selectEventGraphTab();
+        mainFrame.selectEventGraphEditorTab();
     }
     public void selectAssemblyTab()
     {
-        mainFrame.selectAssemblyTab();
+        mainFrame.selectAssemblyEditorTab();
     }
     public void selectSimulationRunTab()
     {

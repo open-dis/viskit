@@ -228,7 +228,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void open()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         File[] filesArray = ViskitGlobals.instance().getAssemblyViewFrame().openFilesAsk();
         if (filesArray == null)
             return;
@@ -465,7 +465,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void save()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel.getCurrentFile() == null) {
             saveAs();
@@ -478,7 +478,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void saveAs()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         AssemblyModel model = (AssemblyModel) getModel();
         AssemblyView assemblyView = (AssemblyView) getView();
         GraphMetadata graphMetadata = model.getMetadata();
@@ -513,9 +513,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 //        }
 //        GraphMetadata graphMetadata = assemblyModel.getMetadata();
         
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         
         AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
+        if (assemblyModel == null)
+            assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
 //        Model model = (Model) getModel();
         if (assemblyModel == null) 
         {
@@ -766,7 +768,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             LOG.error("newAssembly() unable to create new assembly if project is not open");
             return;
         }
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
 
         GraphMetadata oldGraphMetadata = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
@@ -853,7 +855,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void closeAll() 
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyViewFrame().getOpenModels();
         for (AssemblyModel assemblyModel : assemblyModelArray) 
         {
@@ -867,7 +869,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void close()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         if (preClose()) {
             postClose();
         }
@@ -892,7 +894,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         LOG.debug("postClose() close assembly {}", OpenAssembly.inst().getName());
         OpenAssembly.inst().doFireActionCloseAssembly();
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
     }
 
     private void markAssemblyConfigurationClosed(File f) {
@@ -994,7 +996,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      */
     private boolean askToSaveAndContinue()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         String message = "Save modified ";
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if ((assemblyModel != null) && (assemblyModel.getMetadata() != null))
@@ -1235,7 +1237,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void remove()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         if (!selectionVector.isEmpty()) {
             // first ask:
             String s, message = "";
@@ -1371,7 +1373,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void undo()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         if (selectionVector.isEmpty())
             return;
 
@@ -1408,7 +1410,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void redo()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
 
         // Recreate the JAXB (XML) bindings since the paste function only does
         // nodes and not edges
@@ -1464,7 +1466,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void viewXML()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null)
@@ -1498,7 +1500,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void generateJavaSource()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         String source = produceJavaAssemblyClass();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null)
@@ -1953,7 +1955,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void captureWindow() 
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null)
             assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
@@ -1988,7 +1990,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      */
     public void captureAssemblyImage(File assemblyImageFile)
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyTab();
+        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         // Don't displayCapture an extra frame while taking snapshots
         final Timer captureAssemblyImageTimer = new Timer(100, new ImageCaptureTimerCallback(assemblyImageFile, false));
         captureAssemblyImageTimer.setRepeats(false);

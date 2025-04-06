@@ -698,7 +698,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
-        editMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit selected Event Graph Properties...", KeyEvent.VK_E,
+        editMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit selected Event Graph Metadata Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
         }
     }
@@ -757,7 +757,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         
         // TODO "disable" both of these if no Event Graph is active
         eventGraphMenu.add(editEventGraphSubMenu);
-        eventGraphMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit selected Event Graph Properties...", KeyEvent.VK_E,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, "editGraphMetadata", "Edit selected Event Graph Metadata Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
         eventGraphMenu.addSeparator();
 

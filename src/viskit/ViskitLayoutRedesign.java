@@ -83,7 +83,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         addCancellingEdgeMenuItem = new javax.swing.JMenuItem();
         addSelfReferencingSchedulingEdgeMenuItem = new javax.swing.JMenuItem();
         addSelfReferencingCancellingEdgeMenuItem = new javax.swing.JMenuItem();
-        eventGraphPropertiesMI = new javax.swing.JMenuItem();
+        eventGraphMetadataPropertiesMI = new javax.swing.JMenuItem();
         jSeparator9 = new javax.swing.JPopupMenu.Separator();
         newEventGraphMI = new javax.swing.JMenuItem();
         openEventGraphMI = new javax.swing.JMenuItem();
@@ -109,7 +109,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         jSeparator8 = new javax.swing.JPopupMenu.Separator();
         addEventGraphMI = new javax.swing.JMenuItem();
         addPropertyChangeListenerMI = new javax.swing.JMenuItem();
-        assemblyPropertiesMI = new javax.swing.JMenuItem();
+        assemblyMetadataPropertiesMI = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
         newAssemblyMI = new javax.swing.JMenuItem();
         openAssemblyMI = new javax.swing.JMenuItem();
@@ -502,14 +502,14 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         eventGraphMenu.add(editEventGraphSubMenu);
 
-        eventGraphPropertiesMI.setText("Edit selected Event Graph Properties");
-        eventGraphPropertiesMI.setToolTipText("graph metadata editor");
-        eventGraphPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
+        eventGraphMetadataPropertiesMI.setText("Edit selected Event Graph Metadata Properties");
+        eventGraphMetadataPropertiesMI.setToolTipText("graph metadata editor");
+        eventGraphMetadataPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                eventGraphPropertiesMIActionPerformed(evt);
+                eventGraphMetadataPropertiesMIActionPerformed(evt);
             }
         });
-        eventGraphMenu.add(eventGraphPropertiesMI);
+        eventGraphMenu.add(eventGraphMetadataPropertiesMI);
         eventGraphMenu.add(jSeparator9);
 
         newEventGraphMI.setMnemonic(KeyEvent.VK_N);
@@ -625,14 +625,14 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         assemblyMenu.add(editAssemblySubMenu);
 
-        assemblyPropertiesMI.setText("Edit selected Assembly Properties");
-        assemblyPropertiesMI.setToolTipText("graph metadata editor");
-        assemblyPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
+        assemblyMetadataPropertiesMI.setText("Edit selected Assembly Metadata Properties");
+        assemblyMetadataPropertiesMI.setToolTipText("graph metadata editor");
+        assemblyMetadataPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                assemblyPropertiesMIActionPerformed(evt);
+                assemblyMetadataPropertiesMIActionPerformed(evt);
             }
         });
-        assemblyMenu.add(assemblyPropertiesMI);
+        assemblyMenu.add(assemblyMetadataPropertiesMI);
         assemblyMenu.add(jSeparator4);
 
         newAssemblyMI.setMnemonic(KeyEvent.VK_N);
@@ -832,13 +832,13 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_viewCloudSimulationControllerMIActionPerformed
 
-    private void eventGraphPropertiesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eventGraphPropertiesMIActionPerformed
+    private void eventGraphMetadataPropertiesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eventGraphMetadataPropertiesMIActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_eventGraphPropertiesMIActionPerformed
+    }//GEN-LAST:event_eventGraphMetadataPropertiesMIActionPerformed
 
-    private void assemblyPropertiesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_assemblyPropertiesMIActionPerformed
+    private void assemblyMetadataPropertiesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_assemblyMetadataPropertiesMIActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_assemblyPropertiesMIActionPerformed
+    }//GEN-LAST:event_assemblyMetadataPropertiesMIActionPerformed
 
     private void viskitUserPreferencesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viskitUserPreferencesMIActionPerformed
         // TODO add your handling code here:
@@ -963,7 +963,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JPanel assembly3_SimulationRunPanel;
     private javax.swing.JPanel assemblyEditorPanel;
     private javax.swing.JMenu assemblyMenu;
-    private javax.swing.JMenuItem assemblyPropertiesMI;
+    private javax.swing.JMenuItem assemblyMetadataPropertiesMI;
     private javax.swing.JMenu assemblySimulationRunMenu;
     private javax.swing.JTabbedPane assemblySimulationRunTabbedPane;
     private javax.swing.JMenuItem clearSimulationConsoleMI;
@@ -989,7 +989,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JMenu editEventGraphSubMenu;
     private javax.swing.JPanel eventGraphEditorPanel;
     private javax.swing.JMenu eventGraphMenu;
-    private javax.swing.JMenuItem eventGraphPropertiesMI;
+    private javax.swing.JMenuItem eventGraphMetadataPropertiesMI;
     private javax.swing.JMenuItem exitMI;
     private javax.swing.JMenuItem exportToClusterFormatMI;
     private javax.swing.JMenu gridkitCloudMenu;

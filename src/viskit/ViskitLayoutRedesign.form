@@ -202,13 +202,13 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
-            <MenuItem class="javax.swing.JMenuItem" name="eventGraphPropertiesMI">
+            <MenuItem class="javax.swing.JMenuItem" name="eventGraphMetadataPropertiesMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit selected Event Graph Properties"/>
+                <Property name="text" type="java.lang.String" value="Edit selected Event Graph Metadata Properties"/>
                 <Property name="toolTipText" type="java.lang.String" value="graph metadata editor"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="eventGraphPropertiesMIActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="eventGraphMetadataPropertiesMIActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator9">
@@ -394,13 +394,13 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
-            <MenuItem class="javax.swing.JMenuItem" name="assemblyPropertiesMI">
+            <MenuItem class="javax.swing.JMenuItem" name="assemblyMetadataPropertiesMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit selected Assembly Properties"/>
+                <Property name="text" type="java.lang.String" value="Edit selected Assembly Metadata Properties"/>
                 <Property name="toolTipText" type="java.lang.String" value="graph metadata editor"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="assemblyPropertiesMIActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="assemblyMetadataPropertiesMIActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator4">

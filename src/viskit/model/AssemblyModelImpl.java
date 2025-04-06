@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import viskit.ViskitUserConfiguration;
 import viskit.util.FileBasedAssemblyNode;
 import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.MvcAbstractModel;
@@ -134,10 +135,16 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                     return false;
                 }
 
-                GraphMetadata myGraphMetadata = new GraphMetadata(this);
-                myGraphMetadata.version       = jaxbRoot.getVersion();
-                myGraphMetadata.name          = jaxbRoot.getName();
-                myGraphMetadata.packageName   = jaxbRoot.getPackage();
+                GraphMetadata myGraphMetadata         = new GraphMetadata(this);
+                myGraphMetadata.name                  = ViskitStatics.emptyIfNull(jaxbRoot.getName());
+                myGraphMetadata.author                = ViskitStatics.emptyIfNull(jaxbRoot.getAuthor());
+                if (myGraphMetadata.author.isBlank())
+                    myGraphMetadata.author = ViskitUserConfiguration.instance().getAuthorName();
+                myGraphMetadata.description           = ViskitStatics.emptyIfNull(jaxbRoot.getDescription());
+                myGraphMetadata.version               = ViskitStatics.emptyIfNull(jaxbRoot.getVersion());
+                myGraphMetadata.packageName           = ViskitStatics.emptyIfNull(jaxbRoot.getPackage());
+                myGraphMetadata.extendsPackageName    = ViskitStatics.emptyIfNull(jaxbRoot.getExtend());
+                myGraphMetadata.implementsPackageName = ViskitStatics.emptyIfNull(jaxbRoot.getImplement());
 
                 Schedule schedule = jaxbRoot.getSchedule();
                 if (schedule != null) {

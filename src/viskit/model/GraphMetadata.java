@@ -3,6 +3,7 @@ package viskit.model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
+import viskit.ViskitUserConfiguration;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 import viskit.xsd.bindings.eventgraph.SimEntity;
 
@@ -37,7 +38,9 @@ public class GraphMetadata
 
     public GraphMetadata(Object caller) 
     {
-        author = System.getProperty("user.name"); // TODO make this a viskit user property
+//      author = System.getProperty("user.name"); // TODO make this a viskit user property
+        author = ViskitUserConfiguration.instance().getAuthorName();
+        
         packageName = "test"; // default
         
         if (caller instanceof AssemblyModelImpl) 
@@ -46,30 +49,36 @@ public class GraphMetadata
             viskit.xsd.bindings.assembly.ObjectFactory jaxbAssemblyObjectFactory = 
                     new viskit.xsd.bindings.assembly.ObjectFactory();
             SimkitAssembly tempAssembly = jaxbAssemblyObjectFactory.createSimkitAssembly();
-            extendsPackageName = tempAssembly.getExtend();
-            implementsPackageName = tempAssembly.getImplement();
-            description = "";
-        } 
+               extendsPackageName = ViskitStatics.emptyIfNull(tempAssembly.getExtend());
+            implementsPackageName = ViskitStatics.emptyIfNull(tempAssembly.getImplement());
+            description           = ViskitStatics.emptyIfNull(tempAssembly.getDescription());
+            // TODO stopTime?
+        }
         else
         {
             name = "NewEventGraphName";
             viskit.xsd.bindings.eventgraph.ObjectFactory jaxbEventGraphObjectFactory =
                     new viskit.xsd.bindings.eventgraph.ObjectFactory();
             SimEntity tempSimEntity = jaxbEventGraphObjectFactory.createSimEntity();
-            extendsPackageName = tempSimEntity.getExtend();
-            implementsPackageName = tempSimEntity.getImplement();
-            description = "";
+               extendsPackageName = ViskitStatics.emptyIfNull(tempSimEntity.getExtend());
+            implementsPackageName = ViskitStatics.emptyIfNull(tempSimEntity.getImplement());
+            description           = ViskitStatics.emptyIfNull(tempSimEntity.getDescription());
+            // TODO stopTime?
         }
     }
 
     public GraphMetadata(String newName, String newPackageName, String newAuthor, String newVersion, 
                          String newDescription, String newExtendsPackageName, String newImplementsPackageName) {
         name = newName;
-        packageName = newPackageName;
-        author = newAuthor;
-        version = newVersion;
-        extendsPackageName = newExtendsPackageName;
-        implementsPackageName = newImplementsPackageName;
-        description = ViskitStatics.emptyIfNull(newDescription);
+        packageName           = ViskitStatics.emptyIfNull(newPackageName);
+        author                = ViskitStatics.emptyIfNull(newAuthor);
+        if (author.isBlank())
+            author = ViskitUserConfiguration.instance().getAuthorName();
+        
+        version               = ViskitStatics.emptyIfNull(newVersion);
+        extendsPackageName    = ViskitStatics.emptyIfNull(newExtendsPackageName);
+        implementsPackageName = ViskitStatics.emptyIfNull(newImplementsPackageName);
+        description           = ViskitStatics.emptyIfNull(newDescription);
+        // TODO stopTime?
     }
 }

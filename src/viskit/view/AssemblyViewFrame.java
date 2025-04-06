@@ -444,7 +444,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
-        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit selected Assembly Properties", KeyEvent.VK_E,
+        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit selected Assembly Metadata Properties", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
         }
     }
@@ -496,7 +496,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         editSubMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add a new Property Change Listener", KeyEvent.VK_L, null));
         
         assemblyMenu.add(editSubMenu);
-        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit selected Assembly Properties", KeyEvent.VK_E,
+        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit selected Assembly Metadata Properties", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.addSeparator();
         }

@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import viskit.ViskitUserConfiguration;
 import viskit.control.EventGraphControllerImpl;
 import viskit.mvc.MvcAbstractModel;
 import viskit.util.XMLValidationTool;
@@ -71,9 +72,20 @@ public class ModelImpl extends MvcAbstractModel implements Model
     private boolean modelDirty = false;
     private boolean numericPriority;
 
-    public ModelImpl(MvcController newController) {
-        eventGraphController = (EventGraphControllerImpl) newController;
+    public ModelImpl(MvcController newEventGraphController) 
+    {
+        eventGraphController = (EventGraphControllerImpl) newEventGraphController;
         graphMetadata = new GraphMetadata(this);
+        graphMetadata.name                  = ViskitStatics.emptyIfNull(graphMetadata.name);
+        graphMetadata.author                = ViskitStatics.emptyIfNull(graphMetadata.author);
+        if (graphMetadata.author.isBlank())
+            graphMetadata.author = ViskitUserConfiguration.instance().getAuthorName();
+        graphMetadata.description           = ViskitStatics.emptyIfNull(graphMetadata.description);
+        graphMetadata.version               = ViskitStatics.emptyIfNull(graphMetadata.version);
+        graphMetadata.packageName           = ViskitStatics.emptyIfNull(graphMetadata.packageName);
+        graphMetadata.extendsPackageName    = ViskitStatics.emptyIfNull(graphMetadata.extendsPackageName);
+        graphMetadata.implementsPackageName = ViskitStatics.emptyIfNull(graphMetadata.implementsPackageName);
+        graphMetadata.stopTime              = ViskitStatics.emptyIfNull(graphMetadata.stopTime);
     }
 
     @Override
@@ -116,30 +128,34 @@ public class ModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
-    public boolean newModel(File f) 
+    public boolean newModel(File modelFile) 
     {
         stateVariables.removeAllElements();
         simulationParameters.removeAllElements();
         eventNodeCache.clear();
         edgeCache.clear();
 
-        if (f == null) {
+        if (modelFile == null) {
             jaxbRoot = jaxbEventGraphObjectFactory.createSimEntity(); // to start with empty graph
             notifyChanged(new ModelEvent(this, ModelEvent.NEW_MODEL, "New empty model"));
-        } else {
+        } 
+        else {
             try {
-                currentFile = f;
+                currentFile = modelFile;
 
                 Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
                 jaxbRoot = (SimEntity) unmarshaller.unmarshal(currentFile);
 
                 GraphMetadata myGraphMetadata = new GraphMetadata(this);
-                myGraphMetadata.author = jaxbRoot.getAuthor();
-                myGraphMetadata.version = jaxbRoot.getVersion();
-                myGraphMetadata.name = jaxbRoot.getName();
-                myGraphMetadata.packageName = jaxbRoot.getPackage();
-                myGraphMetadata.extendsPackageName = jaxbRoot.getExtend();
-                myGraphMetadata.implementsPackageName = jaxbRoot.getImplement();
+                myGraphMetadata.name                  = ViskitStatics.emptyIfNull(jaxbRoot.getName());
+                myGraphMetadata.author                = ViskitStatics.emptyIfNull(jaxbRoot.getAuthor());
+//              if (myGraphMetadata.author.isBlank()) // don't override an already-existing file
+//                  myGraphMetadata.author =  ViskitUserConfiguration.instance().getAuthorName();
+                myGraphMetadata.version               = ViskitStatics.emptyIfNull(jaxbRoot.getVersion());
+                myGraphMetadata.description           = ViskitStatics.emptyIfNull(jaxbRoot.getDescription());
+                myGraphMetadata.packageName           = ViskitStatics.emptyIfNull(jaxbRoot.getPackage());
+                myGraphMetadata.extendsPackageName    = ViskitStatics.emptyIfNull(jaxbRoot.getExtend());
+                myGraphMetadata.implementsPackageName = ViskitStatics.emptyIfNull(jaxbRoot.getImplement());
                 // obsolete
 //                List<String> commentList = jaxbRoot.getComment();
 //                StringBuilder sb = new StringBuilder("");
@@ -148,7 +164,6 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //                    sb.append(" ");
 //                }
 //                myGraphMetadata.description = sb.toString().trim();
-                myGraphMetadata.description = ViskitStatics.emptyIfNull(jaxbRoot.getDescription());
                 changeMetadata(myGraphMetadata);
 
                 buildEventsFromJaxb(jaxbRoot.getEvent());
@@ -167,12 +182,12 @@ public class ModelImpl extends MvcAbstractModel implements Model
                     if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
                         jaxbContext = JAXBContext.newInstance(SimkitAssemblyXML2Java.ASSEMBLY_BINDINGS);
                     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-                    unmarshaller.unmarshal(f);
+                    unmarshaller.unmarshal(modelFile);
                     // If we get here, we've tried to load an assembly.
                     eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
                             "This file is an Assembly",
                             "Use the Assembly Editor to" +
-                            "\n" + "work with this file: " + f.getName()
+                            "\n" + "work with this file: " + modelFile.getName()
                             );
                 } 
                 catch (JAXBException e)
@@ -180,7 +195,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
                     eventGraphController.messageUser(JOptionPane.ERROR_MESSAGE,
                             "XML I/O Error",
                             "Exception on JAXB unmarshalling of" +
-                            "\n" + f.getName() +
+                            "\n" + modelFile.getName() +
                             "\nError is: " + e.getMessage() +
                             "\nin Model.newModel(File)"
                             );

@@ -112,7 +112,7 @@ public class MainFrame extends JFrame
     public static final int TAB0_EVENTGRAPH_EDITOR_INDEX = 0;
     public static final int TAB0_ASSEMBLY_EDITOR_INDEX   = 1;
     public static final int TAB0_SIMULATIONRUN_INDEX     = 2;
-    public static final int TAB0_ANALYSTREPORT_INDEX    = 3;
+    public static final int TAB0_ANALYSTREPORT_INDEX     = 3;
     public static final int[] tabIndices = {
         TAB0_EVENTGRAPH_EDITOR_INDEX,
         TAB0_ASSEMBLY_EDITOR_INDEX,
@@ -759,11 +759,11 @@ public class MainFrame extends JFrame
         setTitle(newTitle);
         super.setTitle(newTitle);
     }
-    public void selectEventGraphTab ()
+    public void selectEventGraphEditorTab ()
     {
         topTabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX]);
     }
-    public void selectAssemblyTab ()
+    public void selectAssemblyEditorTab ()
     {
         topTabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX]);
     }

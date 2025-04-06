@@ -552,6 +552,7 @@ public final class AnalystReportModel extends MvcAbstractModel
             {
                 tmpDocument = EventGraphCache.instance().loadXML(EventGraphCache.instance().getEventGraphFilesList().get(i));
                 localRootElement = tmpDocument.getRootElement();
+                String rootElementName = localRootElement.getAttribute(NAME).getValue();
 
                 // prevent returning a null if there was no attribute value
                 if  (localRootElement.getAttribute(DESCRIPTION) != null)

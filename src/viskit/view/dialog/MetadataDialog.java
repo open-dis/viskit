@@ -9,6 +9,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import static viskit.ViskitStatics.DESCRIPTION_HINT;
@@ -23,73 +25,77 @@ import static viskit.ViskitStatics.DESCRIPTION_HINT;
  * @since 3:52:05 PM
  * @version $Id$
  */
-abstract public class MetadataDialog extends JDialog {
+abstract public class MetadataDialog extends JDialog 
+{
+    static final Logger LOG = LogManager.getLogger();
 
     protected static boolean modified = false;
     protected JComponent runtimePanel;
     private JButton cancelButton;
-    private JButton okButton;
+    private JButton     okButton;
+    
     GraphMetadata graphMetadata;
-    JTextField nameTf, packageTf, authorTf, versionTf, extendsTf, implementsTf;
-    JTextField stopTimeTf;
-    JCheckBox verboseCb;
-    JTextArea descriptionTextArea;
+    JTextField nameTF, packageTF, authorTF, versionTF, extendsTF, implementsTF;
+    JTextField stopTimeTF;
+    JCheckBox  verboseCB;
+    JTextArea  descriptionTextArea;
 
     public MetadataDialog(JFrame frame, GraphMetadata graphMetadata) {
-        this(frame, graphMetadata, "Event Graph Properties");
+        this(frame, graphMetadata, "Event Graph Metadata Properties");
     }
 
-    public MetadataDialog(JFrame frame, GraphMetadata graphMetadata, String title) {
+    public MetadataDialog(JFrame frame, GraphMetadata graphMetadata, String title) 
+    {
         super(frame, title, true);
         this.graphMetadata = graphMetadata;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
         //Create and populate the panel.
-        JPanel c = new JPanel();
-        setContentPane(c);
-        c.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+        JPanel contentPanel = new JPanel();
+        setContentPane(contentPanel);
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
         JPanel textFieldPanel = new JPanel(new SpringLayout());
         textFieldPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-        JLabel nmLab = new JLabel("name", JLabel.TRAILING);
-        nameTf = new JTextField(20);
-        nmLab.setLabelFor(nameTf);
-        textFieldPanel.add(nmLab);
-        textFieldPanel.add(nameTf);
+        JLabel nameLabel = new JLabel("name", JLabel.TRAILING);
+        nameTF = new JTextField(20);
+        nameLabel.setLabelFor(nameTF);
+        textFieldPanel.add(nameLabel);
+        textFieldPanel.add(nameTF);
 
-        JLabel pkgLab = new JLabel("package", JLabel.TRAILING);
-        packageTf = new JTextField(20);
-        packageTf.setToolTipText("Use standard Java dot notation for package naming");
-        pkgLab.setLabelFor(packageTf);
-        textFieldPanel.add(pkgLab);
-        textFieldPanel.add(packageTf);
+        JLabel packageLabel = new JLabel("package", JLabel.TRAILING);
+        packageTF = new JTextField(20);
+        packageTF.setToolTipText("Use standard Java dot notation for package naming, e.g. packageName.className");
+        packageLabel.setLabelFor(packageTF);
+        textFieldPanel.add(packageLabel);
+        textFieldPanel.add(packageTF);
 
-        JLabel authLab = new JLabel("author", JLabel.TRAILING);
-        authorTf = new JTextField(20);
-        authLab.setLabelFor(authorTf);
-        textFieldPanel.add(authLab);
-        textFieldPanel.add(authorTf);
+        JLabel authorLabel = new JLabel("author", JLabel.TRAILING);
+        authorTF = new JTextField(20);
+        authorLabel.setLabelFor(authorTF);
+        textFieldPanel.add(authorLabel);
+        textFieldPanel.add(authorTF);
 
-        JLabel versLab = new JLabel("version", JLabel.TRAILING);
-        versionTf = new JTextField(20);
-        versLab.setLabelFor(versionTf);
-        textFieldPanel.add(versLab);
-        textFieldPanel.add(versionTf);
+        JLabel versionLabel = new JLabel("version", JLabel.TRAILING);
+        versionTF = new JTextField(20);
+        versionLabel.setLabelFor(versionTF);
+        textFieldPanel.add(versionLabel);
+        textFieldPanel.add(versionTF);
 
-        JLabel extendsLab = new JLabel("extends", JLabel.TRAILING);
-        extendsTf = new JTextField(20);
-        extendsLab.setLabelFor(extendsTf);
-        textFieldPanel.add(extendsLab);
-        textFieldPanel.add(extendsTf);
+        JLabel extendsLabel = new JLabel("extends", JLabel.TRAILING);
+        extendsTF = new JTextField(20);
+        extendsLabel.setLabelFor(extendsTF);
+        textFieldPanel.add(extendsLabel);
+        textFieldPanel.add(extendsTF);
 
-        JLabel implementsLab = new JLabel("implements", JLabel.TRAILING);
-        implementsTf = new JTextField(20);
-        implementsLab.setLabelFor(implementsTf);
-        textFieldPanel.add(implementsLab);
-        textFieldPanel.add(implementsTf);
+        JLabel implementsLabel = new JLabel("implements", JLabel.TRAILING);
+        implementsTF = new JTextField(20);
+        implementsLabel.setLabelFor(implementsTF);
+        textFieldPanel.add(implementsLabel);
+        textFieldPanel.add(implementsTF);
 
         // Lay out the panel.
         SpringUtilities.makeCompactGrid(textFieldPanel,
@@ -99,22 +105,22 @@ abstract public class MetadataDialog extends JDialog {
 
         Dimension d = textFieldPanel.getPreferredSize();
         textFieldPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
-        c.add(textFieldPanel);
+        contentPanel.add(textFieldPanel);
 
         runtimePanel = new JPanel(new SpringLayout());
         runtimePanel.setBorder(BorderFactory.createTitledBorder("Runtime defaults"));
 
-        JLabel stopTimeLab = new JLabel("stop time", JLabel.TRAILING);
-        stopTimeTf = new JTextField(20);
-        stopTimeLab.setLabelFor(stopTimeTf);
-        runtimePanel.add(stopTimeLab);
-        runtimePanel.add(stopTimeTf);
+        JLabel stopTimeLabel = new JLabel("stop time", JLabel.TRAILING);
+        stopTimeTF = new JTextField(20);
+        stopTimeLabel.setLabelFor(stopTimeTF);
+        runtimePanel.add(stopTimeLabel);
+        runtimePanel.add(stopTimeTF);
 
-        JLabel verboseLab = new JLabel("verbose output", JLabel.TRAILING);
-        verboseCb = new JCheckBox();
-        verboseLab.setLabelFor(verboseCb);
-        runtimePanel.add(verboseLab);
-        runtimePanel.add(verboseCb);
+        JLabel verboseLabel = new JLabel("verbose output", JLabel.TRAILING);
+        verboseCB = new JCheckBox();
+        verboseLabel.setLabelFor(verboseCB);
+        runtimePanel.add(verboseLabel);
+        runtimePanel.add(verboseCB);
 
         SpringUtilities.makeCompactGrid(runtimePanel,
                 2, 2, 6, 6, 6, 6);
@@ -122,13 +128,13 @@ abstract public class MetadataDialog extends JDialog {
         runtimePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, d.height));
         runtimePanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 
-        c.add(runtimePanel);
+        contentPanel.add(runtimePanel);
 
         JLabel descriptionLabel = new JLabel("description");
         descriptionLabel.setToolTipText(DESCRIPTION_HINT);
         descriptionLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        c.add(descriptionLabel);
-        c.add(Box.createVerticalStrut(5));
+        contentPanel.add(descriptionLabel);
+        contentPanel.add(Box.createVerticalStrut(5));
 
         descriptionTextArea = new JTextArea(6, 40);
         descriptionTextArea.setToolTipText(DESCRIPTION_HINT);
@@ -138,10 +144,10 @@ abstract public class MetadataDialog extends JDialog {
         JScrollPane descriptionScrollPane = new JScrollPane(descriptionTextArea);
         descriptionScrollPane.setToolTipText(DESCRIPTION_HINT);
         descriptionScrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        descriptionScrollPane.setBorder(authorTf.getBorder());
+        descriptionScrollPane.setBorder(authorTF.getBorder());
 
-        c.add(descriptionScrollPane);
-        c.add(Box.createVerticalStrut(5));
+        contentPanel.add(descriptionScrollPane);
+        contentPanel.add(Box.createVerticalStrut(5));
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -153,23 +159,23 @@ abstract public class MetadataDialog extends JDialog {
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
-        c.add(buttonPanel);
+        contentPanel.add(buttonPanel);
 
         // attach listeners
         cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+            okButton.addActionListener(new applyButtonListener());
 
-        setParams(frame, graphMetadata);
+        setParameters(frame, graphMetadata);
     }
 
-    public final void setParams(Component c, GraphMetadata graphMetadata) {
+    public final void setParameters(Component component, GraphMetadata graphMetadata) {
         this.graphMetadata = graphMetadata;
 
         fillWidgets();
 
         modified = (graphMetadata == null);
         pack();
-        setLocationRelativeTo(c);
+        setLocationRelativeTo(component);
     }
 
     private void fillWidgets() 
@@ -177,23 +183,22 @@ abstract public class MetadataDialog extends JDialog {
         if (graphMetadata == null) {
             graphMetadata = new GraphMetadata();
         }
-        nameTf.setText             (graphMetadata.name);
-        packageTf.setText          (graphMetadata.packageName);
-        authorTf.setText           (graphMetadata.author);
-        versionTf.setText          (graphMetadata.version);
+        nameTF.setText             (graphMetadata.name);
+        packageTF.setText          (graphMetadata.packageName);
+        authorTF.setText           (graphMetadata.author);
+        versionTF.setText          (graphMetadata.version);
         descriptionTextArea.setText(ViskitStatics.emptyIfNull(graphMetadata.description));
-        extendsTf.setText          (graphMetadata.extendsPackageName);
-        implementsTf.setText       (graphMetadata.implementsPackageName);
-        stopTimeTf.setText         (graphMetadata.stopTime);
-        verboseCb.setSelected      (graphMetadata.verbose);
-        nameTf.selectAll();
+        extendsTF.setText          (graphMetadata.extendsPackageName);
+        implementsTF.setText       (graphMetadata.implementsPackageName);
+        stopTimeTF.setText         (graphMetadata.stopTime);
+        verboseCB.setSelected      (graphMetadata.verbose);
+        nameTF.selectAll();
     }
 
     private void unloadWidgets() 
     {
         // cleanups
-        graphMetadata.author      = authorTf.getText().trim();
-        graphMetadata.description = descriptionTextArea.getText().trim();
+        graphMetadata.author      = authorTF.getText().trim();
 
         if (this instanceof AssemblyMetadataDialog) {
 
@@ -201,18 +206,19 @@ abstract public class MetadataDialog extends JDialog {
             if (!graphMetadata.name.contains("Assembly") || graphMetadata.name.equals("AssemblyName"))
 
                 // Note: we need to force "Assembly" in the file name for special recognition
-                graphMetadata.name = nameTf.getText().trim() + "Assembly";
+                graphMetadata.name = nameTF.getText().trim() + "Assembly";
             else
-                graphMetadata.name = nameTf.getText().trim();
+                graphMetadata.name = nameTF.getText().trim();
         } else {
-            graphMetadata.name = nameTf.getText().trim();
+            graphMetadata.name = nameTF.getText().trim();
         }
-        graphMetadata.packageName = packageTf.getText().trim();
-        graphMetadata.version = versionTf.getText().trim();
-        graphMetadata.extendsPackageName = extendsTf.getText().trim();
-        graphMetadata.implementsPackageName = implementsTf.getText().trim();
-        graphMetadata.stopTime = stopTimeTf.getText().trim();
-        graphMetadata.verbose = verboseCb.isSelected();
+        graphMetadata.packageName = packageTF.getText().trim();
+        graphMetadata.version = versionTF.getText().trim();
+        graphMetadata.description = descriptionTextArea.getText().trim();
+        graphMetadata.extendsPackageName = extendsTF.getText().trim();
+        graphMetadata.implementsPackageName = implementsTF.getText().trim();
+        graphMetadata.stopTime = stopTimeTF.getText().trim();
+        graphMetadata.verbose = verboseCB.isSelected();
     }
 
     class cancelButtonListener implements ActionListener {
@@ -234,9 +240,9 @@ abstract public class MetadataDialog extends JDialog {
             // final data and ending data and set modified only if something had actually changed.
             modified = true;
             if (modified) {
-                if (nameTf.getText().trim().isEmpty()) {
+                if (nameTF.getText().trim().isEmpty()) {
                     ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "Error", "Must have a non-zero length name");
-                    nameTf.requestFocus();
+                    nameTF.requestFocus();
                     return;
                 }
 

@@ -257,6 +257,17 @@ public class ViskitUserConfiguration
     public String[] getConfigurationValues(String key) {
         return projectCombinedConfiguration.getStringArray(key);
     }
+    
+    public String getAuthorName()
+    {
+        String userName = getValue(ViskitUserConfiguration.USER_NAME_KEY);
+        // if null or "SYSTEM" then this field has not yet been saved after user initializion
+        if ((userName == null) || userName.equals(ViskitUserConfiguration.USER_SYSTEM))
+        {
+             userName = "";
+        }
+        return userName;
+    }
 
     /**
      * @param projectXmlConfigurationFilePath a Viskit project file, viskitProject.xml
