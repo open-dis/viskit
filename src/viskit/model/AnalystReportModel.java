@@ -56,6 +56,7 @@ import viskit.util.EventGraphCache;
 import viskit.ViskitGlobals;
 import static viskit.ViskitProject.ASSEMBLIES_DIRECTORY_NAME;
 import static viskit.ViskitProject.VISKIT_VERSION;
+import viskit.ViskitStatics;
 import static viskit.ViskitStatics.isFileReady;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
@@ -636,7 +637,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                 for (Element parameterElement : parameterElementList) {
                     parameterName = parameterElement.getAttributeValue(NAME);
                     parameterType = parameterElement.getAttributeValue(TYPE);
-                    parameterDescription = parameterElement.getAttributeValue(DESCRIPTION_ATTRIBUTE);
+                    parameterDescription = ViskitStatics.emptyIfNull(parameterElement.getAttributeValue(DESCRIPTION_ATTRIBUTE));
                     parameterStringArray = new String[]{parameterName, parameterType, parameterDescription};
                     parameterArrayList.add(parameterStringArray);
                 }

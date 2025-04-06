@@ -120,7 +120,7 @@ public class OpenAssembly
     }
 
     public void doParamLocallyEdited(AssemblyChangeListener source) {
-        fireAction(AssemblyChangeListener.PARAM_LOCALLY_EDITED, source, null);
+        fireAction(AssemblyChangeListener.PARAMETER_LOCALLY_EDITED, source, null);
     }
 
     public void doFireActionAssemblyJaxbChanged(AssemblyChangeListener source) {
@@ -149,7 +149,7 @@ public class OpenAssembly
         int JAXB_CHANGED = 1;
         int NEW_ASSEMBLY = 2;
         int CLOSE_ASSEMBLY = 3;
-        int PARAM_LOCALLY_EDITED = 4;
+        int PARAMETER_LOCALLY_EDITED = 4;
 
         /**
          * Notify the assembly listeners of a change

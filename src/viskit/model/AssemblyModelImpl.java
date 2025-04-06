@@ -85,8 +85,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void setDirty(boolean wh) {
-        modelDirty = wh;
+    public void setDirty(boolean value) {
+        modelDirty = value;
     }
 
     @Override
@@ -157,8 +157,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
                 changeMetadata(myGraphMetadata);
                 buildEventGraphsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
-                buildPCLsFromJaxb(jaxbRoot.getPropertyChangeListener());
-                buildPCConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
+                buildPropertyChangeListenersFromJaxb(jaxbRoot.getPropertyChangeListener());
+                buildPropertyChangeListenerConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
                 buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
                 buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
             } 
@@ -994,23 +994,23 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return buildParamFromFreeF((ViskitModelInstantiator.FreeF) viarr.getInstantiators().get(0));
     }
 
-    private void buildPCConnectionsFromJaxb(List<PropertyChangeListenerConnection> pcconnsList) {
-        PropertyChangeEdge pce;
-        AssemblyNode toNode, frNode;
-        for (PropertyChangeListenerConnection pclc : pcconnsList) {
-            pce = new PropertyChangeEdge();
-            pce.setProperty(pclc.getProperty());
-            pce.setDescription(pclc.getDescription());
-            toNode = getNodeCache().get(pclc.getListener());
-            frNode = getNodeCache().get(pclc.getSource());
-            pce.setTo(toNode);
-            pce.setFrom(frNode);
-            pce.opaqueModelObject = pclc;
+    private void buildPropertyChangeListenerConnectionsFromJaxb(List<PropertyChangeListenerConnection> propertyChangeListenerConnectionsList) {
+        PropertyChangeEdge propertyChangeEdge;
+        AssemblyNode toNode, fromNode;
+        for (PropertyChangeListenerConnection nextPropertyChangeListenerConnection : propertyChangeListenerConnectionsList) {
+            propertyChangeEdge = new PropertyChangeEdge();
+            propertyChangeEdge.setProperty(nextPropertyChangeListenerConnection.getProperty());
+            propertyChangeEdge.setDescription(ViskitStatics.emptyIfNull(nextPropertyChangeListenerConnection.getDescription()));
+              toNode = getNodeCache().get(nextPropertyChangeListenerConnection.getListener());
+            fromNode = getNodeCache().get(nextPropertyChangeListenerConnection.getSource());
+            propertyChangeEdge.setTo(toNode);
+            propertyChangeEdge.setFrom(fromNode);
+            propertyChangeEdge.opaqueModelObject = nextPropertyChangeListenerConnection;
 
-            toNode.getConnections().add(pce);
-            frNode.getConnections().add(pce);
+            toNode.getConnections().add(propertyChangeEdge);
+            fromNode.getConnections().add(propertyChangeEdge);
 
-            this.notifyChanged(new ModelEvent(pce, ModelEvent.PCL_EDGE_ADDED, "PCL edge added"));
+            this.notifyChanged(new ModelEvent(propertyChangeEdge, ModelEvent.PCL_EDGE_ADDED, "PCL edge added"));
         }
     }
 
@@ -1064,7 +1064,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         }
     }
 
-    private void buildPCLsFromJaxb(List<PropertyChangeListener> pcLs) {
+    private void buildPropertyChangeListenersFromJaxb(List<PropertyChangeListener> pcLs) {
         for (PropertyChangeListener pcl : pcLs) {
             buildPclNodeFromJaxbPCL(pcl);
         }

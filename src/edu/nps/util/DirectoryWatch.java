@@ -56,13 +56,13 @@ public class DirectoryWatch
 {
     static final Logger LOG = LogManager.getLogger();
 
-    private static int sequenceNum = 0;
-    private final static int DEFAULTSLEEPTIMEMS = 3 * 1_000; // 3 seconds
-    private long sleepTimeMs = DEFAULTSLEEPTIMEMS;
+    private static int sequenceNumber = 0;
+    private final static int DEFAULT_SLEEP_TIME_MS = 3 * 1_000; // 3 seconds
+    private long sleepTimeMs = DEFAULT_SLEEP_TIME_MS;
     private Map<File, Long> lastFiles;
     private Thread thread;
     private File root;
-    private boolean running;
+    private boolean isRunning;
 
     public DirectoryWatch(File root) throws FileNotFoundException {
         this(root, false);
@@ -81,16 +81,16 @@ public class DirectoryWatch
     }
 
     public void startWatcher() {
-        thread = new Thread(new Runner(), "DirectoryWatch-" + sequenceNum++);
+        thread = new Thread(new Runner(), "DirectoryWatch-" + sequenceNumber++);
         thread.setPriority(Thread.NORM_PRIORITY);
         thread.setDaemon(true);
-        running = true;
+        isRunning = true;
         thread.start();
     }
 
     public void stopWatcher() {
         if (thread != null) {
-            running = false;
+            isRunning = false;
             thread = null;
         }
     }
@@ -105,19 +105,19 @@ public class DirectoryWatch
         }
         lastFiles = new HashMap<>();
 
-        fileAdder fa = new fileAdder();
+        FileAdder fileAdder = new FileAdder();
         if (recurse) {
-            recurseTree(root, new fileAdder());
+            recurseTree(root, new FileAdder());
         } else {
-            fa.foundFile(root);
+            fileAdder.foundFile(root);
         }
     }
 
-    class fileAdder implements RecurseListener {
+    class FileAdder implements RecurseListener {
 
         @Override
-        public void foundFile(File f) {
-            lastFiles.put(f, f.lastModified());
+        public void foundFile(File file) {
+            lastFiles.put(file, file.lastModified());
         }
     }
 
@@ -170,7 +170,7 @@ public class DirectoryWatch
 
         @Override
         public void run() {
-            while (running) {
+            while (isRunning) {
                 workingHM.clear();
                 added.clear();
                 changed.clear();
@@ -196,7 +196,7 @@ public class DirectoryWatch
                     Thread.sleep(sleepTimeMs);
                 } catch (InterruptedException e) {
                     LOG.error("DirWatcher killed");
-                    running = false;
+                    isRunning = false;
                 }
             }
         }

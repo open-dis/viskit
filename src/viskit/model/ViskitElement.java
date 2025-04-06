@@ -26,7 +26,7 @@ abstract public class ViskitElement implements Comparable<ViskitElement>
     /** NOT USED */
     public Object opaqueControllerObject; // for private use of C
 
-    protected static final String EMPTY = "";
+    protected static final String  EMPTY = "";
     protected String name        = EMPTY;
     protected String type        = EMPTY;
     protected String description = EMPTY;

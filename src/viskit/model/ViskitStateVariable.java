@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 
 /**
  * Represents the information about one state variable. This
@@ -48,7 +49,7 @@ public class ViskitStateVariable extends ViskitElement
      */
     public ViskitStateVariable(String name, String type, String description) {
         this(name, type);
-        this.description = description;
+        this.description = ViskitStatics.emptyIfNull(description);
     }
 
     @Override
@@ -89,9 +90,7 @@ public class ViskitStateVariable extends ViskitElement
 
     @Override
     public void setDescription(String newDescription) {
-        description = newDescription;
-        if (description == null)
-            description = "";
+        description = ViskitStatics.emptyIfNull(newDescription);
     }
 
     // obsolete

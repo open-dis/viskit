@@ -199,7 +199,7 @@ public interface AssemblyController {
      */
     boolean preQuit();
 
-    void postQuit();
+    void   postQuit();
 
     /**
      * @param lis the AssemblyChangeListener to add as a listener

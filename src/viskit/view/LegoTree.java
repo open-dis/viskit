@@ -61,9 +61,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     private Image myLeafIconImage;
 
-    private DefaultTreeModel mod;
+    private DefaultTreeModel defaultTreeModel;
 
-    private DragStartListener lis;
+    private DragStartListener dragStartListener;
 
     private String genericTableToolTip = "Drag onto canvas";
 
@@ -80,11 +80,11 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
      *
      * @param className a class to evaluate as a LEGO
      * @param iconPath path to a LEGO icon
-     * @param dslis a DragStartListener
+     * @param dragStartListener a DragStartListener
      * @param tooltip description for this LEGO tree
      */
-    LegoTree(String className, String iconPath, DragStartListener dslis, String tooltip) {
-        this(className, new ImageIcon(dslis.getClass().getClassLoader().getResource(iconPath)), dslis, tooltip);
+    LegoTree(String className, String iconPath, DragStartListener dragStartListener, String tooltip) {
+        this(className, new ImageIcon(dragStartListener.getClass().getClassLoader().getResource(iconPath)), dragStartListener, tooltip);
     }
 
     /**
@@ -92,17 +92,17 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
      *
      * @param className a class to evaluate as a LEGO
      * @param icon a LEGO icon
-     * @param dslis a DragStartListener
+     * @param dragStartListener a DragStartListener
      * @param tooltip description for this LEGO tree
      */
-    LegoTree(String className, ImageIcon icon, DragStartListener dslis, String tooltip) {
+    LegoTree(String className, ImageIcon icon, DragStartListener dragStartListener, String tooltip) {
         super();
         rootNode = new DefaultMutableTreeNode("root");
         background = new Color(0xFB, 0xFB, 0xE5);
-        setModel(mod = new DefaultTreeModel(rootNode));
-        directoryRoots = new HashMap<>();
+        setModel(defaultTreeModel = new DefaultTreeModel(rootNode));
+        directoryRootsMap = new HashMap<>();
 
-        lis = dslis;
+        dragStartListener = dragStartListener;
         targetClassName = className;
         genericTableToolTip = tooltip;
 
@@ -110,20 +110,20 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
         getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
-        MyRenderer rendr = new MyRenderer();
-        setCellRenderer(rendr);
+        MyRenderer myRenderer = new MyRenderer();
+        setCellRenderer(myRenderer);
 
         setToolTipText("");  // needs to be done first to enable tt below
         setRootVisible(true); // we want this to be false, but there is some sort of JTree bug...see paintComponent override below
         setShowsRootHandles(true);
         setVisibleRowCount(100);    // means always fill a normal size panel
-        rendr.setBackgroundNonSelectionColor(background);
+        myRenderer.setBackgroundNonSelectionColor(background);
 
         myLeafIcon = icon;
         myLeafIconImage = myLeafIcon.getImage();
-        standardNonLeafIcon = rendr.getOpenIcon();
+        standardNonLeafIcon = myRenderer.getOpenIcon();
 
-        rendr.setLeafIcon(myLeafIcon);
+        myRenderer.setLeafIcon(myLeafIcon);
         DragSource dragSource = DragSource.getDefaultDragSource();
 
         LegoTree instance = this;
@@ -185,7 +185,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 currentNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
                 parent = (MutableTreeNode) (currentNode.getParent());
                 if (parent != null)
-                    mod.removeNodeFromParent(currentNode);
+                    defaultTreeModel.removeNodeFromParent(currentNode);
             }
         }
     }
@@ -218,7 +218,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
                     try {
                         if (fban.isXML && fban.xmlSource.getCanonicalPath().equals(f.getCanonicalPath())) {
-                            mod.removeNodeFromParent(n);
+                            defaultTreeModel.removeNodeFromParent(n);
                             FileBasedClassManager.instance().unloadFile(fban);
                             return n;
                         }
@@ -261,9 +261,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             if (!recurse) {
                 myNode = new DefaultMutableTreeNode(f.getPath());
                 rootNode.add(myNode);
-                directoryRoots.put(f.getPath(), myNode);
+                directoryRootsMap.put(f.getPath(), myNode);
                 int idx = rootNode.getIndex(myNode);
-                mod.nodesWereInserted(rootNode, new int[]{idx});
+                defaultTreeModel.nodesWereInserted(rootNode, new int[]{idx});
 
                 File[] fa = f.listFiles(new MyClassTypeFilter(false));
                 for (File file : fa)
@@ -273,16 +273,16 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 // Am I here?  If so, grab my treenode
                 // Else is my parent here?  If so, hook me as child
                 // If not, put me in under the rootNode
-                myNode = directoryRoots.get(f.getPath());
+                myNode = directoryRootsMap.get(f.getPath());
                 if (myNode == null) {
-                    myNode = directoryRoots.get(f.getParent());
+                    myNode = directoryRootsMap.get(f.getParent());
                     if (myNode != null) {
                         DefaultMutableTreeNode parent = myNode;
                         myNode = new DefaultMutableTreeNode(f.getName());
                         parent.add(myNode);
-                        directoryRoots.put(f.getPath(), myNode);
+                        directoryRootsMap.put(f.getPath(), myNode);
                         int idx = parent.getIndex(myNode);
-                        mod.nodesWereInserted(parent, new int[]{idx});
+                        defaultTreeModel.nodesWereInserted(parent, new int[]{idx});
                     } else {
 
                         // Shorten long path names
@@ -298,9 +298,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
                         myNode = new DefaultMutableTreeNode(name);
                         rootNode.add(myNode);
-                        directoryRoots.put(f.getPath(), myNode);
+                        directoryRootsMap.put(f.getPath(), myNode);
                         int idx = rootNode.getIndex(myNode);
-                        mod.nodesWereInserted(rootNode, new int[]{idx});
+                        defaultTreeModel.nodesWereInserted(rootNode, new int[]{idx});
                     }
                 }
                 File[] fa = f.listFiles(new MyClassTypeFilter(true));
@@ -311,25 +311,25 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         } // is directory
         // We're NOT a directory...
         else {
-            FileBasedAssemblyNode fban;
+            FileBasedAssemblyNode fileBasedAssemblyNode;
             try {
 
                 // This call generates the source, compiles and validates Event Graph XML files
                 // Also checks for extensions of SimEntityBase in .class files
-                fban = FileBasedClassManager.instance().loadFile(f, getTargetClass());
+                fileBasedAssemblyNode = FileBasedClassManager.instance().loadFile(f, getTargetClass());
 
-                if (fban != null) {
-                    myNode = new DefaultMutableTreeNode(fban);
-                    int idx;
-                    DefaultMutableTreeNode par = directoryRoots.get(f.getParent());
+                if (fileBasedAssemblyNode != null) {
+                    myNode = new DefaultMutableTreeNode(fileBasedAssemblyNode);
+                    int index;
+                    DefaultMutableTreeNode par = directoryRootsMap.get(f.getParent());
                     if (par != null) {
                         par.add(myNode);
-                        idx = par.getIndex(myNode);
-                        mod.nodesWereInserted(par, new int[] {idx});
+                        index = par.getIndex(myNode);
+                        defaultTreeModel.nodesWereInserted(par, new int[] {index});
                     } else {
                         rootNode.add(myNode);
-                        idx = rootNode.getIndex(myNode);
-                        mod.nodesWereInserted(rootNode, new int[] {idx});
+                        index = rootNode.getIndex(myNode);
+                        defaultTreeModel.nodesWereInserted(rootNode, new int[] {index});
                     }
                 } else {
                     // NOTE: .class files come here if a directory is listed on
@@ -344,7 +344,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 // model tab is created and the Event Graph file is opened. First pass
                 // is only for inclusion in the LEGOs tree
                 if (ViskitGlobals.instance().getActiveEventGraphModel() != null) {
-                    ViskitGlobals.instance().getActiveEventGraphModel().setDirty(fban == null);
+                    ViskitGlobals.instance().getActiveEventGraphModel().setDirty(fileBasedAssemblyNode == null);
                     ViskitGlobals.instance().getEventGraphViewFrame().toggleEventGraphStatusIndicators();
                 }
 
@@ -357,34 +357,33 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         } // directory
     }
 
-    Map<String, DefaultMutableTreeNode> directoryRoots;
-    Map<String, DefaultMutableTreeNode> packagesHM = new HashMap<>();
+    Map<String, DefaultMutableTreeNode> directoryRootsMap;
+    Map<String, DefaultMutableTreeNode> packagesMap = new HashMap<>();
 
-    DefaultMutableTreeNode getParent(String pkg, DefaultMutableTreeNode lroot) {
-        DefaultMutableTreeNode parent = packagesHM.get(pkg);
+    DefaultMutableTreeNode getParent(String parentPackage, DefaultMutableTreeNode lroot) {
+        DefaultMutableTreeNode parent = packagesMap.get(parentPackage);
 
         if (parent == null) {
-            if (!pkg.contains(".")) {
+            if (!parentPackage.contains(".")) {
                 // we're as far up as we can be
-                parent = new DefaultMutableTreeNode(pkg);
-                mod.insertNodeInto(parent, lroot, 0);
+                parent = new DefaultMutableTreeNode(parentPackage);
+                defaultTreeModel.insertNodeInto(parent, lroot, 0);
             } else {
                 // go further
-                String ppkg = pkg.substring(0, pkg.lastIndexOf('.'));
+                String ppkg = parentPackage.substring(0, parentPackage.lastIndexOf('.'));
                 DefaultMutableTreeNode granddaddy = getParent(ppkg, lroot);
-                parent = new DefaultMutableTreeNode(pkg.substring(pkg.lastIndexOf('.') + 1));
-                mod.insertNodeInto(parent, granddaddy, 0);
+                parent = new DefaultMutableTreeNode(parentPackage.substring(parentPackage.lastIndexOf('.') + 1));
+                defaultTreeModel.insertNodeInto(parent, granddaddy, 0);
             }
-            packagesHM.put(pkg, parent);
+            packagesMap.put(parentPackage, parent);
         }
-
         return parent;
     }
 
     /**
      * Adds SimEntity icons to the Assembly Editor drag and drop tree
      *
-     * @param f the jar to evaluate for SimEntitiy based Event Graphs
+     * @param jarFilePath the jar to evaluate for SimEntitiy based Event Graphs
      */
     private void addJarFile(String jarFilePath) {
         JarFile jf;
@@ -436,7 +435,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
         } else {
 
             DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(name);
-            mod.insertNodeInto(localRoot, rootNode, 0);
+            defaultTreeModel.insertNodeInto(localRoot, rootNode, 0);
 
             list.forEach(c -> {
                 hookToParent(c, localRoot);
@@ -525,7 +524,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
     //** DragGestureListener **
     @Override
     public void dragGestureRecognized(DragGestureEvent e) {
-        if (lis == null) {
+        if (dragStartListener == null) {
             return;
         }
 
@@ -550,7 +549,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
             return;
         } // 24 Nov 04
 
-        lis.startingDrag(ss);
+        dragStartListener.startingDrag(ss);
         xfer = ss;
         try {
             e.startDrag(DragSource.DefaultCopyDrop, myLeafIconImage,
@@ -609,8 +608,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
      */
     public void clear() {
         rootNode.removeAllChildren();
-        if (directoryRoots != null) {
-            directoryRoots.clear();
+        if (directoryRootsMap != null) {
+            directoryRootsMap.clear();
         }
     }
 

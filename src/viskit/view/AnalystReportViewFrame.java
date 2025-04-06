@@ -65,6 +65,7 @@ import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 import static viskit.ViskitStatics.isFileReady;
 
 import viskit.util.OpenAssembly;
@@ -144,7 +145,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
                 break;
 
             case CLOSE_ASSEMBLY:
-            case PARAM_LOCALLY_EDITED:
+            case PARAMETER_LOCALLY_EDITED:
             case JAXB_CHANGED:
                 break;
 
@@ -770,7 +771,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
             {
                 List nextBehavior = (List) itr.next();
                 String behaviorName = (String) nextBehavior.get(0);
-                String behaviorDescription = (String) nextBehavior.get(1);
+                String behaviorDescription = ViskitStatics.emptyIfNull((String) nextBehavior.get(1));
                 List behaviorParameters = (List) nextBehavior.get(2);
                 List behaviorStateVariables = (List) nextBehavior.get(3);
                 String behaviorImagePath = (String) nextBehavior.get(4);
@@ -832,7 +833,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JCheckBox showStatisticsDescriptionAnalysisCB;
     JCheckBox showReplicationStatisticsCB;
     JCheckBox showSummaryStatisticsCB;
-    JTextArea statisticsDescription;
+    JTextArea statisticsDescriptionTextArea;
     JTextArea statisticsConclusions;
     JPanel statisticsSummaryPanel;
     JPanel statisticsReplicationReportsPanel;
@@ -848,7 +849,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         showStatisticsDescriptionAnalysisCB.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         statisticalResultsPanel.add(showStatisticsDescriptionAnalysisCB);
 
-        JScrollPane scrollPane = new JScrollPane(statisticsDescription = new WrappingTextArea());
+        JScrollPane scrollPane = new JScrollPane(statisticsDescriptionTextArea = new WrappingTextArea());
         scrollPane.setBorder(new TitledBorder("Description of Expected Results"));
         scrollPane.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         statisticalResultsPanel.add(scrollPane);
@@ -889,9 +890,9 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         {
             boolean value = analystReportModel.isShowStatiisticalResultsDescriptionAnalysis();
             showStatisticsDescriptionAnalysisCB.setSelected(value);
-            statisticsDescription.setText(analystReportModel.getStatisticsDescription());
+            statisticsDescriptionTextArea.setText(analystReportModel.getStatisticsDescription());
             statisticsConclusions.setText(analystReportModel.getStatisticsConclusions());
-            statisticsDescription.setEnabled(value);
+            statisticsDescriptionTextArea.setEnabled(value);
             statisticsConclusions.setEnabled(value);
 
             value = analystReportModel.isShowReplicationStatistics();
@@ -964,7 +965,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private void unFillStatisticalResultsPanel()
     {
         analystReportModel.setShowStatisticsDescriptionAnalysis(showStatisticsDescriptionAnalysisCB.isSelected());
-        analystReportModel.setStatisticsDescription(statisticsDescription.getText());
+        analystReportModel.setStatisticsDescription(statisticsDescriptionTextArea.getText());
         analystReportModel.setStatisticsConclusions(statisticsConclusions.getText());
         analystReportModel.setShowReplicationStatistics(showReplicationStatisticsCB.isSelected());
         analystReportModel.setShowSummaryStatistics(showSummaryStatisticsCB.isSelected());

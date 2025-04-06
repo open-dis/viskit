@@ -760,9 +760,9 @@ public class EdgeInspectorDialog extends JDialog
         return descriptionJsp.isVisible();
     }
 
-    public void setDescription(String description) {
-        if (description == null)
-            description = "";
+    public void setDescription(String description) 
+    {
+        description = ViskitStatics.emptyIfNull(description);
         descriptionTextArea.setText(description);
         modified = true;
         okButton.setEnabled(true);

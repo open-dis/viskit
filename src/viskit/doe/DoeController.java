@@ -368,7 +368,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                 }
                 break;
 
-            case PARAM_LOCALLY_EDITED:
+            case PARAMETER_LOCALLY_EDITED:
                 break;
             case CLOSE_ASSEMBLY:
                 break;

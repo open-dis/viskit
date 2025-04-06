@@ -3,6 +3,7 @@ package viskit.model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
+import viskit.ViskitStatics;
 
 /**
  * Class describes a "vParameter" to an event graph--something
@@ -33,7 +34,7 @@ public class ViskitParameter extends ViskitElement
     public ViskitParameter(String pName, String pType, String description) //todo make package-accessible
     {
         this(pName, pType);
-        this.description = description;
+        this.description = ViskitStatics.emptyIfNull(description);
     }
 
     @Override

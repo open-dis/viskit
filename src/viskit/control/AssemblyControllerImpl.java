@@ -334,13 +334,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     OpenAssembly.AssemblyChangeListener assemblyChangeListener = new OpenAssembly.AssemblyChangeListener() {
 
         @Override
-        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object parameter) {
             switch (action) {
                 case JAXB_CHANGED:
                     isLocalDirty.remove(source);
                     if (isLocalDirty.isEmpty())
+                    {
                         localDirty = false;
-
+                    }
                     ((AssemblyModel) getModel()).setDirty(true);
                     break;
 
@@ -349,14 +350,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     localDirty = false;
                     break;
 
-                case PARAM_LOCALLY_EDITED:
+                case PARAMETER_LOCALLY_EDITED:
                     // This gets hit when you type something in the last three tabs
                     isLocalDirty.add(source);
                     localDirty = true;
                     break;
 
                 case CLOSE_ASSEMBLY:
-
                     // Close any currently open Event Graphs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
 
@@ -365,8 +365,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     AssemblyModel assemblyModel = (AssemblyModel) getModel();
                     markAssemblyConfigurationClosed(assemblyModel.getCurrentFile());
 
-                    AssemblyView view = (AssemblyView) getView();
-                    view.deleteTab(assemblyModel);
+                    AssemblyView assemblyView = (AssemblyView) getView();
+                    assemblyView.deleteTab(assemblyModel);
 
                     // NOTE: This doesn't work quite right. If no Assembly is open,
                     // then any non-associated Event Graphs that were also open will
@@ -374,13 +374,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     // using an open Event Graph cache system that relies on parsing an
                     // Assembly file to find its associated Event Graphs to open
                     if (!isCloseAll()) {
-                        AssemblyModel[] modAr = view.getOpenModels();
-                        for (AssemblyModel mod : modAr) {
-                            if (!mod.equals(assemblyModel))
-                                openEventGraphs(mod.getCurrentFile());
+                        AssemblyModel[] assemblyModelArray = assemblyView.getOpenModels();
+                        for (AssemblyModel nextAssemblyModel : assemblyModelArray) {
+                            if (!nextAssemblyModel.equals(assemblyModel))
+                                openEventGraphs(nextAssemblyModel.getCurrentFile());
                         }
                     }
-
                     break;
 
                 default:
