@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="ArrayTester" package="examples" version="1.0" author="Terry D. Norbraten" description="Test Viskit's capability to create primitive type arrays" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="ArrayTester" package="examples" version="1.0" author="Terry D. Norbraten" extend="SimEntityBase" description="Test Viskit's capability to create primitive type arrays" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="param_0" type="int[]" description="example parameter"/>
     <StateVariable name="state_0" type="int[param_0.length]" description="example state variable"/>
     <Event name="Run" description="The run event is started automatically by Simkit when execution starts.">
@@ -10,7 +10,7 @@
         <Coordinate x="30.0" y="30.0"/>
     </Event>
     <Event name="Init" description="Initialize the event graph">
-        <Argument name="i" type="int"/>
+        <Argument name="i" type="int" description=""/>
         <StateTransition state="state_0" index="i">
             <Assignment value="param_0[i]"/>
         </StateTransition>
