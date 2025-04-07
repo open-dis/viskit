@@ -66,9 +66,9 @@ public class TextAreaOutputStream extends ByteArrayOutputStream implements Actio
     static final Logger LOG = LogManager.getLogger();
   
   private final JTextArea jTextArea;
-  private final Timer swingTimer;
-  private final int delay = 125; //250;   // Performance adjuster for slow machines
-  private final String warningMsg = "Output limit exceeded / previous text deleted.\n" +
+  private final Timer  swingTimer;
+  private final int    delay = 125; //250;   // Performance adjuster for slow machines
+  private final String warningMessage = "Output limit exceeded / previous text deleted.\n" +
                                     "----------------------------------------------\n";
   public TextAreaOutputStream(JTextArea textArea, int bufferSize)
   {
@@ -89,14 +89,16 @@ public class TextAreaOutputStream extends ByteArrayOutputStream implements Actio
 
       if (jTextArea.getDocument().getLength() > OUTPUTLIMIT) {
         int backoff = Math.max(BACKOFFSIZE, inputSize);
-        jTextArea.replaceRange(warningMsg, 0, backoff - 1);
+        if (backoff > 1)
+            jTextArea.replaceRange(warningMessage, 0, backoff - 1);
       }
       jTextArea.append(inputString);
       jTextArea.setCaretPosition(jTextArea.getDocument().getLength()-1);
      }
     try {
         close();
-    } catch (IOException ex) {
+    } 
+    catch (IOException ex) {
         LOG.error(ex);
     }
   }
@@ -105,6 +107,6 @@ public class TextAreaOutputStream extends ByteArrayOutputStream implements Actio
   public void kill()
   {
     swingTimer.stop();
-    actionPerformed(null);  // flush last bit
+    actionPerformed(null);  // flush last bit of text
   }
 }

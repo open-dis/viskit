@@ -391,8 +391,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         return stopTime;
     }
 
-    public void setSingleStep(boolean b) {
-        singleStep = b;
+    public void setSingleStep(boolean value) {
+        singleStep = value;
     }
 
     public boolean isSingleStep() {
@@ -403,7 +403,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      *
      * @param value if true, stops further simulation runs
      */
-    public void setStopSimulationRun(boolean value) {
+    public void setStopSimulationRun(boolean value) 
+    {
         stopSimulationRun = value;
         if (stopSimulationRun)
         {

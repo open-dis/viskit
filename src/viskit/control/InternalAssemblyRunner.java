@@ -35,7 +35,6 @@ package viskit.control;
 
 import viskit.view.SimulationRunPanel;
 
-import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 import java.awt.Desktop;
 
@@ -124,6 +123,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
      * The internal logic for the Assembly Runner panel
      * @param analystReportPanelVisible if true, the Analyst Report panel will be visible
      */
+    
+    private String vcrState = new String();
+    
     public InternalAssemblyRunner(boolean analystReportPanelVisible) 
     {
         saveListener = new SaveListener();
@@ -132,17 +134,18 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
         // false will enable all VCR buttons. Currently, only start and stop work
 
-        simulationRunPanel = new SimulationRunPanel(SIMULATION_RUN_PANEL_TITLE, false, analystReportPanelVisible);
+        simulationRunPanel = new SimulationRunPanel(SIMULATION_RUN_PANEL_TITLE, true, analystReportPanelVisible);
         buildMenus();
-        simulationRunPanel.vcrStopButton.addActionListener(assemblySimulationRunStopListener = new StopListener());
-        simulationRunPanel.vcrPlayButton.addActionListener(new StartResumeListener());
+        simulationRunPanel.vcrPlayButton  .addActionListener(new StartResumeListener());
+        simulationRunPanel.vcrStopButton  .addActionListener(assemblySimulationRunStopListener = new StopListener());
         simulationRunPanel.vcrRewindButton.addActionListener(new RewindListener());
-        simulationRunPanel.vcrStepButton.addActionListener(new StepListener());
-        simulationRunPanel.vcrVerboseCB.addActionListener(new VerboseListener());
-        simulationRunPanel.vcrStopButton.setEnabled(false);
-        simulationRunPanel.vcrPlayButton.setEnabled(false);
+        simulationRunPanel.vcrStepButton  .addActionListener(new StepListener());
+        simulationRunPanel.vcrVerboseCB   .addActionListener(new VerboseListener());
+        
+        simulationRunPanel.vcrStopButton  .setEnabled(false);
+        simulationRunPanel.vcrPlayButton  .setEnabled(false);
         simulationRunPanel.vcrRewindButton.setEnabled(false);
-        simulationRunPanel.vcrStepButton.setEnabled(false);
+        simulationRunPanel.vcrStepButton  .setEnabled(false);
 
         // Save Viskit's current working ClassLoader for later restoration
         priorWorkingClassLoaderNoReset = ViskitGlobals.instance().getViskitApplicationClassLoader();
@@ -225,6 +228,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             return;
         }
         vcrButtonPressDisplayUpdate(Event.REWIND);
+        vcrButtonPressDisplayUpdate(Event.READY);
     }
 
     private void fillSimulationRunButtonsFromAssemblyInitialization(boolean verbose, boolean saveReplicationDataToXml, double stopTime) throws Throwable 
@@ -379,7 +383,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         }
 
         @Override
-        public Void doInBackground() {
+        public Void doInBackground() 
+        {
             setProgress(0);
 
             simulationRunMonitorThread.start(); // commence thread
@@ -436,7 +441,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
      * or non-integer value.
      * @return the replication instance to output verbose on
      */
-    public int getVerboseReplicationNumber() {
+    public int getVerboseReplicationNumber()
+    {
         int replicationNumber = -1;
         try {
             replicationNumber = Integer.parseInt(simulationRunPanel.verboseReplicationNumberTF.getText().trim());
@@ -450,28 +456,32 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         return replicationNumber;
     }
 
-    class StartResumeListener implements ActionListener {
-
+    class StartResumeListener implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent e) 
+        public void actionPerformed(ActionEvent actionEvent) 
         {
             simulationRunPanel.vcrStartTimeTF.setText("0.0");    // because no pausing
-            vcrButtonPressDisplayUpdate(Event.START);
+            vcrButtonPressDisplayUpdate(Event.START_RESUME);
             prepareAndStartAssemblySimulationRun();
         }
     }
 
-    class StepListener implements ActionListener {
-
+    class StepListener implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent e) // TODO editing in progress, not fully tested
+        public void actionPerformed(ActionEvent actionEvent) // TODO development in progress, not fully tested
         {
             try // StepListener
             {
-                if (simulationRunAssemblyInstance != null) {
-
-                    Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
+                vcrButtonPressDisplayUpdate(Event.STEP);
+                
+                if (simulationRunAssemblyInstance != null) 
+                {
                     LOG.info("StepListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
+                    
+                    if (priorRunSimulationClassLoader != null) // TODO necessary?
+                        Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
 
                     Method setStepRunMethod = simulationRunAssemblyClass.getMethod("setStepRun", boolean.class);
                     setStepRunMethod.invoke(simulationRunAssemblyInstance, true);
@@ -503,7 +513,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 //                LOG.error(ex);
 //                ex.printStackTrace();
             }
-            vcrButtonPressDisplayUpdate(Event.STEP);
         }
     }
 
@@ -513,8 +522,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     public class StopListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent e)
+        public void actionPerformed(ActionEvent actionEvent)
         {
+            vcrButtonPressDisplayUpdate(Event.STOP);
             try // StopListener
             {
                 if (simulationRunAssemblyInstance != null) {
@@ -551,25 +561,36 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 //                LOG.error(ex);
 //                ex.printStackTrace();
             }
-            vcrButtonPressDisplayUpdate(Event.STOP);
         }
     }
 
-    class RewindListener implements ActionListener {
-
+    class RewindListener implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent actionEvent) 
+        {
             vcrButtonPressDisplayUpdate(Event.REWIND);
+            
+            // TODO reset simulation clock
+            try {
+                SwingUtilities.invokeLater(() -> {
+                vcrButtonPressDisplayUpdate(Event.READY);
+                });
+            }
+            catch (Exception ex) {
+                LOG.error("RewindListener.actionPerformed(" + actionEvent.toString() + ") exception: " + ex.getMessage());
+            }
         }
     }
 
     /** Allow for overriding XML set value via the Run panel setting */
-    class VerboseListener implements ActionListener {
-
+    class VerboseListener implements ActionListener 
+    {
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent actionEvent) 
+        {
             if (basicAssembly == null) {return;}
-            basicAssembly.setVerbose(((AbstractButton) e.getSource()).isSelected());
+            basicAssembly.setVerbose(((AbstractButton) actionEvent.getSource()).isSelected());
         }
     }
 
@@ -658,40 +679,68 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     }
 
     public enum Event {
-        START, STOP, STEP, REWIND, OFF
+        START_RESUME, STOP, STEP, REWIND, OFF, READY
     }
 
-    public void vcrButtonPressDisplayUpdate(Event newEvent) {
-        switch (newEvent) {
-            case START:
-                simulationRunPanel.vcrPlayButton.setEnabled(false);
-                simulationRunPanel.vcrStepButton.setEnabled(false); // TODO
-                simulationRunPanel.vcrStopButton.setEnabled(true);
-                simulationRunPanel.vcrRewindButton.setEnabled(false);
+    /** State machine logic
+     * @param newEvent triggered by button push
+     */
+    public void vcrButtonPressDisplayUpdate(Event newEvent) 
+    {
+        vcrState = newEvent.toString();
+        simulationRunPanel.vcrButtonStatusLabel.setText(" " + vcrState);
+        simulationRunPanel.outputStreamTA.setText(
+                simulationRunPanel.outputStreamTA.getText() + "\n" +
+                "User button pressed: " + vcrState          + "\n");
+        switch (newEvent) 
+        {
+            case START_RESUME:
+                simulationRunPanel.vcrPlayButton        .setEnabled(false);
+                simulationRunPanel.vcrStepButton        .setEnabled(true);
+                simulationRunPanel.vcrStopButton        .setEnabled(true);
+                simulationRunPanel.vcrRewindButton      .setEnabled(false);
+                simulationRunPanel.vcrClearConsoleButton.setEnabled(false);
+                LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
             case STEP:
-                simulationRunPanel.vcrPlayButton.setEnabled(true);
-                simulationRunPanel.vcrStepButton.setEnabled(false); // TODO
-                simulationRunPanel.vcrStopButton.setEnabled(true);
-                simulationRunPanel.vcrRewindButton.setEnabled(true);
+                simulationRunPanel.vcrPlayButton        .setEnabled(true);
+                simulationRunPanel.vcrStepButton        .setEnabled(true);
+                simulationRunPanel.vcrStopButton        .setEnabled(true);
+                simulationRunPanel.vcrRewindButton      .setEnabled(true);
+                simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
+                LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
             case STOP:
-                simulationRunPanel.vcrPlayButton.setEnabled(true);
-                simulationRunPanel.vcrStepButton.setEnabled(false); // TODO
-                simulationRunPanel.vcrStopButton.setEnabled(false);
-                simulationRunPanel.vcrRewindButton.setEnabled(false);
+                simulationRunPanel.vcrPlayButton        .setEnabled(true);
+                simulationRunPanel.vcrStepButton        .setEnabled(true);
+                simulationRunPanel.vcrStopButton        .setEnabled(false);
+                simulationRunPanel.vcrRewindButton      .setEnabled(false);
+                simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
+                LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
             case REWIND:
-                simulationRunPanel.vcrPlayButton.setEnabled(true);
-                simulationRunPanel.vcrStepButton.setEnabled(false); // TODO 
-                simulationRunPanel.vcrStopButton.setEnabled(false);
-                simulationRunPanel.vcrRewindButton.setEnabled(false);
+                simulationRunPanel.vcrPlayButton        .setEnabled(true);
+                simulationRunPanel.vcrStepButton        .setEnabled(false); 
+                simulationRunPanel.vcrStopButton        .setEnabled(false);
+                simulationRunPanel.vcrRewindButton      .setEnabled(false);
+                simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
+                LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
             case OFF:
-                simulationRunPanel.vcrPlayButton.setEnabled(false);
-                simulationRunPanel.vcrStepButton.setEnabled(false);
-                simulationRunPanel.vcrStopButton.setEnabled(false);
-                simulationRunPanel.vcrRewindButton.setEnabled(false);
+                simulationRunPanel.vcrPlayButton        .setEnabled(false);
+                simulationRunPanel.vcrStepButton        .setEnabled(false);
+                simulationRunPanel.vcrStopButton        .setEnabled(false);
+                simulationRunPanel.vcrRewindButton      .setEnabled(false);
+                simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
+                LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
+                break;
+            case READY:
+                simulationRunPanel.vcrPlayButton        .setEnabled(true);
+                simulationRunPanel.vcrStepButton        .setEnabled(true);
+                simulationRunPanel.vcrStopButton        .setEnabled(false);
+                simulationRunPanel.vcrRewindButton      .setEnabled(false);
+                simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
+                LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
             default:
                 LOG.warn("*** Unrecognized vcrButtonListener(event=" + newEvent + ")");
@@ -846,7 +895,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         }
     }
 
-    private final String initialValue = "awaiting initialization by Assembly Editor..."; // TODO unscramble logic
+    private final String  initialValue = "awaiting initialization by Assembly Editor..."; // TODO unscramble logic
     private StringBuilder currentTitle = new StringBuilder();
 
     public void doTitle(String newName)
@@ -965,6 +1014,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener
      */
     public void setClassPathUrlArray(URL[] classPathUrlArray) {
         this.classPathUrlArray = classPathUrlArray;
+    }
+
+    /**
+     * @return the vcrState
+     */
+    public String getVcrState() {
+        return vcrState;
     }
 
 }  // end class file InternalAssemblyRunner.java

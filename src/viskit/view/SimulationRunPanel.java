@@ -44,6 +44,7 @@ import javax.swing.event.CaretListener;
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import static viskit.control.InternalAssemblyRunner.Event.READY;
 
 /**
  * A VCR-controls and TextArea panel.  Sends Simkit output to TextArea
@@ -70,7 +71,7 @@ public class SimulationRunPanel extends JPanel
     public JScrollPane scrollPane;
     public JTextArea outputStreamTA;
 //    public JSplitPane xsplitPane;
-    public JButton vcrStopButton, vcrPlayButton, vcrRewindButton, vcrStepButton, closeButton;
+    public JButton vcrStopButton, vcrPlayButton, vcrRewindButton, vcrStepButton, closeButton, vcrClearConsoleButton;
     public JCheckBox vcrVerboseCB;
     public JTextField vcrStartTimeTF, vcrStopTimeTF;
     public JCheckBox saveReplicationDataCB;
@@ -84,7 +85,7 @@ public class SimulationRunPanel extends JPanel
     public JScrollBar scrollBar;
     public JTextField verboseReplicationNumberTF;
     public static final String VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT = "[replication #]";
-    public JLabel nowRunningLabel;
+    public JLabel  vcrButtonStatusLabel, nowRunningLabel;
     public JLabel  viskitRunnerBannerLabel;
     private String viskitRunnerBannerString;
     public JLabel iconLabel;
@@ -192,50 +193,55 @@ public class SimulationRunPanel extends JPanel
 //        runButtonPanel.setBorder(new EmptyBorder(0,10,0,20));
 
         vcrRewindButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Rewind24.gif")));
-        vcrRewindButton.setToolTipText("Reset the simulation run");
-        vcrRewindButton.setEnabled(false);
         vcrRewindButton.setBorder(BorderFactory.createEtchedBorder());
         vcrRewindButton.setText(null);
-        if (showIncompleteButtons) {
+        vcrRewindButton.setToolTipText("Reset the simulation run");
+        vcrRewindButton.setEnabled(true); // false true
+        if (showIncompleteButtons) 
+        {
             runButtonsPanel.add(vcrRewindButton);
         }
 
         vcrPlayButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
-        vcrPlayButton.setToolTipText("Run or resume the simulation run");
         vcrPlayButton.setBorder(BorderFactory.createEtchedBorder());
         vcrPlayButton.setText(null);
+        vcrPlayButton.setToolTipText("Run or resume the simulation run");
+        vcrPlayButton.setEnabled(true);
         runButtonsPanel.add(vcrPlayButton);
 
         vcrStepButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/StepForward24.gif")));
-        vcrStepButton.setToolTipText("Step the simulation");
         vcrStepButton.setBorder(BorderFactory.createEtchedBorder());
         vcrStepButton.setText(null);
-        vcrStepButton.setToolTipText("Single step");
-        vcrStepButton.setEnabled(false); // TODO
+        vcrStepButton.setToolTipText("Single step the simulation");
+        vcrStepButton.setEnabled(true); // false true
         runButtonsPanel.add(vcrStepButton); // i.e. vcrPause
 
         vcrStopButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
-        vcrStopButton.setToolTipText("Stop the simulation run");
-        vcrStopButton.setEnabled(false);
         vcrStopButton.setBorder(BorderFactory.createEtchedBorder());
         vcrStopButton.setText(null);
+        vcrStopButton.setToolTipText("Stop the simulation run");
+        vcrStopButton.setEnabled(true); // false true
         runButtonsPanel.add(vcrStopButton);
         
-        JButton clearConsoleButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Delete24.gif"))); // Clear
+        vcrClearConsoleButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Delete24.gif"))); // Clear
         
-        ViskitStatics.clampComponentSize(clearConsoleButton, vcrStopButton, vcrStopButton);
+        ViskitStatics.clampComponentSize(vcrClearConsoleButton, vcrStopButton, vcrStopButton);
         // https://stackoverflow.com/questions/1954674/can-i-make-swing-jbuttons-have-smaller-margins
-        clearConsoleButton.setMargin(new Insets(3, 4, 3, 4));
-        clearConsoleButton.setToolTipText("Clear all console text");
+        vcrClearConsoleButton.setMargin(new Insets(3, 4, 3, 4));
+        vcrClearConsoleButton.setToolTipText("Clear all console text");
         // https://stackoverflow.com/questions/9569700/java-call-method-via-jbutton
-        clearConsoleButton.addActionListener(new ActionListener() {
+        vcrClearConsoleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 outputStreamTA.selectAll();
                 outputStreamTA.replaceSelection(""); // cleears
             }
         });
-        runButtonsPanel.add(clearConsoleButton);
+        runButtonsPanel.add(vcrClearConsoleButton);
+        
+        vcrButtonStatusLabel = new JLabel(" " + READY);
+        vcrButtonStatusLabel.setToolTipText("Status of simulation run state machine");
+        runButtonsPanel.add(vcrButtonStatusLabel);
 
         upperLeftFlowPanel.add(Box.createVerticalStrut(4));
         upperLeftFlowPanel.add(runButtonsPanel);
