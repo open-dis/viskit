@@ -207,7 +207,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
-    public boolean saveModel(File modelFile) {
+    public boolean saveModel(File modelFile) 
+    {
         boolean returnValue;
         if (modelFile == null) {
             modelFile = currentFile;
@@ -237,13 +238,13 @@ public class ModelImpl extends MvcAbstractModel implements Model
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbRoot.setName(ViskitStatics.nullIfEmpty(graphMetadata.name));
-            jaxbRoot.setVersion(ViskitStatics.nullIfEmpty(graphMetadata.version));
-            jaxbRoot.setAuthor(ViskitStatics.nullIfEmpty(graphMetadata.author));
-            jaxbRoot.setPackage(ViskitStatics.nullIfEmpty(graphMetadata.packageName));
-            jaxbRoot.setExtend(ViskitStatics.nullIfEmpty(graphMetadata.extendsPackageName));
-            jaxbRoot.setImplement(ViskitStatics.nullIfEmpty(graphMetadata.implementsPackageName));
+            jaxbRoot.setName       (ViskitStatics.nullIfEmpty(graphMetadata.name));
+            jaxbRoot.setVersion    (ViskitStatics.nullIfEmpty(graphMetadata.version));
+            jaxbRoot.setAuthor     (ViskitStatics.nullIfEmpty(graphMetadata.author));
             jaxbRoot.setDescription(ViskitStatics.nullIfEmpty(graphMetadata.description));
+            jaxbRoot.setPackage    (ViskitStatics.nullIfEmpty(graphMetadata.packageName));
+            jaxbRoot.setExtend     (ViskitStatics.nullIfEmpty(graphMetadata.extendsPackageName));
+            jaxbRoot.setImplement  (ViskitStatics.nullIfEmpty(graphMetadata.implementsPackageName));
             
             // obsolete
 //            List<String> clis = jaxbRoot.getComment();

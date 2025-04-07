@@ -189,7 +189,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void saveModel(File savableAssemblyModel) {
+    public void saveModel(File savableAssemblyModel) 
+    {
         if (savableAssemblyModel == null) {
             savableAssemblyModel = currentAssemblyModelFile;
         }
@@ -220,9 +221,13 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             assemblyMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             assemblyMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
 
-            jaxbRoot.setName(ViskitStatics.nullIfEmpty(graphMetadata.name));
-            jaxbRoot.setVersion(ViskitStatics.nullIfEmpty(graphMetadata.version));
-            jaxbRoot.setPackage(ViskitStatics.nullIfEmpty(graphMetadata.packageName));
+            jaxbRoot.setName       (ViskitStatics.nullIfEmpty(graphMetadata.name));
+            jaxbRoot.setVersion    (ViskitStatics.nullIfEmpty(graphMetadata.version));
+            jaxbRoot.setAuthor     (ViskitStatics.nullIfEmpty(graphMetadata.author));
+            jaxbRoot.setDescription(ViskitStatics.nullIfEmpty(graphMetadata.description));
+            jaxbRoot.setPackage    (ViskitStatics.nullIfEmpty(graphMetadata.packageName));
+            jaxbRoot.setExtend     (ViskitStatics.nullIfEmpty(graphMetadata.extendsPackageName));
+            jaxbRoot.setImplement  (ViskitStatics.nullIfEmpty(graphMetadata.implementsPackageName));
 
             if (jaxbRoot.getSchedule() == null) {
                 jaxbRoot.setSchedule(jaxbAssemblyObjectFactory.createSchedule());

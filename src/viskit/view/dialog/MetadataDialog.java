@@ -47,12 +47,19 @@ abstract public class MetadataDialog extends JDialog
     public MetadataDialog(JFrame frame, GraphMetadata graphMetadata, String title) 
     {
         super(frame, title, true);
+        
+        String tooltipSuffix;
+        if (this instanceof AssemblyMetadataDialog)
+             tooltipSuffix = " of this assembly";
+        else tooltipSuffix = " of this event graph";
+        
         this.graphMetadata = graphMetadata;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new myCloseListener());
 
-        //Create and populate the panel.
+        //Create and populate the panel
         JPanel contentPanel = new JPanel();
+        contentPanel.setToolTipText("Properties metadata" + tooltipSuffix + " are defined in the .xml file");
         setContentPane(contentPanel);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -63,6 +70,10 @@ abstract public class MetadataDialog extends JDialog
         JLabel nameLabel = new JLabel("name", JLabel.TRAILING);
         nameTF = new JTextField(20);
         nameLabel.setLabelFor(nameTF);
+        String nameTooltip = "name" + tooltipSuffix + " (must be a legal Java name, matching XML file name)";
+        nameLabel.setToolTipText(nameTooltip);
+           nameTF.setToolTipText(nameTooltip);
+           nameTF.setEditable(false); // TODO, changing requires file renaming and possibly other refactoring
         textFieldPanel.add(nameLabel);
         textFieldPanel.add(nameTF);
 
@@ -70,23 +81,34 @@ abstract public class MetadataDialog extends JDialog
         packageTF = new JTextField(20);
         packageTF.setToolTipText("Use standard Java dot notation for package naming, e.g. packageName.className");
         packageLabel.setLabelFor(packageTF);
+        String packageTooltip = "parent Java package" + tooltipSuffix;
+        packageLabel.setToolTipText(packageTooltip);
+           packageTF.setToolTipText(packageTooltip);
         textFieldPanel.add(packageLabel);
         textFieldPanel.add(packageTF);
 
         JLabel authorLabel = new JLabel("author", JLabel.TRAILING);
         authorTF = new JTextField(20);
         authorLabel.setLabelFor(authorTF);
+        String authorTooltip = "author(s)" + tooltipSuffix;
+        authorLabel.setToolTipText(authorTooltip);
+           authorTF.setToolTipText(authorTooltip);
         textFieldPanel.add(authorLabel);
         textFieldPanel.add(authorTF);
 
         JLabel versionLabel = new JLabel("version", JLabel.TRAILING);
         versionTF = new JTextField(20);
         versionLabel.setLabelFor(versionTF);
+        String versionTooltip = "version number" + tooltipSuffix;
+        versionLabel.setToolTipText(versionTooltip);
+           versionTF.setToolTipText(versionTooltip);
         textFieldPanel.add(versionLabel);
         textFieldPanel.add(versionTF);
 
         JLabel extendsLabel = new JLabel("extends", JLabel.TRAILING);
         extendsTF = new JTextField(20);
+        extendsLabel.setToolTipText("list of Java superclasses");
+           extendsTF.setToolTipText("list of Java superclasses");
         extendsLabel.setLabelFor(extendsTF);
         textFieldPanel.add(extendsLabel);
         textFieldPanel.add(extendsTF);
@@ -94,6 +116,8 @@ abstract public class MetadataDialog extends JDialog
         JLabel implementsLabel = new JLabel("implements", JLabel.TRAILING);
         implementsTF = new JTextField(20);
         implementsLabel.setLabelFor(implementsTF);
+        implementsLabel.setToolTipText("list of Java interfaces");
+           implementsTF.setToolTipText("list of Java interfaces");
         textFieldPanel.add(implementsLabel);
         textFieldPanel.add(implementsTF);
 
@@ -200,8 +224,8 @@ abstract public class MetadataDialog extends JDialog
         // cleanups
         graphMetadata.author      = authorTF.getText().trim();
 
-        if (this instanceof AssemblyMetadataDialog) {
-
+        if (this instanceof AssemblyMetadataDialog)
+        {
             // The default names are AssemblyName, or EventGraphName
             if (!graphMetadata.name.contains("Assembly") || graphMetadata.name.equals("AssemblyName"))
 
@@ -209,7 +233,9 @@ abstract public class MetadataDialog extends JDialog
                 graphMetadata.name = nameTF.getText().trim() + "Assembly";
             else
                 graphMetadata.name = nameTF.getText().trim();
-        } else {
+        } 
+        else // event graph 
+        {
             graphMetadata.name = nameTF.getText().trim();
         }
         graphMetadata.packageName = packageTF.getText().trim();

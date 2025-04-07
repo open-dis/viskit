@@ -37,6 +37,7 @@ import viskit.ViskitGlobals;
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitStatics;
 import static viskit.ViskitStatics.DESCRIPTION_HINT;
+import static viskit.control.AssemblyControllerImpl.LOG;
 import viskit.jgraph.ViskitGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.MvcAbstractController;
@@ -577,13 +578,20 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void save()
     {
         ViskitGlobals.instance().getMainFrame().selectEventGraphEditorTab();
-        Model model = (Model) getModel();
-        File localLastFile = model.getLastFile();
+        Model eventGraphModel = (Model) getModel();
+        if (eventGraphModel == null)
+            eventGraphModel = ViskitGlobals.instance().getActiveEventGraphModel();
+        if (eventGraphModel == null)
+        {
+            LOG.error("unable to save() null eventGraphModel");
+            return;
+        }
+        File localLastFile = eventGraphModel.getLastFile();
         if (localLastFile == null) {
             saveAs();
         } 
         else {
-            handleCompileAndSave(model, localLastFile);
+            handleCompileAndSave(eventGraphModel, localLastFile);
         }
     }
 

@@ -466,6 +466,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        if (assemblyModel == null)
+            assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
+        if (assemblyModel == null)
+        {
+            LOG.error("unable to save() null assemblyModel");
+            return;
+        }
         if (assemblyModel.getCurrentFile() == null) {
             saveAs();
         } 
@@ -527,8 +534,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         
         boolean modified =
                 AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyViewFrame(), graphMetadata);
-        if (modified) {
-            ((AssemblyModel) getModel()).changeMetadata(graphMetadata);
+        if (modified) 
+        {
+            assemblyModel.changeMetadata(graphMetadata);
 
             // update title bar for frame
             ViskitGlobals.instance().getAssemblyViewFrame().setSelectedAssemblyName(graphMetadata.name);
@@ -1718,6 +1726,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
             x2j.unmarshal();
 
+            // SimEntity is a synonym for event graph, when running as part of an asssembly
             boolean isEventGraph = x2j.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
             if (!isEventGraph) {
                 LOG.debug("Is an Assembly: {}", !isEventGraph);
