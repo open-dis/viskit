@@ -33,7 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.view;
 
-import edu.nps.util.Log4jUtilities;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -69,6 +68,7 @@ import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
 import static viskit.view.MainFrame.tabIndices;
 import viskit.view.dialog.ViskitUserPreferencesDialog;
 import static viskit.view.MainFrame.TAB0_SIMULATIONRUN_INDEX;
+import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
 
 /**
  * MOVES Institute
@@ -258,7 +258,7 @@ public class MainFrame extends JFrame
             topTabbedPane.add(runTabbedPanePanel);
             assemblyPaneIndex = topTabbedPane.indexOfComponent(runTabbedPanePanel);
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Simulation Run Manager");
-            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "first Prepare Assembly for Simulation Run");
+            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, INITIAL_SIMULATION_RUN_HINT);
             modalMenuBarList.add(null); // placeholder
             tabIndices[TAB0_SIMULATIONRUN_INDEX] = assemblyPaneIndex;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
@@ -435,7 +435,7 @@ public class MainFrame extends JFrame
             }
             else if ((topTabbedPane != null) && (topTabbedPane.getTabCount() >= TAB0_SIMULATIONRUN_INDEX)) // TODO why is this needed??
             {
-                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], "first Prepare Assembly for Simulation Run");
+                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], "first Initialize Assembly for Simulation Run");
             }
 
             JMenuBar selectedMenuBar = new JMenuBar();
@@ -671,7 +671,8 @@ public class MainFrame extends JFrame
             simulationRunPanel.printReplicationReportsCB.setSelected(false);
             simulationRunPanel.printSummaryReportsCB.setSelected(false);
 
-            internalSimulationRunner.vcrButtonPressDisplayUpdate(InternalAssemblyRunner.Event.OFF); // initialize
+            internalSimulationRunner.vcrButtonPressDisplayUpdate(InternalAssemblyRunner.Event.DONE); // initialize
+            simulationRunPanel.outputStreamTA       .setText(INITIAL_SIMULATION_RUN_HINT);
             internalSimulationRunner.doTitle(null);
             
             simulationRunPanel.nowRunningLabel.setText("");

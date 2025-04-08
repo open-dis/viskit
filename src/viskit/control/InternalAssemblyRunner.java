@@ -65,6 +65,7 @@ import viskit.assembly.BasicAssembly;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
+import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
 import static viskit.view.SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
 import static viskit.view.SimulationRunPanel.VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT;
 import viskit.view.dialog.ViskitUserPreferencesDialog;
@@ -223,12 +224,24 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage()
             );
-            vcrButtonPressDisplayUpdate(Event.OFF);
+            vcrButtonPressDisplayUpdate(Event.DONE);
+            simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HINT);
 //            throwable.printStackTrace();
             return;
         }
         vcrButtonPressDisplayUpdate(Event.REWIND);
         vcrButtonPressDisplayUpdate(Event.READY);
+        
+//        try {
+//            SwingUtilities.invokeLater(() -> {
+                 simulationRunPanel.outputStreamTA.setText("");
+                 simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HINT);
+//            });
+//        } 
+//        catch (Exception ex) {
+//            LOG.error("preRunInitialization() console exception: " + ex.getMessage());
+//        }
+//       
     }
 
     private void fillSimulationRunButtonsFromAssemblyInitialization(boolean verbose, boolean saveReplicationDataToXml, double stopTime) throws Throwable 
@@ -262,7 +275,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         // Ignore multiple pushes of the sim run button
         mutex++;
         if (mutex > 1)
+        {
+            LOG.error("prepareAndStartAssemblySimulationRun() unable to commence because mututal-exclusion count mutex={}", mutex);
             return;
+        }
 
         try // prepareAndStartAssemblySimulationRun()
         {
@@ -463,6 +479,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             simulationRunPanel.vcrStartTimeTF.setText("0.0");    // because no pausing
             vcrButtonPressDisplayUpdate(Event.START_RESUME);
+            if (simulationRunPanel.outputStreamTA.getText().isBlank() ||
+                simulationRunPanel.outputStreamTA.getText().trim().equals(INITIAL_SIMULATION_RUN_HINT))
+                simulationRunPanel.outputStreamTA.setText(SIMULATION_RUN_PANEL_TITLE);
             prepareAndStartAssemblySimulationRun();
         }
     }
@@ -476,9 +495,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             {
                 vcrButtonPressDisplayUpdate(Event.STEP);
                 
+                // TODO where is setStepRun ??
+                
                 if (simulationRunAssemblyInstance != null) 
                 {
-                    LOG.info("StepListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
+                    LOG.debug("StepListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     
                     if (priorRunSimulationClassLoader != null) // TODO necessary?
                         Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
@@ -492,7 +513,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 //                    mutex--;
                 }
 
-                Schedule.coldReset();
+//                Schedule.coldReset(); // ??
 
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
                 if ((classLoader != null) && !classLoader.equals(priorWorkingClassLoaderNoReset))
@@ -525,20 +546,22 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         public void actionPerformed(ActionEvent actionEvent)
         {
             vcrButtonPressDisplayUpdate(Event.STOP);
+            if (mutex > 0)
+                mutex--;
             try // StopListener
             {
                 if (simulationRunAssemblyInstance != null) {
 
                     Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
                     LOG.info("StopListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
-
+                    
+                    // TODO where is this method?
                     Method setStopRunMethod = simulationRunAssemblyClass.getMethod("setStopRun", boolean.class);
                     setStopRunMethod.invoke(simulationRunAssemblyInstance, true);
 
                     if (textAreaOutputStream != null)
                         textAreaOutputStream.kill();
 
-                    mutex--;
                 }
 
                 Schedule.coldReset();
@@ -574,7 +597,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             // TODO reset simulation clock
             try {
                 SwingUtilities.invokeLater(() -> {
-                vcrButtonPressDisplayUpdate(Event.READY);
+                    vcrButtonPressDisplayUpdate(Event.READY);
                 });
             }
             catch (Exception ex) {
@@ -679,7 +702,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     }
 
     public enum Event {
-        START_RESUME, STOP, STEP, REWIND, OFF, READY
+        START_RESUME, STOP, STEP, REWIND, DONE, READY
     }
 
     /** State machine logic
@@ -687,11 +710,20 @@ public class InternalAssemblyRunner implements PropertyChangeListener
      */
     public void vcrButtonPressDisplayUpdate(Event newEvent) 
     {
+        String newState = new String();
+        if (newEvent.equals(Event.START_RESUME))
+        {
+            if  (vcrState.equalsIgnoreCase("PAUSE")) // check prior state
+                 newState = "RESUME";
+            else newState = "START";
+        }
+                
         vcrState = newEvent.toString();
-        simulationRunPanel.vcrButtonStatusLabel.setText(" " + vcrState);
-        simulationRunPanel.outputStreamTA.setText(
-                simulationRunPanel.outputStreamTA.getText() + "\n" +
-                "User button pressed: " + vcrState          + "\n");
+        simulationRunPanel.vcrButtonStatusLabel.setText(" " + newState);
+        // debug
+//        simulationRunPanel.outputStreamTA.setText(
+//                simulationRunPanel.outputStreamTA.getText() + "\n" +
+//                "User button pressed: " + vcrState          + "\n");
         switch (newEvent) 
         {
             case START_RESUME:
@@ -700,7 +732,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 simulationRunPanel.vcrStopButton        .setEnabled(true);
                 simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrClearConsoleButton.setEnabled(false);
-                LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
+                LOG.info("vcrButtonPressDisplayUpdate({})", newState); // newEvent);
                 break;
             case STEP:
                 simulationRunPanel.vcrPlayButton        .setEnabled(true);
@@ -726,7 +758,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
                 LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
-            case OFF:
+            case DONE:
                 simulationRunPanel.vcrPlayButton        .setEnabled(false);
                 simulationRunPanel.vcrStepButton        .setEnabled(false);
                 simulationRunPanel.vcrStopButton        .setEnabled(false);
@@ -834,6 +866,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
             simulationRunPanel.outputStreamTA.setText(null);
+            LOG.info("Simulation Run Manager: clear console");
+            // no need to update 
+            simulationRunPanel.vcrButtonStatusLabel.setText(" CLEAR" );
         }
     }
 

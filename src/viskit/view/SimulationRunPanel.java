@@ -63,11 +63,14 @@ public class SimulationRunPanel extends JPanel
     
     public final static String INITIAL_SIMULATION_RUN_HINT = "First initialize an Assembly before Simulation Run..."; // Local Run Simulation
 
+    public static final String lineEnd = System.getProperty("line.separator");
+    
+    public final static String INITIAL_SIMULATION_RUN_HEADER = "Assembly output stream:" + lineEnd +
+                                                               "-----------------------" + lineEnd;
     public static final String SIMULATION_RUN_PANEL_TITLE = "Simulation Run Console";
     
     public boolean dump = true;
     public boolean search;
-    public String lineEnd = System.getProperty("line.separator");
     public JScrollPane scrollPane;
     public JTextArea outputStreamTA;
 //    public JSplitPane xsplitPane;
@@ -127,8 +130,7 @@ public class SimulationRunPanel extends JPanel
         JSplitPane leftRightSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         JSplitPane leftSideHorizontalSplit;
 
-        outputStreamTA = new JTextArea("Assembly output stream:" + lineEnd +
-                "----------------------" + lineEnd);
+        outputStreamTA = new JTextArea(INITIAL_SIMULATION_RUN_HINT + lineEnd);
         outputStreamTA.setEditable(true); // to allow for additional manual input prior to saving out
         outputStreamTA.setFont(new Font("Monospaced", Font.PLAIN, 12));
         outputStreamTA.setBackground(new Color(0xFB, 0xFB, 0xE5));
@@ -363,11 +365,12 @@ public class SimulationRunPanel extends JPanel
         verboseReplicationNumberTF.setToolTipText("Which replication run (1..n) will be verbose?");
         upperLeftFlowPanel.add(verboseReplicationNumberTF);
 
-        closeButton = new JButton( "Close");
-        closeButton.setToolTipText("Close this window");
-        if (showIncompleteButtons) {
-            upperLeftFlowPanel.add(closeButton);
-        }
+        // what is this??
+//        closeButton = new JButton( "Close");
+//        closeButton.setToolTipText("Close this window");
+//        if (showIncompleteButtons) {
+//            upperLeftFlowPanel.add(closeButton);
+//        }
 
         printReplicationReportsCB = new JCheckBox("Log replication reports");
         printReplicationReportsCB.setToolTipText("Print Output Report for Replications to console");

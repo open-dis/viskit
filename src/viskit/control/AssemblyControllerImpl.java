@@ -1911,7 +1911,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 }
                 finally {
                     (ViskitGlobals.instance().getAssemblyViewFrame()).prepareAssemblyForSimulationRunButton.setEnabled(true);
-                    mutex--;
+                    if (mutex > 0)
+                        mutex--;
                 }
             }
         };
@@ -1920,6 +1921,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     private void announceReadyToCommenceSimulationRun(String newAssemblyName)
     {
+        ViskitGlobals.instance().getSimulationRunPanel().outputStreamTA.setText(SimulationRunPanel.INITIAL_SIMULATION_RUN_HEADER);
+        
         String message =
                 "<html><body>" +
                 "<p align='center'>" + newAssemblyName;

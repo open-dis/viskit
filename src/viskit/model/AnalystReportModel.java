@@ -1238,7 +1238,10 @@ public final class AnalystReportModel extends MvcAbstractModel
     {
         // TODO consider inserting loaded assembly filename into message above as a user confirmation
         
-        String assemblyName = assemblyFile.getName().substring(0, assemblyFile.getName().indexOf(".xml"));
+        ViskitGlobals.instance().getSimulationRunPanel().nowRunningLabel.setText("DONE");
+        
+        assemblyName = assemblyFile.getName().substring(0, assemblyFile.getName().indexOf(".xml"));
+        
         int numberOfReplications = ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications();
         String popupTitle = "Simulation Run Data Collected, Analyst Report Ready";
         String message =

@@ -91,6 +91,7 @@ import viskit.view.dialog.PclEdgeInspectorDialog;
 import viskit.mvc.MvcController;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
+import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -553,7 +554,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 /* TODO fix functionality before exposing
         assemblyMenu.addSeparator();
         // TODO add icon?
-        assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Prepare Assembly for Simulation Run", KeyEvent.VK_P,
+        assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly for Simulation Run", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 */
 
@@ -760,8 +761,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getToolBar().addSeparator(new Dimension(24, 24));
 
         getToolBar().add(prepareAssemblyForSimulationRunButton);
-        JLabel prepareAssemblyForSimulationRunLabel = new JLabel ("  Prepare Assembly for Simulation Run");
-        prepareAssemblyForSimulationRunLabel.setToolTipText("first Prepare Assembly for Simulation Run");
+        JLabel prepareAssemblyForSimulationRunLabel = new JLabel ("  Initialize Assembly for Simulation Run");
+        prepareAssemblyForSimulationRunLabel.setToolTipText(INITIAL_SIMULATION_RUN_HINT);
         getToolBar().add(prepareAssemblyForSimulationRunLabel);
 
         // Let the opening of Assembliess make this visible
