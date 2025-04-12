@@ -639,8 +639,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void zipProject() {
 
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() 
+        {
+            String projectName;
             File projectDirectory;
             File projectZipFile;
             File projectZipLogFile;
@@ -652,8 +653,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 String dateOutput = formatter.format(new Date()); // today, now
                 
                 projectDirectory  = ViskitGlobals.instance().getViskitProject().getProjectDirectory();
-                projectZipFile    = new File(projectDirectory.getParentFile(), 
-                                            projectDirectory.getName() + "_" + dateOutput + ".zip");
+                projectName       = projectDirectory.getName();
+                projectZipFile    = new File(projectDirectory.getParentFile(), projectName + "_" + dateOutput + ".zip");
                 projectZipLogFile = new File(projectDirectory, "projectZipDebug.log");
 
                 if (projectZipFile.exists())
@@ -689,7 +690,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     // Waits for the zip process to finish
                     get();
                     
-                    String message = "<html><p align='center'>Viskit project zip file is now ready:</p><br />" + 
+                    String projectSuffix = new String();
+                    if (!projectName.toLowerCase().contains("project"))
+                         projectSuffix = " project";
+                    String message = "<html><p align='center'>Viskit project zip file is now ready for " + projectName + projectSuffix + ".</p><br />" + 
+                                           "<p align='center'>Now showing</p><br />" + 
                                            "<p align='center'>" + projectZipFile.getAbsolutePath()+ "</p></html>";
                     ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                         "Project zip complete", message);
@@ -738,7 +743,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (ViskitGlobals.instance().getViskitProject().isProjectOpen())
         {
             title = "Close Current Project?";
-            message = "<html><p align='center'>Are you sure that you want to first close</p><br/>";
+            message = "<html><p align='center'>Are you sure that you want to close</p><br/>";
             String projectName = ViskitGlobals.instance().getProjectWorkingDirectory().getAbsolutePath();
             if  (projectName.toLowerCase().contains("project"))
                  message += "<p align='center'><i>"         + projectName + "</i></p><br/><p align='center'> as the currently active project?</p><br/>";

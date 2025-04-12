@@ -59,12 +59,20 @@ import org.apache.logging.log4j.Logger;
 
 import viskit.control.EventGraphController;
 import viskit.Help;
+import static viskit.Help.METHOD_aboutViskit;
+import static viskit.Help.METHOD_doContents;
+import static viskit.Help.METHOD_doSearch;
+import static viskit.Help.METHOD_doTutorial;
 import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
 import static viskit.ViskitStatics.DESCRIPTION_HINT;
 import static viskit.control.AssemblyControllerImpl.METHOD_captureWindow;
+import static viskit.control.AssemblyControllerImpl.METHOD_newProject;
+import static viskit.control.AssemblyControllerImpl.METHOD_openProject;
+import static viskit.control.AssemblyControllerImpl.METHOD_quit;
+import static viskit.control.AssemblyControllerImpl.METHOD_showViskitUserPreferences;
 import static viskit.control.EventGraphControllerImpl.METHOD_close;
 import static viskit.control.EventGraphControllerImpl.METHOD_closeAll;
 import static viskit.control.EventGraphControllerImpl.METHOD_copy;
@@ -72,6 +80,11 @@ import static viskit.control.EventGraphControllerImpl.METHOD_cut;
 import static viskit.control.EventGraphControllerImpl.METHOD_editGraphMetadata;
 import static viskit.control.EventGraphControllerImpl.METHOD_generateJavaSource;
 import static viskit.control.EventGraphControllerImpl.METHOD_newEventGraph;
+import static viskit.control.EventGraphControllerImpl.METHOD_newNode;
+import static viskit.control.EventGraphControllerImpl.METHOD_newSelfReferentialCancelingEdge;
+import static viskit.control.EventGraphControllerImpl.METHOD_newSelfReferentialSchedulingEdge;
+import static viskit.control.EventGraphControllerImpl.METHOD_newSimulationParameter;
+import static viskit.control.EventGraphControllerImpl.METHOD_newStateVariable;
 import static viskit.control.EventGraphControllerImpl.METHOD_open;
 import static viskit.control.EventGraphControllerImpl.METHOD_paste;
 import static viskit.control.EventGraphControllerImpl.METHOD_redo;
@@ -338,7 +351,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
         // Wire handlers for stateVariable adds, deletes and edits and tell it we'll be doing adds and deletes
         vp.setEnableAddsAndDeletes(false);
-        vp.addPlusListener(ActionIntrospector.getAction(getController(), "newStateVariable"));
+        vp.addPlusListener(ActionIntrospector.getAction(getController(), METHOD_newStateVariable));
 
         // Introspector can't handle a param to the method....?
         vp.addMinusListener((ActionEvent event) -> {
@@ -402,7 +415,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
         // Wire handlers for parameter adds, deletes and edits and tell it we'll be doing adds and deletes
         pp.setEnableAddsAndDeletes(false);
-        pp.addPlusListener(ActionIntrospector.getAction(getController(), "newSimulationParameter"));
+        pp.addPlusListener(ActionIntrospector.getAction(getController(), METHOD_newSimulationParameter));
 
         // Introspector can't handle a param to the method....?
         pp.addMinusListener((ActionEvent event) -> {
@@ -702,18 +715,18 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         ActionIntrospector.getAction(eventGraphController, METHOD_remove).setEnabled(false);
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(eventGraphController, "newNode", "Add a new Event Node", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newSimulationParameter", "Add a new Simulation Parameter", KeyEvent.VK_S, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add a new State Variable", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfReferentialSchedulingEdge", "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(eventGraphController, "newSelfReferentialCancelingEdge", "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, METHOD_newNode, "Add a new Event Node", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, METHOD_newSimulationParameter, "Add a new Simulation Parameter", KeyEvent.VK_S, null));
+        editMenu.add(buildMenuItem(eventGraphController, METHOD_newStateVariable, "Add a new State Variable", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, METHOD_newSelfReferentialSchedulingEdge, "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, METHOD_newSelfReferentialCancelingEdge, "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
 
         // Thess start off being disabled, until something is selected
-        ActionIntrospector.getAction(eventGraphController, "newSelfReferentialSchedulingEdge").setEnabled(false);
-        ActionIntrospector.getAction(eventGraphController, "newSelfReferentialCancelingEdge").setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, METHOD_newSelfReferentialSchedulingEdge).setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, METHOD_newSelfReferentialCancelingEdge ).setEnabled(false);
         editMenu.addSeparator();
 
-        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
         editMenu.add(buildMenuItem(eventGraphController, METHOD_editGraphMetadata, "Edit selected Event Graph Metadata Properties...", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
@@ -762,15 +775,15 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         ActionIntrospector.getAction(eventGraphController, METHOD_remove).setEnabled(false);
         editEventGraphSubMenu.addSeparator();
 
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newNode", "Add a new Event Node", KeyEvent.VK_A, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSimulationParameter", "Add a new Simulation Parameter", KeyEvent.VK_A, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newStateVariable", "Add a new State Variable", KeyEvent.VK_A, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfReferentialSchedulingEdge", "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, "newSelfReferentialCancelingEdge", "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newNode, "Add a new Event Node", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newSimulationParameter, "Add a new Simulation Parameter", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newStateVariable, "Add a new State Variable", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newSelfReferentialSchedulingEdge, "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newSelfReferentialCancelingEdge, "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
 
         // Thess start off being disabled, until something is selected
-        ActionIntrospector.getAction(eventGraphController, "newSelfReferentialSchedulingEdge").setEnabled(false);
-        ActionIntrospector.getAction(eventGraphController, "newSelfReferentialCancelingEdge").setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, METHOD_newSelfReferentialSchedulingEdge).setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, METHOD_newSelfReferentialCancelingEdge).setEnabled(false);
         
         // TODO "disable" both of these if no Event Graph is active
         eventGraphMenu.add(editEventGraphSubMenu);
@@ -778,12 +791,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
         eventGraphMenu.addSeparator();
 
-        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
-        eventGraphMenu.add(buildMenuItem(eventGraphController, "newProject", "New Viskit Project", KeyEvent.VK_V,
+        eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_newProject, "New Viskit Project", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
         
-        eventGraphMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_P,
+        eventGraphMenu.add(buildMenuItem(this, METHOD_openProject, "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
         eventGraphMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
         // The recently opened project file listener will be set with the
@@ -818,16 +831,16 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
         eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_viewXML, "XML View of Saved Event Graph", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
 
-        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
         eventGraphMenu.addSeparator();
-        eventGraphMenu.add(buildMenuItem(eventGraphController, "showViskitUserPreferences", "Viskit User Preferences", KeyEvent.VK_V, null));
+        eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_showViskitUserPreferences, "Viskit User Preferences", KeyEvent.VK_V, null));
         
-        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
         eventGraphMenu.addSeparator();
 
-        eventGraphMenu.add(quitMenuItem = buildMenuItem(eventGraphController, "quit", "Quit", KeyEvent.VK_Q,
+        eventGraphMenu.add(quitMenuItem = buildMenuItem(eventGraphController, METHOD_quit, "Quit", KeyEvent.VK_Q,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
         }
         }
@@ -844,14 +857,14 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
         
-        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
-        helpMenu.add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));
-        helpMenu.add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null));
+        helpMenu.add(buildMenuItem(help, METHOD_doContents, "Contents", KeyEvent.VK_C, null));
+        helpMenu.add(buildMenuItem(help, METHOD_doSearch, "Search", KeyEvent.VK_S, null));
         helpMenu.addSeparator();
 
-        helpMenu.add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
-        helpMenu.add(buildMenuItem(help, "aboutViskit", "About Viskit", KeyEvent.VK_A, null));
+        helpMenu.add(buildMenuItem(help, METHOD_doTutorial, "Tutorial", KeyEvent.VK_T, null));
+        helpMenu.add(buildMenuItem(help, METHOD_aboutViskit, "About Viskit", KeyEvent.VK_A, null));
 
         myMenuBar.add(helpMenu);
         }
@@ -863,8 +876,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         Action action = ActionIntrospector.getAction(source, method);
         if (action == null)
         {
-            LOG.error("buildMenuItem reflection failed for name=" + name + " method=" + method + " in " + source.toString());
-            return new JMenuItem(name + "(not working, reflection failed) ");
+            LOG.error("buildMenuItem() reflection failed for name=" + name + " method=" + method + " in " + source.toString());
+            return new JMenuItem(name + "(not working, buildMenuItem() reflection failed)");
         }
         Map<String, Object> map = new HashMap<>();
         if (mnemonic != null) {

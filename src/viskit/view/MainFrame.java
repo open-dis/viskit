@@ -194,7 +194,7 @@ public class MainFrame extends JFrame
             // eventGraphFrame.setTitleListener(myTitleListener, assemblyPaneIndex);
             setJMenuBar(mainFrameMenuBar);
             
-        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
             jamQuitHandler(((EventGraphViewFrame) eventGraphFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
         }
@@ -222,7 +222,7 @@ public class MainFrame extends JFrame
             // TODO is this needed?
             // assemblyFrame.setTitleListener(myTitleListener, assemblyPaneIndex);
             setJMenuBar(mainFrameMenuBar);
-        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
             jamQuitHandler(((AssemblyViewFrame) assemblyFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
         }
@@ -286,7 +286,7 @@ public class MainFrame extends JFrame
             }
             // TODO is this needed?
             // analystReportEditorPanel.setTitleListener(myTitleListener, assemblyPaneIndex);
-        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
             jamQuitHandler(null, myQuitAction, mainFrameMenuBar);
         }
@@ -315,7 +315,7 @@ public class MainFrame extends JFrame
         // TODO is this needed?
         // internalSimulationRunner.setTitleListener(myTitleListener, topTabbedAssemblyPane.getTabCount() + TAB1_LOCALRUN_INDEX);
         
-        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
         jamQuitHandler(internalSimulationRunner.getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
         }
@@ -454,7 +454,7 @@ public class MainFrame extends JFrame
             combinedMenuBar.add(ViskitGlobals.instance().getAnalystReportViewFrame().getMenus());   // TODO getAnalystReportMenu() ?
             combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getHelpMenu());
             
-            if  (hasModalMenus())
+            if  (hasOriginalModalMenus())
                  setJMenuBar(selectedMenuBar);
             else setJMenuBar(combinedMenuBar);
             
@@ -710,7 +710,7 @@ public class MainFrame extends JFrame
      * Interface setting modalMenus: true means choice from traditional modalMenuBarList, false means new combinedMenuBar
      * @return the modalMenus
      */
-    public boolean hasModalMenus() {
+    public boolean hasOriginalModalMenus() {
         return modalMenus;
     }
 

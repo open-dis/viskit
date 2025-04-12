@@ -151,6 +151,9 @@ public class AnalystReportController extends MvcAbstractController
         this.mainTabbedPane = (JTabbedPane) tabbedPane;
         mainTabbedPaneIdx = idx;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_openAnalystReportXML = "openAnalystReportXML";
 
     public void openAnalystReportXML() 
     {
@@ -192,6 +195,9 @@ public class AnalystReportController extends MvcAbstractController
             analystReportModel.setAssemblyFile(currentAssemblyFile);
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_saveAnalystReportXML = "saveAnalystReportXML";
 
     public void saveAnalystReportXML() 
     {
@@ -220,6 +226,9 @@ public class AnalystReportController extends MvcAbstractController
         XsltUtility.runXsltStylesheet(analystReportModel.getAnalystReportXmlFile().getAbsolutePath(),
                 outputFileName, "config/AnalystReportXMLtoHTML.xslt");
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_generateHtmlReport = "generateHtmlReport";
 
     public void generateHtmlReport() throws IOException 
     {
@@ -282,7 +291,7 @@ public class AnalystReportController extends MvcAbstractController
         }
         catch (IOException ioe)
         {
-            LOG.error("trouble converting XML to HTML", ioe);
+            LOG.error(METHOD_generateHtmlReport + "() trouble converting XML to HTML", ioe);
         }
 
         // show latest report, they asked for it... also confirms operation in case window is hidden
@@ -413,6 +422,9 @@ public class AnalystReportController extends MvcAbstractController
             LOG.error(ex.getMessage());
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_viewXML = "viewXML";
 
 //    @Override
     public void viewXML() 

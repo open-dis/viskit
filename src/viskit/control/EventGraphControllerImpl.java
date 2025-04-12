@@ -482,6 +482,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     {
         ViskitGlobals.instance().getMainFrame().genericReport(messageType, title, message);
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_quit = "quit";
 
     @Override
     public void quit()
@@ -671,6 +674,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             fileWatchSave(file);
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_newSimulationParameter = "newSimulationParameter";
 
     @Override
     public void newSimulationParameter() //------------------------
@@ -704,6 +710,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             ((viskit.model.Model) getModel()).changeStateVariable(stateVariable);
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_newStateVariable = "newStateVariable";
 
     @Override
     public void newStateVariable() {
@@ -1075,6 +1084,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
     }
     private int nodeCount = 0;
+    
+    /** method name for reflection use */
+    public static final String METHOD_newNode = "newNode";
 
     @Override
     public void newNode() //-------------------
@@ -1111,6 +1123,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         EventNode tar = (EventNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
         ((Model) getModel()).newCancelingEdge(src, tar);
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_newSelfReferentialSchedulingEdge = "newSelfReferentialSchedulingEdge";
 
     /** Handles the menu selection for a new self-referential scheduling edge */
     public void newSelfReferentialSchedulingEdge() //--------------------------
@@ -1123,6 +1138,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             }
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_newSelfReferentialCancelingEdge = "newSelfReferentialCancelingEdge";
 
     /** Handles the menu selection for a new self-referential canceling edge */
     public void newSelfReferentialCancelingEdge() {  //--------------------------

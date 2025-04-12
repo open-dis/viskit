@@ -820,7 +820,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         simulationRunMenu.add(viewConsoleOutputMI);
         simulationRunMenu.add(viewLogsDirectoryMI);
 
-        if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
+        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
         getSimulationRunMenu().addSeparator();
         getSimulationRunMenu().add(new JMenuItem("Viskit User Preferences"));

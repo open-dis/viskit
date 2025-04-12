@@ -521,9 +521,20 @@ public class ViskitUserPreferencesDialog extends JDialog
 
     private void fillWidgets() 
     {
-           author_nameTF.setText(getUserName());
-          author_emailTF.setText(getUserEmail());
-        author_websiteTF.setText(getUserWebsite());
+        // developer convenience support
+        if (getUserName().equalsIgnoreCase("brutzman"))
+        {
+               author_nameTF.setText("Don Brutzman");
+              author_emailTF.setText("brutzman@nps.edu");
+            author_websiteTF.setText("https://faculty.nps.edu/brutzman");
+            repaint();
+        }
+        else
+        {
+            author_nameTF.setText(getUserName());
+           author_emailTF.setText(getUserEmail());
+         author_websiteTF.setText(getUserWebsite());
+        }
         
         DefaultListModel<String> mod = (DefaultListModel<String>) classpathJList.getModel();
         mod.clear();
@@ -857,6 +868,7 @@ public class ViskitUserPreferencesDialog extends JDialog
                 {
                     // initialize user metadata
                     userName = System.getProperty("user.name"); // reset to logged-in user name
+                    
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {

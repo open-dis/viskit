@@ -70,6 +70,10 @@ import static viskit.ViskitStatics.isFileReady;
 
 import viskit.util.OpenAssembly;
 import viskit.control.AnalystReportController;
+import static viskit.control.AnalystReportController.METHOD_generateHtmlReport;
+import static viskit.control.AnalystReportController.METHOD_saveAnalystReportXML;
+import static viskit.control.AnalystReportController.METHOD_openAnalystReportXML;
+import static viskit.control.AnalystReportController.METHOD_viewXML;
 import viskit.mvc.MvcAbstractViewFrame;
 import viskit.mvc.MvcModelEvent;
 import viskit.model.AnalystReportModel;
@@ -1034,25 +1038,25 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         getAnalystReportMenu().setMnemonic(KeyEvent.VK_R);
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
-                "generateHtmlReport",
+                METHOD_generateHtmlReport,
                 "Display HTML Analyst Report",
                 KeyEvent.VK_H, // use H for consistency with hotkey
                 KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
-                "openAnalystReportXML",
+                METHOD_openAnalystReportXML,
                 "Open another Analyst Report XML",
                 KeyEvent.VK_O,
                 null));
         
         getAnalystReportMenu().add(buildMenuItem(analystReportController,
-                "saveAnalystReportXML",
+                METHOD_saveAnalystReportXML,
                 "Save Analyst Report XML",
                 KeyEvent.VK_S,
                 null));
 
         getAnalystReportMenu().add(buildMenuItem(analystReportController, 
-                "viewXML", 
+                METHOD_viewXML, 
                 "XML View of Saved Analyst Report",
                 KeyEvent.VK_X, 
                 null));
@@ -1061,23 +1065,23 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mn, KeyStroke accel)
+    private JMenuItem buildMenuItem(Object sourceObject, String methodName, String menuName, Integer mnemonic, KeyStroke acceleratorKey)
     {
-        Action action = ActionIntrospector.getAction(source, method);
+        Action action = ActionIntrospector.getAction(sourceObject, methodName);
         if (action == null)
         {
-            LOG.error("buildMenuItem reflection failed for name=" + name + " method=" + method + " in " + source.toString());
-            return new JMenuItem(name + "(not working, reflection failed) ");
+            LOG.error("buildMenuItem() reflection failed for name=" + menuName + " method=" + methodName + " in " + sourceObject.toString());
+            return new JMenuItem(menuName + "(not working, reflection failed) ");
         }
         Map<String, Object> map = new HashMap<>();
-        if (mn != null) {
-            map.put(Action.MNEMONIC_KEY, mn);
+        if (mnemonic != null) {
+            map.put(Action.MNEMONIC_KEY, mnemonic);
         }
-        if (accel != null) {
-            map.put(Action.ACCELERATOR_KEY, accel);
+        if (acceleratorKey != null) {
+            map.put(Action.ACCELERATOR_KEY, acceleratorKey);
         }
-        if (name != null) {
-            map.put(Action.NAME, name);
+        if (menuName != null) {
+            map.put(Action.NAME, menuName);
         }
         if (!map.isEmpty()) {
             ActionUtilities.decorateAction(action, map);
