@@ -149,8 +149,12 @@ public class Help
                 + DEVELOPERS + CR + VISKIT_PAGE //+ VISKIT_ISSUES_PAGE
                 + SIMKIT_PAGE + VERSIONS);
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_aboutViskit  = "aboutViskit";
 
-    public void aboutViskit() {
+    public void aboutViskit()
+    {
         JOptionPane.showMessageDialog(parent,
                 aboutViskitEditorPane,
                 "About Viskit",
@@ -158,18 +162,30 @@ public class Help
                 icon
         );
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_doContents  = "doContents";
 
-    public void doContents() {
+    public void doContents() 
+    {
         hb.setDisplayed(true);
         hb.setCurrentView("TOC");
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_doSearch  = "doSearch";
 
-    public void doSearch() {
+    public void doSearch() 
+    {
         hb.setDisplayed(true);
         hb.setCurrentView("Search");
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_doTutorial  = "doTutorial";
 
-    public void doTutorial() {
+    public void doTutorial() 
+    {
         ActionEvent ae = new ActionEvent(TUTORIAL_COMPONENT, 0, "tutorial");
         TUTORIAL_LISTENER_LAUNCHER.actionPerformed(ae);
     }

@@ -217,6 +217,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         return returnValue;  // proceed
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_showViskitUserPreferences = "showViskitUserPreferences";
 
     @Override
     public void showViskitUserPreferences()
@@ -224,6 +227,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         boolean modified; // TODO can we do anything with this notification?
         modified = ViskitUserPreferencesDialog.showDialog(ViskitGlobals.instance().getMainFrame());
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_open = "open";
 
     @Override
     public void open()
@@ -460,6 +466,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public DirectoryWatch.DirectoryChangeListener getOpenEventGraphListener() {
         return eventGraphListener; // A live listener, but currently doing nothing (tdn) 9/13/24
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_save = "save";
 
     @Override
     public void save()
@@ -480,6 +489,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             assemblyModel.saveModel(assemblyModel.getCurrentFile());
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_saveAs = "saveAs";
 
     @Override
     public void saveAs()
@@ -508,6 +520,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             markAssemblyFilesOpened();
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_editGraphMetadata = "editGraphMetadata";
 
     @Override
     public void editGraphMetadata() 
@@ -527,7 +542,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 //        Model model = (Model) getModel();
         if (assemblyModel == null) 
         {
-            LOG.error("editGraphMetadata() failed, (assemblyModel == null)");
+            LOG.error(METHOD_editGraphMetadata + "() failed, (assemblyModel == null)");
             return; // not expected
         }
         GraphMetadata graphMetadata = assemblyModel.getMetadata();
@@ -599,6 +614,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         return retn;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_newProject = "newProject";
 
     @Override
     public void newProject() 
@@ -614,6 +632,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_zipProject = "zipProject";
 
     @Override
     public void zipProject() {
@@ -702,6 +723,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         };
         worker.execute();
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_closeProject = "closeProject";
 
     /** 
      * Common method between the AssemblyView and this AssemblyController
@@ -750,6 +774,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).clearRecentEventGraphFileSet();
         ViskitGlobals.instance().getViskitProject().closeProject();
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_openProject = "openProject";
 
     @Override
     public void openProject(File projectDirectory)
@@ -826,6 +853,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (ViskitGlobals.instance().getAssemblyViewFrame() != null)
             ViskitGlobals.instance().getMainFrame().genericReport(messageType, messageTitle, messageBody);
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_quit  = "quit";
 
     @Override
     public void quit() 
@@ -858,6 +888,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     private boolean closeAll = false;
+    
+    /** method name for reflection use */
+    public static final String METHOD_closeAll = "closeAll";
 
     @Override
     public void closeAll() 
@@ -872,6 +905,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         setCloseAll(false);
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_close = "close";
 
     @Override
     public void close()
@@ -936,6 +972,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         nextPoint.y = nextPoint.y >= 200 ? 25 : nextPoint.y + 25;
         return nextPoint;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_newEventGraphNode = "newEventGraphNode";
 
     @Override
     public void newEventGraphNode() // menu click
@@ -984,6 +1023,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         // If nothing selected or a non-leaf
         messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select a Property Change Listener from the panel on the left.");
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_newPropertyChangeListenerNode = "newPropertyChangeListenerNode";
 
     @Override
     public void newPropertyChangeListenerNode(String name, Point p) {
@@ -1240,6 +1282,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     private boolean doRemove = false;
+    
+    /** method name for reflection use */
+    public static final String METHOD_remove = "remove";
 
     @Override
     public void remove()
@@ -1265,12 +1310,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_cut = "cut";
 
     @Override
     public void cut() //---------------
     {
         // Not supported
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_copy = "copy";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -1293,6 +1344,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     /** Also acts as a bias for point offset */
     private int copyCount = 0;
+    
+    /** method name for reflection use */
+    public static final String METHOD_paste = "paste";
 
     @Override
     public void paste() //-----------------
@@ -1373,6 +1427,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public boolean isUndo() {
         return isUndo;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_undo = "undo";
 
     /**
      * Removes the last selected node or edge from the JGraph model
@@ -1405,11 +1462,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             // This will clear the selectionVector via callbacks
             undoMgr.undo(view.getCurrentViskitGraphAssemblyComponentWrapper().getGraphLayoutCache());
         } catch (CannotUndoException ex) {
-            LOG.error("Unable to undo: {}", ex);
+            LOG.error(METHOD_undo + "() unable to undo: {}", ex);
         } finally {
             updateUndoRedoStatus();
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_redo = "redo";
 
     /**
      * Replaces the last selected node or edge from the JGraph model
@@ -1450,7 +1510,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         try {
             undoMgr.redo(view.getCurrentViskitGraphAssemblyComponentWrapper().getGraphLayoutCache());
         } catch (CannotRedoException ex) {
-            LOG.error("Unable to redo: {}", ex);
+            LOG.error(METHOD_redo + "() unable to redo: {}", ex);
         } finally {
             updateUndoRedoStatus();
         }
@@ -1469,6 +1529,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     /********************************/
     /* from menu:*/
+    
+    /** method name for reflection use */
+    public static final String METHOD_viewXML = "viewXML";
 
     @Override
     public void viewXML()
@@ -1503,6 +1566,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         return true;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_generateJavaSource = "generateJavaSource";
 
     @Override
     public void generateJavaSource()
@@ -1812,6 +1878,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             execStringArray = new String[0];
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_PREPARESIMULATIONRUNNER = "prepareSimulationRunner";
 
     @Override
     public void prepareSimulationRunner()
@@ -1831,13 +1900,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             SwingUtilities.invokeLater(r);
         } 
         catch (Exception e) {
-            LOG.error("prepareSimulationRunner() SwingUtilities.invokeLater(" + r.toString() + ") exception: " + e.getMessage());
+            LOG.error(METHOD_PREPARESIMULATIONRUNNER + "() SwingUtilities.invokeLater(" + r.toString() + ") exception: " + e.getMessage());
         }
 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()
         {
             @Override
-            public Void doInBackground() // prepareSimulationRunner()
+            public Void doInBackground() // prepareSimulationRunner() activity
             {
                 // Compile and prep the execStrings
                 prepareAssemblySimulationRun();
@@ -1962,6 +2031,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
     private String imageSaveCountString = "";
     private int    imageSaveCountInt    = -1;
+    
+    /** method name for reflection use */
+    public static final String METHOD_captureWindow = "captureWindow";
 
     @Override
     public void captureWindow() 

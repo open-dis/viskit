@@ -61,6 +61,10 @@ import javax.swing.tree.TreePath;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.Help;
+import static viskit.Help.METHOD_aboutViskit;
+import static viskit.Help.METHOD_doContents;
+import static viskit.Help.METHOD_doSearch;
+import static viskit.Help.METHOD_doTutorial;
 
 import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssemblyNode;
@@ -69,6 +73,31 @@ import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
 import static viskit.ViskitStatics.isFileReady;
+import static viskit.control.AssemblyControllerImpl.METHOD_PREPARESIMULATIONRUNNER;
+import static viskit.control.AssemblyControllerImpl.METHOD_captureWindow;
+import static viskit.control.AssemblyControllerImpl.METHOD_close;
+import static viskit.control.AssemblyControllerImpl.METHOD_closeAll;
+import static viskit.control.AssemblyControllerImpl.METHOD_closeProject;
+import static viskit.control.AssemblyControllerImpl.METHOD_copy;
+import static viskit.control.AssemblyControllerImpl.METHOD_cut;
+import static viskit.control.AssemblyControllerImpl.METHOD_editGraphMetadata;
+import static viskit.control.AssemblyControllerImpl.METHOD_generateJavaSource;
+import static viskit.control.AssemblyControllerImpl.METHOD_newEventGraphNode;
+import static viskit.control.AssemblyControllerImpl.METHOD_newProject;
+import static viskit.control.AssemblyControllerImpl.METHOD_newPropertyChangeListenerNode;
+import static viskit.control.AssemblyControllerImpl.METHOD_open;
+import static viskit.control.AssemblyControllerImpl.METHOD_openProject;
+import static viskit.control.AssemblyControllerImpl.METHOD_paste;
+import static viskit.control.AssemblyControllerImpl.METHOD_quit;
+import static viskit.control.AssemblyControllerImpl.METHOD_redo;
+import static viskit.control.AssemblyControllerImpl.METHOD_remove;
+import static viskit.control.AssemblyControllerImpl.METHOD_save;
+import static viskit.control.AssemblyControllerImpl.METHOD_saveAs;
+import static viskit.control.AssemblyControllerImpl.METHOD_showViskitUserPreferences;
+import static viskit.control.AssemblyControllerImpl.METHOD_undo;
+import static viskit.control.AssemblyControllerImpl.METHOD_viewXML;
+import static viskit.control.AssemblyControllerImpl.METHOD_zipProject;
+import static viskit.control.EventGraphControllerImpl.METHOD_zipAndMailProject;
 import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
@@ -153,15 +182,15 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     private final static String FRAME_DEFAULT_TITLE = "Assembly Editor";
 
-    private final String FULLPATH      = ViskitStatics.FULL_PATH;
+//    private final String FULLPATH      = ViskitStatics.FULL_PATH;
     private final String CLEARPATHFLAG = ViskitStatics.CLEAR_PATH_FLAG;
     private final Color background = new Color(0xFB, 0xFB, 0xE5);
 
     /** Toolbar for dropping icons, connecting, etc. */
     private JTabbedPane tabbedPane;
     private JToolBar toolBar;
-    private JToggleButton selectMode;
-    private JToggleButton adapterMode,  simEventListenerMode,  propertyChangeListenerMode;
+    private JToggleButton selectModeToggleButton;
+    private JToggleButton adapterModeToggleButton,  simEventListenerModeToggleButton,  propertyChangeListenerModeToggleButton;
     private LegoTree legoEventGraphsTree, propertyChangeListenerTree;
     private JMenuBar myMenuBar;
     private JMenuItem quitMenuItem;
@@ -403,14 +432,14 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     {
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
-        ActionIntrospector.getAction(assemblyController, "undo").setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, "redo").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_undo).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_redo).setEnabled(false);
         
         // These start off being disabled, until something is selected
-        ActionIntrospector.getAction(assemblyController, "cut").setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, "remove").setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, "copy").setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, "paste").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_cut).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_remove).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_copy).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_paste).setEnabled(false);
 
         // Set up edit menu
         editMenu = new JMenu("Edit");
@@ -421,31 +450,31 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 //             whichMenu = editMenu;
 //        else whichMenu = assemblyMenu;
 
-        editMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_U,
+        editMenu.add(buildMenuItem(assemblyController, METHOD_undo, "Undo", KeyEvent.VK_U,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
-        editMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_R,
+        editMenu.add(buildMenuItem(assemblyController, METHOD_redo, "Redo", KeyEvent.VK_R,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.ALT_DOWN_MASK)));
         editMenu.addSeparator();
 
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(assemblyController, "cut", "Cut", KeyEvent.VK_C,
+        editMenu.add(buildMenuItem(assemblyController, METHOD_cut, "Cut", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK)));
         editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
-        editMenu.add(buildMenuItem(assemblyController, "copy", "Copy", KeyEvent.VK_C,
+        editMenu.add(buildMenuItem(assemblyController, METHOD_copy, "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
-        editMenu.add(buildMenuItem(assemblyController, "paste", "Paste Event Node", KeyEvent.VK_P,
+        editMenu.add(buildMenuItem(assemblyController, METHOD_paste, "Paste Event Node", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
-        editMenu.add(buildMenuItem(assemblyController, "remove", "Delete", KeyEvent.VK_R,
+        editMenu.add(buildMenuItem(assemblyController, METHOD_remove, "Delete", KeyEvent.VK_R,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK)));
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add a new Event Graph", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add a new Property Change Listener", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(assemblyController, METHOD_newEventGraphNode, "Add a new Event Graph", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(assemblyController, METHOD_newPropertyChangeListenerNode, "Add a new Property Change Listener", KeyEvent.VK_A, null));
         editMenu.addSeparator();
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
-        editMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit selected Assembly Metadata Properties", KeyEvent.VK_E,
+        editMenu.add(buildMenuItem(assemblyController, METHOD_editGraphMetadata, "Edit selected Assembly Metadata Properties", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
         }
     }
@@ -466,57 +495,57 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         editSubMenu.setMnemonic(KeyEvent.VK_E);
         if (!ViskitGlobals.instance().getMainFrame().hasModalMenus()) // combined menu integration
         {
-        ActionIntrospector.getAction(assemblyController, "undo").setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, "redo").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_undo).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_redo).setEnabled(false);
         
         // These start off being disabled, until something is selected
-        ActionIntrospector.getAction(assemblyController, "cut").setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, "remove").setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, "copy").setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, "paste").setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_cut).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_remove).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_copy).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_paste).setEnabled(false);
 
-        editSubMenu.add(buildMenuItem(assemblyController, "undo", "Undo", KeyEvent.VK_Z,
+        editSubMenu.add(buildMenuItem(assemblyController, METHOD_undo, "Undo", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        editSubMenu.add(buildMenuItem(assemblyController, "redo", "Redo", KeyEvent.VK_Y,
+        editSubMenu.add(buildMenuItem(assemblyController, METHOD_redo, "Redo", KeyEvent.VK_Y,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         editSubMenu.addSeparator();
 
         // the next four are disabled until something is selected
-        editSubMenu.add(buildMenuItem(assemblyController, "cut", "Cut", KeyEvent.VK_X,
+        editSubMenu.add(buildMenuItem(assemblyController, METHOD_cut, "Cut", KeyEvent.VK_X,
                 KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         editSubMenu.getItem(editSubMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
-        editSubMenu.add(buildMenuItem(assemblyController, "copy", "Copy", KeyEvent.VK_C,
+        editSubMenu.add(buildMenuItem(assemblyController, METHOD_copy, "Copy", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        editSubMenu.add(buildMenuItem(assemblyController, "paste", "Paste Event Node", KeyEvent.VK_V,
+        editSubMenu.add(buildMenuItem(assemblyController, METHOD_paste, "Paste Event Node", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        editSubMenu.add(buildMenuItem(assemblyController, "remove", "Delete", KeyEvent.VK_DELETE,
+        editSubMenu.add(buildMenuItem(assemblyController, METHOD_remove, "Delete", KeyEvent.VK_DELETE,
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         editSubMenu.addSeparator();
 
-        editSubMenu.add(buildMenuItem(assemblyController, "newEventGraphNode", "Add a new Event Graph", KeyEvent.VK_G, null));
-        editSubMenu.add(buildMenuItem(assemblyController, "newPropertyChangeListenerNode", "Add a new Property Change Listener", KeyEvent.VK_L, null));
+        editSubMenu.add(buildMenuItem(assemblyController, METHOD_newEventGraphNode, "Add a new Event Graph", KeyEvent.VK_G, null));
+        editSubMenu.add(buildMenuItem(assemblyController, METHOD_newPropertyChangeListenerNode, "Add a new Property Change Listener", KeyEvent.VK_L, null));
         
         assemblyMenu.add(editSubMenu);
-        assemblyMenu.add(buildMenuItem(assemblyController, "editGraphMetadata", "Edit selected Assembly Metadata Properties", KeyEvent.VK_E,
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_editGraphMetadata, "Edit selected Assembly Metadata Properties", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.addSeparator();
         }
 
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
-        assemblyMenu.add(buildMenuItem(assemblyController, "newProject", "New Viskit Project", KeyEvent.VK_N,
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_newProject, "New Viskit Project", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
         
-        assemblyMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_O,
+        assemblyMenu.add(buildMenuItem(this, METHOD_openProject, "Open Project", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
         assemblyMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
         openRecentProjectMenu.setMnemonic('O');
         openRecentProjectMenu.setEnabled(false); // inactive until needed, reset by listener
         
-        assemblyMenu.add(buildMenuItem(this, "closeProject", "Close Project", KeyEvent.VK_C,
+        assemblyMenu.add(buildMenuItem(this, METHOD_closeProject, "Close Project", KeyEvent.VK_C,
                 null));
         
-        assemblyMenu.add(buildMenuItem(assemblyController, "zipAndMailProject", "Zip/Email Viskit Project", KeyEvent.VK_Z, null));
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_zipAndMailProject, "Zip/Email Viskit Project", KeyEvent.VK_Z, null));
         assemblyMenu.addSeparator();
         } // end hasModalMenus
         
@@ -528,7 +557,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
-        assemblyMenu.add(buildMenuItem(assemblyController, "open", "Open Assembly", KeyEvent.VK_O,
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_open, "Open Assembly", KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         assemblyMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
         openRecentAssemblyMenu.setMnemonic('O');
@@ -536,24 +565,24 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         assemblyMenu.addSeparator();
         // Bug fix: 1195
-        assemblyMenu.add(buildMenuItem(assemblyController, "close", "Close Assembly", KeyEvent.VK_C,
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_close, "Close Assembly", KeyEvent.VK_C,
                 KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "closeAll", "Close All Assemblies", KeyEvent.VK_C, null));
-        assemblyMenu.add(buildMenuItem(assemblyController, "save", "Save Assembly", KeyEvent.VK_S,
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_closeAll, "Close All Assemblies", KeyEvent.VK_C, null));
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_save, "Save Assembly", KeyEvent.VK_S,
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "saveAs", "Save Assembly as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_saveAs, "Save Assembly as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         assemblyMenu.addSeparator();
-        assemblyMenu.add(buildMenuItem(assemblyController, "captureWindow", "Image Save for Assembly Diagram", KeyEvent.VK_I,
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_captureWindow, "Image Save for Assembly Diagram", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "generateJavaSource", "Java Source Generation for Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_generateJavaSource, "Java Source Generation for Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, "viewXML", "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_viewXML, "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
         
         
 /* TODO fix functionality before exposing
         assemblyMenu.addSeparator();
-        // TODO add icon?
+        // TODO add icon?  METHOD_PREPARESIMULATIONRUNNER
         assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly for Simulation Run", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 */
@@ -567,10 +596,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         if (ViskitGlobals.instance().getMainFrame().hasModalMenus())
         {
         assemblyMenu.addSeparator();
-        assemblyMenu.add(buildMenuItem(assemblyController, "showViskitUserPreferences", "Viskit User Preferences", null, null));
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_showViskitUserPreferences, "Viskit User Preferences", null, null));
         assemblyMenu.addSeparator();
 
-        assemblyMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Quit", KeyEvent.VK_Q,
+        assemblyMenu.add(quitMenuItem = buildMenuItem(assemblyController, METHOD_quit, "Quit", KeyEvent.VK_Q,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Q, accelMod)));
         } // end hasModalMenus
         
@@ -590,10 +619,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         projectMenu = new JMenu("Project");
         projectMenu.setMnemonic(KeyEvent.VK_P);
 
-        projectMenu.add(buildMenuItem(assemblyController, "newProject", "New Viskit Project", KeyEvent.VK_N,
+        projectMenu.add(buildMenuItem(assemblyController, METHOD_newProject, "New Viskit Project", KeyEvent.VK_N,
                 null));
         
-        projectMenu.add(buildMenuItem(this, "openProject", "Open Project", KeyEvent.VK_O,
+        projectMenu.add(buildMenuItem(this, METHOD_openProject, "Open Project", KeyEvent.VK_O,
                 null));
         projectMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
         openRecentProjectMenu.setMnemonic('O');
@@ -604,16 +633,16 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getRecentProjectFileSetListener().addMenuItem(openRecentProjectMenu);
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         
-        projectMenu.add(buildMenuItem(this, "closeProject", "Close Project", KeyEvent.VK_C,
+        projectMenu.add(buildMenuItem(this, METHOD_closeProject, "Close Project", KeyEvent.VK_C,
                 null));
         
-        projectMenu.add(buildMenuItem(assemblyController, "zipProject", "Zip Viskit Project", KeyEvent.VK_Z,
+        projectMenu.add(buildMenuItem(assemblyController, METHOD_zipProject, "Zip Viskit Project", KeyEvent.VK_Z,
                 null));
 
         projectMenu.addSeparator();
-        projectMenu.add(buildMenuItem(assemblyController, "showViskitUserPreferences", "Viskit User Preferences", KeyEvent.VK_V, null));
+        projectMenu.add(buildMenuItem(assemblyController, METHOD_showViskitUserPreferences, "Viskit User Preferences", KeyEvent.VK_V, null));
 
-        projectMenu.add(quitMenuItem = buildMenuItem(assemblyController, "quit", "Quit", KeyEvent.VK_Q,
+        projectMenu.add(quitMenuItem = buildMenuItem(assemblyController, METHOD_quit, "Quit", KeyEvent.VK_Q,
                 null));
     }
     
@@ -626,12 +655,12 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         helpMenu = new JMenu("Help");
         getHelpMenu().setMnemonic(KeyEvent.VK_H);
 
-        getHelpMenu().add(buildMenuItem(help, "doContents", "Contents", KeyEvent.VK_C, null));
-        getHelpMenu().add(buildMenuItem(help, "doSearch", "Search", KeyEvent.VK_S, null));
+        getHelpMenu().add(buildMenuItem(help, METHOD_doContents, "Contents", KeyEvent.VK_C, null));
+        getHelpMenu().add(buildMenuItem(help, METHOD_doSearch, "Search", KeyEvent.VK_S, null));
         getHelpMenu().addSeparator();
 
-        getHelpMenu().add(buildMenuItem(help, "doTutorial", "Tutorial", KeyEvent.VK_T, null));
-        getHelpMenu().add(buildMenuItem(help, "aboutViskit", "About Viskit", KeyEvent.VK_A, null));
+        getHelpMenu().add(buildMenuItem(help, METHOD_doTutorial, "Tutorial", KeyEvent.VK_T, null));
+        getHelpMenu().add(buildMenuItem(help, METHOD_aboutViskit, "About Viskit", KeyEvent.VK_A, null));
     }
 
     private JMenu buildMenu(String name) 
@@ -640,20 +669,20 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mnemonicKeyEvent, KeyStroke accelleratorKeyStroke) {
-        Action action = ActionIntrospector.getAction(source, method);
+    private JMenuItem buildMenuItem(Object source, String methodName, String menuName, Integer mnemonicKeyEvent, KeyStroke accelleratorKeyStroke) {
+        Action action = ActionIntrospector.getAction(source, methodName);
         if (action == null)
         {
-            LOG.error("buildMenuItem reflection failed for name=" + name + " method=" + method + " in " + source.toString());
-            return new JMenuItem(name + "(not working, reflection failed) ");
+            LOG.error("buildMenuItem reflection failed for name=" + menuName + " method=" + methodName + " in " + source.toString());
+            return new JMenuItem(menuName + "(not working, reflection failed) ");
         }
         Map<String, Object> map = new HashMap<>();
         if (mnemonicKeyEvent != null)
             map.put(Action.MNEMONIC_KEY, mnemonicKeyEvent);
         if (accelleratorKeyStroke != null)
             map.put(Action.ACCELERATOR_KEY, accelleratorKeyStroke);
-        if (name != null) {
-            map.put(Action.NAME, name);
+        if (menuName != null) {
+            map.put(Action.NAME, menuName);
         }
         if (!map.isEmpty())
             ActionUtilities.decorateAction(action, map);
@@ -668,13 +697,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         // Use the button's selected status to figure out what mode
         // we are in.
 
-        if (selectMode.isSelected())
+        if (selectModeToggleButton.isSelected())
             return SELECT_MODE;
-        if (adapterMode.isSelected())
+        if (adapterModeToggleButton.isSelected())
             return ADAPTER_MODE;
-        if (simEventListenerMode.isSelected())
+        if (simEventListenerModeToggleButton.isSelected())
             return SIMEVENT_LISTENER_MODE;
-        if (propertyChangeListenerMode.isSelected())
+        if (propertyChangeListenerModeToggleButton.isSelected())
             return PROPERTY_CHANGE_LISTENER_MODE;
         LOG.error("assert false : \"getCurrentMode()\"");
         return 0;
@@ -687,37 +716,37 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         // Buttons for what mode we are in
 
-        selectMode = makeJToggleButton(
+        selectModeToggleButton = makeJToggleButton(
                 null,
                 "viskit/images/selectNode.png",
                 "Select an item on the graph"
         );
-        Border defBor = selectMode.getBorder();
-        selectMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(Color.lightGray, 2)));
+        Border defBor = selectModeToggleButton.getBorder();
+        selectModeToggleButton.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(Color.lightGray, 2)));
 
-        adapterMode = makeJToggleButton(
+        adapterModeToggleButton = makeJToggleButton(
                 null,
                 new AdapterIcon(24, 24),
                 "Connect SimEntities with adapter pattern"
         );
-        defBor = adapterMode.getBorder();
-        adapterMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
+        defBor = adapterModeToggleButton.getBorder();
+        adapterModeToggleButton.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        simEventListenerMode = makeJToggleButton(
+        simEventListenerModeToggleButton = makeJToggleButton(
                 null,
                 new SimEventListenerIcon(24, 24),
                 "Connect SimEntities through a SimEvent listener pattern"
         );
-        defBor = simEventListenerMode.getBorder();
-        simEventListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
+        defBor = simEventListenerModeToggleButton.getBorder();
+        simEventListenerModeToggleButton.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        propertyChangeListenerMode = makeJToggleButton(
+        propertyChangeListenerModeToggleButton = makeJToggleButton(
                 null,
                 new PropChangeListenerIcon(24, 24),
                 "Connect a property change listener to a SimEntity"
         );
-        defBor = propertyChangeListenerMode.getBorder();
-        propertyChangeListenerMode.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
+        defBor = propertyChangeListenerModeToggleButton.getBorder();
+        propertyChangeListenerModeToggleButton.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xff, 0xc8, 0xc8), 2)));
 
         JButton zoomIn = makeButton(
                 null,
@@ -731,27 +760,27 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 "Zoom out on the graph"
         );
 
-        Action prepareSimulationRunnerAction = ActionIntrospector.getAction(getController(), "prepareSimulationRunner");
+        Action prepareSimulationRunnerAction = ActionIntrospector.getAction(getController(), METHOD_PREPARESIMULATIONRUNNER); // "prepareSimulationRunner");
         prepareAssemblyForSimulationRunButton = makeButton(prepareSimulationRunnerAction, 
              "viskit/images/Play24.gif", // large
                 "Compile and initialize the assembly, prepare for Simulation Run");
-        modeButtonGroup.add(selectMode);
-        modeButtonGroup.add(adapterMode);
-        modeButtonGroup.add(simEventListenerMode);
-        modeButtonGroup.add(propertyChangeListenerMode);
+        modeButtonGroup.add(selectModeToggleButton);
+        modeButtonGroup.add(adapterModeToggleButton);
+        modeButtonGroup.add(simEventListenerModeToggleButton);
+        modeButtonGroup.add(propertyChangeListenerModeToggleButton);
 
         // Make selection mode the default mode
-        selectMode.setSelected(true);
+        selectModeToggleButton.setSelected(true);
 
         getToolBar().add(new JLabel("Mode: "));
 
-        getToolBar().add(selectMode);
+        getToolBar().add(selectModeToggleButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(adapterMode);
+        getToolBar().add(adapterModeToggleButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(simEventListenerMode);
+        getToolBar().add(simEventListenerModeToggleButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(propertyChangeListenerMode);
+        getToolBar().add(propertyChangeListenerModeToggleButton);
 
         getToolBar().addSeparator(new Dimension(24, 24));
         getToolBar().add(new JLabel("Zoom: "));
@@ -795,10 +824,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         PortsVisibleListener portsOn  = new PortsVisibleListener(true);
         PortsVisibleListener portsOff = new PortsVisibleListener(false);
-                    selectMode.addActionListener(portsOff);
-                   adapterMode.addActionListener(portsOn);
-          simEventListenerMode.addActionListener(portsOn);
-        propertyChangeListenerMode.addActionListener(portsOn);
+                    selectModeToggleButton.addActionListener(portsOff);
+                   adapterModeToggleButton.addActionListener(portsOn);
+          simEventListenerModeToggleButton.addActionListener(portsOn);
+        propertyChangeListenerModeToggleButton.addActionListener(portsOn);
     }
 
     private JToggleButton makeJToggleButton(Action newAction, String iconPath, String tooltipText) {

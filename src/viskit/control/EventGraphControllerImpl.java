@@ -109,11 +109,17 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void newProject() {
         ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).newProject();
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_zipAndMailProject = "zipAndMailProject";
 
     @Override
     public void zipAndMailProject() {
         ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).zipProject();
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_newEventGraph = "newEventGraph";
 
     @Override
     public void newEventGraph()
@@ -204,6 +210,10 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
         return retVal;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_open = "open";
+
 
     @Override
     public void open()
@@ -502,6 +512,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         ViskitGlobals.instance().quitEventGraphEditor();
         directoryWatch.stopWatcher();
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_closeAll = "closeAll";
 
     @Override
     public void closeAll() {
@@ -512,6 +525,10 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             close();
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_close = "close";
+
 
     @Override
     public void close()
@@ -573,6 +590,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             idx++;
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_save = "save";
 
     @Override
     public void save()
@@ -594,6 +614,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             handleCompileAndSave(eventGraphModel, localLastFile);
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_saveAs = "saveAs";
 
     @Override
     public void saveAs()
@@ -741,6 +764,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     private boolean doRemove = false;
+    
+    /** method name for reflection use */
+    public static final String METHOD_remove = "remove";
 
     @Override
     public void remove() 
@@ -769,6 +795,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             }
         }
     }
+    /** method name for reflection use */
+    public static final String METHOD_cut = "cut";
 
     @Override
     public void cut() //---------------
@@ -776,6 +804,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         // Not supported
     }
 
+    /** method name for reflection use */
+    public static final String METHOD_copy = "copy";
+    
     @Override
     @SuppressWarnings("unchecked")
     public void copy() //----------------
@@ -797,6 +828,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     private int bias = 0;
+    
+    /** method name for reflection use */
+    public static final String METHOD_paste = "paste";
 
     @Override
     public void paste() //-----------------
@@ -872,6 +906,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public boolean isUndo() {
         return isUndo;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_undo = "undo";
 
     @Override
     public void undo()
@@ -899,12 +936,15 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             graphUndoManager.undo(view.getCurrentVgraphComponentWrapper().getGraphLayoutCache());
         } 
         catch (CannotUndoException ex) {
-            LOG.error("Unable to undo: {}", ex);
+            LOG.error(METHOD_undo + "() unable to undo: {}", ex);
         } 
         finally {
             updateUndoRedoStatus();
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_redo = "redo";
 
     /**
      * Replaces the last selected node or edge from the JGraph model
@@ -983,6 +1023,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
         return true;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_generateJavaSource = "generateJavaSource";
 
     @Override
     public void generateJavaSource()
@@ -1010,6 +1053,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             ViskitGlobals.instance().getAssemblyViewFrame().showAndSaveSource(className, sourceString, localLastFile.getName());
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_viewXML = "viewXML";
 
     @Override
     public void viewXML()
@@ -1089,6 +1135,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             }
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_editGraphMetadata = "editGraphMetadata";
 
     @Override
     public void editGraphMetadata() 
@@ -1101,7 +1150,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
         if (eventGraphModel == null) 
         {
-            LOG.error("editGraphMetadata() unable to find eventGraphModel");
+            LOG.error(METHOD_editGraphMetadata + "() unable to find eventGraphModel");
             return; // not expected
         }
         GraphMetadata graphMetadata = eventGraphModel.getMetadata();
@@ -1148,6 +1197,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
     private String imageSaveCountString = "";
     private int    imageSaveInt = -1;
+    
+    /** method name for reflection use */
+    public static final String METHOD_captureWindow = "captureWindow";
 
     @Override
     public void captureWindow()
