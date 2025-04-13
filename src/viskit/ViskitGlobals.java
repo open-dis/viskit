@@ -1379,11 +1379,11 @@ public class ViskitGlobals
     public void setAnalystReportViewFrame(AnalystReportViewFrame analystReportViewFrame) {
         this.analystReportViewFrame = analystReportViewFrame;
     }
-    public void selectEventGraphTab()
+    public void selectEventGraphEditorTab()
     {
         mainFrame.selectEventGraphEditorTab();
     }
-    public void selectAssemblyTab()
+    public void selectAssemblyEditorTab()
     {
         mainFrame.selectAssemblyEditorTab();
     }
@@ -1394,6 +1394,22 @@ public class ViskitGlobals
     public void selectAnalystReportTab()
     {
         mainFrame.selectAnalystReportTab();
+    }
+    public boolean isSelectedEventGraphEditorTab()
+    {
+        return (ViskitGlobals.instance().getMainFrame().getTopTabbedPaneSelectedIndex() == MainFrame.TAB_INDEX_EVENTGRAPH_EDITOR);
+    }
+    public boolean isSelectedAssemblyEditorTab()
+    {
+        return (ViskitGlobals.instance().getMainFrame().getTopTabbedPaneSelectedIndex() == MainFrame.TAB_INDEX_ASSEMBLY_EDITOR);
+    }
+    public boolean isSelecteSimulationRunTab()
+    {
+        return (ViskitGlobals.instance().getMainFrame().getTopTabbedPaneSelectedIndex() == MainFrame.TAB_INDEX_SIMULATION_RUN);
+    }
+    public boolean isSelectedAnalystReportTab()
+    {
+        return (ViskitGlobals.instance().getMainFrame().getTopTabbedPaneSelectedIndex() == MainFrame.TAB_INDEX_ANALYST_REPORT);
     }
     
     public boolean isProjectOpen()
@@ -1468,6 +1484,18 @@ public class ViskitGlobals
      */
     public void setProjectClassesDirectory(File projectClassesDirectory) {
         this.projectClassesDirectory = projectClassesDirectory;
+    }
+
+    /** 
+     * A component, e.g., vAMod, wants to say something.
+     * @param messageType the type of message, i.e. WARN, ERROR, INFO, QUESTION, etc.
+     * @param messageTitle the title of the message in the dialog frame
+     * @param messageBody the message to transmit
+     */
+    public void messageUser(int messageType, String messageTitle, String messageBody) // messageType is one of JOptionPane types
+    {
+        if (ViskitGlobals.instance().getAssemblyViewFrame() != null)
+            ViskitGlobals.instance().getMainFrame().genericReport(messageType, messageTitle, messageBody);
     }
 
 } // end class file ViskitGlobals.java

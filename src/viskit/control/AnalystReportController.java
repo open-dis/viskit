@@ -98,8 +98,8 @@ public class AnalystReportController extends MvcAbstractController
         String assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getName();
         if ((assemblyName == null) || assemblyName.isBlank())
              assemblyName = currentAssemblyFile.getName().substring(0,currentAssemblyFile.getName().lastIndexOf(".xml"));
-        if (((assemblyName == null) || assemblyName.isBlank()) && (analystReportModel != null))
-            assemblyName = analystReportModel.getReportName();
+        if (((assemblyName == null) || assemblyName.isBlank()) && (getAnalystReportModel() != null))
+            assemblyName = getAnalystReportModel().getReportName();
         if ((assemblyName == null) || assemblyName.isBlank())
         {
             assemblyName = "ERROR_AssemblyNameNotFound";
@@ -122,11 +122,11 @@ public class AnalystReportController extends MvcAbstractController
         }
         LOG.info("analystReportXmlFile.toPath()=\n      " + analystReportXmlFile.getAbsolutePath());
         isFileReady(xmlSourceFile);
-        if (analystReportModel == null)
+        if (getAnalystReportModel() == null)
         {
             analystReportModel =  ViskitGlobals.instance().getAnalystReportModel();
         }
-        if (analystReportModel == null)
+        if (getAnalystReportModel() == null)
         {
             LOG.info("setReportXML() creating analystReportModel");
             analystReportModel =  new AnalystReportModel(analystReportXmlFile);
@@ -157,8 +157,10 @@ public class AnalystReportController extends MvcAbstractController
 
     public void openAnalystReportXML() 
     {
-        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
-        if (analystReportViewFrame.isReportDirty()) {
+        ViskitGlobals.instance().selectAnalystReportTab();
+        
+        if ((analystReportViewFrame != null) && analystReportViewFrame.isReportDirty()) 
+        {
             int result = JOptionPane.showConfirmDialog(analystReportViewFrame,
                     "Save current simulation data and Analyst Report annotations?",
                     "Confirm",
@@ -180,19 +182,31 @@ public class AnalystReportController extends MvcAbstractController
         openAnalystReportChooser.setFileFilter(filter);
         openAnalystReportChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-        int resp = openAnalystReportChooser.showOpenDialog(analystReportViewFrame);
-        if (resp != JFileChooser.APPROVE_OPTION) {
+        int returnValue = openAnalystReportChooser.showOpenDialog(analystReportViewFrame);
+        if (returnValue != JFileChooser.APPROVE_OPTION) {
             return;
         }
 
         openAnalystReport(openAnalystReportChooser.getSelectedFile());
     }
 
-    public void setCurrentAssemblyFile(File f) {
-        currentAssemblyFile = f;
-
-        if (analystReportModel != null) {
-            analystReportModel.setAssemblyFile(currentAssemblyFile);
+    public void setCurrentAssemblyFile(File newAssemblyFile) 
+    {
+        if (getAnalystReportModel() == null)
+        {
+            LOG.error("setCurrentAssemblyFile() error, analystReportModel is null");
+        }
+        else if (newAssemblyFile == null)
+        {
+            LOG.error("setCurrentAssemblyFile() error, received null file");
+        }
+        else if (!newAssemblyFile.exists())
+        {
+            LOG.error("setCurrentAssemblyFile(" + newAssemblyFile.getName() + ") error, file does not exist");
+        }
+        else
+        {
+            currentAssemblyFile = newAssemblyFile;
         }
     }
     
@@ -201,10 +215,17 @@ public class AnalystReportController extends MvcAbstractController
 
     public void saveAnalystReportXML() 
     {
-        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
-        JFileChooser saveAnalystReportXmlChooser = new JFileChooser(analystReportModel.getAnalystReportXmlFile().getParent());
+        ViskitGlobals.instance().selectAnalystReportTab();
+        if (getAnalystReportModel() == null)
+        {
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Analyst Report not ready",
+                    "<html><p align='center'>To save XML, first load and edit an Analyst Report, or else</p><br />" + 
+                          "<p align='center'>perform a simulation run in order to create a new Analyst Report.</p>");
+            return;
+        }
+        JFileChooser saveAnalystReportXmlChooser = new JFileChooser(getAnalystReportModel().getAnalystReportXmlFile().getParent());
         saveAnalystReportXmlChooser.setDialogTitle("Save Analyst Report XML");
-        saveAnalystReportXmlChooser.setSelectedFile(analystReportModel.getAnalystReportXmlFile());
+        saveAnalystReportXmlChooser.setSelectedFile(getAnalystReportModel().getAnalystReportXmlFile());
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Analyst report data files (.xml)", "xml");
         saveAnalystReportXmlChooser.setFileFilter(filter);
         saveAnalystReportXmlChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -217,13 +238,13 @@ public class AnalystReportController extends MvcAbstractController
         analystReportViewFrame.unFillLayout();
 
         // Ensure user can save a unique name for Analyst Report (Bug fix: 1260)
-        analystReportModel.setAnalystReportFile(saveAnalystReportXmlChooser.getSelectedFile());
-        saveReport(analystReportModel.getAnalystReportXmlFile()); // first ensure that current report is saved
-        String outputFileName = analystReportModel.getAnalystReportXmlFile().getAbsolutePath();
+        getAnalystReportModel().setAnalystReportFile(saveAnalystReportXmlChooser.getSelectedFile());
+        saveReport(getAnalystReportModel().getAnalystReportXmlFile()); // first ensure that current report is saved
+        String outputFileName = getAnalystReportModel().getAnalystReportXmlFile().getAbsolutePath();
         int idx = outputFileName.lastIndexOf(".");
 
         outputFileName = outputFileName.substring(0, idx) + ".xml"; // TODO superfluous?
-        XsltUtility.runXsltStylesheet(analystReportModel.getAnalystReportXmlFile().getAbsolutePath(),
+        XsltUtility.runXsltStylesheet(getAnalystReportModel().getAnalystReportXmlFile().getAbsolutePath(),
                 outputFileName, "config/AnalystReportXMLtoHTML.xslt");
     }
     
@@ -237,28 +258,27 @@ public class AnalystReportController extends MvcAbstractController
             String message1 = "Analyst Report results must first be available in order to generateHtmlReport()";
             String message2 = "<html><p align='center'>Analyst Report results must first be available</p><br />" +
                                     "<p align='center'>in order to generate the HTML Analyst Report.</p><br />" +
-                                    "<p align='center'>Please run an assembly or load an Analyst Report.</p><br />";
+                                    "<p align='center'>Please load a prior Analyst Report or else perform a simulation run first.</p><br />";
             LOG.error(message1);
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Unable to show Analyst Report", message2);
             return;
         }
+        ViskitGlobals.instance().selectAnalystReportTab();
         if (!ViskitGlobals.instance().getSimulationRunPanel().analystReportCB.isSelected()) {
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                     "Enable Analyst Reports not selected",
                     "<html><body><p align='center'>"
                     + "The checkbox for <code>Enable Analyst Reports </code>is not"
-                    + " currently selected.  Please select on the <code>Assembly Simulation Run </code>panel,"
-                    + " re-run the experiment and the report will then be available to "
-                    + "view.</p></body></html>"
+                    + " currently selected.  Please select on the <code>Viskit User Preferences</code> panel,"
+                    + "then re-run the simulation to produce the Analyst Report.</p></body></html>"
             );
             return;
         }
-
         analystReportViewFrame.unFillLayout();
-        saveReport(analystReportModel.getAnalystReportXmlFile());
+        saveReport(getAnalystReportModel().getAnalystReportXmlFile());
 
-        String outputHtmlFilePath = analystReportModel.getAnalystReportXmlFile().getAbsolutePath();
+        String outputHtmlFilePath = getAnalystReportModel().getAnalystReportXmlFile().getAbsolutePath();
         // change .xml extension to .html
         // simplified output report name.  TODO: handle . characters in path/filename itself
         outputHtmlFilePath = outputHtmlFilePath.substring(0, 
@@ -285,7 +305,7 @@ public class AnalystReportController extends MvcAbstractController
         // always generate new report before display, regardless of old or new name
         // TODO:  change XML input to temp file, rather than final file, if possible
         try {
-            XsltUtility.runXsltStylesheet(analystReportModel.getAnalystReportXmlFile().getCanonicalPath(), // XML  input
+            XsltUtility.runXsltStylesheet(getAnalystReportModel().getAnalystReportXmlFile().getCanonicalPath(), // XML  input
                 outputHtmlFilePath, // HTML output
                 VISKIT_CONFIG_DIRECTORY + "/" + "AnalystReportXMLtoHTML.xslt");  // XSLT stylesheet
         }
@@ -305,7 +325,7 @@ public class AnalystReportController extends MvcAbstractController
 
     private void saveReport()
     {
-        saveReport(analystReportModel.getAnalystReportXmlFile());
+        saveReport(getAnalystReportModel().getAnalystReportXmlFile());
     }
 
     private void saveReport(File reportFile)
@@ -314,22 +334,25 @@ public class AnalystReportController extends MvcAbstractController
             return;
         
         try {
-            analystReportModel.writeToXMLFile(reportFile);
+            getAnalystReportModel().writeToXMLFile(reportFile);
             analystReportViewFrame.setReportDirty(false);
         } 
         catch (Exception e) {
             LOG.error("saveReport(" + reportFile.getAbsolutePath() + ") exception: " + e);
         }
-        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
+        ViskitGlobals.instance().selectAnalystReportTab();
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_openAnalystReport = "openAnalystReport";
 
     private void openAnalystReport(File selectedFile)
     {
-        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
+        ViskitGlobals.instance().selectAnalystReportTab();
         
         AnalystReportModel analystReportModelLocal = new AnalystReportModel(selectedFile);
         setContent(analystReportModelLocal);
-        analystReportModel.setAnalystReportFile(selectedFile);
+        getAnalystReportModel().setAnalystReportFile(selectedFile);
         analystReportViewFrame.setReportDirty(false);
     }
 
@@ -346,7 +369,7 @@ public class AnalystReportController extends MvcAbstractController
             return;
         }
         setContent(analystReportModelLocal);
-        analystReportModel.setAnalystReportFile(targetFile);
+        getAnalystReportModel().setAnalystReportFile(targetFile);
         analystReportViewFrame.setReportDirty(false);
         analystReportModelLocal.setReportReady(true);
     }
@@ -374,7 +397,7 @@ public class AnalystReportController extends MvcAbstractController
     public void showHtmlViewer(String htmlFilepath) // TODO problem on mac?
     {
         URI htmlFilepathURI;
-        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
+        ViskitGlobals.instance().selectAnalystReportTab();
         // pop up the system html viewer, or send currently running browser to html page
         try {
             htmlFilepathURI = new URI(htmlFilepath.replaceAll("\\\\", "/"));
@@ -401,7 +424,7 @@ public class AnalystReportController extends MvcAbstractController
 
     public void showHtmlViewer(File file)
     {
-        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
+        ViskitGlobals.instance().selectAnalystReportTab();
         // pop up the system html viewer, or send currently running browser to html page
         try {
             // must convert slashes here when creating URI, not beforehand
@@ -429,10 +452,23 @@ public class AnalystReportController extends MvcAbstractController
 //    @Override
     public void viewXML() 
     {
-        ViskitGlobals.instance().getMainFrame().selectAnalystReportTab();
-        
+        ViskitGlobals.instance().selectAnalystReportTab();
+        if ((getAnalystReportModel() == null) || (ViskitGlobals.instance().getAssemblyViewFrame() == null))
+        {
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Analyst Report not ready",
+                    "<html><p align='center'>To view XML, first load an Analyst Report or else</p><br />" + 
+                          "<p align='center'>perform a simulation run in order to create a new Analyst Report.</p>");
+            return;
+        }
         // bravely ignoring error checking here...
-        ViskitGlobals.instance().getAssemblyViewFrame().displayXML(analystReportModel.getAnalystReportXmlFile());
+        ViskitGlobals.instance().getAssemblyViewFrame().displayXML(getAnalystReportModel().getAnalystReportXmlFile());
+    }
+
+    /**
+     * @return the analystReportModel
+     */
+    public AnalystReportModel getAnalystReportModel() {
+        return analystReportModel;
     }
 
 } // end class file AnalystReportController.java

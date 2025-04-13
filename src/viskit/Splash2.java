@@ -130,11 +130,14 @@ public class Splash2 extends JFrame
             contentPanel.underFrameImg = screenImg.getSubimage(x, y, w, h);
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_main = "main";
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args)
+    {
         if (viskit.ViskitStatics.debug) {
-            LOG.info(System.getProperty("java.class.path"));
+            LOG.info("java.class.path=" + System.getProperty("java.class.path"));
         }
 
         final Splash2 splash2 = new Splash2();
@@ -172,9 +175,10 @@ public class Splash2 extends JFrame
 
             Class<?> mainClass = ViskitStatics.classForName(target);
 
-            Method mainMethod = mainClass.getMethod("main", parameterTypes);
+            Method mainMethod = mainClass.getMethod(METHOD_main, parameterTypes);
             mainMethod.invoke(null, arguments);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+        } 
+        catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             LOG.error(ex);
         }
         progressBar.setString("Complete");

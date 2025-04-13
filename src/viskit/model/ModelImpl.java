@@ -818,29 +818,30 @@ public class ModelImpl extends MvcAbstractModel implements Model
     // -----------------
 
     @Override
-    public void newEvent(String nodeName, Point2D p) {
+    public void newEventNode(String nodeName, Point2D p) 
+    {
         EventNode node = new EventNode(nodeName);
         if (p == null) {
             p = new Point2D.Double(30, 60);
         }
         node.setPosition(p);
-        Event jaxbEv = jaxbEventGraphObjectFactory.createEvent();
+        Event jaxbEvent = jaxbEventGraphObjectFactory.createEvent();
 
-        eventNodeCache.put(jaxbEv, node);   // key = ev
+        eventNodeCache.put(jaxbEvent, node);   // key = ev
 
         // Ensure a unique Event name
         if (!nameCheck()) {
             mangleName(node);
         }
 
-        jaxbEv.setName(ViskitStatics.nullIfEmpty(nodeName));
+        jaxbEvent.setName(ViskitStatics.nullIfEmpty(nodeName));
 
-        if ("Run".equals(ViskitStatics.nullIfEmpty(nodeName))) {
-            jaxbEv.setDescription("This event is fired first to facilitate "
-                    + "initialization of all simulation state variables");
+        if ("Run".equals(ViskitStatics.nullIfEmpty(nodeName)))
+        {
+            jaxbEvent.setDescription("The Run event is fired first in order to initialize all state variables");
         }
-        node.opaqueModelObject = jaxbEv;
-        jaxbRoot.getEvent().add(jaxbEv);
+        node.opaqueModelObject = jaxbEvent;
+        jaxbRoot.getEvent().add(jaxbEvent);
 
         setDirty(true);
         notifyChanged(new ModelEvent(node, ModelEvent.EVENT_ADDED, "Event added"));

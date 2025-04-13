@@ -62,13 +62,13 @@ import viskit.control.AnalystReportController;
 import viskit.control.EventGraphControllerImpl;
 import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.DoeMainFrame;
-import static viskit.view.MainFrame.TAB0_ASSEMBLY_EDITOR_INDEX;
-import static viskit.view.MainFrame.TAB0_EVENTGRAPH_EDITOR_INDEX;
 import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
 import static viskit.view.MainFrame.tabIndices;
 import viskit.view.dialog.ViskitUserPreferencesDialog;
-import static viskit.view.MainFrame.TAB0_SIMULATIONRUN_INDEX;
 import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
+import static viskit.view.MainFrame.TAB_INDEX_ASSEMBLY_EDITOR;
+import static viskit.view.MainFrame.TAB_INDEX_EVENTGRAPH_EDITOR;
+import static viskit.view.MainFrame.TAB_INDEX_SIMULATION_RUN;
 
 /**
  * MOVES Institute
@@ -81,7 +81,6 @@ import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
  */
 public class MainFrame extends JFrame
 {
-
     /**
      * @return the eventGraphController
      */
@@ -109,15 +108,15 @@ public class MainFrame extends JFrame
 
     /** The initial assembly to load. */
     private       final String initialAssemblyFile;
-    public static final int TAB0_EVENTGRAPH_EDITOR_INDEX = 0;
-    public static final int TAB0_ASSEMBLY_EDITOR_INDEX   = 1;
-    public static final int TAB0_SIMULATIONRUN_INDEX     = 2;
-    public static final int TAB0_ANALYSTREPORT_INDEX     = 3;
+    public static final int TAB_INDEX_EVENTGRAPH_EDITOR = 0;
+    public static final int TAB_INDEX_ASSEMBLY_EDITOR   = 1;
+    public static final int TAB_INDEX_SIMULATION_RUN    = 2; /* SimulationRun */
+    public static final int TAB_INDEX_ANALYST_REPORT    = 3; /* AnalystReport */
     public static final int[] tabIndices = {
-        TAB0_EVENTGRAPH_EDITOR_INDEX,
-        TAB0_ASSEMBLY_EDITOR_INDEX,
-        TAB0_SIMULATIONRUN_INDEX,
-        TAB0_ANALYSTREPORT_INDEX,
+        TAB_INDEX_EVENTGRAPH_EDITOR,
+        TAB_INDEX_ASSEMBLY_EDITOR,
+        TAB_INDEX_SIMULATION_RUN,
+        TAB_INDEX_ANALYST_REPORT,
     };
     public static final int TAB1_LOCALRUN_INDEX = 0;
     public static final int TAB1_DESIGN_OF_EXPERIMENTS_INDEX = 1;
@@ -162,6 +161,11 @@ public class MainFrame extends JFrame
     public Action getMyQuitAction() {
         return myQuitAction;
     }
+    
+    public int getTopTabbedPaneSelectedIndex()
+    {
+        return topTabbedPane.getSelectedIndex();
+    }
 
     private void initializeMainFrame() 
     {
@@ -198,10 +202,10 @@ public class MainFrame extends JFrame
         {
             jamQuitHandler(((EventGraphViewFrame) eventGraphFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
         }
-            tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX] = assemblyPaneIndex;
+            tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR] = assemblyPaneIndex;
         } 
         else {
-            tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX] = -1;
+            tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR] = -1;
         }
 
         // Ensures Event Graph editor is the selected tab for menu function
@@ -226,15 +230,15 @@ public class MainFrame extends JFrame
         {
             jamQuitHandler(((AssemblyViewFrame) assemblyFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
         }
-            tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] = assemblyPaneIndex;
+            tabIndices[TAB_INDEX_ASSEMBLY_EDITOR] = assemblyPaneIndex;
         } 
         else 
         {
-            tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] = -1;
+            tabIndices[TAB_INDEX_ASSEMBLY_EDITOR] = -1;
         }
 
         assemblyController = ViskitGlobals.instance().getAssemblyController();
-        assemblyController.setMainTabbedPane(topTabbedPane, TAB0_ASSEMBLY_EDITOR_INDEX);
+        assemblyController.setMainTabbedPane(topTabbedPane, TAB_INDEX_ASSEMBLY_EDITOR);
         eventGraphController = ViskitGlobals.instance().getEventGraphController();
 
         // Now set the recent open project's file listener for the eventGraphFrame now
@@ -260,12 +264,12 @@ public class MainFrame extends JFrame
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Simulation Run Manager");
             topTabbedPane.setToolTipTextAt(assemblyPaneIndex, INITIAL_SIMULATION_RUN_HINT);
             modalMenuBarList.add(null); // placeholder
-            tabIndices[TAB0_SIMULATIONRUN_INDEX] = assemblyPaneIndex;
+            tabIndices[TAB_INDEX_SIMULATION_RUN] = assemblyPaneIndex;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
         } 
         else 
         {
-            tabIndices[TAB0_SIMULATIONRUN_INDEX] = -1;
+            tabIndices[TAB_INDEX_SIMULATION_RUN] = -1;
         }
 
         // Analyst report
@@ -290,14 +294,14 @@ public class MainFrame extends JFrame
         {
             jamQuitHandler(null, myQuitAction, mainFrameMenuBar);
         }
-            tabIndices[TAB0_ANALYSTREPORT_INDEX] = assemblyPaneIndex;
+            tabIndices[TAB_INDEX_ANALYST_REPORT] = assemblyPaneIndex;
             AnalystReportController analystReportController = (AnalystReportController) analystReportEditorPanel.getController();
             analystReportController.setMainTabbedPane(topTabbedPane, assemblyPaneIndex);
             getAssemblyController().addAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportEditorPanel);
         } 
         else
         {
-            tabIndices[TAB0_ANALYSTREPORT_INDEX] = -1;
+            tabIndices[TAB_INDEX_ANALYST_REPORT] = -1;
         }
 
         // Assembly Simulation Run
@@ -420,7 +424,7 @@ public class MainFrame extends JFrame
             if (dirtyModel != null && dirtyModel.isDirty()) {
 
                 // This will fire another call to stateChanged()
-                topTabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX]);
+                topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR]);
                 return;
             }
 
@@ -428,14 +432,14 @@ public class MainFrame extends JFrame
 
             // If we compiled and prepped an Assembly to run, but want to go
             // back and change something, then handle that here
-            if (i == tabIndices[TAB0_SIMULATIONRUN_INDEX]) 
+            if (i == tabIndices[TAB_INDEX_SIMULATION_RUN]) 
             {
                 i = topTabbedPane.getTabCount() + getSimulationRunTabbedPane().getSelectedIndex();
-                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], "Run replications of simulation defined by selected Assembly");
+                topTabbedPane.setToolTipTextAt(tabIndices[TAB_INDEX_SIMULATION_RUN], "Run replications of simulation defined by selected Assembly");
             }
-            else if ((topTabbedPane != null) && (topTabbedPane.getTabCount() >= TAB0_SIMULATIONRUN_INDEX)) // TODO why is this needed??
+            else if ((topTabbedPane != null) && (topTabbedPane.getTabCount() >= TAB_INDEX_SIMULATION_RUN)) // TODO why is this needed??
             {
-                topTabbedPane.setToolTipTextAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], "first Initialize Assembly for Simulation Run");
+                topTabbedPane.setToolTipTextAt(tabIndices[TAB_INDEX_SIMULATION_RUN], "first Initialize Assembly for Simulation Run");
             }
 
             JMenuBar selectedMenuBar = new JMenuBar();
@@ -552,22 +556,22 @@ public class MainFrame extends JFrame
             // https://docs.oracle.com/javase/specs/jls/se7/html/jls-14.html#jls-14.15
             // https://docs.oracle.com/javase/specs/jls/se6/html/statements.html
             {
-                if (tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX] != -1) {
-                    topTabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX]);
+                if (tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR] != -1) {
+                    topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR]);
                     if (!((EventGraphController) eventGraphFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
-                if (tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] != -1) {
-                    topTabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX]);
+                if (tabIndices[TAB_INDEX_ASSEMBLY_EDITOR] != -1) {
+                    topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_ASSEMBLY_EDITOR]);
                     if (!((AssemblyControllerImpl) assemblyFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
 
                 /* DIFF between OA3302 branch and trunk */
-                if (tabIndices[TAB0_SIMULATIONRUN_INDEX] != -1) {
-                    topTabbedPane.setSelectedIndex(tabIndices[TAB0_SIMULATIONRUN_INDEX]);
+                if (tabIndices[TAB_INDEX_SIMULATION_RUN] != -1) {
+                    topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_SIMULATION_RUN]);
                     if (doeMain != null) {
                         if (!doeMain.getController().preQuit()) {
                             break outer;
@@ -579,7 +583,7 @@ public class MainFrame extends JFrame
                 // TODO: other preQuits here if needed
                 ViskitGlobals.instance().setSystemExitHandler(defaultHandler);    // reset default handler
 
-                if (tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX] != -1) {
+                if (tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR] != -1) {
                     getEventGraphController().removeEventGraphFileListener(getAssemblyController().getOpenEventGraphListener());
                     getEventGraphController().removeRecentEventGraphFileListener(ViskitGlobals.instance().getEventGraphViewFrame().getRecentEventGraphFileListener());
 
@@ -587,7 +591,7 @@ public class MainFrame extends JFrame
 
                     ((EventGraphController) eventGraphFrame.getController()).postQuit();
                 }
-                if (tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX] != -1) {
+                if (tabIndices[TAB_INDEX_ASSEMBLY_EDITOR] != -1) {
                     getAssemblyController().removeAssemblyFileListener(getAssemblyController().getAssemblyChangeListener());
                     getAssemblyController().removeAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportEditorPanel);
                     getAssemblyController().removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentAssemblyFileListener());
@@ -643,12 +647,12 @@ public class MainFrame extends JFrame
 
         @Override
         public void exec(String[] execStrings) {
-            if (tabIndices[TAB0_SIMULATIONRUN_INDEX] != -1) {
+            if (tabIndices[TAB_INDEX_SIMULATION_RUN] != -1) {
 
-                topTabbedPane.setEnabledAt(tabIndices[TAB0_SIMULATIONRUN_INDEX], true);
+                topTabbedPane.setEnabledAt(tabIndices[TAB_INDEX_SIMULATION_RUN], true);
 
                 // toggles a tab change listener
-                topTabbedPane.setSelectedIndex(tabIndices[TAB0_SIMULATIONRUN_INDEX]);
+                topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_SIMULATION_RUN]);
                 getSimulationRunTabbedPane().setSelectedIndex(TAB1_LOCALRUN_INDEX);
 
                 // initializes a RunSimulation class loader
@@ -688,7 +692,7 @@ public class MainFrame extends JFrame
         public void setTitle(String title, int key) {
             titles[key] = title;
             int assemblyTabIndex = topTabbedPane.getSelectedIndex();
-            if (assemblyTabIndex == tabIndices[TAB0_SIMULATIONRUN_INDEX]) {
+            if (assemblyTabIndex == tabIndices[TAB_INDEX_SIMULATION_RUN]) {
                 assemblyTabIndex = topTabbedPane.getTabCount() + getSimulationRunTabbedPane().getSelectedIndex();
                 getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, title.substring(title.indexOf(":") + 1));
             }
@@ -762,19 +766,19 @@ public class MainFrame extends JFrame
     }
     public void selectEventGraphEditorTab ()
     {
-        topTabbedPane.setSelectedIndex(tabIndices[TAB0_EVENTGRAPH_EDITOR_INDEX]);
+        topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR]);
     }
     public void selectAssemblyEditorTab ()
     {
-        topTabbedPane.setSelectedIndex(tabIndices[TAB0_ASSEMBLY_EDITOR_INDEX]);
+        topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_ASSEMBLY_EDITOR]);
     }
     public void selectSimulationRunTab ()
     {
-        topTabbedPane.setSelectedIndex(tabIndices[TAB0_SIMULATIONRUN_INDEX]);
+        topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_SIMULATION_RUN]);
     }
     public void selectAnalystReportTab ()
     {
-        topTabbedPane.setSelectedIndex(tabIndices[TAB0_ANALYSTREPORT_INDEX]);
+        topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_ANALYST_REPORT]);
     }
 
     public static void displayWelcomeGuidance()

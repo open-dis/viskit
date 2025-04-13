@@ -452,6 +452,9 @@ public class SimulationRunPanel extends JPanel
         return numberOfReplications;
     }
     
+    /** method name for reflection use */
+    public static final String METHOD_setNumberOfReplications = "setNumberOfReplications";
+    
     public void setNumberOfReplications(int value)
     {
         numberOfReplications = value;

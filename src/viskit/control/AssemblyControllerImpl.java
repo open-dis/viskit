@@ -234,7 +234,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void open()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         File[] filesArray = ViskitGlobals.instance().getAssemblyViewFrame().openFilesAsk();
         if (filesArray == null)
             return;
@@ -473,7 +473,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void save()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null)
             assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
@@ -496,7 +496,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void saveAs()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         AssemblyModel model = (AssemblyModel) getModel();
         AssemblyView assemblyView = (AssemblyView) getView();
         GraphMetadata graphMetadata = model.getMetadata();
@@ -534,7 +534,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 //        }
 //        GraphMetadata graphMetadata = assemblyModel.getMetadata();
         
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         
         AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel();
         if (assemblyModel == null)
@@ -797,6 +797,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         
         runnerSimulationRunInterface.resetSimulationRunPanel();
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_newAssembly = "newAssembly";
 
     @Override
     public void newAssembly()
@@ -807,7 +810,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             LOG.error("newAssembly() unable to create new assembly if project is not open");
             return;
         }
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
 
         GraphMetadata oldGraphMetadata = null;
         AssemblyModel viskitAssemblyModel = (AssemblyModel) getModel();
@@ -845,19 +848,6 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             ViskitGlobals.instance().getAssemblyViewFrame().deleteTab(assemblyModel);
         }
     }
-
-    /** 
-     * A component, e.g., vAMod, wants to say something.
-     * @param messageType the type of message, i.e. WARN, ERROR, INFO, QUESTION, etc.
-     * @param messageTitle the title of the message in the dialog frame
-     * @param messageBody the message to transmit
-     */
-    @Override
-    public void messageUser(int messageType, String messageTitle, String messageBody) // messageType is one of JOptionPane types
-    {
-        if (ViskitGlobals.instance().getAssemblyViewFrame() != null)
-            ViskitGlobals.instance().getMainFrame().genericReport(messageType, messageTitle, messageBody);
-    }
     
     /** method name for reflection use */
     public static final String METHOD_quit  = "quit";
@@ -865,10 +855,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void quit() 
     {
-        if (preQuit()) {
-            postQuit();
+        String title, message;
+        title = "Quit Viskit?";
+        message = "<html><p align='center'>Are you sure that you want to quit Viskit?</p><br/>";
+        int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
+        if (returnValue == JOptionPane.YES_OPTION)
+        {
+            if (preQuit()) {
+                postQuit();
+            }
+            ViskitGlobals.instance().getMainFrame().quit();
         }
-        ViskitGlobals.instance().getMainFrame().quit();
+        // otherwise return
     }
 
     @Override
@@ -900,7 +898,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void closeAll() 
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab())
+        {
+            ViskitGlobals.instance().selectAssemblyEditorTab();
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Assembly Editor", "First select Assembly Editor before closing an Aasembly");
+            return;
+        }
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyViewFrame().getOpenModels();
         for (AssemblyModel assemblyModel : assemblyModelArray) 
         {
@@ -917,7 +921,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void close()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab())
+        {
+            ViskitGlobals.instance().selectAssemblyEditorTab();
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Assembly Editor", "First select Assembly Editor before closing an Aasembly");
+            return;
+        }
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         if (preClose()) {
             postClose();
         }
@@ -942,7 +952,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         LOG.debug("postClose() close assembly {}", OpenAssembly.inst().getName());
         OpenAssembly.inst().doFireActionCloseAssembly();
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
     }
 
     private void markAssemblyConfigurationClosed(File f) {
@@ -984,6 +994,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void newEventGraphNode() // menu click
     {
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         Object o = ViskitGlobals.instance().getAssemblyViewFrame().getSelectedEventGraph();
 
         if (o != null) {
@@ -996,7 +1007,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
         }
         // Nothing selected or non-leaf
-        messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select an Event Graph from the panel on the left.");
+        ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select an Event Graph from the panel on the left.");
     }
 
     @Override
@@ -1014,6 +1025,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void newPropertyChangeListenerNode() // menu click
     {
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         Object o = ViskitGlobals.instance().getAssemblyViewFrame().getSelectedPropertyChangeListener();
 
         if (o != null) {
@@ -1026,7 +1038,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
         }
         // If nothing selected or a non-leaf
-        messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select a Property Change Listener from the panel on the left.");
+        ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Can't create", "You must first select a Property Change Listener from the panel on the left.");
     }
     
     /** method name for reflection use */
@@ -1050,7 +1062,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      */
     private boolean askToSaveAndContinue()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         String message = "Save modified ";
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if ((assemblyModel != null) && (assemblyModel.getMetadata() != null))
@@ -1095,11 +1107,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             oArr = checkLegalForSEListenerArc(oA, oB);
         } 
         catch (Exception e) {
-            messageUser(JOptionPane.ERROR_MESSAGE, "Connection error.", "Possible class not found.  All referenced entities must be in a list at left.");
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Connection error.", "Possible class not found.  All referenced entities must be in a list at left.");
             return;
         }
         if (oArr == null) {
-            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
         adapterEdgeEdit(((AssemblyModel) getModel()).newAdapterEdge(shortAdapterName(""), oArr[0], oArr[1]));
@@ -1113,7 +1125,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         AssemblyNode[] oArr = checkLegalForSEListenerArc(oA, oB);
 
         if (oArr == null) {
-            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
         ((AssemblyModel) getModel()).newSimEventListenerEdge(oArr[0], oArr[1]);
@@ -1128,7 +1140,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         AssemblyNode[] oArr = checkLegalForPropChangeArc(oA, oB);
 
         if (oArr == null) {
-            messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
         propertyChangeListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
@@ -1294,7 +1306,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void remove()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         if (!selectionVector.isEmpty()) {
             // first ask:
             String s, message = "";
@@ -1332,7 +1344,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @SuppressWarnings("unchecked")
     public void copy() {
         if (selectionVector.isEmpty()) {
-            messageUser(JOptionPane.WARNING_MESSAGE,
+            ViskitGlobals.instance().messageUser(JOptionPane.WARNING_MESSAGE,
                     "Unsupported Action",
                     "Edges cannot be copied.");
             return;
@@ -1442,7 +1454,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void undo()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         if (selectionVector.isEmpty())
             return;
 
@@ -1482,7 +1494,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void redo()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
 
         // Recreate the JAXB (XML) bindings since the paste function only does
         // nodes and not edges
@@ -1541,7 +1553,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void viewXML()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null)
@@ -1578,7 +1590,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void generateJavaSource()
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         String source = produceJavaAssemblyClass();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null)
@@ -1811,7 +1823,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 String message = xmlFile + " did not translate to source code.\n" +
                         "Manually compile to determine cause";
                 LOG.error(message);
-                messageUser(JOptionPane.ERROR_MESSAGE, "Source code translation error", message);
+                ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Source code translation error", message);
                 return null;
             }
 
@@ -1857,7 +1869,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         try {
             tempFile = TempFileManager.createTempFile("ViskitAssembly", ".xml");
         } catch (IOException e) {
-            messageUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
             return;
         }
         model.saveModel(tempFile);
@@ -1885,7 +1897,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
     
     /** method name for reflection use */
-    public static final String METHOD_PREPARESIMULATIONRUNNER = "prepareSimulationRunner";
+    public static final String METHOD_prepareSimulationRunner = "prepareSimulationRunner";
 
     @Override
     public void prepareSimulationRunner()
@@ -1905,7 +1917,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             SwingUtilities.invokeLater(r);
         } 
         catch (Exception e) {
-            LOG.error(METHOD_PREPARESIMULATIONRUNNER + "() SwingUtilities.invokeLater(" + r.toString() + ") exception: " + e.getMessage());
+            LOG.error(METHOD_prepareSimulationRunner + "() SwingUtilities.invokeLater(" + r.toString() + ") exception: " + e.getMessage());
         }
 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()
@@ -1921,7 +1933,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 //                  if (ViskitGlobals.instance().getActiveAssemblyModel() == null)
                     if (!ViskitGlobals.instance().getAssemblyViewFrame().hasAssembliesLoaded())
                     {
-                        messageUser(JOptionPane.WARNING_MESSAGE,
+                        ViskitGlobals.instance().messageUser(JOptionPane.WARNING_MESSAGE,
                             "Assembly File Not Loaded",
                             "Please load an Assembly file");
                         LOG.error(" doInBackground() " +  "Assembly File Not Loaded, please load an Assembly file");
@@ -1930,7 +1942,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     {
                         String message1 = "Please inspect autogenerated source to debug the source error,";
                         String message2 = "then correct the assembly XML for correct proper compilation";
-                        messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation error",
+                        ViskitGlobals.instance().messageUser(JOptionPane.WARNING_MESSAGE, "Assembly source generation/compilation error",
                                 "<html><p align-'center'>" + message1 + "</p> <p align-'center'>" + message2 + "</p>");
                         LOG.error("doInBackground() " + message1 + "\n      " + message2);
                     }
@@ -2043,7 +2055,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void captureWindow() 
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null)
             assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
@@ -2078,7 +2090,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      */
     public void captureAssemblyImage(File assemblyImageFile)
     {
-        ViskitGlobals.instance().getMainFrame().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab();
         // Don't displayCapture an extra frame while taking snapshots
         final Timer captureAssemblyImageTimer = new Timer(100, new ImageCaptureTimerCallback(assemblyImageFile, false));
         captureAssemblyImageTimer.setRepeats(false);
@@ -2184,7 +2196,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         } 
         catch (Exception ex) {
             LOG.error("Opening EventGraph file: {} caused error: {}", tempFile, ex);
-            messageUser(JOptionPane.WARNING_MESSAGE,
+            ViskitGlobals.instance().messageUser(JOptionPane.WARNING_MESSAGE,
                     "EventGraph Opening Error",
                     "EventGraph file: " + tempFile + "\nencountered error: " + ex + " while loading."
                     );

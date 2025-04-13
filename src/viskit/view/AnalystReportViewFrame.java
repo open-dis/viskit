@@ -140,12 +140,14 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
      * @param param the object to act upon
      */
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
+    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) 
+    {
         switch (action) {
             case NEW_ASSEMBLY:
                 currentAssemblyFile = (File) param;
-                AnalystReportController cntlr = (AnalystReportController) getController();
-                cntlr.setCurrentAssemblyFile(currentAssemblyFile);
+                AnalystReportController analystReportController = (AnalystReportController) getController();
+                if ((analystReportController != null) && (analystReportController.getAnalystReportModel() != null) && (currentAssemblyFile != null))
+                    analystReportController.setCurrentAssemblyFile(currentAssemblyFile);
                 break;
 
             case CLOSE_ASSEMBLY:
@@ -154,7 +156,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
                 break;
 
             default:
-                LOG.error("Program error AnalystReportFrame.assemblyChanged");
+                LOG.error("Program error AnalystReportFrame.assemblyChanged(" + action + ")");
         }
     }
 
@@ -658,7 +660,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
             Vector<Object[]> entityParametersTablesArray = analystReportModel.getEntityParametersTables();
             if (entityParametersTablesArray == null)
             {
-                LOG.info("fillEntityParametersTablesPanel() entityParametersTablesArray is null - TODO expected?");
+                LOG.info("fillEntityParametersTablesPanel() entityParametersTablesArray is null");
                 return;
             }
 
@@ -1065,13 +1067,13 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object sourceObject, String methodName, String menuName, Integer mnemonic, KeyStroke acceleratorKey)
+    private JMenuItem buildMenuItem(Object sourceObject, String methodName, String menuItemName, Integer mnemonic, KeyStroke acceleratorKey)
     {
         Action action = ActionIntrospector.getAction(sourceObject, methodName);
         if (action == null)
         {
-            LOG.error("buildMenuItem() reflection failed for name=" + menuName + " method=" + methodName + " in " + sourceObject.toString());
-            return new JMenuItem(menuName + "(not working, reflection failed) ");
+            LOG.error("buildMenuItem() reflection failed for name=" + menuItemName + " method=" + methodName + " in " + sourceObject.toString());
+            return new JMenuItem(menuItemName + "(not working, reflection failed) ");
         }
         Map<String, Object> map = new HashMap<>();
         if (mnemonic != null) {
@@ -1080,8 +1082,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         if (acceleratorKey != null) {
             map.put(Action.ACCELERATOR_KEY, acceleratorKey);
         }
-        if (menuName != null) {
-            map.put(Action.NAME, menuName);
+        if (menuItemName != null) {
+            map.put(Action.NAME, menuItemName);
         }
         if (!map.isEmpty()) {
             ActionUtilities.decorateAction(action, map);

@@ -65,14 +65,6 @@ public interface AssemblyController {
 
     void viewXML();
 
-    /** 
-     * A component, e.g., vAMod, wants to say something.
-     * @param messageType the type of message, i.e. WARN, ERROR, INFO, QUESTION, etc.
-     * @param messageTitle the title of the message in the dialog frame
-     * @param messageBody the message to transmit
-     */
-    void messageUser(int messageType, String messageTitle, String messageBody);    // typ is one of JOptionPane types
-
     /** Handles UI selection of nodes and edges
      *
      * @param v a Vector of nodes and edges

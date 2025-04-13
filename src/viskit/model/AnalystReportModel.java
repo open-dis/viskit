@@ -61,6 +61,7 @@ import static viskit.ViskitStatics.isFileReady;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.doe.FileHandler;
+import static viskit.model.PropertyChangeListenerNode.METHOD_isGetCount;
 import viskit.mvc.MvcAbstractModel;
 import viskit.reports.HistogramChart;
 import viskit.reports.LinearRegressionChart;
@@ -268,6 +269,9 @@ public final class AnalystReportModel extends MvcAbstractModel
         createStatisticsResults();
         createConclusionsRecommendations();
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_writeToXMLFile  = "writeToXMLFile";
 
     /**
      * File I/O that saves the report in XML format
@@ -845,7 +849,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         // variables for JFreeChart construction
         HistogramChart histogramChart = new HistogramChart();
         LinearRegressionChart linearRegressionChart = new LinearRegressionChart();
-        String chartTitle, axisLabel, typeStat = "", dataPointProperty;
+        String chartTitle, axisLabel, typeStatistic = "", dataPointProperty;
         List<Element> dataPointsElementList, replicationReportsElementList, replicationsElementList;
         boolean isCount;
         Object obj;
@@ -860,8 +864,8 @@ public final class AnalystReportModel extends MvcAbstractModel
                     obj = getPclNodeCache().get(entry.getKey());
                     if (obj.getClass().toString().contains("PropertyChangeListenerNode")) {
                         try {
-                            isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
-                            typeStat = isCount ? "count" : "mean";
+                            isCount = Boolean.parseBoolean(obj.getClass().getMethod(METHOD_isGetCount).invoke(obj).toString());
+                            typeStatistic = isCount ? "count" : "mean";
                             break;
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
                             LOG.error(ex);
@@ -895,8 +899,8 @@ public final class AnalystReportModel extends MvcAbstractModel
                         entityElement.addContent(replicationRecordElement);
 
                         // Add the raw count, or mean of replication data to the chart generators
-                        LOG.debug(replication.getAttributeValue(typeStat));
-                        dataArray[index] = Double.parseDouble(replication.getAttributeValue(typeStat));
+                        LOG.debug(replication.getAttributeValue(typeStatistic));
+                        dataArray[index] = Double.parseDouble(replication.getAttributeValue(typeStatistic));
                         index++;
                     }
 
@@ -1239,6 +1243,9 @@ public final class AnalystReportModel extends MvcAbstractModel
         // TODO consider inserting loaded assembly filename into message above as a user confirmation
         
         ViskitGlobals.instance().getSimulationRunPanel().nowRunningLabel.setText("DONE");
+        
+        if (assemblyFile == null)
+            assemblyFile = ViskitGlobals.instance().getActiveAssemblyModel().getCurrentFile();
         
         assemblyName = assemblyFile.getName().substring(0, assemblyFile.getName().indexOf(".xml"));
         

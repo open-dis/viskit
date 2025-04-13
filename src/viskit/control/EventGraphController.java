@@ -27,7 +27,7 @@ public interface EventGraphController {
     /**
      * User has clicked a button or menu item
      */
-    void newNode();
+    void buildNewEventNode();
 
     void newSimulationParameter();
 
@@ -39,9 +39,9 @@ public interface EventGraphController {
      *
      * @param point the graphical point of new node
      */
-    void buildNewNode(Point point);
+    void buildNewEventNode(Point point);
 
-    void buildNewNode(Point point, String name);
+    void buildNewEventNode(Point point, String name);
 
     void buildNewSimulationParameter(String name, String type, String initialValue, String description);
 

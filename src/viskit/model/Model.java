@@ -79,7 +79,7 @@ public interface Model
      * @param nodeName the name of the Event Node
      * @param p the (x, y) position of the Event Node
      */
-    void newEvent(String nodeName, Point2D p);
+    void newEventNode(String nodeName, Point2D p);
 
     /** Models a scheduling edge between two nodes
      *

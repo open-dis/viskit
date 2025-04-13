@@ -72,9 +72,13 @@ import viskit.model.AnalystReportModel;
 // import static viskit.ViskitGlobals.isFileReady; // while in thread, do not invoke ViskitGlobals!
 
 import viskit.model.AssemblyNode;
+import static viskit.model.PropertyChangeListenerNode.METHOD_isGetCount;
+import static viskit.model.ViskitElement.METHOD_getName;
+import static viskit.model.ViskitElement.METHOD_getType;
 
 import viskit.reports.ReportStatisticsConfiguration;
 import viskit.view.SimulationRunPanel;
+import static viskit.view.SimulationRunPanel.METHOD_setNumberOfReplications;
 
 /**
  * Abstract base class for running assembly simulations, invoked in a thread by InternalAssemblyRunner.
@@ -309,50 +313,55 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * instance for each element in <code>replicationStatisticsPropertyChangeListenerArray</code> with the
      * corresponding name + ".count," or ".mean"
      */
-    protected void createDesignPointStatistics() {
-
+    protected void createDesignPointStatistics() 
+    {
         /* Check for zero length.  SimplePropertyDumper may have been selected
          * as the only PCL
          */
-        if (BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray().length == 0) {return;}
+        if (BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray().length == 0) 
+        {
+            return;
+        }
         designPointSimpleStatisticsTally = new SampleStatistics[BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray().length];
         String statisticType, nodeType;
         int index = 0;
         boolean isCount;
         SampleStatistics sampleStatistics;
         Object obj;
-        for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
-            LOG.debug("entry is: {}", entry);
+        for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) 
+        {
+            LOG.debug("createDesignPointStatistics(): map entry is: {}", entry);
             obj = pclNodeCache.get(entry.getKey());
-            if (obj.getClass().toString().contains("PropertyChangeListenerNode")) {
-                LOG.debug("AssemblyNode is: {}", obj);
+            if (obj.getClass().toString().contains("PropertyChangeListenerNode")) 
+            {
+                LOG.debug("createDesignPointStatistics(): AssemblyNode is: {}", obj);
 
                 try {
                     // Since the pclNodeCache was created under a previous ClassLoader
                     // we must use reflection to invoke the methods on the AssemblyNodes
                     // that it contains, otherwise we will throw ClassCastExceptions
-                    nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
+                    nodeType = obj.getClass().getMethod(METHOD_getType).invoke(obj).toString();
 
                     // This is not a designPoint, so skip
                     if (nodeType.equals(ViskitStatics.SIMPLE_PROPERTY_DUMPER)) {
-                        LOG.debug("SimplePropertyDumper encountered");
+                        LOG.debug("createDesignPointStatistics(): createDesignPointStatistics():SimplePropertyDumper encountered");
                         continue;
                     }
 
-                    isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
-                    LOG.debug("isGetCount: " + isCount);
+                    isCount = Boolean.parseBoolean(obj.getClass().getMethod(METHOD_isGetCount).invoke(obj).toString());
+                    LOG.debug("createDesignPointStatistics(): isGetCount: " + isCount);
 
                     statisticType = isCount ? ".count" : ".mean";
-                    LOG.debug("statisticType is: " + statisticType);
+                    LOG.debug("createDesignPointStatistics(): statisticType is: " + statisticType);
 
                     sampleStatistics = (SampleStatistics) BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray()[index];
                     
                     if (sampleStatistics.getName().equals("%unnamed%"))
-                        sampleStatistics.setName(obj.getClass().getMethod("getName").invoke(obj).toString());
+                        sampleStatistics.setName(obj.getClass().getMethod(METHOD_getName).invoke(obj).toString());
                     
                     designPointSimpleStatisticsTally[index] = new SimpleStatsTally(sampleStatistics.getName() + statisticType);
 
-                    LOG.debug("Design point statistic: {}", designPointSimpleStatisticsTally[index]);
+                    LOG.debug("createDesignPointStatistics(): Design point statistic: {}", designPointSimpleStatisticsTally[index]);
                     index++;
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException ex) {
                     LOG.error("createDesignPointStatistics() exception: " + ex);
@@ -366,11 +375,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     protected abstract void hookupSimEventListeners();
 
     protected abstract void hookupReplicationListeners();
+    
+    /** method name for reflection use, found in superclass */
+    public static final String METHOD_addPropertyChangeListener = "addPropertyChangeListener";
 
     /** Set up all outer statistics propertyChangeListeners */
-    protected void hookupDesignPointListeners() {
-        for (SampleStatistics designPointStatistics : designPointSimpleStatisticsTally) {
-            this.addPropertyChangeListener(designPointStatistics);
+    protected void hookupDesignPointListeners() 
+    {
+        for (SampleStatistics designPointStatistics : designPointSimpleStatisticsTally) 
+        {
+            this.addPropertyChangeListener(designPointStatistics); // add designPointStatistics listener using superclass method
         }
     }
 
@@ -379,6 +393,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * it if no additional PropertyChangeListeners are desired.
      */
     protected void hookupPropertyChangeListeners() {}
+    
+    /** method name for reflection use */
+    public static final String METHOD_setStopTime = "setStopTime";
 
     public void setStopTime(double time) {
         if (time < 0.0) {
@@ -386,36 +403,51 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         }
         stopTime = time;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_getStopTime = "getStopTime";
 
     public double getStopTime() {
         return stopTime;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_setSingleStep = "setSingleStep";
 
-    public void setSingleStep(boolean value) {
-        singleStep = value;
+    public void setSingleStep(boolean newValue) {
+        singleStep = newValue;
     }
 
     public boolean isSingleStep() {
         return singleStep;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_setStopSimulationRun = "setStopSimulationRun";
 
     /** Causes simulation runs to halt
      *
-     * @param value if true, stops further simulation runs
+     * @param newValue if true, stops further simulation runs
      */
-    public void setStopSimulationRun(boolean value) 
+    public void setStopSimulationRun(boolean newValue) 
     {
-        stopSimulationRun = value;
+        stopSimulationRun = newValue;
         if (stopSimulationRun)
         {
             Schedule.stopSimulation();
         }
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_pauseSimulation = "pauseSimulation";
 
     public void pauseSimulation()
     {
         Schedule.pause();
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_resumeSimulation = "resumeSimulation";
 
     public void resumeSimulation()
     {
@@ -428,13 +460,19 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     public void stopSimulationRun() {
         stopSimulationRun = true;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_setEnableAnalystReports = "setEnableAnalystReports";
 
     public void setEnableAnalystReports(boolean enable) {
         enableAnalystReports = enable;
     }
 
     public boolean isEnableAnalystReports() {return enableAnalystReports;}
-
+    
+    /** method name for reflection use */
+    public static final String METHOD_setNumberReplications = "setNumberReplications";
+    
     public final void setNumberReplications(int newNumberReplications) 
     {
         if (newNumberReplications < 1) {
@@ -442,6 +480,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         }
         numberReplications = newNumberReplications;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_getNumberReplications = "getNumberReplications";
 
     /** How many replications have occurred so far during this simulation
      * @return number of replications completed, so far */
@@ -449,22 +490,37 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     {
         return numberReplications;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_setPrintReplicationReports = "setPrintReplicationReports";
 
-    public final void setPrintReplicationReports(boolean b) {
-        printReplicationReports = b;
+    public final void setPrintReplicationReports(boolean newValue) {
+        printReplicationReports = newValue;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_isPrintReplicationReports = "isPrintReplicationReports";
 
     public boolean isPrintReplicationReports() {
         return printReplicationReports;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_setPrintSummaryReport = "setPrintSummaryReport";
 
-    public final void setPrintSummaryReport(boolean b) {
-        printSummaryReport = b;
+    public final void setPrintSummaryReport(boolean newValue) {
+        printSummaryReport = newValue;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_isPrintSummaryReport = "isPrintSummaryReport";
 
     public boolean isPrintSummaryReport() {
         return printSummaryReport;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_getAnalystReport = "getAnalystReport";
 
     /** @return the absolute path to the temporary analyst report if user enabled */
     public String getAnalystReport() 
@@ -484,10 +540,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     public int getDesignPointID() {
         return designPointID;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_setSaveReplicationData = "setSaveReplicationData";
 
-    public void setSaveReplicationData(boolean b) {
-        saveReplicationData = b;
+    public void setSaveReplicationData(boolean newValue) {
+        saveReplicationData = newValue;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_isSaveReplicationData = "isSaveReplicationData";
 
     public boolean isSaveReplicationData() {
         return saveReplicationData;
@@ -680,6 +742,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     public SimEntity[] getSimEntities() {
         return simEntity.clone();
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_setOutputStream = "setOutputStream";
 
     public void setOutputStream(OutputStream outputStream) {
         PrintStream outputPrintStream = new PrintStream(outputStream);
@@ -810,6 +875,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         }
         else LOG.error("BLOCKER: run() findProjectWorkingDirectoryFromWithinThread() not successful, analyst reports will fail");
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_run = "run";
 
     /** Execute the simulation for the desired number of replications */
     // TODO: Simkit not generisized yet
@@ -827,8 +895,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             findProjectWorkingDirectoryFromWithinThread(); // the great mouse hunt
         }
                 
-        if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equals("Run")) {
-            LOG.error("Assemby already running.");
+        if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equalsIgnoreCase("Run")) {
+            LOG.error("Assembly already running.");
         }
 
         // In case the user inputs bad parameters in the XML
@@ -901,14 +969,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
         Method setNumberOfReplicationsMethod;
         // Convenience for Diskit if on the classpath
-        for (ReRunnable entity : runEntitiesSet) {
-
+        for (ReRunnable entity : runEntitiesSet)
+        {
             // access the SM's numberOfReplications parameter setter for user
             // dynamic input to override the XML value
-            if (entity.getName().contains("ScenarioManager")) {
+            if (entity.getName().contains("ScenarioManager")) 
+            {
                 scenarioManager = entity;
                 try {
-                    setNumberOfReplicationsMethod = scenarioManager.getClass().getMethod("setNumberOfReplications", int.class);
+                    setNumberOfReplicationsMethod = scenarioManager.getClass().getMethod(METHOD_setNumberOfReplications, int.class);
                     setNumberOfReplicationsMethod.invoke(scenarioManager, getNumberReplications());
                 } 
                 catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
@@ -924,7 +993,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         for (int replication = 0; replication < getNumberReplications(); replication++)
         {
             firePropertyChange("replicationNumber", (replication + 1));
-            if ((replication + 1) == getVerboseReplication())
+            if ((replication + 1) == getVerboseReplicationNumber())
             {
                 Schedule.setVerbose(true);
                 Schedule.setReallyVerbose(true);
@@ -1014,14 +1083,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                             // Since the pclNodeCache was created under a previous ClassLoader
                             // we must use reflection to invoke the methods on the AssemblyNodes
                             // that it contains, otherwise we will throw ClassCastExceptions
-                            nodeType = obj.getClass().getMethod("getType").invoke(obj).toString();
+                            nodeType = obj.getClass().getMethod(METHOD_getType).invoke(obj).toString();
 
                             // This is not a designPoint, so skip
                             if (nodeType.equals(ViskitStatics.SIMPLE_PROPERTY_DUMPER)) {
                                 LOG.debug("SimplePropertyDumper encountered");
                                 continue;
                             }
-                            isCount = Boolean.parseBoolean(obj.getClass().getMethod("isGetCount").invoke(obj).toString());
+                            isCount = Boolean.parseBoolean(obj.getClass().getMethod(METHOD_isGetCount).invoke(obj).toString());
                             typeStatistics = isCount ? ".count" : ".mean";
                             sampleStatistics = (SampleStatistics) BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray()[ix];
                             fireIndexedPropertyChange(ix, sampleStatistics.getName(), sampleStatistics);
@@ -1101,7 +1170,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 Constructor<?> arbConstructor = clazz.getConstructor(String.class, Map.class);
                 
                 Object arbObject = arbConstructor.newInstance(reportStatisticsConfiguration.saveStatisticsGetReportPath(), pclNodeCache);
-                Method writeToXMLFileMethod = clazz.getMethod("writeToXMLFile", File.class);
+                Method writeToXMLFileMethod = clazz.getMethod(METHOD_writeToXMLFile, File.class);
                 writeToXMLFileMethod.invoke(arbObject, analystReportFile);
             }
             catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SecurityException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException | NullPointerException ex) {
@@ -1130,14 +1199,30 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 this.getName() + "_" + "AnalystReport" + "_" + ViskitStatics.todaysDate() + ".xml"); // 
         LOG.info("createAnalystReportFile() new analyst report (duplicative):\n  " + analystReportFile.getAbsolutePath());
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_setVerboseReplicationNumber = "setVerboseReplicationNumber";
+    
+    /** method name for reflection use, found in superclass */
+    public static final String METHOD_setVerbose = "setVerbose";
+    
+    /** method name for reflection use, found in superclass */
+    public static final String METHOD_isVerbose = "isVerbose";
 
-    public void setVerboseReplication(int i) {
-        verboseReplicationNumber = i;
+    public void setVerboseReplicationNumber(int newVerboseReplicationNumber) {
+        verboseReplicationNumber = newVerboseReplicationNumber;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_getVerboseReplication = "getVerboseReplication";
 
-    public int getVerboseReplication() {
+
+    public int getVerboseReplicationNumber() {
         return verboseReplicationNumber;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_setPclNodeCache = "setPclNodeCache";
 
     public void setPclNodeCache(Map<String, AssemblyNode> pclNodeCache) {
         this.pclNodeCache = pclNodeCache;

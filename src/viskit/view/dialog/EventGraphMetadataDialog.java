@@ -25,7 +25,7 @@ public class EventGraphMetadataDialog extends MetadataDialog
     
     public static boolean showDialog(JFrame frame, GraphMetadata graphMetadata) 
     {
-        ViskitGlobals.instance().getMainFrame().selectEventGraphEditorTab();
+        ViskitGlobals.instance().selectEventGraphEditorTab();
         if (dialog == null) {
             dialog = new EventGraphMetadataDialog(frame, graphMetadata);
         } 

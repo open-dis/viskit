@@ -78,8 +78,8 @@ public class Help
     public static final String DEVELOPERS =
             "Copyright &copy; 2004-2025 under the Lesser GNU Public License (LGPL)" + CR + CR
             + "<b>Developers:</b>" + CR
-            + "&nbsp;&nbsp;&nbsp;Terry Norbraten" + CR
             + "&nbsp;&nbsp;&nbsp;Don Brutzman" + CR
+            + "&nbsp;&nbsp;&nbsp;Terry Norbraten" + CR
             + "with" + CR
             + "&nbsp;&nbsp;&nbsp;Mike Bailey" + CR
             + "&nbsp;&nbsp;&nbsp;Arnold Buss" + CR

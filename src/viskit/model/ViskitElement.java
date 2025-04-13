@@ -51,6 +51,9 @@ abstract public class ViskitElement implements Comparable<ViskitElement>
     public int compareTo(ViskitElement e) {
         return getType().compareTo(e.getType());
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_getName  = "getName";
 
     /**
      * Returns the name of the node variable.
@@ -69,6 +72,9 @@ abstract public class ViskitElement implements Comparable<ViskitElement>
     public void setName(String name){
         this.name = name;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_getType  = "getType";
 
     /**
      * Returns a string representation of the type of the variable. This may

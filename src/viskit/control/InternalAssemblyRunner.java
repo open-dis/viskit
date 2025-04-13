@@ -62,6 +62,25 @@ import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitUserConfiguration;
 import viskit.assembly.BasicAssembly;
+import static viskit.assembly.BasicAssembly.METHOD_addPropertyChangeListener;
+import static viskit.assembly.BasicAssembly.METHOD_getAnalystReport;
+import static viskit.assembly.BasicAssembly.METHOD_getNumberReplications;
+import static viskit.assembly.BasicAssembly.METHOD_getStopTime;
+import static viskit.assembly.BasicAssembly.METHOD_isPrintReplicationReports;
+import static viskit.assembly.BasicAssembly.METHOD_isPrintSummaryReport;
+import static viskit.assembly.BasicAssembly.METHOD_isSaveReplicationData;
+import static viskit.assembly.BasicAssembly.METHOD_isVerbose;
+import static viskit.assembly.BasicAssembly.METHOD_setEnableAnalystReports;
+import static viskit.assembly.BasicAssembly.METHOD_setNumberReplications;
+import static viskit.assembly.BasicAssembly.METHOD_setOutputStream;
+import static viskit.assembly.BasicAssembly.METHOD_setPclNodeCache;
+import static viskit.assembly.BasicAssembly.METHOD_setPrintReplicationReports;
+import static viskit.assembly.BasicAssembly.METHOD_setPrintSummaryReport;
+import static viskit.assembly.BasicAssembly.METHOD_setSaveReplicationData;
+import static viskit.assembly.BasicAssembly.METHOD_setSingleStep;
+import static viskit.assembly.BasicAssembly.METHOD_setStopSimulationRun;
+import static viskit.assembly.BasicAssembly.METHOD_setStopTime;
+import static viskit.assembly.BasicAssembly.METHOD_setVerbose;
 import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
@@ -69,6 +88,7 @@ import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
 import static viskit.view.SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
 import static viskit.view.SimulationRunPanel.VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT;
 import viskit.view.dialog.ViskitUserPreferencesDialog;
+import static viskit.assembly.BasicAssembly.METHOD_setVerboseReplicationNumber;
 
 /** Controller for the Assembly RunSimulation panel, which
  * spawns the BasicAssembly thread
@@ -246,17 +266,16 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
     private void fillSimulationRunButtonsFromAssemblyInitialization(boolean verbose, boolean saveReplicationDataToXml, double stopTime) throws Throwable 
     {
-        
         setClassPathUrlArray(ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray());
 
-        Method getNumberReplicationsMethod     = simulationRunAssemblyClass.getMethod("getNumberReplications");
-        Method isSaveReplicationData           = simulationRunAssemblyClass.getMethod("isSaveReplicationData"); // TODO hook this up
-        Method isPrintReplicationReportsMethod = simulationRunAssemblyClass.getMethod("isPrintReplicationReports");
-        Method isPrintSummaryReportMethod      = simulationRunAssemblyClass.getMethod("isPrintSummaryReport");
-        Method setVerboseMethod                = simulationRunAssemblyClass.getMethod("setVerbose", boolean.class);
-        Method isVerboseMethod                 = simulationRunAssemblyClass.getMethod("isVerbose");
-        Method setStopTimeMethod               = simulationRunAssemblyClass.getMethod("setStopTime", double.class);
-        Method getStopTimeMethod               = simulationRunAssemblyClass.getMethod("getStopTime");
+        Method getNumberReplicationsMethod     = simulationRunAssemblyClass.getMethod(METHOD_getNumberReplications);
+        Method isSaveReplicationData           = simulationRunAssemblyClass.getMethod(METHOD_isSaveReplicationData); // TODO hook this up
+        Method isPrintReplicationReportsMethod = simulationRunAssemblyClass.getMethod(METHOD_isPrintReplicationReports);
+        Method isPrintSummaryReportMethod      = simulationRunAssemblyClass.getMethod(METHOD_isPrintSummaryReport);
+        Method setVerboseMethod                = simulationRunAssemblyClass.getMethod(METHOD_setVerbose, boolean.class);
+        Method isVerboseMethod                 = simulationRunAssemblyClass.getMethod(METHOD_isVerbose);
+        Method setStopTimeMethod               = simulationRunAssemblyClass.getMethod(METHOD_setStopTime, double.class);
+        Method getStopTimeMethod               = simulationRunAssemblyClass.getMethod(METHOD_getStopTime);
 
         simulationRunPanel.numberReplicationsTF.setText("" + getNumberReplicationsMethod.invoke(simulationRunAssemblyInstance));
         simulationRunPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReportsMethod.invoke(simulationRunAssemblyInstance));
@@ -306,17 +325,17 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 //            simulationRunAssemblyInstance = simulationRunAssemblyClass.getDeclaredConstructor(parameterTypes).newInstance(workingDirectory);
             simulationRunAssemblyInstance = simulationRunAssemblyClass.getDeclaredConstructor().newInstance(); // TODO needed?
 
-            Method setOutputStreamMethod            = simulationRunAssemblyClass.getMethod("setOutputStream", OutputStream.class);
-            Method setNumberReplicationsMethod      = simulationRunAssemblyClass.getMethod("setNumberReplications", int.class);
-            Method setPrintReplicationReportsMethod = simulationRunAssemblyClass.getMethod("setPrintReplicationReports", boolean.class);
-            Method setPrintSummaryReportMethod      = simulationRunAssemblyClass.getMethod("setPrintSummaryReport", boolean.class);
-            Method setSaveReplicationDataMethod     = simulationRunAssemblyClass.getMethod("setSaveReplicationData", boolean.class);
-            Method setEnableAnalystReports          = simulationRunAssemblyClass.getMethod("setEnableAnalystReports", boolean.class);
-            Method setVerboseMethod                 = simulationRunAssemblyClass.getMethod("setVerbose", boolean.class);
-            Method setStopTimeMethod                = simulationRunAssemblyClass.getMethod("setStopTime", double.class);
-            Method setVerboseReplicationMethod      = simulationRunAssemblyClass.getMethod("setVerboseReplication", int.class);
-            Method setPclNodeCacheMethod            = simulationRunAssemblyClass.getMethod("setPclNodeCache", Map.class);
-            Method addPropertyChangeListenerMethod  = simulationRunAssemblyClass.getMethod("addPropertyChangeListener", PropertyChangeListener.class);
+            Method setOutputStreamMethod             = simulationRunAssemblyClass.getMethod(METHOD_setOutputStream, OutputStream.class);
+            Method setNumberReplicationsMethod       = simulationRunAssemblyClass.getMethod(METHOD_setNumberReplications, int.class);
+            Method setPrintReplicationReportsMethod  = simulationRunAssemblyClass.getMethod(METHOD_setPrintReplicationReports, boolean.class);
+            Method setPrintSummaryReportMethod       = simulationRunAssemblyClass.getMethod(METHOD_setPrintSummaryReport, boolean.class);
+            Method setSaveReplicationDataMethod      = simulationRunAssemblyClass.getMethod(METHOD_setSaveReplicationData, boolean.class);
+            Method setEnableAnalystReports           = simulationRunAssemblyClass.getMethod(METHOD_setEnableAnalystReports, boolean.class);
+            Method setVerboseMethod                  = simulationRunAssemblyClass.getMethod(METHOD_setVerbose, boolean.class);
+            Method setStopTimeMethod                 = simulationRunAssemblyClass.getMethod(METHOD_setStopTime, double.class);
+            Method setVerboseReplicationNumberMethod = simulationRunAssemblyClass.getMethod(METHOD_setVerboseReplicationNumber, int.class);
+            Method setPclNodeCacheMethod             = simulationRunAssemblyClass.getMethod(METHOD_setPclNodeCache, Map.class);
+            Method addPropertyChangeListenerMethod   = simulationRunAssemblyClass.getMethod(METHOD_addPropertyChangeListener, PropertyChangeListener.class);
 
             // As of discussion held 09 APR 2015, resetting the RNG seed state
             // is not necessary for basic Viskit operation.  Pseudo random
@@ -329,14 +348,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             if (simulationRunPanel.resetSeedStateCB.isSelected()) 
             {
                 Class<?> randomVariateFactoryClass  = priorRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_VARIATE_FACTORY_CLASS);
-                Method getDefaultRandomNumberMethod = randomVariateFactoryClass.getMethod("");
+                Method getDefaultRandomNumberMethod = randomVariateFactoryClass.getMethod(""); // simkit randomVariateFactoryClass semantics for empty string
                 Object defaultRandomNumberMethod = getDefaultRandomNumberMethod.invoke(null);
 
-                Method getSeedsMethod = defaultRandomNumberMethod.getClass().getMethod("getSeeds");
+                Method getSeedsMethod = defaultRandomNumberMethod.getClass().getMethod("getSeeds"); // simkit method
                 seedsArray = (long[]) getSeedsMethod.invoke(defaultRandomNumberMethod);
 
                 Class<?> randomNumberClass = priorRunSimulationClassLoader.loadClass(ViskitStatics.RANDOM_NUMBER_CLASS);
-                Method setSeedsMethod = randomNumberClass.getMethod("setSeeds", long[].class);
+                Method setSeedsMethod = randomNumberClass.getMethod("setSeeds", long[].class); // simkit method
                 setSeedsMethod.invoke(defaultRandomNumberMethod, seedsArray);
 
                 // TODO: We can also call RNG.resetSeed() which recreates the
@@ -356,9 +375,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
             // Allow panel values to override XML set values
             setStopTimeMethod.invoke(simulationRunAssemblyInstance, getStopTime());
-            setVerboseMethod.invoke(simulationRunAssemblyInstance, getVerbose());
+            setVerboseMethod.invoke (simulationRunAssemblyInstance, getVerbose());
 
-            setVerboseReplicationMethod.invoke(simulationRunAssemblyInstance, getVerboseReplicationNumber());
+            setVerboseReplicationNumberMethod.invoke(simulationRunAssemblyInstance, getVerboseReplicationNumber());
             setPclNodeCacheMethod.invoke(simulationRunAssemblyInstance, ((AssemblyModelImpl) ViskitGlobals.instance().getActiveAssemblyModel()).getNodeCache());
             addPropertyChangeListenerMethod.invoke(simulationRunAssemblyInstance, this);
             
@@ -394,8 +413,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     {
         Thread simulationRunMonitorThread;
 
-        public SimulationRunMonitor(Thread newSimulationRunMonitorThread) {
-              simulationRunMonitorThread = newSimulationRunMonitorThread;
+        public SimulationRunMonitor(Thread newSimulationRunMonitorThread) 
+        {
+               simulationRunMonitorThread = newSimulationRunMonitorThread;
         }
 
         @Override
@@ -405,11 +425,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
             simulationRunMonitorThread.start(); // commence thread
             try {
+                LOG.info("SimulationRunMonitor.doInBackground() now commencing simulationRunMonitorThread.join()");
                 simulationRunMonitorThread.join();
-                LOG.info("SimulationRunMonitor now running in simulationRunThread");
             } 
             catch (InterruptedException ex) {
-                LOG.error(ex);
+                LOG.error("SimulationRunMonitor.doInBackground() exception: {}", ex);
 //                ex.printStackTrace();
             }
             return null;
@@ -426,11 +446,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
             // Grab the temp Analyst Report and signal the AnalystReportFrame
             try {
-                Method getAnalystReportMethod = simulationRunAssemblyClass.getMethod("getAnalystReport");
+                Method getAnalystReportMethod = simulationRunAssemblyClass.getMethod(METHOD_getAnalystReport);
                 analystReportTempFile = (String) getAnalystReportMethod.invoke(simulationRunAssemblyInstance);
             } 
             catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
-                LOG.error(ex);
+                LOG.error("SimulationRunMonitor.done(): {}", ex);
                 return;
             }
 
@@ -481,7 +501,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             vcrButtonPressDisplayUpdate(Event.START_RESUME);
             if (simulationRunPanel.outputStreamTA.getText().isBlank() ||
                 simulationRunPanel.outputStreamTA.getText().trim().equals(INITIAL_SIMULATION_RUN_HINT))
+            {
                 simulationRunPanel.outputStreamTA.setText(SIMULATION_RUN_PANEL_TITLE);
+            }
             prepareAndStartAssemblySimulationRun();
         }
     }
@@ -504,7 +526,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     if (priorRunSimulationClassLoader != null) // TODO necessary?
                         Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
 
-                    Method setStepRunMethod = simulationRunAssemblyClass.getMethod("setStepRun", boolean.class);
+                    // TODO where is this method? "setStepRun" ... not certain it turned into METHOD_setSingleStep
+                    Method setStepRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setSingleStep, boolean.class);
                     setStepRunMethod.invoke(simulationRunAssemblyInstance, true);
 
 //                    if (textAreaOutputStream != null)
@@ -555,8 +578,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
                     LOG.info("StopListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     
-                    // TODO where is this method?
-                    Method setStopRunMethod = simulationRunAssemblyClass.getMethod("setStopRun", boolean.class);
+                    // TODO where is this method? "setStopRun" is likely METHOD_setStopSimulationRun
+                    Method setStopRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setStopSimulationRun, boolean.class);
                     setStopRunMethod.invoke(simulationRunAssemblyInstance, true);
 
                     if (textAreaOutputStream != null)
@@ -624,7 +647,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
+            ViskitGlobals.instance().selectSimulationRunTab();
             if (saveChooser == null) {
                 saveChooser = new JFileChooser(ViskitGlobals.instance().getViskitProject().getProjectDirectory());
             }
@@ -840,7 +863,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e) 
         {
-            ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
+            ViskitGlobals.instance().selectSimulationRunTab();
             String s = simulationRunPanel.outputStreamTA.getSelectedText();
             StringSelection ss = new StringSelection(s);
             Clipboard clpbd = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -853,7 +876,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
+            ViskitGlobals.instance().selectSimulationRunTab();
             simulationRunPanel.outputStreamTA.requestFocus();
             simulationRunPanel.outputStreamTA.selectAll();
         }
@@ -864,7 +887,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
+            ViskitGlobals.instance().selectSimulationRunTab();
             simulationRunPanel.outputStreamTA.setText(null);
             LOG.info("Simulation Run Manager: clear console");
             // no need to update 
@@ -877,7 +900,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            ViskitGlobals.instance().getMainFrame().selectSimulationRunTab();
+            ViskitGlobals.instance().selectSimulationRunTab();
             File f; // = tmpFile;
             String osName = ViskitStatics.OPERATING_SYSTEM;
             String filePath = "";

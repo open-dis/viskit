@@ -73,7 +73,6 @@ import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
 import static viskit.ViskitStatics.isFileReady;
-import static viskit.control.AssemblyControllerImpl.METHOD_PREPARESIMULATIONRUNNER;
 import static viskit.control.AssemblyControllerImpl.METHOD_captureWindow;
 import static viskit.control.AssemblyControllerImpl.METHOD_close;
 import static viskit.control.AssemblyControllerImpl.METHOD_closeAll;
@@ -82,6 +81,7 @@ import static viskit.control.AssemblyControllerImpl.METHOD_copy;
 import static viskit.control.AssemblyControllerImpl.METHOD_cut;
 import static viskit.control.AssemblyControllerImpl.METHOD_editGraphMetadata;
 import static viskit.control.AssemblyControllerImpl.METHOD_generateJavaSource;
+import static viskit.control.AssemblyControllerImpl.METHOD_newAssembly;
 import static viskit.control.AssemblyControllerImpl.METHOD_newEventGraphNode;
 import static viskit.control.AssemblyControllerImpl.METHOD_newProject;
 import static viskit.control.AssemblyControllerImpl.METHOD_newPropertyChangeListenerNode;
@@ -121,6 +121,7 @@ import viskit.mvc.MvcController;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
 import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
+import static viskit.control.AssemblyControllerImpl.METHOD_prepareSimulationRunner;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -554,7 +555,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         recentProjectFileSetListener.addMenuItem(openRecentProjectMenu);
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         
-        assemblyMenu.add(buildMenuItem(assemblyController, "newAssembly", "New Assembly", KeyEvent.VK_N,
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_newAssembly, "New Assembly", KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         assemblyMenu.add(buildMenuItem(assemblyController, METHOD_open, "Open Assembly", KeyEvent.VK_O,
@@ -582,8 +583,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         
 /* TODO fix functionality before exposing
         assemblyMenu.addSeparator();
-        // TODO add icon?  METHOD_PREPARESIMULATIONRUNNER  renamed prepareSimulationRunner
-        assemblyMenu.add(buildMenuItem(assemblyController, "prepareSimulationRunner", "Initialize Assembly for Simulation Run", KeyEvent.VK_P,
+        // TODO add icon?
+        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_prepareSimulationRunner, "Initialize Assembly for Simulation Run", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 */
 
@@ -669,21 +670,21 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String methodName, String menuName, Integer mnemonicKeyEvent, KeyStroke accelleratorKeyStroke) 
+    private JMenuItem buildMenuItem(Object source, String methodName, String menuItemName, Integer mnemonicKeyEvent, KeyStroke accelleratorKeyStroke) 
     {
         Action action = ActionIntrospector.getAction(source, methodName);
         if (action == null)
         {
-            LOG.error("buildMenuItem reflection failed for name=" + menuName + " method=" + methodName + " in " + source.toString());
-            return new JMenuItem(menuName + "(not working, reflection failed) ");
+            LOG.error("buildMenuItem reflection failed for name=" + menuItemName + " method=" + methodName + " in " + source.toString());
+            return new JMenuItem(menuItemName + "(not working, reflection failed) ");
         }
         Map<String, Object> map = new HashMap<>();
         if (mnemonicKeyEvent != null)
             map.put(Action.MNEMONIC_KEY, mnemonicKeyEvent);
         if (accelleratorKeyStroke != null)
             map.put(Action.ACCELERATOR_KEY, accelleratorKeyStroke);
-        if (menuName != null) {
-            map.put(Action.NAME, menuName);
+        if (menuItemName != null) {
+            map.put(Action.NAME, menuItemName);
         }
         if (!map.isEmpty())
             ActionUtilities.decorateAction(action, map);
@@ -761,7 +762,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 "Zoom out on the graph"
         );
 
-        Action prepareSimulationRunnerAction = ActionIntrospector.getAction(getController(), METHOD_PREPARESIMULATIONRUNNER); // "prepareSimulationRunner");
+        Action prepareSimulationRunnerAction = ActionIntrospector.getAction(getController(), METHOD_prepareSimulationRunner);
         prepareAssemblyForSimulationRunButton = makeButton(prepareSimulationRunnerAction, 
              "viskit/images/Play24.gif", // large
                 "Compile and initialize the assembly, prepare for Simulation Run");
@@ -916,7 +917,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 //            if (assemblyController == null)
 //                assemblyController = ViskitGlobals.instance().getAssemblyController(); // unexpected
 //            assemblyController.makeTopPaneAssemblyTabActive();
-            ViskitGlobals.instance().selectAssemblyTab();
+            ViskitGlobals.instance().selectAssemblyEditorTab();
         };
         SwingUtilities.invokeLater(r);
     }

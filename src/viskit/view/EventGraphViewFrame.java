@@ -80,7 +80,6 @@ import static viskit.control.EventGraphControllerImpl.METHOD_cut;
 import static viskit.control.EventGraphControllerImpl.METHOD_editGraphMetadata;
 import static viskit.control.EventGraphControllerImpl.METHOD_generateJavaSource;
 import static viskit.control.EventGraphControllerImpl.METHOD_newEventGraph;
-import static viskit.control.EventGraphControllerImpl.METHOD_newNode;
 import static viskit.control.EventGraphControllerImpl.METHOD_newSelfReferentialCancelingEdge;
 import static viskit.control.EventGraphControllerImpl.METHOD_newSelfReferentialSchedulingEdge;
 import static viskit.control.EventGraphControllerImpl.METHOD_newSimulationParameter;
@@ -111,6 +110,7 @@ import viskit.view.dialog.ViskitUserPreferencesDialog;
 import viskit.mvc.MvcController;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
+import static viskit.control.EventGraphControllerImpl.METHOD_buildNewEventNode;
 
 /**
  Main "view" of the Viskit app. This class controls a 3-paneled JFrame showing
@@ -544,7 +544,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     @Override
-    public void deleteTab(Model mod) {
+    public void deleteTab(Model mod)
+    {
         JSplitPane jsplt;
         JScrollPane jsp;
         ViskitGraphComponentWrapper viskitGraphComponentWrapper;
@@ -570,7 +571,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     @Override
-    public Model[] getOpenModels() {
+    public Model[] getOpenModels() 
+    {
         JSplitPane jsplt;
         JScrollPane jsp;
         ViskitGraphComponentWrapper vgcw;
@@ -586,7 +588,9 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     @Override
-    public String addParameterDialog() {
+    public String addParameterDialog()
+    {
+        ViskitGlobals.instance().selectEventGraphEditorTab();
 
         if (ParameterDialog.showDialog(ViskitGlobals.instance().getMainFrame(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewSimulationParameter(ParameterDialog.newName,
@@ -599,7 +603,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     @Override
-    public String addStateVariableDialog() {
+    public String addStateVariableDialog() 
+    {
+        ViskitGlobals.instance().selectEventGraphEditorTab();
+        
         if (StateVariableDialog.showDialog(ViskitGlobals.instance().getMainFrame(), null)) {      // blocks here
             ((EventGraphController) getController()).buildNewStateVariable(StateVariableDialog.newName,
                     StateVariableDialog.newType,
@@ -653,8 +660,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         }
     }
 
-    class ParameterizedAction extends javax.swing.AbstractAction {
-
+    class ParameterizedAction extends javax.swing.AbstractAction 
+    {
         ParameterizedAction(String s) {
             super(s);
         }
@@ -662,6 +669,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         @Override
         public void actionPerformed(ActionEvent actionEvent) 
         {
+            ViskitGlobals.instance().selectEventGraphEditorTab();
             EventGraphController eventGraphController = (EventGraphController) getController();
 
             File fullPath;
@@ -715,7 +723,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         ActionIntrospector.getAction(eventGraphController, METHOD_remove).setEnabled(false);
         editMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(eventGraphController, METHOD_newNode, "Add a new Event Node", KeyEvent.VK_A, null));
+        editMenu.add(buildMenuItem(eventGraphController, METHOD_buildNewEventNode, "Add a new Event Node", KeyEvent.VK_A, null));
         editMenu.add(buildMenuItem(eventGraphController, METHOD_newSimulationParameter, "Add a new Simulation Parameter", KeyEvent.VK_S, null));
         editMenu.add(buildMenuItem(eventGraphController, METHOD_newStateVariable, "Add a new State Variable", KeyEvent.VK_A, null));
         editMenu.add(buildMenuItem(eventGraphController, METHOD_newSelfReferentialSchedulingEdge, "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
@@ -775,7 +783,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         ActionIntrospector.getAction(eventGraphController, METHOD_remove).setEnabled(false);
         editEventGraphSubMenu.addSeparator();
 
-        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newNode, "Add a new Event Node", KeyEvent.VK_A, null));
+        editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_buildNewEventNode, "Add a new Event Node", KeyEvent.VK_A, null));
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newSimulationParameter, "Add a new Simulation Parameter", KeyEvent.VK_A, null));
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newStateVariable, "Add a new State Variable", KeyEvent.VK_A, null));
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newSelfReferentialSchedulingEdge, "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
@@ -796,7 +804,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_newProject, "New Viskit Project", KeyEvent.VK_V,
                 KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
         
-        eventGraphMenu.add(buildMenuItem(this, METHOD_openProject, "Open Project", KeyEvent.VK_P,
+        eventGraphMenu.add(buildMenuItem(this,                 METHOD_openProject, "Open Project", KeyEvent.VK_P,
                 KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK)));
         eventGraphMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
         // The recently opened project file listener will be set with the
@@ -871,13 +879,13 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
     
     // Use the actions package
-    private JMenuItem buildMenuItem(Object source, String method, String name, Integer mnemonic, KeyStroke accelerator)
+    private JMenuItem buildMenuItem(Object source, String methodName, String menuItemName, Integer mnemonic, KeyStroke accelerator)
     {
-        Action action = ActionIntrospector.getAction(source, method);
+        Action action = ActionIntrospector.getAction(source, methodName);
         if (action == null)
         {
-            LOG.error("buildMenuItem() reflection failed for name=" + name + " method=" + method + " in " + source.toString());
-            return new JMenuItem(name + "(not working, buildMenuItem() reflection failed)");
+            LOG.error("buildMenuItem() reflection failed for name=" + menuItemName + " method=" + methodName + " in " + source.toString());
+            return new JMenuItem(menuItemName + "(not working, buildMenuItem() reflection failed)");
         }
         Map<String, Object> map = new HashMap<>();
         if (mnemonic != null) {
@@ -886,8 +894,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         if (accelerator != null) {
             map.put(Action.ACCELERATOR_KEY, accelerator);
         }
-        if (name != null) {
-            map.put(Action.NAME, name);
+        if (menuItemName != null) {
+            map.put(Action.NAME, menuItemName);
         }
         if (!map.isEmpty()) {
             ActionUtilities.decorateAction(action, map);
@@ -1229,7 +1237,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                     Point pp = new Point(
                             p.x - addEvent.getWidth(),
                             p.y - addEvent.getHeight());
-                    ((EventGraphController) getController()).buildNewNode(pp);
+                    ((EventGraphController) getController()).buildNewEventNode(pp);
                     break;
                 case SELF_REF_CANCEL_DRAG:
                     if (o != null && o instanceof EventNode) {

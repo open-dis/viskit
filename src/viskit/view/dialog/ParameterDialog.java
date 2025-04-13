@@ -58,7 +58,8 @@ public class ParameterDialog extends JDialog
         return modified;
     }
 
-    private ParameterDialog(JFrame parentFrame, ViskitParameter newParameter) {
+    private ParameterDialog(JFrame parentFrame, ViskitParameter newParameter) 
+    {
         super(parentFrame, "Simulation Parameter Inspector", true);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new myCloseListener());
@@ -153,7 +154,7 @@ public class ParameterDialog extends JDialog
         else 
         {
             parameterNameField.setText("param_" + count++);
-            parameterTypeCombo.setSelectedIndex(-1); // TODO correct default?
+            parameterTypeCombo.setSelectedIndex(0); // TODO correct default?
             descriptionField.setText("");
         }
     }

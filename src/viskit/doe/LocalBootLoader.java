@@ -257,7 +257,7 @@ public class LocalBootLoader extends URLClassLoader {
     }
 
     /** @return an indication for allowing an Assembly to be jarred up */
-    public boolean getAllowAssemby() {
+    public boolean getAllowAssembly() {
         return allowAssembly;
     }
 

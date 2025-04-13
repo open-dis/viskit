@@ -20,6 +20,7 @@ import viskit.ViskitStatics;
  */
 public class PropertyChangeListenerNode extends AssemblyNode
 {
+    @SuppressWarnings("FieldNameHidesFieldInSuperclass")
     static final Logger LOG = LogManager.getLogger();
     
     private boolean operation;
@@ -78,6 +79,9 @@ public class PropertyChangeListenerNode extends AssemblyNode
     public void setGetMean(boolean b) {
         getMean = b;
     }
+    
+    /** method name for reflection use */
+    public static final String METHOD_isGetCount  = "isGetCount";
 
     public boolean isGetCount() {
         return getCount;
