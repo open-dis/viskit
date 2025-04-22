@@ -232,9 +232,11 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             if (jaxbRoot.getSchedule() == null) {
                 jaxbRoot.setSchedule(jaxbAssemblyObjectFactory.createSchedule());
             }
-            if (!graphMetadata.stopTime.equals("")) {
+            if (!graphMetadata.stopTime.equals("")) 
+            {
                 jaxbRoot.getSchedule().setStopTime(graphMetadata.stopTime);
-            } else {
+            } 
+            else {
                 jaxbRoot.getSchedule().setStopTime("100.0");
             }
 

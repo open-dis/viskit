@@ -44,7 +44,7 @@ import javax.swing.event.CaretListener;
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import static viskit.control.InternalAssemblyRunner.Event.READY;
+import static viskit.control.InternalAssemblyRunner.SimulationState.READY;
 
 /**
  * A VCR-controls and TextArea panel.  Sends Simkit output to TextArea
@@ -74,13 +74,13 @@ public class SimulationRunPanel extends JPanel
     public JScrollPane scrollPane;
     public JTextArea outputStreamTA;
 //    public JSplitPane xsplitPane;
-    public JButton vcrStopButton, vcrPlayButton, vcrRewindButton, vcrStepButton, closeButton, vcrClearConsoleButton;
+    public JButton   vcrStopButton, vcrRunResumeButton, vcrRewindButton, vcrPauseStepButton, closeButton, vcrClearConsoleButton;
     public JCheckBox vcrVerboseCB;
     public JTextField vcrStartTimeTF, vcrStopTimeTF;
     public JCheckBox saveReplicationDataCB;
     public JCheckBox printReplicationReportsCB;
     public JCheckBox searchCB;
-    public JDialog searchPopupDialog;
+    public JDialog   searchPopupDialog;
     public JCheckBox printSummaryReportsCB;
     public JCheckBox resetSeedStateCB;
     public JCheckBox analystReportCB;
@@ -204,19 +204,19 @@ public class SimulationRunPanel extends JPanel
             vcrButtonsPanel.add(vcrRewindButton);
         }
 
-        vcrPlayButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
-        vcrPlayButton.setBorder(BorderFactory.createEtchedBorder());
-        vcrPlayButton.setText(null);
-        vcrPlayButton.setToolTipText("Run or resume the simulation run");
-        vcrPlayButton.setEnabled(true);
-        vcrButtonsPanel.add(vcrPlayButton);
+        vcrRunResumeButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
+        vcrRunResumeButton.setBorder(BorderFactory.createEtchedBorder());
+        vcrRunResumeButton.setText(null);
+        vcrRunResumeButton.setToolTipText("Run or resume the simulation run");
+        vcrRunResumeButton.setEnabled(true);
+        vcrButtonsPanel.add(vcrRunResumeButton);
 
-        vcrStepButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/StepForward24.gif")));
-        vcrStepButton.setBorder(BorderFactory.createEtchedBorder());
-        vcrStepButton.setText(null);
-        vcrStepButton.setToolTipText("Single step the simulation");
-        vcrStepButton.setEnabled(true); // false true
-        vcrButtonsPanel.add(vcrStepButton); // i.e. vcrPause
+        vcrPauseStepButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/StepForward24.gif")));
+        vcrPauseStepButton.setBorder(BorderFactory.createEtchedBorder());
+        vcrPauseStepButton.setText(null);
+        vcrPauseStepButton.setToolTipText("Single step the simulation");
+        vcrPauseStepButton.setEnabled(true); // false true
+        vcrButtonsPanel.add(vcrPauseStepButton); // i.e. vcrPause
 
         vcrStopButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
         vcrStopButton.setBorder(BorderFactory.createEtchedBorder());
@@ -400,7 +400,7 @@ public class SimulationRunPanel extends JPanel
 //      flowPanel.add(resetSeedStateCB);
 
         upperLeftFlowPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        upperLeftFlowPanel.setPreferredSize(new Dimension(vcrPlayButton.getPreferredSize()));
+        upperLeftFlowPanel.setPreferredSize(new Dimension(vcrRunResumeButton.getPreferredSize()));
         
         return upperLeftFlowPanel;
     }

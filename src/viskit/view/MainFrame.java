@@ -208,7 +208,7 @@ public class MainFrame extends JFrame
             tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR] = -1;
         }
 
-        // Ensures Event Graph editor is the selected tab for menu function
+        // Ensures SimulationState Graph editor is the selected tab for menu function
         topTabbedPane.addChangeListener(tabChangeListener);
 
         // Assembly editor
@@ -412,7 +412,7 @@ public class MainFrame extends JFrame
             Model[] modelArray = ViskitGlobals.instance().getEventGraphViewFrame().getOpenModels();
             Model dirtyModel = null;
 
-            // Make sure we save modified Event Graphs if we wander off to the Assembly tab
+            // Make sure we save modified SimulationState Graphs if we wander off to the Assembly tab
             for (Model nextModel : modelArray) {
                 if (nextModel.isDirty()) {
                     dirtyModel = nextModel;
@@ -547,7 +547,7 @@ public class MainFrame extends JFrame
             SystemExitHandler defaultHandler = ViskitGlobals.instance().getSystemExitHandler();
             ViskitGlobals.instance().setSystemExitHandler(nullSystemExitHandler);
 
-            // Tell Visit to not recompile open Event Graphs from any remaining open
+            // Tell Visit to not recompile open SimulationState Graphs from any remaining open
             // Assemblies when we perform a Viskit exit
             ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).setCloseAll(true);
 
@@ -675,7 +675,7 @@ public class MainFrame extends JFrame
             simulationRunPanel.printReplicationReportsCB.setSelected(false);
             simulationRunPanel.printSummaryReportsCB.setSelected(false);
 
-            internalSimulationRunner.vcrButtonPressDisplayUpdate(InternalAssemblyRunner.Event.DONE); // initialize
+            internalSimulationRunner.vcrButtonPressDisplayUpdate(InternalAssemblyRunner.SimulationState.DONE); // initialize
             simulationRunPanel.outputStreamTA       .setText(INITIAL_SIMULATION_RUN_HINT);
             internalSimulationRunner.doTitle(null);
             
