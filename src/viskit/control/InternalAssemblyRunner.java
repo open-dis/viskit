@@ -111,7 +111,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     private SimulationRunPanel simulationRunPanel;
     private ActionListener saveListener;
     private JMenuBar myMenuBar;
-    private JMenu simulationRunMenu;
+    private JMenu  simulationRunMenu;
     private Thread simulationRunThread;
     private BasicAssembly basicAssembly;
 
@@ -128,7 +128,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     private final ClassLoader priorWorkingClassLoaderNoReset;
     private       ClassLoader priorRunSimulationClassLoader;  // TODO needed?
     
-    private /*static*/ ClassLoader runSimulationClassLoader; // TODO moved this out of ViskitGlobals due to thread-clobbering issues,
+    private /*static*/ ClassLoader runSimulationClassLoader; // this was moved out of ViskitGlobals due to thread-clobbering issues,
     
     private URL[] classPathUrlArray = new URL[0]; // legal default, actual values are set externally
 
@@ -439,7 +439,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void done()
         {
-            setProgress(100);
+            setProgress(100); // TODO what happens here, exactly?
             
             // TODO perform analyst report work here, avoid reflection!!
             
@@ -521,6 +521,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 
                 if (simulationRunAssemblyInstance != null) 
                 {
+                    if (priorRunSimulationClassLoader == null)
+                        priorRunSimulationClassLoader = getRunSimulationClassLoader(); // can occur if stepping prior to running
+                    
                     LOG.debug("StepListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     
                     if (priorRunSimulationClassLoader != null) // TODO necessary?
@@ -536,7 +539,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 //                    mutex--;
                 }
 
-//                Schedule.coldReset(); // ??
+                Schedule.coldReset(); // simkit
 
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
                 if ((classLoader != null) && !classLoader.equals(priorWorkingClassLoaderNoReset))
@@ -560,21 +563,22 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         }
     }
 
-    /** Restores the Viskit default ClassLoader after an Assembly compile and
-     * run.  Performs a Schedule.coldReset() to clear Simkit for the next run.
+    /** Restores the Viskit default ClassLoader after an Assembly compile and run.
+     *  Performs a Schedule.coldReset() to clear Simkit for the next run.
      */
-    public class StopListener implements ActionListener {
-
+    public class StopListener implements ActionListener 
+    {
         @Override
         public void actionPerformed(ActionEvent actionEvent)
         {
             vcrButtonPressDisplayUpdate(Event.STOP);
             if (mutex > 0)
                 mutex--;
+            
             try // StopListener
             {
-                if (simulationRunAssemblyInstance != null) {
-
+                if (simulationRunAssemblyInstance != null) 
+                {
                     Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
                     LOG.info("StopListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     
@@ -586,8 +590,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                         textAreaOutputStream.kill();
 
                 }
-
-                Schedule.coldReset();
+                Schedule.coldReset(); // simkit
 
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
                 if ((classLoader != null) && !classLoader.equals(priorWorkingClassLoaderNoReset))
@@ -728,6 +731,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         START_RESUME, STOP, STEP, REWIND, DONE, READY
     }
 
+    public enum State {
+        START, RESUME, PAUSE
+    }
+
     /** State machine logic
      * @param newEvent triggered by button push
      */
@@ -750,50 +757,50 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         switch (newEvent) 
         {
             case START_RESUME:
+                simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrPlayButton        .setEnabled(false);
                 simulationRunPanel.vcrStepButton        .setEnabled(true);
                 simulationRunPanel.vcrStopButton        .setEnabled(true);
-                simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrClearConsoleButton.setEnabled(false);
                 LOG.info("vcrButtonPressDisplayUpdate({})", newState); // newEvent);
                 break;
             case STEP:
+                simulationRunPanel.vcrRewindButton      .setEnabled(true);
                 simulationRunPanel.vcrPlayButton        .setEnabled(true);
                 simulationRunPanel.vcrStepButton        .setEnabled(true);
                 simulationRunPanel.vcrStopButton        .setEnabled(true);
-                simulationRunPanel.vcrRewindButton      .setEnabled(true);
                 simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
                 LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
             case STOP:
+                simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrPlayButton        .setEnabled(true);
                 simulationRunPanel.vcrStepButton        .setEnabled(true);
                 simulationRunPanel.vcrStopButton        .setEnabled(false);
-                simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
                 LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
             case REWIND:
+                simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrPlayButton        .setEnabled(true);
                 simulationRunPanel.vcrStepButton        .setEnabled(false); 
                 simulationRunPanel.vcrStopButton        .setEnabled(false);
-                simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
                 LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
             case DONE:
+                simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrPlayButton        .setEnabled(false);
                 simulationRunPanel.vcrStepButton        .setEnabled(false);
                 simulationRunPanel.vcrStopButton        .setEnabled(false);
-                simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
                 LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
             case READY:
+                simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrPlayButton        .setEnabled(true);
                 simulationRunPanel.vcrStepButton        .setEnabled(true);
                 simulationRunPanel.vcrStopButton        .setEnabled(false);
-                simulationRunPanel.vcrRewindButton      .setEnabled(false);
                 simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
                 LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                 break;
@@ -801,6 +808,24 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 LOG.warn("*** Unrecognized vcrButtonListener(event=" + newEvent + ")");
                 break;
         }
+        logButtonState(); // TODO development use
+    }
+    private String isOnOff(boolean booleanValue)
+    {
+        if  (booleanValue)
+             return "on ";
+        else return "off";
+    }
+
+    public void logButtonState()
+    {
+        LOG.info("logButtonState()" +
+                   " play=" + isOnOff(simulationRunPanel.vcrPlayButton.isEnabled()) +
+                   " step=" + isOnOff(simulationRunPanel.vcrStepButton.isEnabled()) +
+                   " stop=" + isOnOff(simulationRunPanel.vcrStopButton.isEnabled()) +
+                 " rewind=" + isOnOff(simulationRunPanel.vcrRewindButton.isEnabled()) +
+                  " clear=" + isOnOff(simulationRunPanel.vcrClearConsoleButton.isEnabled())
+        );
     }
 
     private void buildMenus() // Simulation Run
@@ -887,6 +912,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
+            // TODO vcrButtonPressDisplayUpdate(Event.);
+            
             ViskitGlobals.instance().selectSimulationRunTab();
             simulationRunPanel.outputStreamTA.setText(null);
             LOG.info("Simulation Run Manager: clear console");

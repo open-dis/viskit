@@ -246,10 +246,12 @@ public class ObjectListPanel extends JPanel implements ActionListener, CaretList
 
             try {
                 oi.setData(inst);
-            } catch (ClassNotFoundException e1) {
+            } 
+            catch (ClassNotFoundException e1)
+            {
                 String msg = "An object type specified in this element (probably " + inst.getType() + ") was not found.\n" +
                         "Add the XML or class file defining the element to the proper list at left.";
-                ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyViewFrame().getController()).messageUser(
+                ViskitGlobals.instance().messageUser(
                         JOptionPane.ERROR_MESSAGE,
                         e1.getMessage(),
                         msg);

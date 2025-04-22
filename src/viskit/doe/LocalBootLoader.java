@@ -1,6 +1,5 @@
 package viskit.doe;
 
-import edu.nps.util.Log4jUtilities;
 import edu.nps.util.TempFileManager;
 
 import java.io.File;

@@ -155,6 +155,11 @@ public class Help
 
     public void aboutViskit()
     {
+        // https://stackoverflow.com/questions/442747/getting-the-name-of-the-currently-executing-method
+        String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+        if (!methodName.equals(METHOD_aboutViskit))
+            LOG.error("Reflection error: methodName=" + methodName + " does not match METHOD_run=" + METHOD_aboutViskit);
+        
         JOptionPane.showMessageDialog(parent,
                 aboutViskitEditorPane,
                 "About Viskit",
@@ -168,6 +173,10 @@ public class Help
 
     public void doContents() 
     {
+        // https://stackoverflow.com/questions/442747/getting-the-name-of-the-currently-executing-method
+        String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+        if (!methodName.equals(METHOD_doContents))
+            LOG.error("Reflection error: methodName=" + methodName + " does not match METHOD_doContents=" + METHOD_doContents);
         hb.setDisplayed(true);
         hb.setCurrentView("TOC");
     }
@@ -177,6 +186,11 @@ public class Help
 
     public void doSearch() 
     {
+        // https://stackoverflow.com/questions/442747/getting-the-name-of-the-currently-executing-method
+        String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+        if (!methodName.equals(METHOD_doSearch))
+            LOG.error("Reflection error: methodName=" + methodName + " does not match METHOD_doSearch=" + METHOD_doSearch);
+        
         hb.setDisplayed(true);
         hb.setCurrentView("Search");
     }
@@ -186,11 +200,17 @@ public class Help
 
     public void doTutorial() 
     {
+        // https://stackoverflow.com/questions/442747/getting-the-name-of-the-currently-executing-method
+        String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+        if (!methodName.equals(METHOD_doTutorial))
+            LOG.error("Reflection error: methodName=" + methodName + " does not match METHOD_doTutorial=" + METHOD_doTutorial);
+        
         ActionEvent ae = new ActionEvent(TUTORIAL_COMPONENT, 0, "tutorial");
         TUTORIAL_LISTENER_LAUNCHER.actionPerformed(ae);
     }
 
-    public void mainFrameLocated(Rectangle bounds) {
+    public void mainFrameLocated(Rectangle bounds) 
+    {
         Point p = new Point(bounds.x, bounds.y);
         Dimension d = new Dimension(bounds.width, bounds.height);
         Dimension hd = new Dimension(1200, 700);

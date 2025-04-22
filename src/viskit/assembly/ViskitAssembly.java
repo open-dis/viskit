@@ -330,6 +330,12 @@ public class ViskitAssembly extends BasicAssembly
         return simEntitiesMap.get(name);
     }
 
+    @Override
+    protected void printInfo()
+    {
+        LOG.info("TODO  printInfo()");
+    }
+
     protected class PropertyConnector {
         String property;
         String source;

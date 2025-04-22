@@ -272,7 +272,8 @@ public class ViskitUserConfiguration
     /**
      * @param projectXmlConfigurationFilePath a Viskit project file, viskitProject.xml
      */
-    public void setProjectXMLConfiguration(String projectXmlConfigurationFilePath) {
+    public void setProjectXMLConfiguration(String projectXmlConfigurationFilePath) 
+    {
         try {
             Parameters params = new Parameters();
             FileBasedConfigurationBuilder<XMLConfiguration> fileBasedConfigurationBuilder
@@ -281,9 +282,10 @@ public class ViskitUserConfiguration
                         .setFileName(projectXmlConfigurationFilePath));
             fileBasedConfigurationBuilder.setAutoSave(true);
             projectXMLConfiguration = fileBasedConfigurationBuilder.getConfiguration();
-        } catch (ConfigurationException ex) {
+        } 
+        catch (ConfigurationException ce) {
             // TODO seems to fail when creating new project?
-            LOG.error(ex);
+            LOG.error(ce);
         }
         if ((projectCombinedConfiguration.getConfiguration("proj") == null) || projectCombinedConfiguration.getConfiguration("proj").isEmpty())
             projectCombinedConfiguration.addConfiguration(projectXMLConfiguration, "proj");

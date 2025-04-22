@@ -71,7 +71,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             jaxbRoot = jaxbAssemblyObjectFactory.createSimkitAssembly(); // to start with empty graph
         } 
         catch (JAXBException e) {
-            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML Error",
                     "Exception on JAXBContext instantiation" +
                     "\n" + e.getMessage()
@@ -127,7 +127,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 } 
                 catch (ClassCastException cce) {
                     // If we get here, they've tried to load an event graph.
-                    assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
+                    ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE,
                             "This is an Event Graph",
                             "Use the Event Graph Editor to" +
                             "\n" + "work with this file: " + newAssemblyModelFile.getName()
@@ -164,7 +164,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             } 
             catch (JAXBException e) 
             {
-                assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
+                ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE,
                         "XML I/O Error",
                         "Exception on JAXB unmarshalling of" +
                             "\n" + newAssemblyModelFile.getName() +
@@ -205,7 +205,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             LOG.debug("tempAssemblyMarshallFile=\n      " + tempAssemblyMarshallFile.getAbsolutePath());
         } 
         catch (IOException e) {
-            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE,
                     "I/O Error",
                     "Exception creating temporary file, AssemblyModel.saveModel():" +
                     "\n" + e.getMessage()
@@ -251,7 +251,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             currentAssemblyModelFile = savableAssemblyModel;
         }
         catch (JAXBException e) {
-            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML I/O Error",
                     "Exception on JAXB marshalling" +
                     "\n" + savableAssemblyModel +
@@ -260,7 +260,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                     );
         }
         catch (IOException ex) {
-            assemblyController.messageUser(JOptionPane.ERROR_MESSAGE,
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE,
                     "File I/O Error",
                     "Exception on writing " + savableAssemblyModel.getName() +
                     "\n" + ex.getMessage());
@@ -326,7 +326,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         Set<String> hs = new HashSet<>(10);
         for (AssemblyNode n : getNodeCache().values()) {
             if (!hs.add(n.getName())) {
-                assemblyController.messageUser(JOptionPane.INFORMATION_MESSAGE,
+                ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE,
                         "XML file contains duplicate event name", n.getName() +
                         "\nUnique name substituted.");
                 return false;

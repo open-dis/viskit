@@ -190,8 +190,8 @@ public class SimulationRunPanel extends JPanel
         upperLeftFlowPanel.add(Box.createVerticalStrut(4));
 //        upperLeftFlowPanel.add(Box.createHorizontalStrut(40)); // indent next button panel
 
-        JPanel runButtonsPanel = new JPanel();
-        runButtonsPanel.setLayout(new BoxLayout(runButtonsPanel, BoxLayout.X_AXIS));
+        JPanel vcrButtonsPanel = new JPanel();
+        vcrButtonsPanel.setLayout(new BoxLayout(vcrButtonsPanel, BoxLayout.X_AXIS));
 //        runButtonPanel.setBorder(new EmptyBorder(0,10,0,20));
 
         vcrRewindButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Rewind24.gif")));
@@ -201,7 +201,7 @@ public class SimulationRunPanel extends JPanel
         vcrRewindButton.setEnabled(true); // false true
         if (showIncompleteButtons) 
         {
-            runButtonsPanel.add(vcrRewindButton);
+            vcrButtonsPanel.add(vcrRewindButton);
         }
 
         vcrPlayButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
@@ -209,21 +209,21 @@ public class SimulationRunPanel extends JPanel
         vcrPlayButton.setText(null);
         vcrPlayButton.setToolTipText("Run or resume the simulation run");
         vcrPlayButton.setEnabled(true);
-        runButtonsPanel.add(vcrPlayButton);
+        vcrButtonsPanel.add(vcrPlayButton);
 
         vcrStepButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/StepForward24.gif")));
         vcrStepButton.setBorder(BorderFactory.createEtchedBorder());
         vcrStepButton.setText(null);
         vcrStepButton.setToolTipText("Single step the simulation");
         vcrStepButton.setEnabled(true); // false true
-        runButtonsPanel.add(vcrStepButton); // i.e. vcrPause
+        vcrButtonsPanel.add(vcrStepButton); // i.e. vcrPause
 
         vcrStopButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
         vcrStopButton.setBorder(BorderFactory.createEtchedBorder());
         vcrStopButton.setText(null);
         vcrStopButton.setToolTipText("Stop the simulation run");
         vcrStopButton.setEnabled(true); // false true
-        runButtonsPanel.add(vcrStopButton);
+        vcrButtonsPanel.add(vcrStopButton);
         
         vcrClearConsoleButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Delete24.gif"))); // Clear
         
@@ -239,14 +239,14 @@ public class SimulationRunPanel extends JPanel
                 outputStreamTA.replaceSelection(""); // cleears
             }
         });
-        runButtonsPanel.add(vcrClearConsoleButton);
+        vcrButtonsPanel.add(vcrClearConsoleButton);
         
         vcrButtonStatusLabel = new JLabel(" " + READY);
         vcrButtonStatusLabel.setToolTipText("Status of simulation run state machine");
-        runButtonsPanel.add(vcrButtonStatusLabel);
+        vcrButtonsPanel.add(vcrButtonStatusLabel);
 
         upperLeftFlowPanel.add(Box.createVerticalStrut(4));
-        upperLeftFlowPanel.add(runButtonsPanel);
+        upperLeftFlowPanel.add(vcrButtonsPanel);
         upperLeftFlowPanel.add(Box.createVerticalStrut(4));
         
         nowRunningLabel = new JLabel(new String(), JLabel.CENTER);
@@ -258,7 +258,7 @@ public class SimulationRunPanel extends JPanel
         upperLeftFlowPanel.add(nowRunningLabel);
         upperLeftFlowPanel.add(Box.createVerticalStrut(4));
 
-        runButtonsPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        vcrButtonsPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
 
         JLabel replicationSettingsLabel = new JLabel("Replication Settings", JLabel.CENTER);
         replicationSettingsLabel.setToolTipText("These settings control simulation replications");
@@ -352,14 +352,14 @@ public class SimulationRunPanel extends JPanel
         vcrVerboseCB = new JCheckBox("Verbose output", false);
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
         vcrVerboseCB.setBorder(new EmptyBorder(0,2,0,10));
-        vcrVerboseCB.addActionListener(new vcrVerboseCBListener());
+        vcrVerboseCB.addActionListener(new VcrVerboseCBListener());
         vcrVerboseCB.setToolTipText("Enables verbose output for all runs (or one run)");
         upperLeftFlowPanel.add(vcrVerboseCB);
 
         verboseReplicationNumberTF = new JTextField(7);
-        VerboseReplicationNumberTFListener replicationListener = new VerboseReplicationNumberTFListener();
-        verboseReplicationNumberTF.addActionListener(replicationListener);
-        verboseReplicationNumberTF.addCaretListener(replicationListener);
+        VerboseReplicationNumberTFListener verboseReplicationNumberTFListener = new VerboseReplicationNumberTFListener();
+        verboseReplicationNumberTF.addActionListener(verboseReplicationNumberTFListener);
+        verboseReplicationNumberTF.addCaretListener(verboseReplicationNumberTFListener);
         ViskitStatics.clampComponentSize(verboseReplicationNumberTF);
         verboseReplicationNumberTF.setText(VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT);
         verboseReplicationNumberTF.setToolTipText("Which replication run (1..n) will be verbose?");
@@ -405,8 +405,8 @@ public class SimulationRunPanel extends JPanel
         return upperLeftFlowPanel;
     }
 
-    class vcrVerboseCBListener implements ActionListener {
-
+    class VcrVerboseCBListener implements ActionListener 
+    {
         @Override
         public void actionPerformed(ActionEvent event) 
         {
@@ -463,14 +463,16 @@ public class SimulationRunPanel extends JPanel
     /**
      * @return the viskitRunnerNoteString
      */
-    public String getViskitRunnerBannerString() {
+    public String getViskitRunnerBannerString() 
+    {
         return viskitRunnerBannerString;
     }
 
     /**
      * @param newViskitRunnerFeedbackString the viskitRunnerNoteString to set
      */
-    public void setViskitRunnerFeedbackString(String newViskitRunnerFeedbackString) {
+    public void setViskitRunnerFeedbackString(String newViskitRunnerFeedbackString) 
+    {
         this.viskitRunnerBannerString = newViskitRunnerFeedbackString;
         viskitRunnerBannerLabel.setText(newViskitRunnerFeedbackString);
     }
@@ -478,14 +480,16 @@ public class SimulationRunPanel extends JPanel
     /**
      * @return the title
      */
-    public String getTitle() {
+    public String getTitle() 
+    {
         return title;
     }
 
     /**
      * @param newTitle the title to set
      */
-    public void setTitle(String newTitle) {
+    public void setTitle(String newTitle) 
+    {
         title = newTitle;
         titleLabel.setText(newTitle);
         revalidate();

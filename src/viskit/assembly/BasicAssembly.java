@@ -121,6 +121,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     /** A checkbox is user enabled from the Analyst Report Panel */
     private boolean enableAnalystReports = true;
+    
+    /** debugThread is for developer use */
+    private boolean debugThread = true; /* default */
 
     private int designPointID;
     private final DecimalFormat decimalFormat1, decimalFormat4;
@@ -397,11 +400,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     /** method name for reflection use */
     public static final String METHOD_setStopTime = "setStopTime";
 
-    public void setStopTime(double time) {
-        if (time < 0.0) {
-            throw new IllegalArgumentException("Stop time must be >= 0.0: " + time);
+    public void setStopTime(double newStopTime) 
+    {
+        if (isDebugThread()) logThreadState(METHOD_setStopTime + " newStopTime=" + newStopTime);
+        
+        if (newStopTime < 0.0) {
+            throw new IllegalArgumentException("Stop time must be >= 0.0: " + newStopTime);
         }
-        stopTime = time;
+        stopTime = newStopTime;
     }
     
     /** method name for reflection use */
@@ -414,11 +420,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     /** method name for reflection use */
     public static final String METHOD_setSingleStep = "setSingleStep";
 
-    public void setSingleStep(boolean newValue) {
+    public void setSingleStep(boolean newValue) 
+    {
+        if (isDebugThread()) logThreadState(METHOD_setSingleStep + " newValue=" + newValue);
+        
         singleStep = newValue;
     }
 
-    public boolean isSingleStep() {
+    public boolean isSingleStep() 
+    {
         return singleStep;
     }
     
@@ -431,10 +441,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      */
     public void setStopSimulationRun(boolean newValue) 
     {
+        if (isDebugThread()) logThreadState(METHOD_setStopSimulationRun);
+        
         stopSimulationRun = newValue;
         if (stopSimulationRun)
         {
-            Schedule.stopSimulation();
+            Schedule.stopSimulation(); // simkit
         }
     }
     
@@ -443,7 +455,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     public void pauseSimulation()
     {
-        Schedule.pause();
+        if (isDebugThread()) logThreadState(METHOD_pauseSimulation);
+        
+        Schedule.pause(); // simkit
     }
     
     /** method name for reflection use */
@@ -451,13 +465,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     public void resumeSimulation()
     {
-        Schedule.startSimulation();
+        if (isDebugThread()) logThreadState(METHOD_resumeSimulation);
+        
+        Schedule.startSimulation(); // simkit
     }
 
     /** this is getting called by the Assembly Runner stopSimulationRun
  button, which may get called on startup.
      */
-    public void stopSimulationRun() {
+    // TODO unused??
+    public void stopSimulationRun()
+    {
         stopSimulationRun = true;
     }
     
@@ -751,7 +769,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         this.printWriter = new PrintWriter(outputStream);
 
         // This OutputStream gets ported to the JScrollPane of the Assembly Runner
-        Schedule.setOutputStream(outputPrintStream);
+        Schedule.setOutputStream(outputPrintStream); // simkit
         // tbd, need a way to not use System.out as
         // during multi-threaded runs, some applications
         // send debug messages directy to System.out.
@@ -885,6 +903,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     @Override
     public void run() // we are now in the simulation thread, commence thread complete
     {
+        // https://stackoverflow.com/questions/442747/getting-the-name-of-the-currently-executing-method
+        String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
+        if (!methodName.equals(METHOD_run))
+            LOG.error("Reflection error: methodName=" + methodName + " does not match METHOD_run=" + METHOD_run);
+        
+        if (isDebugThread()) logThreadState(METHOD_run);
+        
         fixThreadedName();
         LOG.info(assemblyName + " is now running inside BasicAssembly run() Simulation Run thread...");
         
@@ -895,7 +920,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             findProjectWorkingDirectoryFromWithinThread(); // the great mouse hunt
         }
                 
-        if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equalsIgnoreCase("Run")) {
+        if (Schedule.isRunning() && !Schedule.getCurrentEvent().getName().equalsIgnoreCase("Run")) // simkit
+        {
             LOG.error("Assembly already running.");
         }
 
@@ -947,11 +973,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         }
 
         LOG.info("Planned simulation stop time: " + getStopTime());
-        Schedule.stopAtTime(getStopTime());
-        Schedule.setEventSourceVerbose(true);
+        Schedule.stopAtTime(getStopTime()); // simkit
+        Schedule.setEventSourceVerbose(true);   // simkit
 
         if (isSingleStep())
-            Schedule.setSingleStep(isSingleStep());
+            Schedule.setSingleStep(isSingleStep()); // simkit
        
         // Used by the Gridlet(s)
         replicationDataSavedStatisticsList.clear();
@@ -965,7 +991,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         // all agree to be dependent on, i.e. viskit.simulation.Interface
         ReRunnable scenarioManager;
 
-        runEntitiesSet = Schedule.getReruns();
+        runEntitiesSet = Schedule.getReruns(); // simkit
 
         Method setNumberOfReplicationsMethod;
         // Convenience for Diskit if on the classpath
@@ -995,16 +1021,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             firePropertyChange("replicationNumber", (replication + 1));
             if ((replication + 1) == getVerboseReplicationNumber())
             {
-                Schedule.setVerbose(true);
-                Schedule.setReallyVerbose(true);
+                Schedule.setVerbose(true);       // simkit
+                Schedule.setReallyVerbose(true); // simkit
             } 
             else 
             {
-                Schedule.setVerbose(isVerbose());
-                Schedule.setReallyVerbose(isVerbose());
+                Schedule.setVerbose(isVerbose());       // simkit
+                Schedule.setReallyVerbose(isVerbose()); // simkit
             }
 
-            int nextRunCount = Schedule.getReruns().size();
+            int nextRunCount = Schedule.getReruns().size(); // simkit
             if (nextRunCount != runCount) {
                 LOG.info("Reruns changed old: " + runCount + " new: " + nextRunCount);
                 firePropertyChange("rerunCount", runCount, nextRunCount);
@@ -1014,7 +1040,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 // Note: too many Sysouts for multiple replications. 
                 // Comment in for debugging only.
 //                LOG.info("ReRun entities added since startup: ");
-//                Set<SimEntity> entitiesWithRunEvents = Schedule.getDefaultEventList().getRerun();
+//                Set<SimEntity> entitiesWithRunEvents = Schedule.getDefaultEventList().getRerun(); // simkit
 //                for (SimEntity entity : entitiesWithRunEvents) {
 //                    if (!runEntitiesSet.contains(entity)) {
 //                        System.out.print(entity.getName() + " ");
@@ -1029,8 +1055,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             } 
             else // continue running replications
             {
-                if (Schedule.isRunning())
-                    LOG.info("Already running.");
+                if (Schedule.isRunning()) // simkit
+                    LOG.info("Simulation is already running.");
                 
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 String spacing = new String();
@@ -1038,7 +1064,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                     spacing = " ";
                 LOG.info("Simulation starting Replication #" + (replication + 1) + " with RNG seed state = " + spacing + seed);
                 try {
-                    Schedule.reset();
+                    Schedule.reset(); // simkit
                 } 
                 catch (ConcurrentModificationException cme) 
                 {
@@ -1047,20 +1073,20 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                             "Assembly Run Error",
                             cme + "\nSimulation will terminate"
                     );
-                    int newEventListId = Schedule.addNewEventList();
-                    Schedule.setDefaultEventList(Schedule.getEventList(newEventListId));
+                    int newEventListId = Schedule.addNewEventList(); // simkit
+                    Schedule.setDefaultEventList(Schedule.getEventList(newEventListId)); // simkit
                     for (SimEntity entity : simEntity) {
                         entity.setEventListID(newEventListId);
                     }
 
-                    Schedule.stopSimulation();
-                    Schedule.clearRerun();
+                    Schedule.stopSimulation(); // simkit
+                    Schedule.clearRerun();     // simkit
                     runEntitiesSet.forEach(entity -> {
-                        Schedule.addRerun(entity);
+                        Schedule.addRerun(entity); // simkit
                     });
                 }
 
-                Schedule.startSimulation();
+                Schedule.startSimulation(); // simkit
 
                 String typeStatistics, nodeType;
                 int ix = 0;
@@ -1200,31 +1226,32 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         LOG.info("createAnalystReportFile() new analyst report (duplicative):\n  " + analystReportFile.getAbsolutePath());
     }
     
-    /** method name for reflection use */
-    public static final String METHOD_setVerboseReplicationNumber = "setVerboseReplicationNumber";
-    
     /** method name for reflection use, found in superclass */
     public static final String METHOD_setVerbose = "setVerbose";
     
     /** method name for reflection use, found in superclass */
     public static final String METHOD_isVerbose = "isVerbose";
+    
+    /** method name for reflection use */
+    public static final String METHOD_setVerboseReplicationNumber = "setVerboseReplicationNumber";
 
     public void setVerboseReplicationNumber(int newVerboseReplicationNumber) {
         verboseReplicationNumber = newVerboseReplicationNumber;
     }
     
     /** method name for reflection use */
-    public static final String METHOD_getVerboseReplication = "getVerboseReplication";
+    public static final String METHOD_getVerboseReplicationNumber = "getVerboseReplicationNumber";
 
-
-    public int getVerboseReplicationNumber() {
+    public int getVerboseReplicationNumber() 
+    {
         return verboseReplicationNumber;
     }
     
     /** method name for reflection use */
     public static final String METHOD_setPclNodeCache = "setPclNodeCache";
 
-    public void setPclNodeCache(Map<String, AssemblyNode> pclNodeCache) {
+    public void setPclNodeCache(Map<String, AssemblyNode> pclNodeCache) 
+    {
         this.pclNodeCache = pclNodeCache;
     }
 
@@ -1232,7 +1259,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * Method which may be overridden by subclasses (e.g., ViskitAssembly) which will be called after
      * createObject() at run time.
      */
-    protected void printInfo() {}
+    abstract protected void printInfo();
 
     /**
      * @return the localWorkingClassLoader
@@ -1283,6 +1310,25 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         {
             LOG.error("setWorkingDirectory() does not exist: " + workingDirectory.getAbsolutePath());
         }
+    }
+
+    /**
+     * @return the debugThread
+     */
+    public boolean isDebugThread() {
+        return debugThread;
+    }
+
+    /**
+     * @param debugThread the debugThread to set
+     */
+    public void setDebugThread(boolean debugThread) {
+        this.debugThread = debugThread;
+    }
+    private void logThreadState(String methodInvocation)
+    {
+        LOG.info("logThreadState() methodInvocation=" + methodInvocation);
+        // TODO print more state information
     }
 
 } // end class file BasicAssembly.java
