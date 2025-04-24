@@ -207,7 +207,7 @@ public class SimulationRunPanel extends JPanel
         vcrRunResumeButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
         vcrRunResumeButton.setBorder(BorderFactory.createEtchedBorder());
         vcrRunResumeButton.setText(null);
-        vcrRunResumeButton.setToolTipText("Run or resume the simulation run");
+        vcrRunResumeButton.setToolTipText("Run or resume the simulation");
         vcrRunResumeButton.setEnabled(true);
         vcrButtonsPanel.add(vcrRunResumeButton);
 

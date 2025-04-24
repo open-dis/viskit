@@ -151,22 +151,19 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     {
         saveListener = new SaveListener();
 
-        // NOTE:
-        // Don't supply rewind or pause buttons on VCR, not hooked up, or working right.
-        // false will enable all VCR buttons. Currently, only start and stop work
-
         simulationRunPanel = new SimulationRunPanel(SIMULATION_RUN_PANEL_TITLE, true, analystReportPanelVisible);
         buildMenus();
-        simulationRunPanel.vcrRunResumeButton  .addActionListener(new StartResumeListener());
-        simulationRunPanel.vcrStopButton  .addActionListener(assemblySimulationRunStopListener = new StopListener());
-        simulationRunPanel.vcrRewindButton.addActionListener(new RewindListener());
-        simulationRunPanel.vcrPauseStepButton  .addActionListener(new StepListener());
-        simulationRunPanel.vcrVerboseCB   .addActionListener(new VerboseListener());
+        simulationRunPanel.vcrRewindButton   .addActionListener(new RewindListener());
+        simulationRunPanel.vcrRunResumeButton.addActionListener(new RunResumeListener());
+        simulationRunPanel.vcrPauseStepButton.addActionListener(new PauseStepListener());
+        simulationRunPanel.vcrStopButton     .addActionListener(assemblySimulationRunStopListener = new StopListener());
+        simulationRunPanel.vcrVerboseCB      .addActionListener(new VerboseListener());
         
-        simulationRunPanel.vcrStopButton  .setEnabled(false);
-        simulationRunPanel.vcrRunResumeButton  .setEnabled(false);
-        simulationRunPanel.vcrRewindButton.setEnabled(false);
-        simulationRunPanel.vcrPauseStepButton  .setEnabled(false);
+        simulationRunPanel.vcrRewindButton   .setEnabled (false);
+        simulationRunPanel.vcrRunResumeButton.setEnabled (false);
+        simulationRunPanel.vcrPauseStepButton.setEnabled (false);
+        simulationRunPanel.vcrStopButton     .setEnabled (false);
+        simulationRunPanel.vcrVerboseCB      .setSelected(false);
 
         // Save Viskit's current working ClassLoader for later restoration
         priorWorkingClassLoaderNoReset = ViskitGlobals.instance().getViskitApplicationClassLoader();
@@ -454,7 +451,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 return;
             }
 
-            signalAnalystReportReady(); // saves temp report
+            notifyUserAnalystReportReady(); // saves temp report
 
             System.out.println("+------------------+"); // output goes to console TextArea
             System.out.println("| Simulation ended |");
@@ -492,7 +489,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         return replicationNumber;
     }
 
-    class StartResumeListener implements ActionListener 
+    class RunResumeListener implements ActionListener 
     {
         @Override
         public void actionPerformed(ActionEvent actionEvent) 
@@ -509,12 +506,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         }
     }
 
-    class StepListener implements ActionListener 
+    class PauseStepListener implements ActionListener 
     {
         @Override
         public void actionPerformed(ActionEvent actionEvent) // TODO development in progress, not fully tested
         {
-            try // StepListener
+            try // PauseStepListener
             {
                 vcrButtonPressDisplayUpdate(SimulationState.STEP);
                 
@@ -546,7 +543,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 if ((classLoader != null) && !classLoader.equals(priorWorkingClassLoaderNoReset))
                 {
                     Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
-                    LOG.info("StepListener actionPerformed(), rejoin regular thread, currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
+                    LOG.info("StepListener actionPerformed(), rejoin regular thread");
+                    LOG.info("      currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
                 } // rejoin regular thread
 
                 // TODO should prior thread be removed?
@@ -597,7 +595,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 if ((classLoader != null) && !classLoader.equals(priorWorkingClassLoaderNoReset))
                 {
                     Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
-                    LOG.info("StopListener actionPerformed(), rejoin regular thread, currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
+                    LOG.info("StopListener actionPerformed(), rejoin regular thread");
+                    LOG.info("      currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
                 } // rejoin regular thread
 
             } 
@@ -659,33 +658,34 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             saveChooser.setSelectedFile(consoleFile);
             saveChooser.setDialogTitle("Save Console Output");
 
-            int retv = saveChooser.showSaveDialog(null);
-            if (retv != JFileChooser.APPROVE_OPTION) {
+            int returnValue = saveChooser.showSaveDialog(null);
+            if (returnValue != JFileChooser.APPROVE_OPTION) {
                 return;
             }
 
             consoleFile = saveChooser.getSelectedFile();
-            if (consoleFile.exists()) {
-                int r = JOptionPane.showConfirmDialog(null, "File exists.  Overwrite?", "Confirm",
+            if (consoleFile.exists())
+            {
+                returnValue = JOptionPane.showConfirmDialog(null, "File exists.  Overwrite?", "Confirm",
                         JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (r != JOptionPane.YES_OPTION) {
+                if (returnValue != JOptionPane.YES_OPTION) {
                     return;
                 }
             }
 
-            try (Writer bw = new BufferedWriter(new FileWriter(consoleFile))) {
-                bw.write(simulationRunPanel.outputStreamTA.getText());
+            try (Writer bufferedWriter = new BufferedWriter(new FileWriter(consoleFile))) {
+                bufferedWriter.write(simulationRunPanel.outputStreamTA.getText());
             } catch (IOException e1) {
                 ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "I/O Error,", e1.getMessage() );
             }
         }
     }
 
-    private void signalAnalystReportReady()
+    private void notifyUserAnalystReportReady()
     {
         if (analystReportTempFile == null) 
         {
-            // No report to print, TODO undexpected
+            // No report to print, TODO unexpected
             return;
         }
         AnalystReportController analystReportController = ViskitGlobals.instance().getAnalystReportController();
@@ -729,7 +729,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     }
 
     public enum SimulationState {
-        RUN_RESUME, RUN, RESUME, PAUSE_STEP, PAUSE, STEP, STOP, REWIND, DONE, READY
+        RUN_RESUME, RUN, RESUME, PAUSE_STEP, PAUSE, STEP, STOP, REWIND, READY, DONE
     }
 
     /** SimulationState machine logic
@@ -799,13 +799,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  simulationRunPanel.vcrPauseStepButton   .setEnabled(true);
                  simulationRunPanel.vcrStopButton        .setEnabled(true);
                  simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
-                 LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
+                 LOG.info("vcrButtonPressDisplayUpdate({})", newState); // newEvent);
                  break;
                 
             case STOP:
                  simulationRunPanel.vcrRewindButton      .setEnabled(false);
-                 simulationRunPanel.vcrRunResumeButton   .setEnabled(true);
-                 simulationRunPanel.vcrPauseStepButton   .setEnabled(true);
+                 simulationRunPanel.vcrRunResumeButton   .setEnabled(false);
+                 simulationRunPanel.vcrPauseStepButton   .setEnabled(false);
                  simulationRunPanel.vcrStopButton        .setEnabled(false);
                  simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
                  LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
@@ -826,6 +826,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         }
         logButtonState(); // development diagnostics
     }
+    /** diagnostic utility
+     * @param booleanValue value of interest
+     * @return true "on" or false "off"
+     */
     private String isOnOff(boolean booleanValue)
     {
         if  (booleanValue)
@@ -872,10 +876,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         viewLogsDirectoryMI.setMnemonic('V');
         viewLogsDirectoryMI.setToolTipText("View simulation logs directory in system");
 
-        copyMI.addActionListener(new CopyListener());
+        copyMI.addActionListener(new CopyConsoleTextListener());
         saveMI.addActionListener(saveListener);
-        selectAllMI.addActionListener(new SelectAllListener());
-        clearAllMI.addActionListener(new ClearListener());
+        selectAllMI.addActionListener(new SelectAllConsoleTextListener());
+        clearAllMI.addActionListener(new ClearConsoleListener());
         viewConsoleOutputMI.addActionListener(new ViewConsoleListener());
         viewLogsDirectoryMI.addActionListener(new ViewLogsDirectoryListener());
 
@@ -901,20 +905,20 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 //        myMenuBar.add(editMenu);
     }
 
-    class CopyListener implements ActionListener {
-
+    class CopyConsoleTextListener implements ActionListener 
+    {
         @Override
         public void actionPerformed(ActionEvent e) 
         {
             ViskitGlobals.instance().selectSimulationRunTab();
-            String s = simulationRunPanel.outputStreamTA.getSelectedText();
-            StringSelection ss = new StringSelection(s);
-            Clipboard clpbd = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clpbd.setContents(ss, ss);
+            String selectedText = simulationRunPanel.outputStreamTA.getSelectedText();
+            StringSelection stringSelection = new StringSelection(selectedText);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(stringSelection, stringSelection);
         }
     }
 
-    class SelectAllListener implements ActionListener
+    class SelectAllConsoleTextListener implements ActionListener
     {
         @Override
         public void actionPerformed(ActionEvent e)
@@ -925,7 +929,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         }
     }
 
-    class ClearListener implements ActionListener
+    class ClearConsoleListener implements ActionListener
     {
         @Override
         public void actionPerformed(ActionEvent e)
@@ -933,7 +937,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             // TODO vcrButtonPressDisplayUpdate(SimulationState.);
             
             ViskitGlobals.instance().selectSimulationRunTab();
-            simulationRunPanel.outputStreamTA.setText(null);
+            simulationRunPanel.outputStreamTA.setText("");
             LOG.info("Simulation Run Manager: clear console");
             // no need to update 
             simulationRunPanel.vcrButtonStatusLabel.setText(" CLEAR" );
@@ -1030,7 +1034,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     {
         LOG.debug(event.getPropertyName());
 
-        if (event.getPropertyName().equals("replicationNumber")) {
+        if (event.getPropertyName().equals("replicationNumber")) 
+        {
             int beginLength = nowRunningMessageBuilder.length();
             nowRunningMessageBuilder.append(event.getNewValue());
             simulationRunPanel.setNumberOfReplications(Integer.parseInt(event.getNewValue().toString()));
