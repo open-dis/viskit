@@ -61,12 +61,12 @@ public class SimulationRunPanel extends JPanel
 {
     public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 30; // also defined twice in viskit.xsd schema
     
-    public final static String INITIAL_SIMULATION_RUN_HINT = "First initialize an Assembly before Simulation Run..."; // Local Run Simulation
+    public final static String INITIAL_SIMULATION_RUN_HINT = "You must first initialize an Assembly before commencing Simulation Run..."; // Local Run Simulation
 
     public static final String lineEnd = System.getProperty("line.separator");
     
-    public final static String INITIAL_SIMULATION_RUN_HEADER = "Assembly output stream:" + lineEnd +
-                                                               "-----------------------" + lineEnd;
+    public final static String INITIAL_SIMULATION_RUN_HEADER = "Assembly simulation output stream:" + lineEnd +
+                                                               "----------------------------------" + lineEnd;
     public static final String SIMULATION_RUN_PANEL_TITLE = "Simulation Run Console";
     
     public boolean dump = true;
@@ -325,6 +325,7 @@ public class SimulationRunPanel extends JPanel
               "30", // 3
              "100", // 4
             "1000", // 5
+//         "10000", // 6
         };
         JComboBox numberReplicationsComboBox = new JComboBox<>(exampleReplicationCounts);
         numberReplicationsComboBox.setSelectedIndex(3); // 30, law of large numbers (LLN)

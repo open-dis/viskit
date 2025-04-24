@@ -68,6 +68,7 @@ import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitProject;
+import viskit.control.InternalAssemblyRunner.SimulationState;
 import viskit.model.AnalystReportModel;
 // import static viskit.ViskitGlobals.isFileReady; // while in thread, do not invoke ViskitGlobals!
 
@@ -96,8 +97,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     protected Map<Integer, List<SavedStats>> replicationDataSavedStatisticsList;
     protected PropertyChangeListener[]       replicationStatisticsPropertyChangeListenerArray;
     protected SampleStatistics[]             designPointSimpleStatisticsTally;
-    protected SimEntity[] simEntity;
-    protected PropertyChangeListener[] propertyChangeListenerArray;
+    protected SimEntity[]                    simEntity;
+    protected PropertyChangeListener[]       propertyChangeListenerArray;
+    
     protected boolean hookupsCalled;
     protected boolean stopSimulationRun;
     protected int startReplicationNumber = 0;
@@ -106,10 +108,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     private double  stopTime;
     private boolean singleStep;
-    private int     numberReplications;
+    private int     numberPlannedReplications;
     private boolean printReplicationReports;
     private boolean printSummaryReport;
     private boolean saveReplicationData;
+    private int     numberOfPlannedReplications;
 
     /** Ordering is essential for this collection */
     private Map<String, AssemblyNode> pclNodeCache;
@@ -144,6 +147,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     private       String projectDirectoryPath = new String();
     private       String projectName          = new String();
     private       String assemblyName         = new String();
+    
+    private SimulationState simulationState;
         
             // Because there is no instantiated report builder in the current
             // thread context, we reflect here
@@ -170,11 +175,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * Default constructor sets parameters of BasicAssembly to their
      * default values.These are:
      * <pre>
-     * printReplicationReports = true
-     * printSummaryReport = true
-     * saveReplicationData = false
-     * numberReplications = 1
-     * </pre>
+ printReplicationReports = true
+ printSummaryReport = true
+ saveReplicationData = false
+ numberPlannedReplications = 1
+ </pre>
      */
     public BasicAssembly() 
     {
@@ -187,7 +192,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         replicationStatisticsPropertyChangeListenerArray = new PropertyChangeListener[0];
         designPointSimpleStatisticsTally = new SampleStatistics[0];
         propertyChangeListenerArray = new PropertyChangeListener[0];
-        setNumberReplications(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
+        setNumberPlannedReplications(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
         hookupsCalled = false;
         
         fixThreadedName();
@@ -441,6 +446,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      */
     public void setStopSimulationRun(boolean newValue) 
     {
+        // do not set debug breakpoint in this method or else thread is not notified to stop
+        
         if (isDebugThread()) logThreadState(METHOD_setStopSimulationRun);
         
         stopSimulationRun = newValue;
@@ -489,24 +496,24 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     public boolean isEnableAnalystReports() {return enableAnalystReports;}
     
     /** method name for reflection use */
-    public static final String METHOD_setNumberReplications = "setNumberReplications";
+    public static final String METHOD_setNumberPlannedReplications = "setNumberPlannedReplications";
     
-    public final void setNumberReplications(int newNumberReplications) 
+    public final void setNumberPlannedReplications(int newNumberReplications) 
     {
         if (newNumberReplications < 1) {
-            throw new IllegalArgumentException("Number replications must be > 0: " + newNumberReplications);
+            throw new IllegalArgumentException("setNumberPlannedReplications() Number replications must be > 0: " + newNumberReplications);
         }
-        numberReplications = newNumberReplications;
+        numberPlannedReplications = newNumberReplications;
     }
     
     /** method name for reflection use */
-    public static final String METHOD_getNumberReplications = "getNumberReplications";
+    public static final String METHOD_getNumberPlannedReplications = "getNumberPlannedReplications";
 
     /** How many replications have occurred so far during this simulation
      * @return number of replications completed, so far */
-    public int getNumberReplications()
+    public int getNumberPlannedReplications()
     {
-        return numberReplications;
+        return numberPlannedReplications;
     }
     
     /** method name for reflection use */
@@ -696,7 +703,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         int varCW    = 16;
 
         // Report header
-        StringBuilder outputReportStringBuilder = new StringBuilder("\nOutput Report for Replication #");
+        StringBuilder outputReportStringBuilder = new StringBuilder();
+        
+        if ((simulationState != null) && (simulationState != SimulationState.RUN) && 
+            (replicationNumber != getNumberPlannedReplications()))
+        {
+            // likely the STOP button was pressed
+            outputReportStringBuilder.append(System.getProperty("line.separator"));
+            outputReportStringBuilder.append("(Simulation did not complete ")
+                                     .append(getNumberPlannedReplications()).append(" replications as originally planned)");
+            outputReportStringBuilder.append(System.getProperty("line.separator"));
+        }
+        outputReportStringBuilder.append("\nOutput Report following Replication #");
         outputReportStringBuilder.append(replicationNumber + 1);
         outputReportStringBuilder.append(System.getProperty("line.separator"));
         outputReportStringBuilder.append(String.format("%-" + nameCW + "s%" + countCW + "s%" 
@@ -1004,7 +1022,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 scenarioManager = entity;
                 try {
                     setNumberOfReplicationsMethod = scenarioManager.getClass().getMethod(METHOD_setNumberOfReplications, int.class);
-                    setNumberOfReplicationsMethod.invoke(scenarioManager, getNumberReplications());
+                    setNumberOfReplicationsMethod.invoke(scenarioManager, getNumberPlannedReplications());
                 } 
                 catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
                     LOG.error("run() error during ScenarioManager checks: " + ex);
@@ -1016,7 +1034,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         
         LOG.info("Begin running simulation replications for " + getName());
 
-        for (int replication = 0; replication < getNumberReplications(); replication++)
+        for (int replication = 0; replication < getNumberPlannedReplications(); replication++)
         {
             firePropertyChange("replicationNumber", (replication + 1));
             if ((replication + 1) == getVerboseReplicationNumber())
@@ -1050,13 +1068,19 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             }
             if (stopSimulationRun) 
             {
-                LOG.info("Simulation stopped in Replication # " + (replication + 1));
+                String stopMessage = "Simulation stopped in Replication # " + (replication + 1);
+                LOG.info(stopMessage);
+                // breaks simulation threading if not deferred, nevertheless not reachable at tuntime due to different classloader
+                // not a problem since console notes number of completed replication
+//                SwingUtilities.invokeLater(() -> {
+//                     ViskitGlobals.instance().getSimulationRunPanel().outputStreamTA.append(stopMessage);
+//                });
                 break;
             } 
             else // continue running replications
             {
                 if (Schedule.isRunning()) // simkit
-                    LOG.info("Simulation is already running.");
+                    LOG.info("run() discrepancy: Simulation is already running, continuing anyway...");
                 
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 String spacing = new String();
@@ -1329,6 +1353,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     {
         LOG.info("logThreadState() methodInvocation=" + methodInvocation);
         // TODO print more state information
+    }
+    
+    /**
+     * @param newSimulationState the simulationState to set
+     */
+    public void setSimulationState(SimulationState newSimulationState) 
+    {
+        this.simulationState = newSimulationState;
     }
 
 } // end class file BasicAssembly.java

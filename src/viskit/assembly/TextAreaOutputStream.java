@@ -104,7 +104,7 @@ public class TextAreaOutputStream extends ByteArrayOutputStream implements Actio
   }
 
   /** swingTimer.stop() */
-  public void kill()
+  public void stop()
   {
     swingTimer.stop();
     actionPerformed(null);  // flush last bit of text

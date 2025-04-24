@@ -267,7 +267,7 @@ public class SimkitAssemblyXML2Java
             pw.print(sp8 + "setVerbose");
             pw.println(lp + schedule.getVerbose() + rp + sc);
 
-            pw.print(sp8 + "setNumberReplications");
+            pw.print(sp8 + "setNumberPlannedReplications");
             pw.println(lp + schedule.getNumberReplications() + rp + sc);
 
             pw.print(sp8 + "setPrintReplicationReports");

@@ -69,6 +69,7 @@ import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
 import static viskit.view.MainFrame.TAB_INDEX_ASSEMBLY_EDITOR;
 import static viskit.view.MainFrame.TAB_INDEX_EVENTGRAPH_EDITOR;
 import static viskit.view.MainFrame.TAB_INDEX_SIMULATION_RUN;
+import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HEADER;
 
 /**
  * MOVES Institute
@@ -439,7 +440,7 @@ public class MainFrame extends JFrame
             }
             else if ((topTabbedPane != null) && (topTabbedPane.getTabCount() >= TAB_INDEX_SIMULATION_RUN)) // TODO why is this needed??
             {
-                topTabbedPane.setToolTipTextAt(tabIndices[TAB_INDEX_SIMULATION_RUN], "first Initialize Assembly for Simulation Run");
+                topTabbedPane.setToolTipTextAt(tabIndices[TAB_INDEX_SIMULATION_RUN], INITIAL_SIMULATION_RUN_HINT);
             }
 
             JMenuBar selectedMenuBar = new JMenuBar();
@@ -665,9 +666,7 @@ public class MainFrame extends JFrame
         {
             SimulationRunPanel simulationRunPanel = ViskitGlobals.instance().getSimulationRunPanel();
             simulationRunPanel.outputStreamTA.setText(null);
-            simulationRunPanel.outputStreamTA.setText(
-                    "Assembly output stream:" + simulationRunPanel.lineEnd +
-                    "-----------------------" + simulationRunPanel.lineEnd);
+            simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HEADER);
             simulationRunPanel.vcrStartTimeTF.setText("");
             simulationRunPanel.vcrStopTimeTF.setText("");
             simulationRunPanel.numberReplicationsTF.setText(Integer.toString(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS)); // initialized in XML and panel

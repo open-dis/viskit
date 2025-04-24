@@ -237,7 +237,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 jaxbRoot.getSchedule().setStopTime(graphMetadata.stopTime);
             } 
             else {
-                jaxbRoot.getSchedule().setStopTime("100.0");
+                jaxbRoot.getSchedule().setStopTime("100.0"); // default
             }
 
             // Schedule needs this value to properly sync with Enable Analyst Reports

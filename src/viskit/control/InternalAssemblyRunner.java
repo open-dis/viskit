@@ -64,14 +64,12 @@ import viskit.ViskitUserConfiguration;
 import viskit.assembly.BasicAssembly;
 import static viskit.assembly.BasicAssembly.METHOD_addPropertyChangeListener;
 import static viskit.assembly.BasicAssembly.METHOD_getAnalystReport;
-import static viskit.assembly.BasicAssembly.METHOD_getNumberReplications;
 import static viskit.assembly.BasicAssembly.METHOD_getStopTime;
 import static viskit.assembly.BasicAssembly.METHOD_isPrintReplicationReports;
 import static viskit.assembly.BasicAssembly.METHOD_isPrintSummaryReport;
 import static viskit.assembly.BasicAssembly.METHOD_isSaveReplicationData;
 import static viskit.assembly.BasicAssembly.METHOD_isVerbose;
 import static viskit.assembly.BasicAssembly.METHOD_setEnableAnalystReports;
-import static viskit.assembly.BasicAssembly.METHOD_setNumberReplications;
 import static viskit.assembly.BasicAssembly.METHOD_setOutputStream;
 import static viskit.assembly.BasicAssembly.METHOD_setPclNodeCache;
 import static viskit.assembly.BasicAssembly.METHOD_setPrintReplicationReports;
@@ -89,6 +87,8 @@ import static viskit.view.SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
 import static viskit.view.SimulationRunPanel.VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT;
 import viskit.view.dialog.ViskitUserPreferencesDialog;
 import static viskit.assembly.BasicAssembly.METHOD_setVerboseReplicationNumber;
+import static viskit.assembly.BasicAssembly.METHOD_getNumberPlannedReplications;
+import static viskit.assembly.BasicAssembly.METHOD_setNumberPlannedReplications;
 
 /** Controller for the Assembly RunSimulation panel, which
  * spawns the BasicAssembly thread
@@ -265,7 +265,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     {
         setClassPathUrlArray(ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray());
 
-        Method getNumberReplicationsMethod     = simulationRunAssemblyClass.getMethod(METHOD_getNumberReplications);
+        Method getNumberReplicationsMethod     = simulationRunAssemblyClass.getMethod(METHOD_getNumberPlannedReplications);
         Method isSaveReplicationData           = simulationRunAssemblyClass.getMethod(METHOD_isSaveReplicationData); // TODO hook this up
         Method isPrintReplicationReportsMethod = simulationRunAssemblyClass.getMethod(METHOD_isPrintReplicationReports);
         Method isPrintSummaryReportMethod      = simulationRunAssemblyClass.getMethod(METHOD_isPrintSummaryReport);
@@ -323,7 +323,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             simulationRunAssemblyInstance = simulationRunAssemblyClass.getDeclaredConstructor().newInstance(); // TODO needed?
 
             Method setOutputStreamMethod             = simulationRunAssemblyClass.getMethod(METHOD_setOutputStream, OutputStream.class);
-            Method setNumberReplicationsMethod       = simulationRunAssemblyClass.getMethod(METHOD_setNumberReplications, int.class);
+            Method setNumberReplicationsMethod       = simulationRunAssemblyClass.getMethod(METHOD_setNumberPlannedReplications, int.class);
             Method setPrintReplicationReportsMethod  = simulationRunAssemblyClass.getMethod(METHOD_setPrintReplicationReports, boolean.class);
             Method setPrintSummaryReportMethod       = simulationRunAssemblyClass.getMethod(METHOD_setPrintSummaryReport, boolean.class);
             Method setSaveReplicationDataMethod      = simulationRunAssemblyClass.getMethod(METHOD_setSaveReplicationData, boolean.class);
@@ -432,7 +432,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             return null;
         }
 
-        // Perform simulation stop and reset calls
+        /** Perform simulation stop and reset calls.
+         *  Java javadoc: "Executed on the Event Dispatch Thread after the doInBackground method is finished."
+         */
         @Override
         public void done()
         {
@@ -450,15 +452,20 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 LOG.error("SimulationRunMonitor.done(): {}", ex);
                 return;
             }
+            
+            vcrButtonPressDisplayUpdate(SimulationState.DONE); // also sets simulationState
 
             notifyUserAnalystReportReady(); // saves temp report
 
-            System.out.println("+------------------+"); // output goes to console TextArea
-            System.out.println("| Simulation ended |");
-            System.out.println("+------------------+");
+            System.out.println("+------------------------------+"); // output goes to console TextArea
+            System.out.println("| Simulation replications DONE |");
+            System.out.println("+------------------------------+");
 
-            simulationRunPanel.nowRunningLabel.setText("<html><body><p><b>Replications all complete.\n</b></p></body></html>");
-            assemblySimulationRunStopListener.actionPerformed(null);
+// TODO old/contrary? mistakenly resets status label
+//            simulationRunPanel.nowRunningLabel.setText("<html><body><p><b>Replications all complete.</b>\n</p></body></html>");
+//            assemblySimulationRunStopListener.actionPerformed(null);
+                
+            LOG.info("SimulationRunMonitor.done() is complete");
             
             // TODO when do we clean up this thread, or does it automatically get removed?
         }
@@ -532,7 +539,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     setStepRunMethod.invoke(simulationRunAssemblyInstance, true);
 
 //                    if (textAreaOutputStream != null)
-//                        textAreaOutputStream.kill();
+//                        textAreaOutputStream.stop();
 //
 //                    mutex--;
                 }
@@ -570,9 +577,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent actionEvent)
         {
-            vcrButtonPressDisplayUpdate(SimulationState.STOP);
             if (mutex > 0)
                 mutex--;
+            
+            // threaded method includes Schedule.stopSimulation();
+            basicAssembly.setStopSimulationRun(true);
             
             try // StopListener
             {
@@ -585,10 +594,17 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     Method setStopRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setStopSimulationRun, boolean.class);
                     setStopRunMethod.invoke(simulationRunAssemblyInstance, true);
 
-                    if (textAreaOutputStream != null)
-                        textAreaOutputStream.kill();
-
+//////                    if (textAreaOutputStream != null)
+//////                    {
+//////                        textAreaOutputStream.stop(); // TODO misleading?  loses output if thread continues
+////////                        textAreaOutputStream.
+//////                    }
                 }
+                else
+                {
+                    LOG.error("StopListener.actionPerformed(" + actionEvent + ") unable to find simulationRunAssemblyInstance");
+                }
+                vcrButtonPressDisplayUpdate(SimulationState.STOP);
                 Schedule.coldReset(); // simkit
 
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -598,10 +614,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     LOG.info("StopListener actionPerformed(), rejoin regular thread");
                     LOG.info("      currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
                 } // rejoin regular thread
-
+                else
+                {
+                    LOG.error("StopListener.actionPerformed(" + actionEvent + ") classLoader restoration problem");
+                }
             } 
-            catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
-
+            catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException exception) 
+            {
                 // Some screwy stuff can happen here if a user jams around with
                 // the Prepare Assembly Run button and tabs back and forth
                 // between the Assembly editor and the Assembly runner panel, but it
@@ -609,6 +628,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 // IllegalArgumentException and move on.
 //                LOG.error(ex);
 //                ex.printStackTrace();
+
+                 LOG.error("StopListener.actionPerformed(" + actionEvent + ") exception: {}", exception);
             }
         }
     }
@@ -728,40 +749,43 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         return simulationRunPanel.vcrVerboseCB.isSelected();
     }
 
+    /** Simulation state machine: states plus transitions,
+     *  see Viskit Assembly Simulation State Machine diagram */
     public enum SimulationState {
-        RUN_RESUME, RUN, RESUME, PAUSE_STEP, PAUSE, STEP, STOP, REWIND, READY, DONE
+        READY, RUN_RESUME, RUN, RESUME, PAUSE_STEP, PAUSE, STEP, STOP, REWIND, DONE
     }
 
-    /** SimulationState machine logic
+    /** Simulation State Machine transition logic, initiated by user button selection.
      * @param newEvent triggered by button push
      */
     public void vcrButtonPressDisplayUpdate(SimulationState newEvent) 
     {
         SimulationState newState = newEvent; // save original value
         
-        // disambiguate RUN_RESUME
+        // disambiguate RUN_RESUME modes
         if (newEvent.equals(SimulationState.RUN_RESUME))
         {
-            if  (simulationState == SimulationState.PAUSE) // check prior state
-                 newState =  SimulationState.RESUME;  // previously paused, resume running
-            else newState =  SimulationState.RUN;   // previously ready, not running
+            if  (getSimulationState() == SimulationState.PAUSE) // check prior state to determine transition mode
+                 newState =  SimulationState.RESUME;  // previously PAUSE, now resume running
+            else newState =  SimulationState.RUN;     // previously READY, now begin running
         }
-        // disambiguate PAUSE_STEP
+        // disambiguate PAUSE_STEP modes
         if (newEvent.equals(SimulationState.PAUSE_STEP))
         {
-            if  (simulationState == SimulationState.PAUSE) // check prior state
-                 newState =  SimulationState.STEP;  // previously paused,  single step
-            else newState =  SimulationState.PAUSE; // previously running, initial pause
+            if  (getSimulationState() == SimulationState.PAUSE) // check prior state to determine transition mode
+                 newState =  SimulationState.STEP;  // previously PAUSE,  now perform single step
+            else newState =  SimulationState.PAUSE; // previously RUN,    now initial pause
         }
                 
-        simulationState = newState; // update overall state
+        setSimulationState(newState); // update overall state
         simulationRunPanel.vcrButtonStatusLabel.setText(" " + newState.name());
+        
         // debug
 //        simulationRunPanel.outputStreamTA.setText(
 //                simulationRunPanel.outputStreamTA.getText() + "\n" +
 //                "User button pressed: " + vcrState          + "\n");
 
-        switch (simulationState) 
+        switch (getSimulationState()) 
         {
             case READY: // initialization
                  simulationRunPanel.vcrRewindButton      .setEnabled(false);
@@ -788,7 +812,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  simulationRunPanel.vcrRunResumeButton   .setEnabled(false);
                  simulationRunPanel.vcrPauseStepButton   .setEnabled(true);
                  simulationRunPanel.vcrStopButton        .setEnabled(true);
-                 simulationRunPanel.vcrClearConsoleButton.setEnabled(false);
+                 simulationRunPanel.vcrClearConsoleButton.setEnabled(false);   // avoid clearing console accidentally while running
                  LOG.info("vcrButtonPressDisplayUpdate({})", newState); // newEvent);
                  break;
                 
@@ -846,7 +870,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                    " stop=" + isOnOff(simulationRunPanel.vcrStopButton.isEnabled()) +
                  " rewind=" + isOnOff(simulationRunPanel.vcrRewindButton.isEnabled()) +
                   " clear=" + isOnOff(simulationRunPanel.vcrClearConsoleButton.isEnabled()) +
-                " simulationState=" + simulationState.name()
+                " simulationState=" + getSimulationState().name()
         );
     }
 
@@ -934,9 +958,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            // TODO vcrButtonPressDisplayUpdate(SimulationState.);
+            // TODO vcrButtonPressDisplayUpdate(SimulationState._); not appropriate, ClearConsole is not a state
             
-            ViskitGlobals.instance().selectSimulationRunTab();
+            ViskitGlobals.instance().selectSimulationRunTab(); // making sure
             simulationRunPanel.outputStreamTA.setText("");
             LOG.info("Simulation Run Manager: clear console");
             // no need to update 
@@ -1129,6 +1153,16 @@ public class InternalAssemblyRunner implements PropertyChangeListener
      */
     public SimulationState getSimulationState() {
         return simulationState;
+    }
+
+    /**
+     * @param newSimulationState the simulationState to set
+     */
+    public void setSimulationState(SimulationState newSimulationState) 
+    {
+        this.simulationState = newSimulationState;
+        if (basicAssembly != null) // also update superclass
+            basicAssembly.setSimulationState(newSimulationState);
     }
 
 }  // end class file InternalAssemblyRunner.java
