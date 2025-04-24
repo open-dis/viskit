@@ -132,7 +132,7 @@ public class HistogramChart
             if (!chartFile.getParentFile().exists())
                  chartFile.getParentFile().mkdirs(); // ensure intermediate path is present
             ChartUtils.saveChartAsPNG(chartFile, chart, 969, 641);
-            LOG.info("saveChart successful, " + chartFile.getName() + "\n      {}", chartFile);
+            LOG.debug("saveChart successful, " + chartFile.getName() + "\n      {}", chartFile);
         } 
         catch (IOException ioe) {
             LOG.error(ioe);
