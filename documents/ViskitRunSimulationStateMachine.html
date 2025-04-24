@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html>
+    <head>
+        <title>Viskit Run Simulation State Machine</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h2>Viskit Run Simulation State Machine</h2>
+        
+        <h3>
+            Run Simulation States
+        </h3>
+        <p>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <b>Ready.</b>
+                Simulation initialization complete, ready to begin first replication.
+        </p>
+        <p>
+                <img src="images/Play24.gif" alt="Run - Resume" style="vertical-align: text-bottom;"/>
+                <b>Run - Resume.</b>
+        </p>
+                <ul>
+                    <li>
+                        <i>Run</i>:  &nbsp;&nbsp;&nbsp; &nbsp; begin simulation replications in continuous mode until completion.
+                    </li>
+                    <li>
+                        <i>Resume</i>: perform remaining simulation replications in continuous mode until completion.
+                    </li>
+                </ul>
+        <p>
+                <img src="images/Pause24.gif" alt="Pause - Step" style="vertical-align: text-bottom;"/>
+                <b>Pause - Step.</b>
+        </p>
+                <ul>
+                    <li>
+                        <i>Pause</i>: pause continuous replications, begin single-step mode,
+                        await <i>Resume</i> or  <i>Step</i> or  <i>Stop</i>.
+                    </li>
+                    <li>
+                        <i>Step</i>: &nbsp;&nbsp; perform one simulation loop within current replication, continue single-step mode,
+                        await <i>Resume</i> or  <i>Step</i> or  <i>Stop</i>.
+                    </li>
+                </ul>
+        <p>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <b>Done.</b>
+                Simulation replications are completed or stopped, ready to prepare Analyst Report.
+        </p>
+        <h3>
+            Additional VCR Buttons
+        </h3>
+        <p>
+                <img src="images/Delete24.gif" alt="Delete" style="vertical-align: text-bottom;"/>
+                <b>Clear.</b>
+                Clear all text in console area.
+        </p>
+        <p>
+                <img src="images/Stop24.gif" alt="Stop" style="vertical-align: text-bottom;"/>
+                <b>Stop.</b>
+                Halt simulation replications, set state <b>Done</b>, ready to prepare Analyst Report.
+        </p>
+        <br />
+        <br />
+        
+        <p align="center">
+            <a href="images/ViskitRunSimulationStateMachine.png">
+                <img src="images/ViskitRunSimulationStateMachine.png" style="width: 90%; border: 1px solid black;" alt="Viskit Run Simulation State Machine diagram"/>
+            </a>
+        </p>
+    </body>
+</html>
