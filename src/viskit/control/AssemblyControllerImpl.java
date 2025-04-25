@@ -1925,7 +1925,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             @Override
             public Void doInBackground() // prepareSimulationRunner() activity
             {
-                // Compile and prep the execStrings
+                // Compile and prepare the execStrings
                 prepareAssemblySimulationRun();
 
                 if (execStringArray == null)
@@ -1972,12 +1972,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     // reset
                     execStringArray = null;
                     
-                    // provide user guidance on first initialization
-                    if (!ViskitGlobals.instance().getSimulationRunPanel().hasLoadedAssembly())
-                    {
-                        announceReadyToCommenceSimulationRun(assemblyName); // initialization complete
-                    }
+                    // TODO reset SimulationRunPanel simulation stop time to match graph metadata if new Assembly found
+
                     ViskitGlobals.instance().getSimulationRunPanel().setHasLoadedAssembly(true);
+                    announceReadyToCommenceSimulationRun(assemblyName); // initialization complete
                 }
                 
                 // TODO what else?
@@ -2007,7 +2005,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     private void announceReadyToCommenceSimulationRun(String newAssemblyName)
     {
-        ViskitGlobals.instance().getSimulationRunPanel().outputStreamTA.setText(SimulationRunPanel.INITIAL_SIMULATION_RUN_HEADER);
+        ViskitGlobals.instance().getMainFrame().initializeSimulationRunPanelOutputStreamTA();
         
         String message =
                 "<html><body>" +

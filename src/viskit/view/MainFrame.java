@@ -641,6 +641,26 @@ public class MainFrame extends JFrame
         // do nothing
     };
 
+    public void initializeSimulationRunPanelOutputStreamTA()
+    {
+        SimulationRunPanel simulationRunPanel = ViskitGlobals.instance().getSimulationRunPanel();
+        simulationRunPanel.outputStreamTA.setText(null); // clear
+        String header       = new String();
+        String assemblyName = new String();
+        if (ViskitGlobals.instance().getActiveAssemblyModel() != null)
+            assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getName();
+
+        if      ((assemblyName == null) || assemblyName.isBlank())
+                 header = INITIAL_SIMULATION_RUN_HEADER;
+        else if (assemblyName.toLowerCase().contains("assembly"))
+                 header = assemblyName + " " + INITIAL_SIMULATION_RUN_HEADER.substring("Assembly ".length());
+        // https://stackoverflow.com/questions/1235179/simple-way-to-repeat-a-string
+        String repeated = new String(new char[header.length()]).replace("\0", "-");
+        simulationRunPanel.outputStreamTA.setText(repeated + "\n");
+        simulationRunPanel.outputStreamTA.append (header   + "\n");
+        simulationRunPanel.outputStreamTA.append (repeated + "\n" + "\n");
+    }
+
     /** Prepares the Assembly with a RunSimulation class loader free of static artifacts for
      * a completely independent run
      */
@@ -665,8 +685,7 @@ public class MainFrame extends JFrame
         public void resetSimulationRunPanel()
         {
             SimulationRunPanel simulationRunPanel = ViskitGlobals.instance().getSimulationRunPanel();
-            simulationRunPanel.outputStreamTA.setText(null);
-            simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HEADER);
+            initializeSimulationRunPanelOutputStreamTA();
             simulationRunPanel.vcrStartTimeTF.setText("");
             simulationRunPanel.vcrStopTimeTF.setText("");
             simulationRunPanel.numberReplicationsTF.setText(Integer.toString(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS)); // initialized in XML and panel
