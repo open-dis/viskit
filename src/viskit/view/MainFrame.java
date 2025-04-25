@@ -656,9 +656,9 @@ public class MainFrame extends JFrame
                  header = assemblyName + " " + INITIAL_SIMULATION_RUN_HEADER.substring("Assembly ".length());
         // https://stackoverflow.com/questions/1235179/simple-way-to-repeat-a-string
         String repeated = new String(new char[header.length()]).replace("\0", "-");
-        simulationRunPanel.outputStreamTA.setText(repeated + "\n");
-        simulationRunPanel.outputStreamTA.append (header   + "\n");
-        simulationRunPanel.outputStreamTA.append (repeated + "\n" + "\n");
+        simulationRunPanel.outputStreamTA.setText("+-" + repeated + " +" + "\n");
+        simulationRunPanel.outputStreamTA.append ("| " + header   + " |" + "\n");
+        simulationRunPanel.outputStreamTA.append ("+-" + repeated + "-+" + "\n" + "\n");
     }
 
     /** Prepares the Assembly with a RunSimulation class loader free of static artifacts for
