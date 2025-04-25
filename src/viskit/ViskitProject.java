@@ -246,7 +246,7 @@ public class ViskitProject
         else {
             loadProjectFromFile(getProjectFile());
         }
-        ViskitUserConfiguration.instance().setProjectXMLConfiguration(getProjectFile().getPath());
+        ViskitUserConfiguration.instance().setProjectXMLConfiguration(getProjectFile().getPath()); // TODO problem on re-RUN
 
         XMLConfiguration config = ViskitUserConfiguration.instance().getProjectXMLConfiguration();
         config.setProperty(ViskitUserConfiguration.VISKIT_PROJECT_NAME, getProjectDirectory().getName());

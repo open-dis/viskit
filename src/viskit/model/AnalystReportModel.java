@@ -856,18 +856,23 @@ public final class AnalystReportModel extends MvcAbstractModel
         Element entityElement, histogramChartUrlElement, linearRegressionChartUrlElement, replicationRecordElement;
         double[] dataArray;
         int index;
-        for (Element simEntityElement : simEntitiesElementList) {
+        for (Element simEntityElement : simEntitiesElementList) 
+        {
             dataPointsElementList = simEntityElement.getChildren("DataPoint");
-            for (Element dataPoint : dataPointsElementList) {
+            for (Element dataPoint : dataPointsElementList) 
+            {
                 dataPointProperty = dataPoint.getAttributeValue(PROPERTY);
-                for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) {
+                for (Map.Entry<String, AssemblyNode> entry : getPclNodeCache().entrySet()) 
+                {
                     obj = getPclNodeCache().get(entry.getKey());
-                    if (obj.getClass().toString().contains("PropertyChangeListenerNode")) {
+                    if (obj.getClass().toString().contains("PropertyChangeListenerNode")) 
+                    {
                         try {
                             isCount = Boolean.parseBoolean(obj.getClass().getMethod(METHOD_isGetCount).invoke(obj).toString());
                             typeStatistic = isCount ? "count" : "mean";
                             break;
-                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
+                        } 
+                        catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
                             LOG.error(ex);
                         }
                     }
@@ -887,15 +892,16 @@ public final class AnalystReportModel extends MvcAbstractModel
                     // Create a data set instance and histogramChart for each replication report
                     dataArray = new double[replicationReport.getChildren().size()];
                     index = 0;
-                    for (Element replication : replicationsElementList) {
+                    for (Element replication : replicationsElementList) 
+                    {
                         replicationRecordElement = new Element(REPLICATION);
-                        replicationRecordElement.setAttribute("number", replication.getAttributeValue("number"));
-                        replicationRecordElement.setAttribute("count", replication.getAttributeValue("count"));
-                        replicationRecordElement.setAttribute("minObs", replication.getAttributeValue("minObs"));
-                        replicationRecordElement.setAttribute("maxObs", replication.getAttributeValue("maxObs"));
-                        replicationRecordElement.setAttribute("mean", replication.getAttributeValue("mean"));
+                        replicationRecordElement.setAttribute("number",       replication.getAttributeValue("number"));
+                        replicationRecordElement.setAttribute("count",        replication.getAttributeValue("count"));
+                        replicationRecordElement.setAttribute("minObs",       replication.getAttributeValue("minObs"));
+                        replicationRecordElement.setAttribute("maxObs",       replication.getAttributeValue("maxObs"));
+                        replicationRecordElement.setAttribute("mean",         replication.getAttributeValue("mean"));
                         replicationRecordElement.setAttribute("stdDeviation", replication.getAttributeValue("stdDeviation"));
-                        replicationRecordElement.setAttribute("variance", replication.getAttributeValue("variance"));
+                        replicationRecordElement.setAttribute("variance",     replication.getAttributeValue("variance"));
                         entityElement.addContent(replicationRecordElement);
 
                         // Add the raw count, or mean of replication data to the chart generators

@@ -717,6 +717,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         outputReportStringBuilder.append("\nOutput Report following Replication #");
         outputReportStringBuilder.append(replicationNumber + 1);
         outputReportStringBuilder.append(System.getProperty("line.separator"));
+        outputReportStringBuilder.append(System.getProperty("line.separator"));
         outputReportStringBuilder.append(String.format("%-" + nameCW + "s%" + countCW + "s%" 
                 + minCW + "s%" + maxCW + "s%" + meanCW + "s%" + stdDevCW 
                 + "s%" + varCW + "s", 
@@ -757,11 +758,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             reportStatisticsConfiguration.processSummaryReport(getDesignPointSampleStatistics());
 
         StringBuilder summaryReportStringBuilder = new StringBuilder("Summary Output Report:");
-        summaryReportStringBuilder.append(System.getProperty("line.separator"));
-        summaryReportStringBuilder.append("	").append(assemblyName); // class name is mangled by thread with .1 appended: super.toString());
+        summaryReportStringBuilder.append(" ").append(assemblyName); // class name is mangled by thread with .1 appended: super.toString());
         summaryReportStringBuilder.append(System.getProperty("line.separator"));
 
-        for (SampleStatistics designPointStatistics : getDesignPointSampleStatistics()) {
+        for (SampleStatistics designPointStatistics : getDesignPointSampleStatistics())
+        {
             summaryReportStringBuilder.append(System.getProperty("line.separator"));
             summaryReportStringBuilder.append(designPointStatistics);
         }

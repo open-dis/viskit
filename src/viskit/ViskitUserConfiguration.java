@@ -268,6 +268,9 @@ public class ViskitUserConfiguration
         }
         return userName;
     }
+    
+    FileBasedConfigurationBuilder<XMLConfiguration> fileBasedConfigurationBuilder;
+    String priorProjectXmlConfigurationFilePath = new String();
 
     /**
      * @param projectXmlConfigurationFilePath a Viskit project file, viskitProject.xml
@@ -276,20 +279,23 @@ public class ViskitUserConfiguration
     {
         try {
             Parameters params = new Parameters();
-            FileBasedConfigurationBuilder<XMLConfiguration> fileBasedConfigurationBuilder
-                    = new FileBasedConfigurationBuilder<>(XMLConfiguration.class)
-                        .configure(params.xml()
-                        .setFileName(projectXmlConfigurationFilePath));
-            fileBasedConfigurationBuilder.setAutoSave(true);
-            projectXMLConfiguration = fileBasedConfigurationBuilder.getConfiguration();
+            if ((fileBasedConfigurationBuilder == null) || (!projectXmlConfigurationFilePath.equals(projectXmlConfigurationFilePath)))
+            {
+                fileBasedConfigurationBuilder = new FileBasedConfigurationBuilder<>(XMLConfiguration.class)
+                        .configure(params.xml().setFileName(projectXmlConfigurationFilePath));
+                fileBasedConfigurationBuilder.setAutoSave(true);
+                projectXMLConfiguration = fileBasedConfigurationBuilder.getConfiguration();
+                priorProjectXmlConfigurationFilePath = projectXmlConfigurationFilePath;
+
+                if ((projectCombinedConfiguration.getConfiguration("proj") == null) || projectCombinedConfiguration.getConfiguration("proj").isEmpty())
+                     projectCombinedConfiguration.addConfiguration(projectXMLConfiguration, "proj");
+                xmlConfigurationsMap.put("proj", projectXMLConfiguration);
+            }
         } 
         catch (ConfigurationException ce) {
             // TODO seems to fail when creating new project?
             LOG.error(ce);
         }
-        if ((projectCombinedConfiguration.getConfiguration("proj") == null) || projectCombinedConfiguration.getConfiguration("proj").isEmpty())
-            projectCombinedConfiguration.addConfiguration(projectXMLConfiguration, "proj");
-        xmlConfigurationsMap.put("proj", projectXMLConfiguration);
     }
 
     /** @return the XMLConfiguration for Viskit project */

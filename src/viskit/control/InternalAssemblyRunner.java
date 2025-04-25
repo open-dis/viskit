@@ -242,10 +242,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     "Error initializing Assembly:\n" + throwable.getMessage()
             );
             vcrButtonPressDisplayUpdate(SimulationState.DONE);
-            simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HINT);
+            simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HINT); // duplicative since handling exception
 //            throwable.printStackTrace();
             return;
         }
+        // reset state machine
         vcrButtonPressDisplayUpdate(SimulationState.REWIND);
         vcrButtonPressDisplayUpdate(SimulationState.READY);
         
@@ -438,7 +439,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void done()
         {
-            setProgress(100); // TODO what happens here, exactly?
+            setProgress(100); // TODO what happens here, exactly? SwingWorker method
+            mutex--; // this thread is complete, decrement mutual exclusion (mutex) safety-net counter
             
             // TODO perform analyst report work here, avoid reflection!!
             
