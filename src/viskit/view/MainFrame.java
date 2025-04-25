@@ -658,7 +658,8 @@ public class MainFrame extends JFrame
         String repeated = new String(new char[header.length()]).replace("\0", "-");
         simulationRunPanel.outputStreamTA.setText("+-" + repeated + " +" + "\n");
         simulationRunPanel.outputStreamTA.append ("| " + header   + " |" + "\n");
-        simulationRunPanel.outputStreamTA.append ("+-" + repeated + "-+" + "\n" + "\n");
+        simulationRunPanel.outputStreamTA.append ("+-" + repeated + "-+" + "\n");
+        simulationRunPanel.outputStreamTA.append ("\n");
     }
 
     /** Prepares the Assembly with a RunSimulation class loader free of static artifacts for
