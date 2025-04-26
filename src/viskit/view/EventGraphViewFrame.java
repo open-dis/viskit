@@ -858,24 +858,25 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         myMenuBar.add(eventGraphMenu);
         myMenuBar.add(editMenu);
         
-        Help help = new Help(ViskitGlobals.instance().getMainFrame());
-        help.mainFrameLocated(ViskitGlobals.instance().getMainFrame().getBounds());
-        ViskitGlobals.instance().setHelp(help); // single instance for all viskit frames
-
-        JMenu helpMenu = new JMenu("Help");
-        helpMenu.setMnemonic(KeyEvent.VK_H);
-        
-        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
-        {
-        helpMenu.add(buildMenuItem(help, METHOD_doContents, "Contents", KeyEvent.VK_C, null));
-        helpMenu.add(buildMenuItem(help, METHOD_doSearch, "Search", KeyEvent.VK_S, null));
-        helpMenu.addSeparator();
-
-        helpMenu.add(buildMenuItem(help, METHOD_doTutorial, "Tutorial", KeyEvent.VK_T, null));
-        helpMenu.add(buildMenuItem(help, METHOD_aboutViskit, "About Viskit", KeyEvent.VK_A, null));
-
-        myMenuBar.add(helpMenu);
-        }
+// see AssemblyViewFrame
+//        Help help = new Help(ViskitGlobals.instance().getMainFrame());
+//        help.mainFrameLocated(ViskitGlobals.instance().getMainFrame().getBounds());
+//        ViskitGlobals.instance().setHelp(help); // single instance for all viskit frames
+//
+//        JMenu helpMenu = new JMenu("Help");
+//        helpMenu.setMnemonic(KeyEvent.VK_H);
+//        
+//        if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
+//        {
+//        helpMenu.add(buildMenuItem(help, METHOD_doContents, "Contents", KeyEvent.VK_C, null));
+//        helpMenu.add(buildMenuItem(help, METHOD_doSearch, "Search", KeyEvent.VK_S, null));
+//        helpMenu.addSeparator();
+//
+//        helpMenu.add(buildMenuItem(help, METHOD_doTutorial, "Tutorial", KeyEvent.VK_T, null));
+//        helpMenu.add(buildMenuItem(help, METHOD_aboutViskit, "About Viskit", KeyEvent.VK_A, null));
+//
+//        myMenuBar.add(helpMenu);
+//        }
     }
     
     // Use the actions package

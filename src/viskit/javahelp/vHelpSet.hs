@@ -5,10 +5,11 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
 
 <helpset version="2.0">
 
-  <!-- title -->
-  <title>Viskit - Help</title>
-    <size width="400" height="600" />
-    <location x="200" y="300" />
+    <title>Viskit Help</title>
+    
+    <!-- see presentation below
+    <size height="600" width="800" />
+    <location x="200" y="300" /> -->
 
   <!-- maps -->
   <maps>
@@ -46,9 +47,9 @@ PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN"
 
   <presentation default="true">
     <name>main window</name>
-    <size width="400" height="600" />
+    <size height="600" width="800" />
     <location x="200" y="300" />
-    <title>Viskit</title>
+    <title>Viskit Help</title>
     <toolbar>
         <helpaction>javax.help.BackAction</helpaction>
         <helpaction>javax.help.ForwardAction</helpaction>

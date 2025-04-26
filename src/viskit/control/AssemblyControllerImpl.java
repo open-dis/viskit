@@ -2153,16 +2153,16 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             // displayCapture a scaled version
             if (displayCapture)
             {
-                final JFrame frame = new JFrame("Saved as " + imageFile.getName());
+                final JFrame imageCaptureFrame = new JFrame("Saved as " + imageFile.getName());
                 Icon imageIcon = new ImageIcon(image);
                 JLabel jLabel = new JLabel(imageIcon);
-                frame.getContentPane().setLayout(new BorderLayout());
-                frame.getContentPane().add(jLabel, BorderLayout.CENTER);
-                frame.pack();
-                frame.setLocationRelativeTo((Component) getView());
+                imageCaptureFrame.getContentPane().setLayout(new BorderLayout());
+                imageCaptureFrame.getContentPane().add(jLabel, BorderLayout.CENTER);
+                imageCaptureFrame.pack();
+                imageCaptureFrame.setLocationRelativeTo((Component) getView());
 
                 Runnable runnableImageDisplay = () -> {
-                    frame.setVisible(true);
+                    imageCaptureFrame.setVisible(true);
                 };
                 SwingUtilities.invokeLater(runnableImageDisplay);
             }

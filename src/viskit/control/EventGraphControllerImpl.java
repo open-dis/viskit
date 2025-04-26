@@ -153,8 +153,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
         boolean modified =
                 EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
-        if (modified) {
-
+        if (modified) 
+        {
             // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name);
             ((EventGraphView) getView()).setSelectedEventGraphDescription(ViskitStatics.emptyIfNull(graphMetadata.description));
@@ -1311,7 +1311,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 imageFile = fileIterator.next();
                 LOG.info("captureEventGraphImages() image " + imageFile.getName() + "\n      {}", imageFile);
 
-                // Don't display an extra frame while taking snapshots
+                // Don't display an extra timerCallbackFrame while taking snapshots
                 timerCallback = new TimerCallback(imageFile, false, eventGraphViewFrame.getCurrentJgraphComponent());
 
                 // Make sure we have a directory ready to receive these images
@@ -1327,11 +1327,11 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
     }
 
-    class TimerCallback implements ActionListener {
-
+    class TimerCallback implements ActionListener 
+    {
         File file;
         boolean display;
-        JFrame frame;
+        JFrame timerCallbackFrame;
         Component component;
 
         TimerCallback(File file, boolean whetherToDisplay, Component component) {
@@ -1343,7 +1343,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
 
-            if (component instanceof JScrollPane) {
+            if (component instanceof JScrollPane) 
+            {
                 component = ((JScrollPane) component).getViewport().getView();
                 LOG.debug("CurrentJgraphComponent is a JScrollPane: " + component);
             }
@@ -1353,29 +1354,32 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             // Tell the jgraph component to draw into memory
             try {
                 component.paint(image.getGraphics());
-            } catch (NullPointerException e) {
+            } 
+            catch (NullPointerException e) {
                 LOG.error(e);
             }
             // NPEs are happening in JGraph
 
             try {
                 ImageIO.write((RenderedImage)image, "png", file);
-            } catch (IOException e) {
+            } 
+            catch (IOException e) {
                 LOG.error(e);
             }
 
             // display a scaled version
-            if (display) {
-                frame = new JFrame("Saved as " + file.getName());
+            if (display) 
+            {
+                timerCallbackFrame = new JFrame("Saved as " + file.getName());
                 Icon ii = new ImageIcon(image);
                 JLabel lab = new JLabel(ii);
-                frame.getContentPane().setLayout(new BorderLayout());
-                frame.getContentPane().add(lab, BorderLayout.CENTER);
-                frame.pack();
-                frame.setLocationRelativeTo((Component) getView());
+                timerCallbackFrame.getContentPane().setLayout(new BorderLayout());
+                timerCallbackFrame.getContentPane().add(lab, BorderLayout.CENTER);
+                timerCallbackFrame.pack();
+                timerCallbackFrame.setLocationRelativeTo((Component) getView());
 
                 Runnable r = () -> {
-                    frame.setVisible(true);
+                    timerCallbackFrame.setVisible(true);
                 };
                 SwingUtilities.invokeLater(r);
             }
@@ -1388,7 +1392,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         try {
             historyXMLConfiguration = ViskitUserConfiguration.instance().getViskitAppConfiguration();
         } 
-        catch (Exception e) {
+        catch (Exception e) 
+        {
             LOG.error("Error loading history file: {}", e);
             LOG.warn("Recent file saving disabled");
             historyXMLConfiguration = null;

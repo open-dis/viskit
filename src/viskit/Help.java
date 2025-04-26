@@ -57,6 +57,7 @@ import viskit.util.Version;
 /**
  * @version $Id$
  * @author  ahbuss
+ * 
  */
 public class Help
 {
@@ -102,10 +103,10 @@ public class Help
             + "Viskit Issue tracker:" + CR
             + LinkURLString(ISSUES_URL);
 
-    private HelpBroker hb;
+    private HelpBroker helpBroker;
 
     // A strange couple of things to support JavaHelp's rather strange design for CSH use:
-    private final Component TUTORIAL_COMPONENT;
+    private final Component      TUTORIAL_COMPONENT;
     private final ActionListener TUTORIAL_LISTENER_LAUNCHER;
 
     private Component parent;
@@ -114,21 +115,26 @@ public class Help
 
     /** Creates a new instance of Help
      * @param parent main frame to center on
+     * @see https://docs.oracle.com/cd/E19253-01/819-0913/dev/dev.html
      */
-    public Help(Component parent) {
+    public Help(Component parent)
+    {
         this.parent = parent;
 
-        ClassLoader cl = viskit.Help.class.getClassLoader();
-        URL helpSetURL = HelpSet.findHelpSet(cl, "viskit/javahelp/vHelpSet.hs");
+        ClassLoader classLoader = viskit.Help.class.getClassLoader();
+        URL helpSetURL = HelpSet.findHelpSet(classLoader, "viskit/javahelp/vHelpSet.hs");
         try {
-            hb = new HelpSet(null, helpSetURL).createHelpBroker();
-        } catch (HelpSetException e) {
+            helpBroker = new HelpSet(null, helpSetURL).createHelpBroker();
+//          helpBroker.setLocation(parent.getLocation()); // TODO trying to center help window
+            helpBroker.initPresentation(); // shot in the dark
+        } 
+        catch (HelpSetException e) {
 //        e.printStackTrace();
             LOG.error(e);
         }
 
         // Here we're setting up the action event peripherals for the tutorial menu selection
-        TUTORIAL_LISTENER_LAUNCHER = new CSH.DisplayHelpFromSource(hb);
+        TUTORIAL_LISTENER_LAUNCHER = new CSH.DisplayHelpFromSource(helpBroker);
         TUTORIAL_COMPONENT = new Button();
 
         CSH.setHelpIDString(TUTORIAL_COMPONENT, "hTutorial");
@@ -177,8 +183,9 @@ public class Help
         String methodName = new Object(){}.getClass().getEnclosingMethod().getName();
         if (!methodName.equals(METHOD_doContents))
             LOG.error("Reflection error: methodName=" + methodName + " does not match METHOD_doContents=" + METHOD_doContents);
-        hb.setDisplayed(true);
-        hb.setCurrentView("TOC");
+        
+        helpBroker.setDisplayed(true);
+        helpBroker.setCurrentView("TOC");
     }
     
     /** method name for reflection use */
@@ -191,8 +198,8 @@ public class Help
         if (!methodName.equals(METHOD_doSearch))
             LOG.error("Reflection error: methodName=" + methodName + " does not match METHOD_doSearch=" + METHOD_doSearch);
         
-        hb.setDisplayed(true);
-        hb.setCurrentView("Search");
+        helpBroker.setDisplayed(true);
+        helpBroker.setCurrentView("Search");
     }
     
     /** method name for reflection use */
@@ -205,8 +212,8 @@ public class Help
         if (!methodName.equals(METHOD_doTutorial))
             LOG.error("Reflection error: methodName=" + methodName + " does not match METHOD_doTutorial=" + METHOD_doTutorial);
         
-        ActionEvent ae = new ActionEvent(TUTORIAL_COMPONENT, 0, "tutorial");
-        TUTORIAL_LISTENER_LAUNCHER.actionPerformed(ae);
+        ActionEvent actionEvent = new ActionEvent(TUTORIAL_COMPONENT, 0, "tutorial");
+        TUTORIAL_LISTENER_LAUNCHER.actionPerformed(actionEvent);
     }
 
     public void mainFrameLocated(Rectangle bounds) 
@@ -214,10 +221,10 @@ public class Help
         Point p = new Point(bounds.x, bounds.y);
         Dimension d = new Dimension(bounds.width, bounds.height);
         Dimension hd = new Dimension(1200, 700);
-        hb.setSize(hd);
+        helpBroker.setSize(hd);
         p.x = p.x + d.width / 2 - hd.width / 2;
         p.y = p.y + d.height / 2 - hd.height / 2;
-        hb.setLocation(p);
+        helpBroker.setLocation(p);
     }
 
     public static String LinkURLString(String urlString) {

@@ -650,7 +650,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     public void buildHelpMenu()
     {
         Help help = new Help(ViskitGlobals.instance().getMainFrame());
-        help.mainFrameLocated(ViskitGlobals.instance().getMainFrame().getBounds());
+//        help.mainFrameLocated(ViskitGlobals.instance().getMainFrame().getBounds()); // this fails, apparently puts center at (0, 0)
+        
         ViskitGlobals.instance().setHelp(help); // single instance for all viskit frames
 
         helpMenu = new JMenu("Help");
@@ -658,9 +659,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         getHelpMenu().add(buildMenuItem(help, METHOD_doContents,  "Contents",     KeyEvent.VK_C, null));
         getHelpMenu().add(buildMenuItem(help, METHOD_doSearch,    "Search",       KeyEvent.VK_S, null));
-        getHelpMenu().addSeparator();
-
         getHelpMenu().add(buildMenuItem(help, METHOD_doTutorial,  "Tutorial",     KeyEvent.VK_T, null));
+        
+        getHelpMenu().addSeparator();
         getHelpMenu().add(buildMenuItem(help, METHOD_aboutViskit, "About Viskit", KeyEvent.VK_A, null));
     }
 

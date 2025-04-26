@@ -2,21 +2,28 @@
 <!DOCTYPE toc
   PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN"
          "http://java.sun.com/products/javahelp/toc_2_0.dtd">
+         
 <toc version="2.0" topicimage="topic">
+    
   <tocitem text="Viskit Help">
     <tocitem text="Overview" expand="false">
-      <tocitem text="Introduction"  target="Introduction"/>
-      <tocitem text="Contributors"  target="Contributors"/>
- <!-- <tocitem text="Overview"	    target="Overview"/> -->
-      <tocitem text="Terms"	    target="Terms"/>
+        <tocitem text="Introduction"  target="Introduction"/>
+        <tocitem text="Contributors"  target="Contributors"/>
+        <tocitem text="Terms"	    target="Terms"/>
+        <tocitem text="Developers" expand="false">
+            <tocitem text="Authoring and Adding Help to Viskit" target="addHelp" />
+        </tocitem>
+        <tocitem text="Additional Resources" expand="false">
+            <tocitem text="References" target="references" />
+        </tocitem>
     </tocitem>
 
-    <tocitem text="Tutorial"				expand="true">
-      <tocitem text="Event Graph"			expand="true">
+    <tocitem text="Tutorial"			expand="true">
+      <tocitem text="Event Graph"		expand="true">
         <tocitem text="Contents"		target="TutorialEventContents"/>
         <tocitem text="Introduction"		target="TutorialEventIntro"/>
-        <tocitem text="Creating Event Graph"	target="TutorialEvent"/>
-        <tocitem text="Event Components"		expand="true">
+        <tocitem text="Create an Event Graph"	target="TutorialEvent"/>
+        <tocitem text="Event Components"	expand="true">
           <tocitem text="Arrival Process"	target="TutorialEventArrival"/>
           <tocitem text="Event Parameters"	target="TutorialEventEvntParameters"/>
           <tocitem text="State Parameters"	target="TutorialEventStParmaeters"/>
@@ -24,21 +31,15 @@
           <tocitem text="Event Schedules"	target="TutorialEventSchedules"/>
         </tocitem>
       </tocitem>
-      <tocitem text="Creating Assembly"			expand="true">
+      <tocitem text="Create an Assembly"	expand="true">
         <tocitem text="Contents"		target="TutorialAssemblyContents"/>
       </tocitem>
     </tocitem>
 
-
-    <tocitem text="Tabs" expand="true">
-      <tocitem text="Event Graph Editor"	target="TabEventGraph"/>
-      <tocitem text="Assembly Edit"		target="TabAssemblyEdit"/>
-      <tocitem text="Assembly Run"		target="TabAssemblyRun"/>
-      <tocitem text="Analyst Report"		target="TabAnalystReport"/>
-    </tocitem>
-
     <tocitem text="Menus" expand="true">
-      <tocitem text="Event Graph Edit Tab" expand="false">
+      <tocitem text="Project" expand="false">
+      </tocitem>
+      <tocitem text="Event Graph" expand="false">
         <tocitem text="File" expand="false">
           <tocitem text="New Event Graph" target="NewEventGraph" />
           <tocitem text="Open" target="Open" />
@@ -71,7 +72,7 @@
         </tocitem>
       </tocitem>
 
-      <tocitem text="Assembly Edit Tab" expand="false">
+      <tocitem text="Assembly" expand="false">
         <tocitem text="File" expand="false">
           <tocitem text="New Assembly" target="NewAssembly" />
           <tocitem text="Open" target="Open" />
@@ -101,7 +102,7 @@
         </tocitem>
       </tocitem>
 
-      <tocitem text="Assembly Run Tab" expand="false">
+      <tocitem text="Simulation Run" expand="false">
         <tocitem text="File" expand="false">
           <tocitem text="Save Output Streams..." target="SaveOutputStreams" />
           <tocitem text="Settings" target="Settings" />
@@ -120,24 +121,28 @@
         </tocitem>
       </tocitem>
 
-      <tocitem text="Analyst Report Tab" expand="false">
+      <tocitem text="Analyst Report" expand="false">
           <!-- TODO others -->
-        <tocitem text="Help" expand="false">
-          <tocitem text="Contents" target="hContents" />
-          <tocitem text="Search" target="hSearch" />
-          <tocitem text="Tutorial" target="NOT" />
-          <tocitem text="About..." target="hAbout" />
-        </tocitem>
       </tocitem>
+      
+      <tocitem text="Help" expand="false">
+        <tocitem text="Contents" target="hContents" />
+        <tocitem text="Search" target="hSearch" />
+        <tocitem text="Tutorial" target="NOT" />
+        <tocitem text="About..." target="hAbout" />
+      </tocitem>
+      
+    </tocitem><!-- Menus -->
 
-    </tocitem>
-
-    <tocitem text="Developers" expand="false">
-        <tocitem text="Adding Help" target="addHelp" />
+    <tocitem text="Tabs" expand="true">
+      <!-- Project -->
+      <tocitem text="Event Graph Editor"	target="TabEventGraph"/>
+      <tocitem text="Assembly Editor"		target="TabAssemblyEdit"/>
+      <tocitem text="Simulation Run Manager"    target="TabAssemblyRun"/>
+      <tocitem text="Analyst Report Editor"	target="TabAnalystReport"/>
+      <!-- Design of Experiments -->
+      <!-- Cloud -->
     </tocitem>
     
-    <tocitem text="Additional Resources" expand="false">
-        <tocitem text="References" target="references" />
-    </tocitem>
   </tocitem>
 </toc>

@@ -477,12 +477,15 @@ public class MainFrame extends JFrame
     private void doCommonHelp(JMenuBar menuBar) 
     {
         JMenu menu;
-        for (int i = 0; i < menuBar.getMenuCount(); i++) {
+        for (int i = 0; i < menuBar.getMenuCount(); i++) 
+        {
             menu = menuBar.getMenu(i);
-            if (menu.getText().equalsIgnoreCase("Help")) {
+            if (menu.getText().equalsIgnoreCase("Help")) 
+            {
                 if (helpMenu == null) {
                     helpMenu = menu;
-                } else {
+                } 
+                else {
                     menuBar.remove(i);
                 }
                 return;
