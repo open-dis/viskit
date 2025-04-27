@@ -464,7 +464,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             System.out.println("+------------------------------+");
 
 // TODO old/contrary? mistakenly resets status label
-//            simulationRunPanel.nowRunningLabel.setText("<html><body><p><b>Replications all complete.</b>\n</p></body></html>");
+//            simulationRunPanel.stateMachineMessageLabel.setText("<html><body><p><b>Replications all complete.</b>\n</p></body></html>");
 //            assemblySimulationRunStopListener.actionPerformed(null);
                 
             LOG.info("SimulationRunMonitor.done() is complete");
@@ -641,16 +641,26 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent actionEvent) 
         {
-            vcrButtonPressDisplayUpdate(SimulationState.REWIND);
+            String title, message;
+            title = "Rewind and reset simulation?";
+            message = "<html><p align='center'>Are you sure that you want to reset this simulation?</p><br/>";
+            int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
+            if (returnValue == JOptionPane.YES_OPTION)
+            {
+                vcrButtonPressDisplayUpdate(SimulationState.REWIND);
             
-            // TODO reset simulation clock
-            try {
-                SwingUtilities.invokeLater(() -> {
-                    vcrButtonPressDisplayUpdate(SimulationState.READY);
-                });
-            }
-            catch (Exception ex) {
-                LOG.error("RewindListener.actionPerformed(" + actionEvent.toString() + ") exception: " + ex.getMessage());
+                AssemblyController assemblyController = ViskitGlobals.instance().getAssemblyController();
+                assemblyController.prepareSimulationRunner();
+
+                // TODO reset simulation clock
+                try {
+                    SwingUtilities.invokeLater(() -> {
+                        vcrButtonPressDisplayUpdate(SimulationState.READY);
+                    });
+                }
+                catch (Exception ex) {
+                    LOG.error("RewindListener.actionPerformed(" + actionEvent.toString() + ") exception: " + ex.getMessage());
+                }
             }
         }
     }
@@ -810,7 +820,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             case RUN_RESUME:
             case RUN:
             case RESUME:
-                 simulationRunPanel.vcrRewindButton      .setEnabled(true);
+                 simulationRunPanel.vcrRewindButton      .setEnabled(false);
                  simulationRunPanel.vcrRunResumeButton   .setEnabled(false);
                  simulationRunPanel.vcrPauseStepButton   .setEnabled(true);
                  simulationRunPanel.vcrStopButton        .setEnabled(true);
@@ -838,7 +848,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  break;
                 
             case DONE:
-                 simulationRunPanel.vcrRewindButton      .setEnabled(false);
+                 simulationRunPanel.vcrRewindButton      .setEnabled(true);
                  simulationRunPanel.vcrRunResumeButton   .setEnabled(false);
                  simulationRunPanel.vcrPauseStepButton   .setEnabled(false);
                  simulationRunPanel.vcrStopButton        .setEnabled(false);
@@ -1069,7 +1079,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             nowRunningMessageBuilder.append(Integer.parseInt(simulationRunPanel.numberReplicationsTF.getText()));
             nowRunningMessageBuilder.append("...</b>\n");
             nowRunningMessageBuilder.append("</font></p><br></body></html>\n");
-            simulationRunPanel.nowRunningLabel.setText(nowRunningMessageBuilder.toString());
+            simulationRunPanel.stateMachineMessageLabel.setText(nowRunningMessageBuilder.toString());
 
             // reset display string in preparation for the next replication output
             nowRunningMessageBuilder.delete(beginLength, nowRunningMessageBuilder.length());

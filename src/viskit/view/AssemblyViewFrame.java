@@ -657,8 +657,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         helpMenu = new JMenu("Help");
         getHelpMenu().setMnemonic(KeyEvent.VK_H);
 
-        getHelpMenu().add(buildMenuItem(help, METHOD_doContents,  "Contents",     KeyEvent.VK_C, null));
-        getHelpMenu().add(buildMenuItem(help, METHOD_doSearch,    "Search",       KeyEvent.VK_S, null));
+        // https://stackoverflow.com/questions//15266351/make-f1-shortcut-key-in-swing
+        getHelpMenu().add(buildMenuItem(help, METHOD_doContents,  "Contents",     KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_F1,0)));
+        getHelpMenu().add(buildMenuItem(help, METHOD_doSearch,    "Search",       KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.SHIFT_DOWN_MASK)));
         getHelpMenu().add(buildMenuItem(help, METHOD_doTutorial,  "Tutorial",     KeyEvent.VK_T, null));
         
         getHelpMenu().addSeparator();

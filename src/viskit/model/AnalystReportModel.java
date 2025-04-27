@@ -1246,9 +1246,9 @@ public final class AnalystReportModel extends MvcAbstractModel
 
     public void announceAnalystReportReadyToView()
     {
-        // TODO consider inserting loaded assembly filename into message above as a user confirmation
+        // TODO consider inserting loaded assembly filename into message below as a user confirmation
         
-        ViskitGlobals.instance().getSimulationRunPanel().nowRunningLabel.setText("DONE");
+//        ViskitGlobals.instance().getSimulationRunPanel().stateMachineMessageLabel.setText("DONE");
         
         if (assemblyFile == null)
             assemblyFile = ViskitGlobals.instance().getActiveAssemblyModel().getCurrentFile();

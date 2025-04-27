@@ -65,7 +65,7 @@ public class SimulationRunPanel extends JPanel
 
     public static final String lineEnd = System.getProperty("line.separator");
     
-    public final static String INITIAL_SIMULATION_RUN_HEADER = "Assembly simulation output stream";
+    public final static String INITIAL_SIMULATION_RUN_HEADER = "Assembly simulation console output";
     
     public static final String SIMULATION_RUN_PANEL_TITLE = "Simulation Run Console";
     
@@ -88,7 +88,7 @@ public class SimulationRunPanel extends JPanel
     public JScrollBar scrollBar;
     public JTextField verboseReplicationNumberTF;
     public static final String VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT = "[replication #]";
-    public JLabel  vcrButtonStatusLabel, nowRunningLabel;
+    public JLabel  vcrButtonStatusLabel, stateMachineMessageLabel;
     public JLabel  viskitRunnerBannerLabel;
     private String viskitRunnerBannerString;
     public JLabel iconLabel;
@@ -249,13 +249,12 @@ public class SimulationRunPanel extends JPanel
         upperLeftFlowPanel.add(vcrButtonsPanel);
         upperLeftFlowPanel.add(Box.createVerticalStrut(4));
         
-        nowRunningLabel = new JLabel(new String(), JLabel.CENTER);
-        nowRunningLabel.setBorder(new EmptyBorder(0,1,0,10));
-        nowRunningLabel.setText(lineEnd);
+        stateMachineMessageLabel = new JLabel(new String(), JLabel.CENTER);
+        stateMachineMessageLabel.setBorder(new EmptyBorder(0,1,0,10));
+        stateMachineMessageLabel.setText(lineEnd);
+        upperLeftFlowPanel.add(stateMachineMessageLabel);
         // text value is set by propertyChange listener
-        upperLeftFlowPanel.add(Box.createVerticalBox()); // TODO which?
-        upperLeftFlowPanel.add(Box.createVerticalStrut(4));
-        upperLeftFlowPanel.add(nowRunningLabel);
+//        upperLeftFlowPanel.add(Box.createVerticalBox()); // TODO which?
         upperLeftFlowPanel.add(Box.createVerticalStrut(4));
 
         vcrButtonsPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);

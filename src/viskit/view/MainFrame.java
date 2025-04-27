@@ -701,7 +701,7 @@ public class MainFrame extends JFrame
             simulationRunPanel.outputStreamTA       .setText(INITIAL_SIMULATION_RUN_HINT);
             internalSimulationRunner.doTitle(null);
             
-            simulationRunPanel.nowRunningLabel.setText("");
+            simulationRunPanel.stateMachineMessageLabel.setText("");
         }
     }
 
