@@ -1,6 +1,5 @@
 package viskit.reports;
 
-import edu.nps.util.Log4jUtilities;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
@@ -16,11 +15,9 @@ import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.IntervalXYDataset;
-import viskit.ViskitGlobals;
 import static viskit.ViskitProject.ANALYST_REPORTS_DIRECTORY_NAME;
 import viskit.ViskitUserConfiguration;
 import static viskit.ViskitProject.ANALYST_REPORT_CHARTS_DIRECTORY_PATH;
-import static viskit.reports.LinearRegressionChart.LOG;
 
 /**
  *
@@ -73,8 +70,13 @@ public class HistogramChart
 
         double[] dataCopy = data.clone();
         Arrays.sort(dataCopy);
-        double max = dataCopy[dataCopy.length - 1];
-        double min = dataCopy[0];
+        double max = 0.0;
+        double min = 0.0;
+        if (dataCopy.length > 0)
+        {
+            max = dataCopy[dataCopy.length - 1];
+            min = dataCopy[0];
+        }
 
         // From: http://www.isixsigma.com/library/forum/c031022_number_bins_histogram.asp
         double result = 1 + (3.3 * Math.log(dataCopy.length));
