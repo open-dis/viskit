@@ -18,21 +18,24 @@
         </tocitem>
     </tocitem>
 
-    <tocitem text="Tutorial"			expand="true">
-      <tocitem text="Event Graph"		expand="true">
-        <tocitem text="Contents"		target="TutorialEventContents"/>
-        <tocitem text="Introduction"		target="TutorialEventIntro"/>
-        <tocitem text="Create an Event Graph"	target="TutorialEvent"/>
-        <tocitem text="Event Components"	expand="true">
-          <tocitem text="Arrival Process"	target="TutorialEventArrival"/>
-          <tocitem text="Event Parameters"	target="TutorialEventEvntParameters"/>
-          <tocitem text="State Parameters"	target="TutorialEventStParmaeters"/>
-          <tocitem text="Event Nodes"		target="TutorialEventNodes"/>
-          <tocitem text="Event Schedules"	target="TutorialEventSchedules"/>
+    <tocitem text="Tutorial"			  expand="true">
+      <tocitem text="Event Graph"		  expand="true">
+        <tocitem text="Contents"		  target="TutorialEventContents"/>
+        <tocitem text="Introduction"		  target="TutorialEventIntro"/>
+        <tocitem text="Create an Event Graph"	  target="TutorialEvent"/>
+        <tocitem text="Event Components"	  expand="true">
+          <tocitem text="Arrival Process"	  target="TutorialEventArrival"/>
+          <tocitem text="Event Parameters"	  target="TutorialEventEvntParameters"/>
+          <tocitem text="State Parameters"	  target="TutorialEventStParmaeters"/>
+          <tocitem text="Event Nodes"		  target="TutorialEventNodes"/>
+          <tocitem text="Event Schedules"	  target="TutorialEventSchedules"/>
         </tocitem>
       </tocitem>
-      <tocitem text="Create an Assembly"	expand="true">
-        <tocitem text="Contents"		target="TutorialAssemblyContents"/>
+      <tocitem text="Create an Assembly"	  expand="true">
+        <tocitem text="Contents"		  target="TutorialAssemblyContents"/>
+      </tocitem>
+      <tocitem text="Simulation Run"	  expand="true">
+        <tocitem text="Simulation State Machine"  target="SimulationStateMachine"/>
       </tocitem>
     </tocitem>
 
