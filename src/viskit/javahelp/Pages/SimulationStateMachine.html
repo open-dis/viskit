@@ -2,23 +2,23 @@
 
 <html>
     <head>
-        <title>Viskit Simulation State Machine</title>
-        <meta name="name" content="Don Brutzman">
-        <meta name="creator" content="ViskitSimulationStateMachine.html">
+        <title>Simulation State Machine</title>
+        <meta name="creator" content="Don Brutzman">
+        <meta name="name" content="SimulationStateMachine.html">
         <link type="image/x-icon" href="images/Viskit.ico" rel="shortcut icon" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
         
-        <h2 align="center">Viskit Assembly Simulation State Machine</h2>
+        <h2 align="center">Assembly Simulation State Machine</h2>
         
         <p align="center">
             This state machine describes how Viskit VCR buttons work when running an Assembly Simulation.
         </p>
         
-        <h3>
+        <h2>
             Simulation States
-        </h3>
+        </h2>
         <p>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <b>INITIALIZE</b>.
@@ -55,9 +55,9 @@
                 <b>DONE</b>.
                 Simulation replications are completed or stopped, ready to review Analyst Report.
         </p>
-        <h3>
+        <h2>
             Additional VCR Buttons
-        </h3>
+        </h2>
         <p>
                 <img src="images/Delete24.gif" alt="Delete" style="vertical-align: text-bottom;"/>
                 <b>Clear.</b>
@@ -68,13 +68,19 @@
                 <b>Stop.</b>
                 Halt simulation replications, set state <b>Done</b>, ready to prepare Analyst Report.
         </p>
+        <h2>
+            Repeating a Simulation
+        </h2>
+        <p>
+            <!--TODO <img src="images/Delete24.gif" alt="Delete" style="vertical-align: text-bottom;"/>
+                <b>Initialize.</b> -->
+            Select <b>Assembly Editor</b> tab, once again press button <b>Initialize Assembly for Simulation Run</b>.
+        </p>
         <br />
         <br />
         
         <p align="center">
-            <a href="images/ViskitSimulationStateMachine.png">
-                <img src="images/ViskitSimulationStateMachine.png" style="width: 90%; border: 1px solid black;" alt="Viskit Run Simulation State Machine diagram"/>
-            </a>
+            <img src="images/ViskitSimulationStateMachine.png" style="width: 90%; border: 1px solid black;" alt="Viskit Run Simulation State Machine diagram"/>
         </p>
     </body>
 </html>

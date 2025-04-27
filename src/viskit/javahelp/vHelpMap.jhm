@@ -33,7 +33,7 @@
   <mapID target="TabAssemblyRun"    url="Pages/Tabs/assemblyRun.html"/>
   <mapID target="TabAnalystReport"  url="Pages/Tabs/analystReport.html"/>
   
-  <mapID target="SimulationStateMachine"  url="Pages/ViskitSimulationStateMachine.html"/>
+  <mapID target="SimulationStateMachine"  url="Pages/SimulationStateMachine.html"/>
 
 <!-- Menu items -->
 
