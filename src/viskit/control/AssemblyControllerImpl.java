@@ -1949,8 +1949,29 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 }
                 else
                 {
+                    // TODO reset SimulationRunPanel simulation start and stop time to match graph metadata if new Assembly found
+                    
+                    // in case of rewind/rerun, get SimulationRunPanel startTime, stopTime, number of replications
+                    double  priorStartTime                = ViskitGlobals.instance().getSimulationRunPanel().getStartTime();
+                    double  priorStopTime                 = ViskitGlobals.instance().getSimulationRunPanel().getStopTime();
+                    int     priorNumberReplications       = ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications();
+                    int     priorVerboseReplicationNumber = ViskitGlobals.instance().getSimulationRunPanel().getVerboseReplicationNumber();
+                    boolean priorVerboseOutput            = ViskitGlobals.instance().getSimulationRunPanel().getVerboseOutput();
+                    
+                    
+                    
                     // Ensure a cleared Simulation panel upon every Assembly compile
                     runnerSimulationRunInterface.resetSimulationRunPanel();
+                    
+                    if (priorStartTime != -1.0)
+                        ViskitGlobals.instance().getSimulationRunPanel().setStartTime(priorStartTime);
+                    if (priorStopTime != -1.0)
+                        ViskitGlobals.instance().getSimulationRunPanel().setStopTime(priorStopTime);
+                    if (priorNumberReplications != 0)
+                        ViskitGlobals.instance().getSimulationRunPanel().setNumberOfReplications(priorNumberReplications);
+                    if (priorVerboseReplicationNumber != -1)
+                        ViskitGlobals.instance().getSimulationRunPanel().setVerboseReplicationNumber(priorVerboseReplicationNumber);
+                    ViskitGlobals.instance().getSimulationRunPanel().setVerboseOutput(priorVerboseOutput);
 
                     // Ensure any changes to the Assembly Properties dialog get saved
                     save();
@@ -1971,8 +1992,6 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
                     // reset
                     execStringArray = null;
-                    
-                    // TODO reset SimulationRunPanel simulation stop time to match graph metadata if new Assembly found
 
                     ViskitGlobals.instance().getSimulationRunPanel().setHasLoadedAssembly(true);
                     announceReadyToCommenceSimulationRun(assemblyName); // initialization complete
