@@ -59,20 +59,22 @@ public class SchedulingEdge extends Edge
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
 
     /** package-limited constructor */
-    SchedulingEdge() {
-        parameters = new ArrayList<>();
+    SchedulingEdge() 
+    {
     }
 
     @Override
-    Object copyShallow() {
+    Object copyShallow() 
+    {
         SchedulingEdge newSchedulingEdge = new SchedulingEdge();
         newSchedulingEdge.opaqueViewObject = opaqueViewObject;
-        newSchedulingEdge.to = to;
-        newSchedulingEdge.from = from;
-        newSchedulingEdge.parameters = parameters;
-        newSchedulingEdge.delay = delay;
-        newSchedulingEdge.conditional = conditional;
-        newSchedulingEdge.conditionalDescription = conditionalDescription;
+        newSchedulingEdge.setTo(getTo());
+        newSchedulingEdge.setFrom(getFrom());
+        newSchedulingEdge.setParameters(getParameters());
+        newSchedulingEdge.setDelay(getDelay());
+        newSchedulingEdge.setDescription(getDescription());
+        newSchedulingEdge.setConditional(getConditional());
+        newSchedulingEdge.setConditionalDescription(getConditionalDescription());
         newSchedulingEdge.priority = priority;
         return newSchedulingEdge;
     }

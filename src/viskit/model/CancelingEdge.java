@@ -26,18 +26,19 @@ public class CancelingEdge extends Edge // single "l" is preferred American spel
 
     CancelingEdge() //package-limited
     {
-        parameters = new ArrayList<>();
     }
 
     @Override
-    Object copyShallow() {
+    Object copyShallow() 
+    {
         CancelingEdge ce = new CancelingEdge();
         ce.opaqueViewObject = opaqueViewObject;
-        ce.to = to;
-        ce.from = from;
-        ce.parameters = parameters;
-        ce.conditional = conditional;
-        ce.delay = delay;
+        ce.setTo(getTo());
+        ce.setFrom(getFrom());
+        ce.setParameters(getParameters());
+        ce.setConditional(getConditional());
+        ce.setDelay(getDelay());
+        ce.setDescription(getDescription());
         return ce;
     }
     @Override
