@@ -22,20 +22,20 @@
   <xs:element name="SimkitAssembly">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" ref="head"/>
-        <xs:group minOccurs="0" maxOccurs="unbounded" ref="DesignParameters"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SimEntity"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="EventGraph"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="PropertyChangeListener"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SimEventListenerConnection"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="PropertyChangeListenerConnection"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Adapter"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Output"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Verbose"/>
-        <xs:element minOccurs="0" ref="Schedule"/>
-        <xs:element minOccurs="0" ref="Experiment"/>
+        <xs:element ref="head" minOccurs="0"/>
+        <xs:group ref="DesignParameters" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="SimEntity" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="EventGraph" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="PropertyChangeListener" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="SimEventListenerConnection" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="PropertyChangeListenerConnection" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Adapter" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Output" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Verbose" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Schedule" minOccurs="0"/>
+        <xs:element ref="Experiment" minOccurs="0"/>
       </xs:sequence>
-      <xs:attribute name="name" use="required" type="xs:ID"/>
+      <xs:attribute name="name" type="xs:ID" use="required"/>
       <xs:attribute name="version" default="1.0"/>
       <xs:attribute name="package" use="required"/>
       <xs:attribute name="author"/>
@@ -47,7 +47,7 @@
   <xs:element name="head">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="meta"/>
+        <xs:element ref="meta" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -60,10 +60,10 @@
   <xs:element name="SimEntity">
     <xs:complexType>
       <xs:sequence>
-        <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
-        <xs:element minOccurs="0" ref="Coordinate"/>
+        <xs:group ref="Parameters" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Coordinate" minOccurs="0"/>
       </xs:sequence>
-      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="name" type="xs:ID" use="required"/>
       <xs:attribute name="type" use="required"/>
       <xs:attribute name="url"/>
       <xs:attribute name="description"/>
@@ -72,7 +72,7 @@
   <xs:element name="TerminalParameter">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" ref="ValueRange"/>
+        <xs:element ref="ValueRange" minOccurs="0"/>
       </xs:sequence>
       <xs:attribute name="name"/>
       <xs:attribute name="linkRef" type="xs:IDREF"/>
@@ -85,14 +85,14 @@
   <xs:element name="IntegerRange" substitutionGroup="ValueRange"/>
   <xs:element name="MultiParameter">
     <xs:complexType>
-      <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
+      <xs:group ref="Parameters" minOccurs="0" maxOccurs="unbounded"/>
       <xs:attribute name="name"/>
       <xs:attribute name="type" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="FactoryParameter">
     <xs:complexType>
-      <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
+      <xs:group ref="Parameters" minOccurs="0" maxOccurs="unbounded"/>
       <xs:attribute name="name"/>
       <xs:attribute name="factory" use="required"/>
       <xs:attribute name="method" default="getInstance"/>
@@ -113,10 +113,10 @@
   <xs:element name="PropertyChangeListener">
     <xs:complexType>
       <xs:sequence>
-        <xs:group minOccurs="0" maxOccurs="unbounded" ref="Parameters"/>
-        <xs:element minOccurs="0" ref="Coordinate"/>
+        <xs:group ref="Parameters" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Coordinate" minOccurs="0"/>
       </xs:sequence>
-      <xs:attribute name="name" use="required" type="xs:ID"/>
+      <xs:attribute name="name" type="xs:ID" use="required"/>
       <xs:attribute name="type" use="required"/>
       <xs:attribute name="mode" default="listener">
         <xs:simpleType>
@@ -165,13 +165,13 @@
   </xs:element>
   <xs:element name="Output">
     <xs:complexType>
-      <xs:attribute name="entity" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="entity" type="xs:NMTOKEN" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Verbose">
     <xs:complexType>
+      <xs:attribute name="entity" type="xs:NMTOKEN" use="required"/>
       <!-- Bugfix 1425 (xs:NMTOKEN) -->
-      <xs:attribute name="entity" use="required" type="xs:NMTOKEN"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Schedule">
@@ -185,7 +185,7 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="numberReplications" default="30"/><!-- many occurrences throughout multiple schema -->
+      <xs:attribute name="numberReplications" default="30"/>
       <xs:attribute name="printReplicationReports" default="true">
         <xs:simpleType>
           <xs:restriction base="xs:token">
@@ -210,18 +210,19 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
+      <!-- many occurrences throughout multiple schema -->
     </xs:complexType>
   </xs:element>
   <xs:element name="Adapter">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" ref="Coordinate"/>
+        <xs:element ref="Coordinate" minOccurs="0"/>
       </xs:sequence>
       <xs:attribute name="name" use="required"/>
       <xs:attribute name="eventHeard" use="required"/>
       <xs:attribute name="eventSent" use="required"/>
-      <xs:attribute name="from" use="required" type="xs:NMTOKEN"/>
-      <xs:attribute name="to" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="from" type="xs:NMTOKEN" use="required"/>
+      <xs:attribute name="to" type="xs:NMTOKEN" use="required"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
@@ -230,7 +231,7 @@
   <xs:element name="PropertyChange">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Statistics"/>
+        <xs:element ref="Statistics" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="listenerName" use="required"/>
       <xs:attribute name="property"/>
@@ -259,7 +260,7 @@
   <xs:element name="IndexedSampleStatistics" substitutionGroup="Statistics">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SampleStatistics"/>
+        <xs:element ref="SampleStatistics" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="name"/>
     </xs:complexType>
@@ -280,11 +281,11 @@
   <xs:element name="DesignPoint">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="TerminalParameter"/>
-        <xs:element minOccurs="0" ref="Script"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Replication"/>
-        <xs:element minOccurs="0" ref="Results"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Statistics"/>
+        <xs:element ref="TerminalParameter" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Script" minOccurs="0"/>
+        <xs:element ref="Replication" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="Results" minOccurs="0"/>
+        <xs:element ref="Statistics" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="index"/>
     </xs:complexType>
@@ -292,7 +293,7 @@
   <xs:element name="Replication">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Statistics"/>
+        <xs:element ref="Statistics" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="index"/>
     </xs:complexType>
@@ -301,7 +302,7 @@
   <xs:element name="Sample">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="DesignPoint"/>
+        <xs:element ref="DesignPoint" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="index"/>
     </xs:complexType>
@@ -309,8 +310,8 @@
   <xs:element name="Experiment">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" ref="Script"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Sample"/>
+        <xs:element ref="Script" minOccurs="0"/>
+        <xs:element ref="Sample" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="jobID"/>
       <xs:attribute name="type" default="latin-hypercube">
@@ -350,14 +351,14 @@
   <xs:element name="PasswordFile">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="User"/>
+        <xs:element ref="User" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="name" default="/tmp/passwd.xml"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="User">
     <xs:complexType>
-      <xs:attribute name="name" use="required" type="xs:ID"/>
+      <xs:attribute name="name" type="xs:ID" use="required"/>
       <xs:attribute name="password" use="required"/>
     </xs:complexType>
   </xs:element>
