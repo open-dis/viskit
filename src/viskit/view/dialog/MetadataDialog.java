@@ -266,7 +266,7 @@ abstract public class MetadataDialog extends JDialog
             // final data and ending data and set modified only if something had actually changed.
             modified = true;
             if (modified) {
-                if (nameTF.getText().trim().isEmpty()) {
+                if (nameTF.getText().isBlank()) {
                     ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "Error", "Must have a non-zero length name");
                     nameTF.requestFocus();
                     return;

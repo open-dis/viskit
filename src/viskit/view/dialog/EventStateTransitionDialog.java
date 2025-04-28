@@ -669,7 +669,7 @@ public class EventStateTransitionDialog extends JDialog
                 // check for array index
                 String typ = ((ViskitElement) stateVariablesCB.getSelectedItem()).getType();
                 if (ViskitGlobals.instance().isArray(typ)) {
-                    if (arrayIndexField.getText().trim().isEmpty()) {
+                    if (arrayIndexField.getText().isBlank()) {
                         int ret = JOptionPane.showConfirmDialog(EventStateTransitionDialog.this,
                                 "Using a state variable which is an array" +
                                 "\nrequires an indexing expression.\nIgnore and continue?",

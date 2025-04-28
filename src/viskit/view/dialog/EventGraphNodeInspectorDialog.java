@@ -252,7 +252,7 @@ public class EventGraphNodeInspectorDialog extends JDialog {
         }
         testLp:
         {
-            if (handleField.getText().trim().isEmpty()) {
+            if (handleField.getText().isBlank()) {
                 break testLp;
             }
             if (!viskitModelInstantiator.isValid()) {
