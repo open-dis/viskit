@@ -318,7 +318,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     protected abstract void createReplicationStatistics();
 
     /**
-     * The default behavior is to create a <code>SimplStatsTally</code>
+     * The default behavior is to create a <code>SimpleStatsTally</code>
      * instance for each element in <code>replicationStatisticsPropertyChangeListenerArray</code> with the
      * corresponding name + ".count," or ".mean"
      */
