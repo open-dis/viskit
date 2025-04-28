@@ -503,15 +503,18 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent actionEvent) 
         {
-            simulationRunPanel.vcrStartTimeTF.setText("0.0");        // because no pausing ?? TODO check
+//          simulationRunPanel.vcrStartTimeTF.setText("0.0");        // because no pausing ?? TODO check
             
             vcrButtonPressDisplayUpdate(SimulationState.RUN_RESUME); // resolves RUN or RESUME
+            
+            Schedule.setSingleStep(false);        // simkit ensure no longer in single-step mode
+            Schedule.setPauseAfterEachEvent(false); // simkit ensure no longer in single-step mode
+            
             if (simulationRunPanel.outputStreamTA.getText().isBlank() ||
                 simulationRunPanel.outputStreamTA.getText().trim().equals(INITIAL_SIMULATION_RUN_HINT)) // TODO fix
             {
                 simulationRunPanel.outputStreamTA.setText(SIMULATION_RUN_PANEL_TITLE);
             }
-            Schedule.setPauseAfterEachEvent(false); // simkit ensure no longer in single-step mode
             
             prepareAndStartAssemblySimulationRun(); // keep this last, launches thread
         }
@@ -529,6 +532,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     if (getSimulationState() != SimulationState.PAUSE)
                     {
                         vcrButtonPressDisplayUpdate(SimulationState.PAUSE);
+                        
                         // Pause (from Run mode)
                         Schedule.setSingleStep(true);
                         Schedule.setPauseAfterEachEvent(true);
@@ -880,7 +884,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  LOG.warn("*** Unrecognized vcrButtonListener(event=" + newEvent + ")");
                  break;
         }
-        logButtonState(); // development diagnostics
+        logSimulationRunState(); // development diagnostics
     }
     /** diagnostic utility
      * @param booleanValue value of interest
@@ -893,16 +897,27 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         else return "off";
     }
 
-    /** simulationState diagnostics */
-    public void logButtonState()
+    /** LOG simulationState and simkitState diagnostics */
+    public void logSimulationRunState()
     {
-        LOG.info("logButtonState()" +
+        String simkitState;
+        if      (Schedule.isRunning())
+                 simkitState = "Running    simTime=" + Schedule.getSimTime();
+        else if (Schedule.isSingleStep())
+                 simkitState = "SingleStep simTime=" + Schedule.getSimTime();
+        else if (Schedule.getSimTime() == 0.0)
+                 simkitState = "(inactive)"; // likely between replications
+        else
+                 simkitState = "(unknown)  simTime=" + Schedule.getSimTime();
+        LOG.info("logSimulationRunState()" +
                    " play=" + isOnOff(simulationRunPanel.vcrRunResumeButton.isEnabled()) +
                    " step=" + isOnOff(simulationRunPanel.vcrPauseStepButton.isEnabled()) +
                    " stop=" + isOnOff(simulationRunPanel.vcrStopButton.isEnabled()) +
                  " rewind=" + isOnOff(simulationRunPanel.vcrRewindButton.isEnabled()) +
                   " clear=" + isOnOff(simulationRunPanel.vcrClearConsoleButton.isEnabled()) +
-                " simulationState=" + getSimulationState().name()
+                  "\n     " + // log readability
+        " simulationState=" + getSimulationState().name() +
+            " simkitState=" + simkitState
         );
     }
 
