@@ -165,13 +165,12 @@
   </xs:element>
   <xs:element name="Output">
     <xs:complexType>
-      <xs:attribute name="entity" type="xs:NMTOKEN" use="required"/>
+      <xs:attribute name="entity" type="xs:NMTOKEN" use="required"/><!-- TODO JAXB difficiulties handling type="xs:IDREF" -->
     </xs:complexType>
   </xs:element>
   <xs:element name="Verbose">
     <xs:complexType>
-      <xs:attribute name="entity" type="xs:NMTOKEN" use="required"/>
-      <!-- Bugfix 1425 (xs:NMTOKEN) -->
+      <xs:attribute name="entity" type="xs:NMTOKEN" use="required"/><!-- TODO JAXB difficiulties handling type="xs:IDREF" -->
     </xs:complexType>
   </xs:element>
   <xs:element name="Schedule">
@@ -221,8 +220,8 @@
       <xs:attribute name="name" use="required"/>
       <xs:attribute name="eventHeard" use="required"/>
       <xs:attribute name="eventSent" use="required"/>
-      <xs:attribute name="from" type="xs:NMTOKEN" use="required"/>
-      <xs:attribute name="to" type="xs:NMTOKEN" use="required"/>
+      <xs:attribute name="from" type="xs:NMTOKEN" use="required"/><!-- TODO JAXB difficiulties handling type="xs:IDREF" -->
+      <xs:attribute name="to" type="xs:NMTOKEN" use="required"/><!-- TODO JAXB difficiulties handling type="xs:IDREF" -->
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
