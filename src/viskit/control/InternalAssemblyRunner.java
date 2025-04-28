@@ -526,7 +526,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             {
                 if (simulationRunAssemblyInstance != null) 
                 {
-
                     if (getSimulationState() != SimulationState.PAUSE)
                     {
                         vcrButtonPressDisplayUpdate(SimulationState.PAUSE);
@@ -547,9 +546,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     }
                     
                     if (priorRunSimulationClassLoader == null)
+                    {
                         priorRunSimulationClassLoader = getRunSimulationClassLoader(); // can occur if stepping prior to running
-                    
-                    LOG.debug("StepListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
+                        
+                        LOG.debug("StepListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
+                    }
                     
                     if (priorRunSimulationClassLoader != null) // TODO necessary?
                         Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);

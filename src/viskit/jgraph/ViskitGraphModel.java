@@ -94,7 +94,7 @@ public class ViskitGraphModel extends DefaultGraphModel {
 
     // I don't think this is required anymore.  We don't change src/targets...we rebuild the edge
     private void changeEitherEdge(Edge ed) {
-        vCircleCell newFromCC = (vCircleCell) ed.from.opaqueViewObject;
+        vCircleCell newFromCC = (vCircleCell) ed.getFrom().opaqueViewObject;
         vEdgeCell edgeC = (vEdgeCell) ed.opaqueViewObject;
 
         DefaultPort dpFrom = (DefaultPort) edgeC.getSource();
@@ -155,8 +155,8 @@ public class ViskitGraphModel extends DefaultGraphModel {
     @SuppressWarnings("unchecked")
     private void _addEdgeCommon(Edge ed, Map edgeStyle) {
 
-        EventNode enfrom = ed.from;
-        EventNode ento = ed.to;
+        EventNode enfrom = ed.getFrom();
+        EventNode ento = ed.getTo();
         DefaultGraphCell source = (DefaultGraphCell) enfrom.opaqueViewObject;
         DefaultGraphCell target = (DefaultGraphCell) ento.opaqueViewObject;
 

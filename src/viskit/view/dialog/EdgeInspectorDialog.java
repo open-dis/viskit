@@ -377,8 +377,8 @@ public class EdgeInspectorDialog extends JDialog
         ((MutableComboBoxModel<ViskitElement>)m).insertElementAt(new EventLocalVariable("", "", ""), 0);
         cb.setModel(m);
 
-        java.util.List<ViskitElement> vars = new ArrayList<>(edge.from.getLocalVariables());
-        vars.addAll(edge.from.getArguments());
+        java.util.List<ViskitElement> vars = new ArrayList<>(edge.getFrom().getLocalVariables());
+        vars.addAll(edge.getFrom().getArguments());
 
         for (ViskitElement e : vars) {
             ((MutableComboBoxModel<ViskitElement>)m).addElement(e);
@@ -393,8 +393,8 @@ public class EdgeInspectorDialog extends JDialog
         String typ;
         Vector<String> methodNames = new Vector<>();
 
-        java.util.List<ViskitElement> types = new ArrayList<>(edge.from.getLocalVariables());
-        types.addAll(edge.from.getArguments());
+        java.util.List<ViskitElement> types = new ArrayList<>(edge.getFrom().getLocalVariables());
+        types.addAll(edge.getFrom().getArguments());
         types.addAll(ViskitGlobals.instance().getSimParametersList());
 
         String className;
@@ -515,12 +515,12 @@ public class EdgeInspectorDialog extends JDialog
 
     private void fillWidgets() {
 
-        srcEvent.setText(edge.from.getName());
-        targEvent.setText(edge.to.getName());
+        srcEvent.setText(edge.getFrom().getName());
+        targEvent.setText(edge.getTo().getName());
 
-        if (edge.to.getArguments() != null || !edge.to.getArguments().isEmpty()) {
-            parameters.setArgumentList(edge.to.getArguments());
-            parameters.setData(edge.parameters);
+        if (edge.getTo().getArguments() != null || !edge.getTo().getArguments().isEmpty()) {
+            parameters.setArgumentList(edge.getTo().getArguments());
+            parameters.setData(edge.getParameters());
             myParmPanel.setBorder(new CompoundBorder(
                     new EmptyBorder(0, 0, 5, 0),
                     BorderFactory.createTitledBorder("Edge Parameters passed to " + targEvent.getText())));
@@ -543,9 +543,9 @@ public class EdgeInspectorDialog extends JDialog
             else
                 allGood = false;
 
-            if (edge.delay != null && !edge.delay.trim().isEmpty()) {
+            if (edge.getDelay() != null && !edge.getDelay().isBlank()) {
 
-                String[] s = edge.delay.split("\\.");
+                String[] s = edge.getDelay().split("\\.");
                 if (s.length == 1) {
                     setTimeDelayMethodsCBValue(s[0]);
                 } else if (s.length == 2) {
@@ -553,7 +553,7 @@ public class EdgeInspectorDialog extends JDialog
                         setTimeDelayVarsCBValue(s[0]);
                         setTimeDelayMethodsCBValue(s[1]);
                     } else {
-                        setTimeDelayMethodsCBValue(edge.delay);
+                        setTimeDelayMethodsCBValue(edge.getDelay());
                     }
                 }
             }
@@ -577,19 +577,19 @@ public class EdgeInspectorDialog extends JDialog
             timeDelayPanel.setBorder(delayPanDisabledBorder);
         }
 
-        if (edge.conditional == null || edge.conditional.trim().isEmpty()) {
+        if (edge.getConditional() == null || edge.getConditional().trim().isEmpty()) {
             conditionalExpressionPanel.setText("");
             hideShowConditionals(false);
         } else {
-            conditionalExpressionPanel.setText(edge.conditional);
+            conditionalExpressionPanel.setText(edge.getConditional());
             hideShowConditionals(true);
         }
 
-        if (edge.conditionalDescription == null || edge.conditionalDescription.isEmpty()) {
+        if (edge.getConditionalDescription() == null || edge.getConditionalDescription().isEmpty()) {
             setDescription("");
             hideShowDescription(false);
         } else {
-            setDescription(edge.conditionalDescription);
+            setDescription(edge.getConditionalDescription());
             hideShowDescription(true);
         }
         hideShowDescription(true); // always show
@@ -640,29 +640,29 @@ public class EdgeInspectorDialog extends JDialog
         else
             delaySt += ("." + timeDelayMethodsCB.getSelectedItem());
 
-        edge.delay = delaySt;
+        edge.setDelay(delaySt);
 
         String condSt = conditionalExpressionPanel.getText();
-        edge.conditional = (condSt == null || condSt.trim().isEmpty()) ? null : conditionalExpressionPanel.getText();
+        edge.setConditional((condSt == null || condSt.trim().isEmpty()) ? null : conditionalExpressionPanel.getText());
 
-        edge.conditionalDescription = getDescription();
-        if (!edge.parameters.isEmpty()) {
-            edge.parameters.clear();
+        edge.setConditionalDescription(getDescription());
+        if (!edge.getParameters().isEmpty()) {
+             edge.getParameters().clear();
         }
 
         // Key on the EdgeNode's list of potential arguments
         // TODO: How do we do this automatically from the EventNodeInspectorDialog
         // when we remove an argument?
-        if (!edge.to.getArguments().isEmpty()) {
+        if (!edge.getTo().getArguments().isEmpty()) {
 
             // Bug 1373: This is how applying changes to a scheduling edge
             // causes the correct Event Graph XML representation when removing event
             // parameters from a proceeding node.  This loop adds vEdgeParameters
-            for (ViskitElement o : parameters.getData()) {
-                edge.parameters.add(o);
+            for (ViskitElement element : parameters.getData()) {
+                edge.getParameters().add(element);
             }
         } else {
-            parameters.setData(edge.parameters);
+            parameters.setData(edge.getParameters());
         }
     }
 

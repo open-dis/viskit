@@ -1279,7 +1279,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         message =
                    "<html><body>" +
                    "<p align='center'>Edit tabbed report entries as needed, then select</p><br />" +
-                   "<p align='center'><b>Generate HTML Analyst Report</b> (Alt-shift-H)</p><br />";
+                   "<p align='center'><b>Generate HTML Analyst Report</b> (Alt-Shift-H)</p><br />";
         // no joy
 //        String  menuImageURL = "doc/images/AnalystReportDisplayHtmlMenu.png";
 //        boolean menuImageFileExists = (new File("doc/images/AnalystReportDisplayHtmlMenu.png").exists()); // debug

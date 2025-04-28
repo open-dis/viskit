@@ -267,15 +267,15 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                              htmlBuilder.append("<p align='center'>Self Scheduling Edge</p>");
                         else htmlBuilder.append("<p align='center'>Scheduling Edge</p>");
 
-                        if (!edge.getDescription().isBlank() || (edge.conditionalDescription != null))
+                        if (!edge.getDescription().isBlank() || (edge.getConditionalDescription() != null))
                         {
                             String newDescription = edge.getDescription().trim();
-                            if (edge.conditionalDescription != null)
+                            if (edge.getConditionalDescription() != null)
                             {
                                 if (!newDescription.isBlank() && !newDescription.endsWith(".") && 
-                                    !edge.conditionalDescription.isBlank())
+                                    !edge.getConditionalDescription().isBlank())
                                     newDescription += ".";
-                                newDescription += " " + edge.conditionalDescription.trim();                                
+                                newDescription += " " + edge.getConditionalDescription().trim();                                
                             }
                             if (newDescription.length() > 0) 
                             {
@@ -310,8 +310,8 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                         htmlBuilder.append(s);
                         htmlBuilder.append("<br>");
 
-                        if (edge.delay != null) {
-                            String dly = edge.delay.trim();
+                        if (edge.getDelay() != null) {
+                            String dly = edge.getDelay().trim();
                             if (dly.length() > 0) {
                                 htmlBuilder.append("<u>delay</u><br>&nbsp;");
                                 htmlBuilder.append(dly);
@@ -320,21 +320,21 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                         }
 
                         int idx = 1;
-                        if (!edge.parameters.isEmpty()) {
+                        if (!edge.getParameters().isEmpty()) {
 
                             htmlBuilder.append("<u>edge parameters</u><br>");
-                            ViskitEdgeParameter ep;
-                            for (ViskitElement e : edge.parameters) {
-                                ep = (ViskitEdgeParameter) e;
+                            ViskitEdgeParameter edgeParameter;
+                            for (ViskitElement element : edge.getParameters()) {
+                                edgeParameter = (ViskitEdgeParameter) element;
                                 htmlBuilder.append("&nbsp;");
                                 htmlBuilder.append(idx++);
                                 htmlBuilder.append(" ");
-                                htmlBuilder.append(ep.getValue());
+                                htmlBuilder.append(edgeParameter.getValue());
 
-                                if (ep.getType() != null && !ep.getType().isEmpty()) {
+                                if (edgeParameter.getType() != null && !edgeParameter.getType().isEmpty()) {
                                     htmlBuilder.append(" ");
                                     htmlBuilder.append("(");
-                                    htmlBuilder.append(ep.getType());
+                                    htmlBuilder.append(edgeParameter.getType());
                                     htmlBuilder.append(")");
                                 }
                                 htmlBuilder.append("<br>");
@@ -349,8 +349,8 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                         else htmlBuilder.append("<p align='center'>Canceling Edge</p>");
                     }
 
-                    if (edge != null && edge.conditionalDescription != null) {
-                        String newDescription = edge.conditionalDescription.trim();
+                    if (edge != null && edge.getConditionalDescription() != null) {
+                        String newDescription = edge.getConditionalDescription().trim();
                         if (newDescription.length() > 0) 
                         {
                             htmlBuilder.append("<u>description</u><br>");
@@ -359,8 +359,8 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                         }
                     }
 
-                    if (edge != null && edge.conditional != null) {
-                        String conditional = edge.conditional.trim();
+                    if (edge != null && edge.getConditional() != null) {
+                        String conditional = edge.getConditional().trim();
                         if (conditional.length() > 0) {
                             htmlBuilder.append("<u>condition</u><br>&nbsp;if ( <b>");
                             htmlBuilder.append(escapeLTGT(conditional));
@@ -538,7 +538,7 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
             if (e instanceof SchedulingEdge) {
                 SchedulingEdge se = (SchedulingEdge) e;
 
-                if (se.conditional == null || se.conditional.isEmpty())
+                if (se.getConditional() == null || se.getConditional().isEmpty())
                     retVal = "";
                 else
                     retVal = "\u01A7"; // https://www.compart.com/en/unicode/U+01A7

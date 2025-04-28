@@ -58,11 +58,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import viskit.control.EventGraphController;
-import viskit.Help;
-import static viskit.Help.METHOD_aboutViskit;
-import static viskit.Help.METHOD_doContents;
-import static viskit.Help.METHOD_doSearch;
-import static viskit.Help.METHOD_doTutorial;
 import viskit.model.ModelEvent;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
@@ -520,9 +515,9 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         graphPane.drawingSplitPane.setResizeWeight(0.75);
         graphPane.drawingSplitPane.setOneTouchExpandable(true);
 
-        graphPane.addMouseListener(new vCursorHandler());
+        graphPane.addMouseListener(new CursorHandler());
         try {
-            graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
+            graphPane.getDropTarget().addDropTargetListener(new EventGraphDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
             LOG.error(tmle);
         }
@@ -1087,13 +1082,13 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     /** Some private classes to implement Drag and Drop (DnD) and dynamic cursor update */
-    class vCursorHandler extends MouseAdapter {
+    class CursorHandler extends MouseAdapter {
 
         Cursor select;
         Cursor arc;
         Cursor cancel;
 
-        vCursorHandler() {
+        CursorHandler() {
             super();
             select = Cursor.getDefaultCursor();
             arc = new Cursor(Cursor.CROSSHAIR_CURSOR);
@@ -1116,14 +1111,14 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
          * @param img the cursor image to build
          */
         private void buildCancelCursor(Image img) {
-            new Thread(new cursorBuilder(img)).start();
+            new Thread(new CursorBuilder(img)).start();
         }
 
-        class cursorBuilder implements Runnable, ImageObserver {
+        class CursorBuilder implements Runnable, ImageObserver {
 
             Image img;
 
-            cursorBuilder(Image img) {
+            CursorBuilder(Image img) {
                 this.img = img;
             }
             int infoflags;
@@ -1216,7 +1211,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     /** Class to facilitate dragging new nodes, or self-referential edges onto nodes on the jGraph pallette */
-    class vDropTargetAdapter extends DropTargetAdapter {
+    class EventGraphDropTargetAdapter extends DropTargetAdapter {
 
         @Override
         public void dragOver(DropTargetDragEvent e) {

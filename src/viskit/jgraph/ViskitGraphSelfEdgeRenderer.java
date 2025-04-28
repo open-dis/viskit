@@ -197,7 +197,7 @@ class ViskitGraphSelfEdgeRenderer extends ViskitGraphEdgeRenderer {
         Edge e;
         for (ViskitElement ve : en.getConnections()) {
             e = (Edge) ve;
-            if (e.to == en && e.from == en) {
+            if (e.getTo() == en && e.getFrom() == en) {
                 retd += (ROT_INCR * 3/8);
                 if (e == edg) {
                     return retd;

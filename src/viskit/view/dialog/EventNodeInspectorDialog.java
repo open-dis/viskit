@@ -88,7 +88,7 @@ public class EventNodeInspectorDialog extends JDialog
         this.eventNode = node;
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new myCloseListener());
+        this.addWindowListener(new CloseListener());
 
         JPanel panel = new JPanel();
         setContentPane(panel);
@@ -205,22 +205,22 @@ public class EventNodeInspectorDialog extends JDialog
         panel.add(twoRowButtonPanel);
 
         // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new CancelButtonListener());
+        okButton.addActionListener(new ApplyButtonListener());
 
-        addHideButtListener hideList = new addHideButtListener();
+        AddHideButtonListener hideList = new AddHideButtonListener();
         addDescriptionButton.addActionListener(hideList);
         addArgumentsButton.addActionListener(hideList);
         addLocalVariablesButton.addActionListener(hideList);
         addCodeBlockButton.addActionListener(hideList);
         addStateTransitionsButton.addActionListener(hideList);
 
-        myChangeActionListener myChangeListener = new myChangeActionListener();
+        ChangeActionListener myChangeListener = new ChangeActionListener();
         //name.addActionListener(chlis);
-        KeyListener keyListener = new myKeyListener();
+        KeyListener keyListener = new KeyListener();
         eventNameTF.addKeyListener(keyListener);
         descriptionTF.addKeyListener(keyListener);
-        editDescriptionButton.addActionListener(new commentListener());
+        editDescriptionButton.addActionListener(new DescriptionListener());
 
         arguments.addPlusListener(myChangeListener);
         arguments.addMinusListener(myChangeListener);
@@ -357,25 +357,25 @@ public class EventNodeInspectorDialog extends JDialog
                 if (viskitElement instanceof SchedulingEdge) {
 
                     // and, this SchedulingEdge is going to this node
-                    if (((Edge) viskitElement).to.getName().equals(eventNode.getName())) {
+                    if (((Edge) viskitElement).getTo().getName().equals(eventNode.getName())) {
                         LOG.debug("Found the SE's 'to' Node that matches this EventNode");
 
                         // The lower key values signal when it was connected to
                         // to this event node.  We're interested in the first
                         // SchedulingEdge to this EventNode
-                        LOG.debug("SE ID is: " + viskitElement.getModelKey());
+                        LOG.debug("SchedulingEdge ID is: " + viskitElement.getModelKey());
 
                         // If this isn't the first time, then skip over this edge
-                        if (!((Edge) viskitElement).parameters.isEmpty()) {continue;}
+                        if (!((Edge) viskitElement).getParameters().isEmpty()) {continue;}
 
                         // We match EventArgument count to EdgeParameter count
                         // here.
-                        for (ViskitElement v : eventNode.getArguments()) {
+                        for (ViskitElement element : eventNode.getArguments()) {
 
                             // The user will be able to change any values from
                             // the EdgeInspectorDialog.  Right now, values are
                             // defaulted to zeros.
-                            ((Edge) viskitElement).parameters.add(new ViskitEdgeParameter(v.getValue()));
+                            ((Edge) viskitElement).getParameters().add(new ViskitEdgeParameter(element.getValue()));
                         }
                     }
                 }
@@ -401,7 +401,7 @@ public class EventNodeInspectorDialog extends JDialog
         return sb.toString().trim();
     }
 
-    class cancelButtonListener implements ActionListener {
+    class CancelButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -413,7 +413,7 @@ public class EventNodeInspectorDialog extends JDialog
         }
     }
 
-    class applyButtonListener implements ActionListener {
+    class ApplyButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -499,7 +499,7 @@ public class EventNodeInspectorDialog extends JDialog
         pack();
     }
 
-    class addHideButtListener implements ActionListener {
+    class AddHideButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -518,7 +518,7 @@ public class EventNodeInspectorDialog extends JDialog
     }
 
     // end show/hide support for unused fields
-    class myKeyListener extends KeyAdapter {
+    class KeyListener extends KeyAdapter {
 
         @Override
         public void keyTyped(KeyEvent e) {
@@ -527,7 +527,7 @@ public class EventNodeInspectorDialog extends JDialog
         }
     }
 
-    class myChangeActionListener implements ChangeListener, ActionListener {
+    class ChangeActionListener implements ChangeListener, ActionListener {
 
         @Override
         public void stateChanged(ChangeEvent event) {
@@ -541,7 +541,7 @@ public class EventNodeInspectorDialog extends JDialog
         }
     }
 
-    class myCloseListener extends WindowAdapter {
+    class CloseListener extends WindowAdapter {
 
         @Override
         public void windowClosing(WindowEvent e) {
@@ -559,7 +559,7 @@ public class EventNodeInspectorDialog extends JDialog
         }
     }
 
-    class commentListener implements ActionListener {
+    class DescriptionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {

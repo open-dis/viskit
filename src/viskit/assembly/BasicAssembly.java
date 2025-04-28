@@ -324,9 +324,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      */
     protected void createDesignPointStatistics() 
     {
-        /* Check for zero length.  SimplePropertyDumper may have been selected
-         * as the only PCL
-         */
+        /* Check for zero length.  SimplePropertyDumper may have been selected as the only PCL */
         if (BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray().length == 0) 
         {
             return;

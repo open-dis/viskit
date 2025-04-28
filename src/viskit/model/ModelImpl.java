@@ -499,13 +499,13 @@ public class ModelImpl extends MvcAbstractModel implements Model
         String s;
         schedulingEdge.opaqueModelObject = schedule;
 
-        schedulingEdge.from = sourceEventNode;
+        schedulingEdge.setFrom(sourceEventNode);
         EventNode targetEventNode = buildNodeFromJaxbEvent((Event) schedule.getEvent());
-        schedulingEdge.to = targetEventNode;
+        schedulingEdge.setTo(targetEventNode);
 
         sourceEventNode.getConnections().add(schedulingEdge);
         targetEventNode.getConnections().add(schedulingEdge);
-        schedulingEdge.conditional = schedule.getCondition();
+        schedulingEdge.setConditional(schedule.getCondition());
 
         // Attempt to avoid NumberFormatException thrown on Double.parseDouble(String s)
         if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, schedule.getPriority())) {
@@ -554,8 +554,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //            schedulingEdge.conditionalDescription = sb.toString().trim();
 //        }
         schedulingEdge.setDescription(ViskitStatics.emptyIfNull(schedule.getDescription()));
-        schedulingEdge.delay = schedule.getDelay();
-        schedulingEdge.parameters = buildEdgeParametersFromJaxb(schedule.getEdgeParameter());
+        schedulingEdge.setDelay(schedule.getDelay());
+        schedulingEdge.setParameters(buildEdgeParametersFromJaxb(schedule.getEdgeParameter()));
 
         edgeCache.put(schedule, schedulingEdge);
 
@@ -567,7 +567,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     {
         CancelingEdge cancelingEdge = new CancelingEdge();
         cancelingEdge.opaqueModelObject = cancel;
-        cancelingEdge.conditional = cancel.getCondition();
+        cancelingEdge.setConditional(cancel.getCondition());
 
         // obsolete
 //        List<String> cmt = cancel.getComment();
@@ -581,11 +581,11 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //        }
         cancelingEdge.setDescription(ViskitStatics.emptyIfNull(cancel.getDescription()));
 
-        cancelingEdge.parameters = buildEdgeParametersFromJaxb(cancel.getEdgeParameter());
+        cancelingEdge.setParameters(buildEdgeParametersFromJaxb(cancel.getEdgeParameter()));
 
-        cancelingEdge.from = sourceEventNode;
+        cancelingEdge.setFrom(sourceEventNode);
         EventNode targetEventNode = buildNodeFromJaxbEvent((Event) cancel.getEvent());
-        cancelingEdge.to = targetEventNode;
+        cancelingEdge.setTo(targetEventNode);
 
         sourceEventNode.getConnections().add(cancelingEdge);
         targetEventNode.getConnections().add(cancelingEdge);
@@ -1108,8 +1108,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
     public void newSchedulingEdge(EventNode sourceEventNode, EventNode targetEventNode) 
     {
         SchedulingEdge schedulingEdge = new SchedulingEdge();
-        schedulingEdge.from = sourceEventNode;
-        schedulingEdge.to = targetEventNode;
+        schedulingEdge.setFrom(sourceEventNode);
+        schedulingEdge.setTo(targetEventNode);
         sourceEventNode.getConnections().add(schedulingEdge);
         targetEventNode.getConnections().add(schedulingEdge);
 
@@ -1130,7 +1130,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             for (ViskitElement argument : argumentList) {
                 edgeParameters.add(new ViskitEdgeParameter(argument.getValue()));
             }
-            schedulingEdge.parameters = edgeParameters;
+            schedulingEdge.setParameters(edgeParameters);
         }
         schedulingEdge.priority = "DEFAULT";  // set default priority
 
@@ -1146,8 +1146,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
             return;
 
         EventNode sourceEventNode, targetEventNode;
-        sourceEventNode = (EventNode) ((DefaultMutableTreeNode) edge.from.opaqueViewObject).getUserObject();
-        targetEventNode = (EventNode) ((DefaultMutableTreeNode) edge.to.opaqueViewObject).getUserObject();
+        sourceEventNode = (EventNode) ((DefaultMutableTreeNode) edge.getFrom().opaqueViewObject).getUserObject();
+        targetEventNode = (EventNode) ((DefaultMutableTreeNode) edge.getTo().opaqueViewObject).getUserObject();
         Schedule schedule = jaxbEventGraphObjectFactory.createSchedule();
         edge.opaqueModelObject = schedule;
         Event targetEvent = (Event) targetEventNode.opaqueModelObject;
@@ -1164,8 +1164,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
     public void newCancelingEdge(EventNode sourceEventNode, EventNode targetEventNode) 
     {
         CancelingEdge cancelingEdge = new CancelingEdge();
-        cancelingEdge.from = sourceEventNode;
-        cancelingEdge.to   = targetEventNode;
+        cancelingEdge.setFrom(sourceEventNode);
+        cancelingEdge.setTo(targetEventNode);
         sourceEventNode.getConnections().add(cancelingEdge);
         targetEventNode.getConnections().add(cancelingEdge);
 
@@ -1185,7 +1185,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             for (ViskitElement argument : argumentList) {
                 edgeParameters.add(new ViskitEdgeParameter(argument.getValue()));
             }
-            cancelingEdge.parameters = edgeParameters;
+            cancelingEdge.setParameters(edgeParameters);
         }
         edgeCache.put(cancel, cancelingEdge);
 
@@ -1200,8 +1200,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
             return;
 
         EventNode sourceEventNode, targetEventNode;
-        sourceEventNode = (EventNode) ((DefaultMutableTreeNode) edge.from.opaqueViewObject).getUserObject();
-        targetEventNode = (EventNode) ((DefaultMutableTreeNode) edge.to.opaqueViewObject).getUserObject();
+        sourceEventNode = (EventNode) ((DefaultMutableTreeNode) edge.getFrom().opaqueViewObject).getUserObject();
+        targetEventNode = (EventNode) ((DefaultMutableTreeNode) edge.getTo().opaqueViewObject).getUserObject();
         Cancel cancel = jaxbEventGraphObjectFactory.createCancel();
         edge.opaqueModelObject = cancel;
         Event targetEvent = (Event) targetEventNode.opaqueModelObject;
@@ -1254,19 +1254,19 @@ public class ModelImpl extends MvcAbstractModel implements Model
     public void changeSchedulingEdge(Edge schedulingEdge) 
     {
         Schedule schedule = (Schedule) schedulingEdge.opaqueModelObject;
-        schedule.setCondition(schedulingEdge.conditional);
+        schedule.setCondition(schedulingEdge.getConditional());
 //        schedule.getComment().clear();
 //        schedule.getComment().add(schedulingEdge.conditionalDescription);
         schedule.setDescription(schedulingEdge.getDescription());
-        schedule.setDelay("" + schedulingEdge.delay);
+        schedule.setDelay("" + schedulingEdge.getDelay());
 
-        schedule.setEvent(schedulingEdge.to.opaqueModelObject);
+        schedule.setEvent(schedulingEdge.getTo().opaqueModelObject);
         schedule.setPriority(((SchedulingEdge)schedulingEdge).priority);
         schedule.getEdgeParameter().clear();
 
         EdgeParameter edgeParameter;
         // Bug 1373: This is where an edge parameter gets written out to XML
-        for (ViskitElement nextEdgeParameter : schedulingEdge.parameters)
+        for (ViskitElement nextEdgeParameter : schedulingEdge.getParameters())
         {
             edgeParameter = jaxbEventGraphObjectFactory.createEdgeParameter();
             edgeParameter.setValue(ViskitStatics.nullIfEmpty(nextEdgeParameter.getValue()));
@@ -1280,15 +1280,15 @@ public class ModelImpl extends MvcAbstractModel implements Model
     public void changeCancelingEdge(Edge newCancellingEdge )
     {
         Cancel cancel = (Cancel) newCancellingEdge.opaqueModelObject;
-        cancel.setCondition(newCancellingEdge.conditional);
-        cancel.setEvent(newCancellingEdge.to.opaqueModelObject);
+        cancel.setCondition(newCancellingEdge.getConditional());
+        cancel.setEvent(newCancellingEdge.getTo().opaqueModelObject);
 //        cancel.getComment().clear();
 //        cancel.getComment().add(newCancellingEdge.conditionalDescription);
-        cancel.setDescription(newCancellingEdge.conditionalDescription);
+        cancel.setDescription(newCancellingEdge.getConditionalDescription());
 
         cancel.getEdgeParameter().clear();
         EdgeParameter edgeParameter;
-        for (ViskitElement nextEdgeParameter : newCancellingEdge.parameters) {
+        for (ViskitElement nextEdgeParameter : newCancellingEdge.getParameters()) {
             edgeParameter = jaxbEventGraphObjectFactory.createEdgeParameter();
             edgeParameter.setValue(ViskitStatics.nullIfEmpty(nextEdgeParameter.getValue()));
             cancel.getEdgeParameter().add(edgeParameter);
