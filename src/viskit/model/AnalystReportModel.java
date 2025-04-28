@@ -785,7 +785,8 @@ public final class AnalystReportModel extends MvcAbstractModel
      */
     // TODO: This version JDOM does not support generics
     @SuppressWarnings("unchecked")
-    private Element makeTableEntry(String category, Element data) {
+    private Element makeTableEntry(String category, Element data) 
+    {
         Element tableEntry = new Element(category);
         List<Element> dataList = data.getChildren("TerminalParameter");
         Element parameterElement;
@@ -1278,7 +1279,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         message =
                    "<html><body>" +
                    "<p align='center'>Edit tabbed report entries as needed, then select</p><br />" +
-                   "<p align='center'><b>Generate HTML Analyst Report</b></p><br />";
+                   "<p align='center'><b>Generate HTML Analyst Report</b> (Alt-shift-H)</p><br />";
         // no joy
 //        String  menuImageURL = "doc/images/AnalystReportDisplayHtmlMenu.png";
 //        boolean menuImageFileExists = (new File("doc/images/AnalystReportDisplayHtmlMenu.png").exists()); // debug

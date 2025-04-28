@@ -13,6 +13,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlIDREF;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
@@ -159,8 +160,10 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 buildEventGraphsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
                 buildPropertyChangeListenersFromJaxb(jaxbRoot.getPropertyChangeListener());
                 buildPropertyChangeListenerConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
-                buildSimEvConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
+                buildSimEventConnectionsFromJaxb(jaxbRoot.getSimEventListenerConnection());
                 buildAdapterConnectionsFromJaxb(jaxbRoot.getAdapter());
+            
+                // TODO check that corresponding SimEntity name exists, otherwise erroneous (difficulty implementing xs:IDREF checking)
             } 
             catch (JAXBException e) 
             {
@@ -804,47 +807,47 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return retcode;
     }
 
-    private void removeFromOutputList(SimEntity se) {
+    private void removeFromOutputList(SimEntity simEntity) {
         List<Output> outTL = jaxbRoot.getOutput();
         for (Output o : outTL) {
-            if (o.getEntity().equals(se.getName())) {
+            if (o.getEntity().equals(simEntity.getName())) {
                 outTL.remove(o);
                 return;
             }
         }
     }
 
-    private void removeFromVerboseList(SimEntity se) {
+    private void removeFromVerboseList(SimEntity simEntity) {
         List<Verbose> vTL = jaxbRoot.getVerbose();
         for (Verbose v : vTL) {
-            if (v.getEntity().equals(se.getName())) {
+            if (v.getEntity().equals(simEntity.getName())) {
                 vTL.remove(v);
                 return;
             }
         }
     }
 
-    private void addToOutputList(SimEntity se) {
+    private void addToOutputList(SimEntity simEntity) {
         List<Output> outTL = jaxbRoot.getOutput();
         for (Output o : outTL) {
-            if (o.getEntity().equals(se.getName())) {
+            if (o.getEntity().equals(simEntity.getName())) {
                 return;
             }
         }
         Output op = jaxbAssemblyObjectFactory.createOutput();
-        op.setEntity(se.getName());
+        op.setEntity(simEntity.getName());
         outTL.add(op);
     }
 
-    private void addToVerboseList(SimEntity se) {
+    private void addToVerboseList(SimEntity simEntity) {
         List<Verbose> vTL = jaxbRoot.getVerbose();
         for (Verbose v : vTL) {
-            if (v.getEntity().equals(se.getName())) {
+            if (v.getEntity().equals(simEntity.getName())) {
                 return;
             }
         }
         Verbose op = jaxbAssemblyObjectFactory.createVerbose();
-        op.setEntity(se.getName());
+        op.setEntity(simEntity.getName());
         vTL.add(op);
     }
 
@@ -878,7 +881,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return v;
     }
 
-   private List<Object> getInstantiatorListFromJaxbParmList(List<Object> lis) {
+   private List<Object> getInstantiatorListFromJaxbParameterList(List<Object> lis) {
 
        // To prevent java.util.ConcurrentModificationException
        List<Object> vi = new ArrayList<>();
@@ -890,7 +893,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     private ViskitModelInstantiator buildInstantiatorFromJaxbParameter(Object o) {
         if (o instanceof TerminalParameter) {
-            return buildFreeFormFromTermParameter((TerminalParameter) o);
+            return buildFreeFormFromTerminalParameter((TerminalParameter) o);
         }
         if (o instanceof MultiParameter) {           // used for both arrays and Constr arg lists
             MultiParameter mu = (MultiParameter) o;
@@ -899,31 +902,32 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return (o instanceof FactoryParameter) ? buildFactoryInstFromFactoryParameter((FactoryParameter) o) : null;
     }
 
-    private ViskitModelInstantiator.FreeF buildFreeFormFromTermParameter(TerminalParameter tp) {
+    private ViskitModelInstantiator.FreeF buildFreeFormFromTerminalParameter(TerminalParameter tp) {
         return new ViskitModelInstantiator.FreeF(tp.getType(), tp.getValue());
     }
 
     private ViskitModelInstantiator.Array buildArrayFromMultiParameter(MultiParameter o) {
         return new ViskitModelInstantiator.Array(o.getType(),
-                getInstantiatorListFromJaxbParmList(o.getParameters()));
+                getInstantiatorListFromJaxbParameterList(o.getParameters()));
     }
 
     private ViskitModelInstantiator.Constr buildConstrFromMultiParameter(MultiParameter o) {
         return new ViskitModelInstantiator.Constr(o.getType(),
-                getInstantiatorListFromJaxbParmList(o.getParameters()));
+                getInstantiatorListFromJaxbParameterList(o.getParameters()));
     }
 
     private ViskitModelInstantiator.Factory buildFactoryInstFromFactoryParameter(FactoryParameter o) {
         return new ViskitModelInstantiator.Factory(o.getType(),
                 o.getFactory(),
                 ViskitStatics.RANDOM_VARIATE_FACTORY_DEFAULT_METHOD,
-                getInstantiatorListFromJaxbParmList(o.getParameters()));
+                getInstantiatorListFromJaxbParameterList(o.getParameters()));
     }
 
     // We know we will get a List<Object> one way or the other
     @SuppressWarnings("unchecked")
-    private List<Object> getJaxbParameterList(ViskitModelInstantiator mdelInstantiator) {
-        Object o = buildParameters(mdelInstantiator);
+    private List<Object> getJaxbParameterList(ViskitModelInstantiator modelInstantiator) 
+    {
+        Object o = buildParameters(modelInstantiator);
         if (o instanceof List<?>) {
             return (List<Object>) o;
         }
@@ -933,7 +937,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return v;
     }
 
-    private Object buildParameters(Object vi) {
+    private Object buildParameters(Object vi) 
+    {
         if (vi instanceof ViskitModelInstantiator.FreeF) {
             return buildParamFromFreeF((ViskitModelInstantiator.FreeF) vi);
         } //TerminalParm
@@ -1021,7 +1026,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         }
     }
 
-    private void buildSimEvConnectionsFromJaxb(List<SimEventListenerConnection> simevconnsList) {
+    private void buildSimEventConnectionsFromJaxb(List<SimEventListenerConnection> simevconnsList) {
         SimEventListenerEdge sele;
         AssemblyNode toNode, frNode;
         for (SimEventListenerConnection selc : simevconnsList) {
@@ -1039,35 +1044,37 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         }
     }
 
-    private void buildAdapterConnectionsFromJaxb(List<Adapter> adaptersList) {
-        AdapterEdge ae;
-        AssemblyNode toNode, frNode;
+    private void buildAdapterConnectionsFromJaxb(List<Adapter> adaptersList) 
+    {
+        AdapterEdge adapterEdge;
+        AssemblyNode toNode, fromNode;
         String event;
-        for (Adapter jaxbAdapter : adaptersList) {
-            ae = new AdapterEdge();
-            toNode = getNodeCache().get(jaxbAdapter.getTo());
-            frNode = getNodeCache().get(jaxbAdapter.getFrom());
-            ae.setTo(toNode);
-            ae.setFrom(frNode);
+        for (Adapter jaxbAdapter : adaptersList) 
+        {
+            adapterEdge = new AdapterEdge();
+            toNode   = getNodeCache().get(jaxbAdapter.getTo());
+            fromNode = getNodeCache().get(jaxbAdapter.getFrom());
+            adapterEdge.setTo(toNode);
+            adapterEdge.setFrom(fromNode);
 
             // Handle XML names w/ underscores (XML IDREF issue)
             event = jaxbAdapter.getEventHeard();
             if (event.contains("_"))
                 event = event.substring(0, event.indexOf("_"));
-            ae.setSourceEvent(event);
+            adapterEdge.setSourceEvent(event);
 
             event = jaxbAdapter.getEventSent();
             if (event.contains("_"))
                 event = event.substring(0, event.indexOf("_"));
-            ae.setTargetEvent(event);
+            adapterEdge.setTargetEvent(event);
 
-            ae.setName(jaxbAdapter.getName());
-            ae.setDescription(jaxbAdapter.getDescription());
-            ae.opaqueModelObject = jaxbAdapter;
+            adapterEdge.setName(jaxbAdapter.getName());
+            adapterEdge.setDescription(jaxbAdapter.getDescription());
+            adapterEdge.opaqueModelObject = jaxbAdapter;
 
-            toNode.getConnections().add(ae);
-            frNode.getConnections().add(ae);
-            this.notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTER_EDGE_ADDED, "Adapter connection added"));
+              toNode.getConnections().add(adapterEdge);
+            fromNode.getConnections().add(adapterEdge);
+            this.notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_ADDED, "Adapter connection added"));
         }
     }
 
@@ -1077,16 +1084,17 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         }
     }
 
-    private void buildEventGraphsFromJaxb(List<SimEntity> simEntities, List<Output> outputList, List<Verbose> verboseList) {
-        for (SimEntity se : simEntities) {
+    private void buildEventGraphsFromJaxb(List<SimEntity> simEntityList, List<Output> outputList, List<Verbose> verboseList) 
+    {
+        for (SimEntity nextSimEntity : simEntityList) {
             boolean isOutput = false;
             boolean isVerbose = false;
             // This must be done in this order, because the buildEvgNode...below
             // causes AssembleModel to be reentered, and the outputList gets hit.
-            String simE;
+            Object simEntity;
             for (Output o : outputList) {
-                simE = o.getEntity();
-                if (simE.equals(se.getName())) {
+                simEntity = o.getEntity();
+                if (simEntity.equals(nextSimEntity.getName())) {
                     isOutput = true;
                     break;
                 }
@@ -1094,13 +1102,13 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
             // Verbose shouldn't be populated since the verbose check box has been disabled
             for (Verbose v : verboseList) {
-                simE = v.getEntity();
-                if (simE.equals(se.getName())) {
+                simEntity = v.getEntity();
+                if (simEntity.equals(nextSimEntity.getName())) {
                     isVerbose = true;
                     break;
                 }
             }
-            buildEvgNodeFromJaxbSimEntity(se, isOutput, isVerbose);
+            buildEventGraphNodeFromJaxbSimEntity(nextSimEntity, isOutput, isVerbose);
         }
     }
 
@@ -1127,7 +1135,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         List<Object> lis = pcl.getParameters();
         ViskitModelInstantiator vc = new ViskitModelInstantiator.Constr(pcl.getType(),
-                getInstantiatorListFromJaxbParmList(lis));
+                getInstantiatorListFromJaxbParameterList(lis));
         pNode.setInstantiator(vc);
 
         pNode.opaqueModelObject = pcl;
@@ -1142,14 +1150,14 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         return pNode;
     }
 
-    private EventGraphNode buildEvgNodeFromJaxbSimEntity(SimEntity se, boolean isOutputNode, boolean isVerboseNode) {
-        EventGraphNode en = (EventGraphNode) getNodeCache().get(se.getName());
+    private EventGraphNode buildEventGraphNodeFromJaxbSimEntity(SimEntity simEntity, boolean isOutputNode, boolean isVerboseNode) {
+        EventGraphNode en = (EventGraphNode) getNodeCache().get(simEntity.getName());
         if (en != null) {
             return en;
         }
-        en = new EventGraphNode(se.getName(), se.getType());
+        en = new EventGraphNode(simEntity.getName(), simEntity.getType());
 
-        Coordinate coor = se.getCoordinate();
+        Coordinate coor = simEntity.getCoordinate();
         if (coor == null) {
             en.setPosition(pointLess);
             pointLess = new Point2D.Double(pointLess.x + 20, pointLess.y + 20);
@@ -1158,16 +1166,16 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                     Double.parseDouble(coor.getY())));
         }
 
-        en.setDescription(se.getDescription());
+        en.setDescription(simEntity.getDescription());
         en.setOutputMarked(isOutputNode);
         en.setVerboseMarked(isVerboseNode);
 
-        List<Object> lis = se.getParameters();
+        List<Object> lis = simEntity.getParameters();
 
-        ViskitModelInstantiator vc = new ViskitModelInstantiator.Constr(lis, se.getType());
+        ViskitModelInstantiator vc = new ViskitModelInstantiator.Constr(lis, simEntity.getType());
         en.setInstantiator(vc);
 
-        en.opaqueModelObject = se;
+        en.opaqueModelObject = simEntity;
 
         getNodeCache().put(en.getName(), en);   // key = se
 
@@ -1215,7 +1223,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     /**
      * @return the currentAssemblyModelName
      */
-    public String getCurrentAssemblyModelName() {
+    public String getCurrentAssemblyModelName() 
+    {
         if (currentAssemblyModelFile != null)
         {
             currentAssemblyModelName = currentAssemblyModelFile.getName();

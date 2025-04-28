@@ -197,8 +197,8 @@ public class FindClassesForInterface
         if (true) {
             return;
         }
-        List<Class<?>> simEntities = new ArrayList<>();
-        List<Class<?>> propertyChangeListeners = new ArrayList<>();
+        List<Class<?>> simEntityClassList = new ArrayList<>();
+        List<Class<?>> propertyChangeListenerClassList = new ArrayList<>();
         LOG.info(jarFile.getName());
         URLClassLoader loader = new URLClassLoader(new URL[]{new File(jarFile.getName()).toURI().toURL()});
         for (Enumeration entries = jarFile.entries(); entries.hasMoreElements();) {
@@ -215,11 +215,11 @@ public class FindClassesForInterface
                 }
 //                LOG.debug(c);
                 if (java.beans.PropertyChangeListener.class.isAssignableFrom(c) && isConcrete(c)) {
-                    propertyChangeListeners.add(c);
+                    propertyChangeListenerClassList.add(c);
 //                    LOG.info("\tIs PropertyChangeListener!");
                 }
                 if (simkit.SimEntity.class.isAssignableFrom(c) && isConcrete(c)) {
-                    simEntities.add(c);
+                    simEntityClassList.add(c);
 //                    LOG.info("\tIs SimEntity!");
                 }
             } catch (ClassNotFoundException t) {
@@ -227,12 +227,12 @@ public class FindClassesForInterface
             }
         }
         LOG.info("SimEntities:");
-        for (int i = 0; i < simEntities.size(); i++) {
-            LOG.info(simEntities.get(i));
+        for (int i = 0; i < simEntityClassList.size(); i++) {
+            LOG.info(simEntityClassList.get(i));
         }
         LOG.info("PropertyChangeListeners:");
-        for (int i = 0; i < propertyChangeListeners.size(); i++) {
-            LOG.info(propertyChangeListeners.get(i));
+        for (int i = 0; i < propertyChangeListenerClassList.size(); i++) {
+            LOG.info(propertyChangeListenerClassList.get(i));
         }
 
         if (true) {

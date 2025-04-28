@@ -57,9 +57,9 @@ public class ParameterTable extends JTable {
 
     private ParameterTableModel ptm;
 
-    ParameterTable(List<SimEntity> simEntities, List<TerminalParameter> designParameters) {
-        if (simEntities != null) {
-            setParameters(simEntities, designParameters);
+    ParameterTable(List<SimEntity> simEntityList, List<TerminalParameter> designParameters) {
+        if (simEntityList != null) {
+            setParameters(simEntityList, designParameters);
         } else {
             setModel(new DefaultTableModel(new Object[][]{{}}, ParameterTableModel.columnNames));
         }

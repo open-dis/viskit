@@ -231,8 +231,8 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     public void setJobLauncher(JobLauncherTab2 jobL) {
         jobLauncher = jobL;
     }
-    Vector<TerminalParameter> savedDesignParms;
-    Vector<EventGraph> savedEvGraphs;
+    Vector<TerminalParameter> savedDesignParameters;
+    Vector<EventGraph> savedEventGraphs;
 
     public boolean prepRun() {
         DoeFileModel dfm = doeFrame.getModel();
@@ -255,12 +255,12 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         // clone the jaxbroot (we want to use currently checked widgets, but don't want to force save
     // No clone method, but save the params
 
-        savedDesignParms = new Vector<>(OpenAssembly.inst().jaxbRoot.getDesignParameters());
+        savedDesignParameters = new Vector<>(OpenAssembly.inst().jaxbRoot.getDesignParameters());
         saveDoeParmsNoNotify();
 
         // put Event graphs in place (CDATA stuff)
 
-        savedEvGraphs = new Vector<>(OpenAssembly.inst().jaxbRoot.getEventGraph());
+        savedEventGraphs = new Vector<>(OpenAssembly.inst().jaxbRoot.getEventGraph());
         // event graphs aren't inserted in gridkit xml any more ... dfm.saveEventGraphsToJaxb(loadedEventGraphs);
         return true;
     }
@@ -272,11 +272,11 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     public void restorePrepRun() {
         SimkitAssembly sa = OpenAssembly.inst().jaxbRoot;
         sa.getDesignParameters().clear();
-        sa.getDesignParameters().addAll(savedDesignParms);
-        savedDesignParms = null;
+        sa.getDesignParameters().addAll(savedDesignParameters);
+        savedDesignParameters = null;
         sa.getEventGraph().clear();
-        sa.getEventGraph().addAll(savedEvGraphs);
-        savedEvGraphs = null;
+        sa.getEventGraph().addAll(savedEventGraphs);
+        savedEventGraphs = null;
     }
 
     private void doRun() {

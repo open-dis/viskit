@@ -70,7 +70,7 @@ public class DoeFileModel
     public boolean dirty = false;
     public HashMap<SimEntity, TerminalParameter> seTerminalParamsHM;
 
-    private List<SimEntity> simEntities;
+    private List<SimEntity> simEntityList;
     private final Map<String, Integer> nameSpace = new HashMap<>();
 
     public File marshallJaxb() throws Exception {
@@ -200,12 +200,12 @@ public class DoeFileModel
     }
 
     /** @return a List of SimEntities for this experiment */
-    public List<SimEntity> getSimEntities() {
-        return simEntities;
+    public List<SimEntity> getSimEntityList() {
+        return simEntityList;
     }
 
-    public void setSimEntities(List<SimEntity> se) {
-        simEntities = se;   //jdom
-        seTerminalParamsHM = new HashMap<>(se.size());
+    public void setSimEntityList(List<SimEntity> simEntityList) {
+        simEntityList = simEntityList;   //jdom
+        seTerminalParamsHM = new HashMap<>(simEntityList.size());
     }
 }

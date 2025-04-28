@@ -261,7 +261,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
  are empty by default.  The <code>createReplicationStatistics()</code> method
      * must be overridden if any replications statistics are needed.
      */
-    protected void createObjects() {
+    protected void createObjects() 
+    {
 //        LOG.info("I was called?");
         createSimEntities();
         createReplicationStatistics();

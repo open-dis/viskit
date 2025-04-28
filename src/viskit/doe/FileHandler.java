@@ -96,8 +96,8 @@ public class FileHandler
 
         doeFileModel.jdomDocument = document;
         doeFileModel.designParameters = getDesignParameters(document);
-        doeFileModel.setSimEntities(getSimEntities(document));
-        doeFileModel.parameterTable = new ParameterTable(doeFileModel.getSimEntities(), doeFileModel.designParameters);
+        doeFileModel.setSimEntityList(getSimEntities(document));
+        doeFileModel.parameterTable = new ParameterTable(doeFileModel.getSimEntityList(), doeFileModel.designParameters);
 
         return doeFileModel;
     }
@@ -108,8 +108,8 @@ public class FileHandler
         dfm.userFile = f;
         // todo dfm.jaxbRoot = assembly;
         dfm.designParameters = simkitAssembly.getDesignParameters();
-        dfm.setSimEntities(simkitAssembly.getSimEntity());
-        dfm.parameterTable = new ParameterTable(dfm.getSimEntities(), dfm.designParameters);
+        dfm.setSimEntityList(simkitAssembly.getSimEntity());
+        dfm.parameterTable = new ParameterTable(dfm.getSimEntityList(), dfm.designParameters);
 
         return dfm;
     }
