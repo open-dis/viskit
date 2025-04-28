@@ -552,10 +552,11 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     @Override
     public void close()
     {
-        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab())
+        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && // closing without checking first
+            !ViskitGlobals.instance().isSelectedAssemblyEditorTab())     // closing automatically when closing parent Assembly
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
-            messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph before closing");
+            messageUser(JOptionPane.INFORMATION_MESSAGE, "Check Event Graph Editor", "First select an Event Graph before closing");
             return;
         }
         ViskitGlobals.instance().selectEventGraphEditorTab();
