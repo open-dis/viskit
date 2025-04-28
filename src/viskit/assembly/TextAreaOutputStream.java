@@ -97,7 +97,7 @@ public class TextAreaOutputStream extends ByteArrayOutputStream implements Actio
                      beginIndex = jTextArea.getText().lastIndexOf(CONSOLE_warningMessage) + 2;
             else if (jTextArea.getText().contains("---+"))
                      beginIndex = jTextArea.getText().lastIndexOf("---+") + 2;
-            jTextArea.replaceRange(CONSOLE_warningMessage, 0, backoff - 1);
+            jTextArea.replaceRange(CONSOLE_warningMessage, beginIndex, backoff - 1);
             LOG.info("Warning: " + CONSOLE_warningMessage.substring(beginIndex, CONSOLE_warningMessage.indexOf("\n")));
         }
       }

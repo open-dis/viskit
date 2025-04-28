@@ -1273,12 +1273,12 @@ public final class AnalystReportModel extends MvcAbstractModel
         // user: OK
         
         ViskitGlobals.instance().selectAnalystReportTab();
-        popupTitle = "Ready to Edit and Display HTML Analyst Report";
+        popupTitle = "Ready to Edit and Generate HTML Analyst Report";
         
         message =
                    "<html><body>" +
                    "<p align='center'>Edit tabbed report entries as needed, then select</p><br />" +
-                   "<p align='center'><b>Display HTML Analyst Report</b></p><br />";
+                   "<p align='center'><b>Generate HTML Analyst Report</b></p><br />";
         // no joy
 //        String  menuImageURL = "doc/images/AnalystReportDisplayHtmlMenu.png";
 //        boolean menuImageFileExists = (new File("doc/images/AnalystReportDisplayHtmlMenu.png").exists()); // debug

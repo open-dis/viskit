@@ -737,7 +737,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         analystReportMenu.setText("Analyst Report   ");
 
         displayAnalystReportHtmlMI.setMnemonic(KeyEvent.VK_D);
-        displayAnalystReportHtmlMI.setText("Display HTML Analyst Report");
+        displayAnalystReportHtmlMI.setText("Generate HTML Analyst Report");
         displayAnalystReportHtmlMI.setToolTipText("Display Analyst Report in Web browser");
         analystReportMenu.add(displayAnalystReportHtmlMI);
 
