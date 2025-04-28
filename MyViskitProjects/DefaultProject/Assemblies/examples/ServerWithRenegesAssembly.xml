@@ -50,7 +50,7 @@
     <PropertyChangeListenerConnection property="numberServed" listener="numberServedStat" source="serverWithReneges"/>
     <PropertyChangeListenerConnection property="numberReneges" listener="numberRenegesStat" source="serverWithReneges"/>
     <PropertyChangeListenerConnection property="numberArrivals" listener="numberArrivalsStat" source="arrivalProcess"/>
-    <Adapter name="adptr_3" eventHeard="CustomerArrival" eventSent="Arrival" from="creator" to="serverWithReneges"/>
+    <Adapter name="arrivalAdapter" eventHeard="CustomerArrival" eventSent="Arrival" from="creator" to="serverWithReneges"/>
     <Output entity="creator"/>
     <Output entity="arrivalProcess"/>
     <Output entity="serverWithReneges"/>
