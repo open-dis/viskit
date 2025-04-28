@@ -40,6 +40,8 @@ import java.awt.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitGlobals;
@@ -59,6 +61,8 @@ import static viskit.control.InternalAssemblyRunner.SimulationState.READY;
  */
 public class SimulationRunPanel extends JPanel
 {
+    static final Logger LOG = LogManager.getLogger();
+    
     public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 30; // also defined twice in viskit.xsd schema
     
     public final static String INITIAL_SIMULATION_RUN_HINT = "First initialize an Assembly in the Assembly Editor before commencing a Simulation Run..."; // Local Run Simulation
@@ -450,6 +454,50 @@ public class SimulationRunPanel extends JPanel
     public int getNumberOfReplications()
     {
         return numberOfReplications;
+    }
+    public double getStartTime()
+    {
+        if ((vcrStartTimeTF.getText() != null) && !vcrStartTimeTF.getText().isBlank() && ViskitGlobals.isNumeric(vcrStartTimeTF.getText()))
+             return Double.parseDouble(vcrStartTimeTF.getText());
+        else return -1.0;
+    }
+    public void setStartTime(double newStartTime)
+    {
+        if  (newStartTime < 0.0)
+             LOG.error("setStartTime({}) recieved a negative value, ignored", newStartTime);
+        else vcrStartTimeTF.setText(Double.toString(newStartTime));
+    }
+    public double getStopTime()
+    {
+        if ((vcrStartTimeTF.getText() != null) && !vcrStartTimeTF.getText().isBlank() && ViskitGlobals.isNumeric(vcrStartTimeTF.getText()))
+             return Double.parseDouble(vcrStopTimeTF.getText());
+        else return -1.0;
+    }
+    public void setStopTime(double newStopTime)
+    {
+        if  (newStopTime < 0.0)
+             LOG.error("setStopTime({}) recieved a negative value, ignored", newStopTime);
+        else vcrStopTimeTF.setText(Double.toString(newStopTime));
+    }
+    public boolean getVerboseOutput()
+    {
+        return vcrVerboseCB.isSelected();
+    }
+    public void setVerboseOutput(boolean newValue)
+    {
+        vcrVerboseCB.setSelected(newValue);
+    }
+    public int getVerboseReplicationNumber()
+    {
+        if ((verboseReplicationNumberTF.getText() != null) && !verboseReplicationNumberTF.getText().isBlank() && ViskitGlobals.isNumeric(verboseReplicationNumberTF.getText()))
+             return Integer.parseInt(verboseReplicationNumberTF.getText());
+        else return -1;
+    }
+    public void setVerboseReplicationNumber(int newVerboseReplicationNumber)
+    {
+        if  (newVerboseReplicationNumber < 0)
+             LOG.error("setVerboseReplicationNumber({}) recieved a negative value, ignored", newVerboseReplicationNumber);
+        else verboseReplicationNumberTF.setText(Integer.toString(newVerboseReplicationNumber));
     }
     
     /** method name for reflection use */

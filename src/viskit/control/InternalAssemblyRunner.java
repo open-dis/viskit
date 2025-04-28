@@ -457,11 +457,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             
             vcrButtonPressDisplayUpdate(SimulationState.DONE); // also sets simulationState
 
-            notifyUserAnalystReportReady(); // saves temp report
-
             System.out.println("+------------------------------+"); // output goes to console TextArea
             System.out.println("| Simulation replications DONE |");
             System.out.println("+------------------------------+");
+
+            notifyUserAnalystReportReady(); // saves temp report
 
 // TODO old/contrary? mistakenly resets status label
 //            simulationRunPanel.stateMachineMessageLabel.setText("<html><body><p><b>Replications all complete.</b>\n</p></body></html>");
@@ -504,14 +504,16 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         public void actionPerformed(ActionEvent actionEvent) 
         {
             simulationRunPanel.vcrStartTimeTF.setText("0.0");        // because no pausing ?? TODO check
-//          vcrButtonPressDisplayUpdate(SimulationState.RUN); // TODO check
-            vcrButtonPressDisplayUpdate(SimulationState.RUN_RESUME);
+            
+            vcrButtonPressDisplayUpdate(SimulationState.RUN_RESUME); // resolves RUN or RESUME
             if (simulationRunPanel.outputStreamTA.getText().isBlank() ||
-                simulationRunPanel.outputStreamTA.getText().trim().equals(INITIAL_SIMULATION_RUN_HINT))
+                simulationRunPanel.outputStreamTA.getText().trim().equals(INITIAL_SIMULATION_RUN_HINT)) // TODO fix
             {
                 simulationRunPanel.outputStreamTA.setText(SIMULATION_RUN_PANEL_TITLE);
             }
-            prepareAndStartAssemblySimulationRun();
+            Schedule.setPauseAfterEachEvent(false); // simkit ensure no longer in single-step mode
+            
+            prepareAndStartAssemblySimulationRun(); // keep this last, launches thread
         }
     }
 
@@ -522,12 +524,28 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             try // PauseStepListener
             {
-                vcrButtonPressDisplayUpdate(SimulationState.STEP);
-                
-                // TODO where is setStepRun ??
-                
                 if (simulationRunAssemblyInstance != null) 
                 {
+
+                    if (getSimulationState() != SimulationState.PAUSE)
+                    {
+                        vcrButtonPressDisplayUpdate(SimulationState.PAUSE);
+                        // Pause (from Run mode)
+                        Schedule.setSingleStep(true);
+                        Schedule.setPauseAfterEachEvent(true);
+                        Schedule.pause();
+                        
+                        // TODO runaway thread; is any action needed at this point?
+//                        Schedule.startSimulation();
+                    }
+                    else
+                    {
+                        vcrButtonPressDisplayUpdate(SimulationState.STEP);
+                        // Step (while in single-step mode)
+                        // TODO run one step and return
+                        Schedule.startSimulation(); // TODO is this correct method for single stepping?
+                    }
+                    
                     if (priorRunSimulationClassLoader == null)
                         priorRunSimulationClassLoader = getRunSimulationClassLoader(); // can occur if stepping prior to running
                     
@@ -545,8 +563,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 //
 //                    mutex--;
                 }
-
-                Schedule.coldReset(); // simkit
+//              Schedule.coldReset(); // simkit
 
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
                 if ((classLoader != null) && !classLoader.equals(priorWorkingClassLoaderNoReset))
@@ -582,7 +599,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             if (mutex > 0)
                 mutex--;
             
-            // threaded method includes Schedule.stopSimulation();
+            // the following method threaded basicAssembly includes simkit.Schedule.stopSimulation();
             basicAssembly.setStopSimulationRun(true);
             
             try // StopListener
@@ -648,6 +665,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             if (returnValue == JOptionPane.YES_OPTION)
             {
                 vcrButtonPressDisplayUpdate(SimulationState.REWIND);
+                
+                Schedule.reset(); // simkit reset event list
             
                 AssemblyController assemblyController = ViskitGlobals.instance().getAssemblyController();
                 assemblyController.prepareSimulationRunner();

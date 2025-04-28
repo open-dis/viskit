@@ -464,7 +464,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     {
         if (isDebugThread()) logThreadState(METHOD_pauseSimulation);
         
-        Schedule.pause(); // simkit
+        Schedule.pause();// simkit
     }
     
     /** method name for reflection use */
@@ -1080,8 +1080,10 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             } 
             else // continue running replications
             {
-                if (Schedule.isRunning()) // simkit
-                    LOG.info("run() discrepancy: Simulation is already running, continuing anyway...");
+                if      (Schedule.isRunning()) // simkit
+                        LOG.info("run() initialization discrepancy: Simulation is already running, continuing anyway...");
+                else if(Schedule.isSingleStep()) // simkit
+                        LOG.info("run() initialization discrepancy: Simulation is already running in single step mode, continuing anyway...");
                 
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 String spacing = new String();
@@ -1111,7 +1113,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                     });
                 }
 
-                Schedule.startSimulation(); // simkit
+                // usually Viskit starts/stops the simulation, this test is in case of standalone operation (TODO confirm)
+                if (!Schedule.isRunning() && !Schedule.isSingleStep()) // simkit
+                {
+                    Schedule.startSimulation();
+                }
 
                 String typeStatistics, nodeType;
                 int ix = 0;
@@ -1124,7 +1130,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 if (pclNodeCache == null) // <- Headless mode
                     return;
                 
-                for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) {
+                for (Map.Entry<String, AssemblyNode> entry : pclNodeCache.entrySet()) 
+                {
                     LOG.debug("entry is: {}", entry);
 
                     obj = pclNodeCache.get(entry.getKey());

@@ -363,7 +363,7 @@ public class Gridlet extends Thread
 
             // Now add the Assembly
 
-            String assemblyJava = sax2j.translate();
+            String assemblyJava = sax2j.translateIntoJavaSource();
             File assemblyJavaFile = new File(tempDir, root.getName()+".java");
             try (FileWriter writer = new FileWriter(assemblyJavaFile)) {
                 writer.write(assemblyJava);
@@ -378,7 +378,7 @@ public class Gridlet extends Thread
 
             if (/*debug_io*/true) {
                 LOG.info("Evaluating generated java Simulation "+ root.getName() + ":");
-                LOG.info(sax2j.translate());
+                LOG.info(sax2j.translateIntoJavaSource());
                 URI cwd = tempDir.toURI();
                 for (Diagnostic<? extends JavaFileObject> diagnostic :
                     diagnostics.getDiagnostics()) {

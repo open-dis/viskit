@@ -232,14 +232,14 @@ public class BshGridlet extends Thread
 
             if (debug_io) {
                 LOG.info("Evaluating generated java Simulation "+ root.getName() + ":");
-                LOG.info(sax2j.translate());
+                LOG.info(sax2j.translateIntoJavaSource());
             }
             //
             // Now do the Assembly
             //
             // first beanshell "compile" and instance
             //
-            bsh.eval(sax2j.translate());
+            bsh.eval(sax2j.translateIntoJavaSource());
             bsh.eval("sim = new "+ root.getName() +"();");
             ViskitAssembly sim = (ViskitAssembly) bsh.get("sim");
             //

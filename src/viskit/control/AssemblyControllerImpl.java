@@ -1595,7 +1595,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         AssemblyModel assemblyModel = (AssemblyModel) getModel();
         if (assemblyModel == null)
             assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
-        if (source != null && !source.isEmpty()) {
+        if (source != null && !source.isEmpty()) 
+        {
             String className = assemblyModel.getMetadata().packageName + "." + assemblyModel.getMetadata().name;
             ViskitGlobals.instance().getAssemblyViewFrame().showAndSaveSource(className, source, assemblyModel.getCurrentFile().getName());
         }
@@ -1651,7 +1652,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         try {
             x2j = new SimkitAssemblyXML2Java(f);
             x2j.unmarshal();
-            assemblySource = x2j.translate();
+            assemblySource = x2j.translateIntoJavaSource();
         } 
         catch (FileNotFoundException e) {
             LOG.error(e);

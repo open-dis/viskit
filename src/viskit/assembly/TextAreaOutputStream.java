@@ -60,16 +60,16 @@ import org.apache.logging.log4j.Logger;
  */
 public class TextAreaOutputStream extends ByteArrayOutputStream implements ActionListener
 {
-  public static final int OUTPUTLIMIT = 1024 * 1024 * 8; // 8Mb
-  public static final int BACKOFFSIZE = 1024 * 16;       // 16Kb, must be less than OUTPUTLIMIT
+  public static final int CONSOLE_OUTPUT_LIMIT = 1024 * 1024 * 8; // 8Mb
+  public static final int CONSOLE_BACKOFF_SIZE = 1024 * 16;       // 16Kb, must be less than CONSOLE_OUTPUT_LIMIT
   
     static final Logger LOG = LogManager.getLogger();
   
   private final JTextArea jTextArea;
   private final Timer  swingTimer;
   private final int    delay = 125; //250;   // Performance adjuster for slow machines
-  private final String warningMessage = "Output limit exceeded / previous text deleted.\n" +
-                                    "----------------------------------------------\n";
+  private final String CONSOLE_warningMessage = "[Console output limit exceeded, prior text deleted.]\n" +
+                                                "----------------------------------------------------\n";
   public TextAreaOutputStream(JTextArea textArea, int bufferSize)
   {
     super(bufferSize);
@@ -87,10 +87,19 @@ public class TextAreaOutputStream extends ByteArrayOutputStream implements Actio
       String inputString = this.toString();  // "this" = this output stream
       reset();
 
-      if (jTextArea.getDocument().getLength() > OUTPUTLIMIT) {
-        int backoff = Math.max(BACKOFFSIZE, inputSize);
+      if (jTextArea.getText().length() > CONSOLE_OUTPUT_LIMIT) 
+      {
+        int backoff = Math.max(CONSOLE_BACKOFF_SIZE, inputSize);
         if (backoff > 1)
-            jTextArea.replaceRange(warningMessage, 0, backoff - 1);
+        {
+            int beginIndex = 0;
+            if      (jTextArea.getText().contains(CONSOLE_warningMessage))
+                     beginIndex = jTextArea.getText().lastIndexOf(CONSOLE_warningMessage) + 2;
+            else if (jTextArea.getText().contains("---+"))
+                     beginIndex = jTextArea.getText().lastIndexOf("---+") + 2;
+            jTextArea.replaceRange(CONSOLE_warningMessage, 0, backoff - 1);
+            LOG.info("Warning: " + CONSOLE_warningMessage.substring(beginIndex, CONSOLE_warningMessage.indexOf("\n")));
+        }
       }
       jTextArea.append(inputString);
       jTextArea.setCaretPosition(jTextArea.getDocument().getLength()-1);

@@ -1277,7 +1277,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         
         message =
                    "<html><body>" +
-                   "<p align='center'>Edit tabbed field values as needed, then select</p><br />" +
+                   "<p align='center'>Edit tabbed report entries as needed, then select</p><br />" +
                    "<p align='center'><b>Display HTML Analyst Report</b></p><br />";
         // no joy
 //        String  menuImageURL = "doc/images/AnalystReportDisplayHtmlMenu.png";
