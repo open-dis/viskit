@@ -37,7 +37,6 @@ import viskit.ViskitGlobals;
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitStatics;
 import static viskit.ViskitStatics.DESCRIPTION_HINT;
-import static viskit.control.AssemblyControllerImpl.LOG;
 import viskit.jgraph.ViskitGraphUndoManager;
 import viskit.model.*;
 import viskit.mvc.MvcAbstractController;
@@ -48,7 +47,6 @@ import viskit.view.EventGraphView;
 import viskit.xsd.translator.eventgraph.SimkitXML2Java;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
-import viskit.view.MainFrame;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -523,15 +521,26 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     @Override
     public void closeAll() 
     {
-        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab())
+        boolean hasDirtyEventGraph = false; // TODO if needed
+        
+        Model[] eventGraphModels = ((EventGraphView) getView()).getOpenModels();
+        for (Model model : eventGraphModels) 
+        {
+            if (model.isDirty())
+            {
+                hasDirtyEventGraph = true;
+                break;
+            }
+        }
+        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && hasDirtyEventGraph)
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
             messageUser(JOptionPane.INFORMATION_MESSAGE, "View Event Graph Editor", "First review Event Graphs before closing");
             return;
         }
-        Model[] models = ((EventGraphView) getView()).getOpenModels();
-        for (Model model : models) {
-            setModel((MvcModel) model);
+        for (Model model : eventGraphModels) 
+        {
+            setModel((MvcModel) model); // TODO this is a little sloppy since an event graph might also be used by another open assembly
             close();
         }
     }
