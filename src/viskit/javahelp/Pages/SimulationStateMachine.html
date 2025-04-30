@@ -13,74 +13,111 @@
         <h2 align="center">Assembly Simulation State Machine</h2>
         
         <p align="center">
-            This state machine describes how Viskit VCR buttons work when running an Assembly Simulation.
+            This state machine describes how an Assembly Simulation replications progress by using the Viskit VCR buttons.
         </p>
         
         <h2>
             Simulation States
         </h2>
         <p>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <b>INITIALIZE</b>.
-                Perform simulation initialization, ready to begin first replication.
+                <img src="images/Rewind24.gif" alt="Stop" style="vertical-align: text-bottom;"/>
+                <b>READY</b> state
         </p>
+        <ul>
+            <li>
+                Perform simulation initialization, now ready to begin first replication.
+                Next: await <i>Run</i> or <i>Step</i> button.
+            </li>
+        </ul>
+        
         <p>
                 <img src="images/Play24.gif" alt="Run - Resume" style="vertical-align: text-bottom;"/>
-                <b>RUN</b>
+                <b>RUN</b> state
         </p>
-                <ul>
-                    <li>
-                        <i>Run</i> mode:  &nbsp;&nbsp;&nbsp; &nbsp; begin simulation replications in continuous mode until completion.
-                    </li>
-                    <li>
-                        <i>Resume</i> mode: continue running remaining simulation replications in continuous mode until completion.
-                    </li>
-                </ul>
+        <ul>
+            <li>
+                <i>Run</i> mode:  &nbsp;&nbsp;&nbsp; &nbsp; begin continuous simulation replications.
+                Next: run until completion, unless interrupted by <i>Step</i> or <i>Stop</i> buttons.
+            </li>
+            <li>
+                <i>Resume</i> mode: continue running remaining simulation replications in <i>Run</i> mode.
+            </li>
+        </ul>
+
         <p>
                 <img src="images/Pause24.gif" alt="Pause - Step" style="vertical-align: text-bottom;"/>
-                <b>PAUSE</b>
+                <b>PAUSE</b> state
         </p>
-                <ul>
-                    <li>
-                        <i>Pause</i> mode: pause continuous simulation replications, begin single-step mode,
-                        await <i>Resume</i> or <i>Step</i> or <i>Stop</i>.
-                    </li>
-                    <li>
-                        <i>Step</i> mode: &nbsp;&nbsp; perform one simulation loop within current replication, continue single-step mode,
-                        await <i>Resume</i> or <i>Step</i> or <i>Stop</i>.
-                    </li>
-                </ul>
+        <ul>
+            <li>
+                <i>Pause</i> mode: pause continuous simulation replications, stand by in single-step mode.
+                Next: await <i>Resume</i> or <i>Step</i> or <i>Stop</i> buttons.
+            </li>
+            <li>
+                <i>Step</i> mode: &nbsp;&nbsp; perform one replication loop within current simulation, remain in single-step mode.
+                Next: await <i>Resume</i> or <i>Step</i> or <i>Stop</i> buttons.
+            </li>
+        </ul>
+        
         <p>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <b>DONE</b>.
-                Simulation replications are completed or stopped, ready to review Analyst Report.
+                <img src="images/Stop24.gif" alt="Stop" style="vertical-align: text-bottom;"/>
+                <b>DONE</b> state
         </p>
+        <ul>
+            <li>
+                Simulation replications are completed or stopped.
+                Next: ready to prepare Analyst Report.
+            </li>
+        </ul>
+        
         <h2>
-            Additional VCR Buttons
+            VCR Buttons for State Transitions
         </h2>
+        <p>
+                <img src="images/Rewind24.gif" alt="Rewind" style="vertical-align: text-bottom;"/>
+                <b>Rewind.</b>
+                Halt simulation replications, initialize all settings, now in <b>READY</b> state.
+        </p>
+        <p>
+                <img src="images/Play24.gif" alt="Run" style="vertical-align: text-bottom;"/>
+                <b>Run, Resume.</b>
+                Enter <i>RUN</i> mode, continue the next simulation replications.
+        </p>
+        <p>
+                <img src="images/Pause24.gif" alt="Step" style="vertical-align: text-bottom;"/>
+                <b>Pause, Step.</b>
+                 Enter <i>PAUSE</i> mode, pause or single-step the next simulation replication.
+        </p>
+        <p>
+                <img src="images/Stop24.gif" alt="Stop" style="vertical-align: text-bottom;"/>
+                <b>Stop.</b>
+                Halt simulation replications, now in <b>DONE</b> state.
+        </p>
         <p>
                 <img src="images/Delete24.gif" alt="Delete" style="vertical-align: text-bottom;"/>
                 <b>Clear.</b>
                 Clear all text in console area.
         </p>
-        <p>
-                <img src="images/Stop24.gif" alt="Stop" style="vertical-align: text-bottom;"/>
-                <b>Stop.</b>
-                Halt simulation replications, set state <b>Done</b>, ready to prepare Analyst Report.
-        </p>
         <h2>
             Repeating a Simulation
         </h2>
         <p>
-            <!--TODO <img src="images/Delete24.gif" alt="Delete" style="vertical-align: text-bottom;"/>
-                <b>Initialize.</b> -->
-            Select <b>Assembly Editor</b> tab, once again press button <b>Initialize Assembly for Simulation Run</b>.
+            There are two ways to repeat a simulation.
         </p>
+        <ul>
+            <li>
+                Select the <b>Rewind</b> button.
+            </li>
+            <li>
+                Select <b>Assembly Editor</b> tab, once again press button <b>Initialize Assembly for Simulation Run</b>.
+            </li>
+        </ul>
         <br />
         <br />
         
         <p align="center">
-            <img src="images/ViskitSimulationStateMachine.png" style="width: 90%; border: 1px solid black;" alt="Viskit Run Simulation State Machine diagram"/>
+            <!-- JavaHelp system uses HTML4, avoid css forms for width and border style="width: 90%; border: 1px solid black;" -->
+            <img src="images/ViskitSimulationStateMachine.png" width="90%" border="1" alt="Viskit Assembly Simulation State Machine diagram"/>
         </p>
     </body>
 </html>
