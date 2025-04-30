@@ -929,6 +929,8 @@ their descpritions.
     <property name="javadoc.doctitle"        value="${javadoc.windowtitle}"/>
     <!-- build.impl <javadoc additionalparam="-J-Dfile.encoding=${file.encoding} ${javadoc.additionalparam}" author="${javadoc.author}" charset="UTF-8" destdir="${dist.javadoc.dir}" docencoding="UTF-8" encoding="${javadoc.encoding.used}" failonerror="true" noindex="${javadoc.noindex}" nonavbar="${javadoc.nonavbar}" notree="${javadoc.notree}" private="${javadoc.private}" source="${javac.source}" splitindex="${javadoc.splitindex}" use="${javadoc.use}" useexternalfile="true" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}"> -->
 
+    <target name="javadoc" depends="javadoc.custom" description="redirect to customized javadoc"/>        
+        
     <target name="javadoc.custom" description="Customized javadoc">
         <!-- adapted from opendis7java project -->
         <echo message="$javac.classpath=${javac.classpath}"/>
