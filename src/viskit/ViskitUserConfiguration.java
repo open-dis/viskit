@@ -25,7 +25,7 @@ import static viskit.ViskitStatics.isFileReady;
 import viskit.doe.FileHandler;
 
 /**
- * Persistent key-value store for Viskit configuration values.
+ * Singleton class for persistent key-value store for Viskit configuration values.
  * <p>Viskit Discrete Event Simulation (DES) Tool
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
