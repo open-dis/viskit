@@ -22,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- *
+ * Test case
  * @author Rick Goldberg
  */
 public class TestCodeFormat extends Thread 

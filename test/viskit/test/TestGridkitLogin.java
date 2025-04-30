@@ -20,7 +20,7 @@ import org.apache.xmlrpc.XmlRpcException;
 import viskit.ViskitGlobals;
 
 /**
- *
+ * Test case
  * @author Rick Goldberg
  * @version $Id: TestGridkitLogin.java 1662 2007-12-16 19:44:04Z tdnorbra $
  */
