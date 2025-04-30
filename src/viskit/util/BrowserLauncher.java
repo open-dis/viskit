@@ -49,6 +49,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
+ * Launch user's web browser
  * @version $Id: BrowserLauncher.java 1860 2008-06-17 23:48:42Z ahbuss $
  * @author <a href="mailto:tdnorbra@nps.edu?subject=viskit.util.BrowserLauncher">Terry Norbraten, NPS MOVES</a>
  */

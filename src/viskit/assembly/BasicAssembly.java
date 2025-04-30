@@ -101,7 +101,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     protected PropertyChangeListener[]       propertyChangeListenerArray;
     
     protected boolean hookupsCalled;
-    protected boolean stopSimulationRun;
+    protected boolean  stopSimulationRun;
+    protected boolean pauseSimulationRun;
     protected int startReplicationNumber = 0;
     protected Set<ReRunnable> runEntitiesSet;
     protected long seed;
@@ -439,7 +440,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     /** method name for reflection use */
     public static final String METHOD_setStopSimulationRun = "setStopSimulationRun";
 
-    /** Causes simulation runs to halt
+    /** Causes simulation runs to halt by signaling inside the execution thread
      *
      * @param newValue if true, stops further simulation runs
      */
@@ -457,14 +458,39 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     }
     
     /** method name for reflection use */
-    public static final String METHOD_pauseSimulation = "pauseSimulation";
+    public static final String METHOD_setPauseSimulationRun = "setPauseSimulationRun";
 
-    public void pauseSimulation()
+    /** Causes simulation runs to halt by signaling inside the execution thread
+     *
+     * @param newValue if true, pauses further simulation runs
+     */
+    public void setPauseSimulationRun(boolean newValue) 
     {
-        if (isDebugThread()) logThreadState(METHOD_pauseSimulation);
+        // do not set debug breakpoint in this method or else thread is not notified to pause
         
-        Schedule.pause();// simkit
+        if (isDebugThread()) logThreadState(METHOD_setPauseSimulationRun);
+        
+        pauseSimulationRun = newValue;
+        if (pauseSimulationRun)
+        {
+            // TODO advance sim clock when in single step mode?
+
+            Schedule.pause();// simkit
+        }
     }
+    
+    // duplicative
+//    /** method name for reflection use */
+//    public static final String METHOD_pauseSimulation = "pauseSimulation";
+//
+//    public void pauseSimulation()
+//    {
+//        if (isDebugThread()) logThreadState(METHOD_pauseSimulation);
+//            
+//        // TODO advance sim clock when in single step mode?
+//        
+//        Schedule.pause();// simkit
+//    }
     
     /** method name for reflection use */
     public static final String METHOD_resumeSimulation = "resumeSimulation";
@@ -473,13 +499,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     {
         if (isDebugThread()) logThreadState(METHOD_resumeSimulation);
         
+        pauseSimulationRun = false;
+        
         Schedule.startSimulation(); // simkit
     }
 
     /** this is getting called by the Assembly Runner stopSimulationRun
  button, which may get called on startup.
      */
-    // TODO unused??
+    // TODO unused??  uncalled?
     public void stopSimulationRun()
     {
         stopSimulationRun = true;
@@ -931,7 +959,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         fixThreadedName();
         LOG.info(assemblyName + " is now running inside BasicAssembly run() Simulation Run thread...");
         
-        stopSimulationRun = false;
+         stopSimulationRun = false;
+        pauseSimulationRun = false;
         
         if (projectDirectory == null) // don't test getWorkingDirectory() which likely produces NPE
         {
@@ -1036,6 +1065,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
         for (int replication = 0; replication < getNumberPlannedReplications(); replication++)
         {
+            // TODO check for pause
+            
             firePropertyChange("replicationNumber", (replication + 1));
             if ((replication + 1) == getVerboseReplicationNumber())
             {
@@ -1049,8 +1080,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             }
 
             int nextRunCount = Schedule.getReruns().size(); // simkit
-            if (nextRunCount != runCount) {
-                LOG.info("Reruns changed old: " + runCount + " new: " + nextRunCount);
+            if (nextRunCount != runCount) 
+            {
+                LOG.info("run() simkit.Schedule.getReruns() value changed, old: " + runCount + " new: " + nextRunCount);
                 firePropertyChange("rerunCount", runCount, nextRunCount);
                 runCount = nextRunCount;
 
@@ -1077,12 +1109,24 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 //                });
                 break;
             } 
+            else if (pauseSimulationRun) 
+            {
+                String pauseMessage = "Simulation paused in Replication # " + (replication + 1);
+                LOG.info(pauseMessage);
+                // breaks simulation threading if not deferred, nevertheless not reachable at tuntime due to different classloader
+                // not a problem since console notes number of completed replication
+//                SwingUtilities.invokeLater(() -> {
+//                     ViskitGlobals.instance().getSimulationRunPanel().outputStreamTA.append(stopMessage);
+//                });
+                break;
+            } 
             else // continue running replications
             {
-                if      (Schedule.isRunning()) // simkit
-                        LOG.info("run() initialization discrepancy: Simulation is already running, continuing anyway...");
+                // simkit execution consistency checks:
+                if      (Schedule.isRunning())   // simkit
+                        LOG.error("run() initialization discrepancy: Simulation is already running, continuing anyway...");
                 else if(Schedule.isSingleStep()) // simkit
-                        LOG.info("run() initialization discrepancy: Simulation is already running in single step mode, continuing anyway...");
+                        LOG.error("run() initialization discrepancy: Simulation is already running in single step mode, continuing anyway...");
                 
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 String spacing = new String();
@@ -1112,11 +1156,20 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                     });
                 }
 
-                // usually Viskit starts/stops the simulation, this test is in case of standalone operation (TODO confirm)
-                if (!Schedule.isRunning() && !Schedule.isSingleStep()) // simkit
+//                if (!Schedule.isRunning() && !Schedule.isSingleStep()) // simkit
+//                {
+//                }
+
+                if (!pauseSimulationRun)
                 {
+                    // now run the replication
                     Schedule.startSimulation();
                 }
+                else
+                {
+                    LOG.info("run() paused...");
+                }
+                    
 
                 String typeStatistics, nodeType;
                 int ix = 0;

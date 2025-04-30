@@ -12,6 +12,7 @@ import viskit.model.*;
 import viskit.mvc.MvcRecentFileListener;
 
 /**
+ * Abstract interface for EventGraphControllerImpl
  * @author Mike Bailey
  * @since Mar 19, 2004
  * @since 9:00:57 AM

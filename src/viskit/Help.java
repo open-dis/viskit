@@ -55,6 +55,7 @@ import viskit.util.BrowserLauncher;
 import viskit.util.Version;
 
 /**
+ * Provide JavaHelp support
  * @version $Id$
  * @author  ahbuss
  * 

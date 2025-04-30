@@ -302,6 +302,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             // the follow-on initializations using ViskitGlobals and ViskitUserPreferencesDialog
             // must occur prior to threading and new RunSimulationClassLoader
 ////            basicAssembly.resetRunSimulationClassLoader(); // TODO wrong place for this, likely out of place
+            
             basicAssembly.setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory()); // TODO duplicate invocation?
             setClassPathUrlArray(ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray());
             
@@ -362,6 +363,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             // *** End RNG seed state reset ***
 
             textAreaOutputStream = new viskit.assembly.TextAreaOutputStream(simulationRunPanel.outputStreamTA, 16*1024);
+
+            // TODO update panel values for Simulation Run
 
             setOutputStreamMethod.invoke(simulationRunAssemblyInstance, textAreaOutputStream); // redirect output
             setNumberReplicationsMethod.invoke(simulationRunAssemblyInstance, Integer.valueOf(simulationRunPanel.numberReplicationsTF.getText().trim()));
@@ -525,6 +528,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent actionEvent) // TODO development in progress, not fully tested
         {
+            // the following method threaded basicAssembly includes simkit.Schedule.stopSimulation();
+            basicAssembly.setPauseSimulationRun(true);
+            
             try // PauseStepListener
             {
                 if (simulationRunAssemblyInstance != null) 
@@ -533,17 +539,21 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     {
                         vcrButtonPressDisplayUpdate(SimulationState.PAUSE);
                         
+                        // TODO duplicative?
+                        
                         // Pause (from Run mode)
                         Schedule.setSingleStep(true);
                         Schedule.setPauseAfterEachEvent(true);
                         Schedule.pause();
                         
                         // TODO runaway thread; is any action needed at this point?
+                        // Likely problem:  pause event is not being recieved in threaded event loop, rather in between replications
 //                        Schedule.startSimulation();
                     }
                     else
                     {
                         vcrButtonPressDisplayUpdate(SimulationState.STEP);
+                        
                         // Step (while in single-step mode)
                         // TODO run one step and return
                         Schedule.startSimulation(); // TODO is this correct method for single stepping?

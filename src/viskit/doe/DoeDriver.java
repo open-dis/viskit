@@ -11,7 +11,7 @@
 package viskit.doe;
 
 /**
- *
+ * Abstract interface for RemoteDriverImpl
  * @author Rick Goldberg
  *
  */

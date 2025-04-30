@@ -90,7 +90,7 @@ public abstract class ViskitModelInstantiator
         return v;
     }
 
-    /***********************************************************************/
+    /* **********************************************************************/
     public static class FreeF extends ViskitModelInstantiator {
 
         private String value;
@@ -129,7 +129,7 @@ public abstract class ViskitModelInstantiator
         }
     }
 
-    /***********************************************************************/
+    /* **********************************************************************/
     public static class Constr extends ViskitModelInstantiator {
 
         private List<Object> args;
@@ -576,7 +576,7 @@ public abstract class ViskitModelInstantiator
         }
     }
 
-    /***********************************************************************/
+    /* **********************************************************************/
     public static class Array extends ViskitModelInstantiator {
 
         private List<Object> instantiators; // array dimension == size()
@@ -634,7 +634,7 @@ public abstract class ViskitModelInstantiator
         }
     }
 
-    /***********************************************************************/
+    /* **********************************************************************/
     public static class Factory extends ViskitModelInstantiator {
 
         private String factoryClass;

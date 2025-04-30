@@ -287,7 +287,9 @@ public final class AnalystReportModel extends MvcAbstractModel
         return file;
     }
 
-    /** @return the initial temp file to be saved for further post-processing
+    /** 
+     * Write XML file
+     * @return the initial temp file to be saved for further post-processing
      * @throws java.lang.Exception general catchall
      */
     public File writeToXMLFile() throws Exception {
@@ -1013,7 +1015,9 @@ public final class AnalystReportModel extends MvcAbstractModel
         replaceChildren(parentElement,_makeElementContent(elementPrefix,"Conclusions",conclusionText));
     }
 
-    /** @param element the Element to extract information from
+    /**
+     * clear Conclusions
+     * @param element the Element to extract information from
      * @return a String object of the Element's contents
      */
     public String unMakeConclusions(Element element) {
