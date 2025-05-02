@@ -33,8 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit.assembly;
 
-import edu.nps.util.Log4jUtilities;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
@@ -82,21 +80,21 @@ public class TextAreaOutputStream extends ByteArrayOutputStream implements Actio
   public void actionPerformed(ActionEvent e)
   {
     int inputSize = size();
-    if (inputSize > 0) {
-
+    if (inputSize > 0)
+    {
       String inputString = this.toString();  // "this" = this output stream
       reset();
 
-      if (jTextArea.getText().length() > CONSOLE_OUTPUT_LIMIT) 
+      if (inputString.length() > CONSOLE_OUTPUT_LIMIT) 
       {
         int backoff = Math.max(CONSOLE_BACKOFF_SIZE, inputSize);
         if (backoff > 1)
         {
             int beginIndex = 0;
-            if      (jTextArea.getText().contains(CONSOLE_warningMessage))
-                     beginIndex = jTextArea.getText().lastIndexOf(CONSOLE_warningMessage) + 4;
-            else if (jTextArea.getText().contains("---+"))
-                     beginIndex = jTextArea.getText().lastIndexOf("---+") + 4;
+            if      (inputString.contains(CONSOLE_warningMessage))
+                     beginIndex = inputString.lastIndexOf(CONSOLE_warningMessage) + 4;
+            else if (inputString.contains("---+"))
+                     beginIndex = inputString.lastIndexOf("---+") + 4;
             jTextArea.replaceRange("\n\n" + CONSOLE_warningMessage, beginIndex, backoff - 1);
             LOG.info("Warning: " + CONSOLE_warningMessage.substring(beginIndex, CONSOLE_warningMessage.indexOf("\n")));
         }

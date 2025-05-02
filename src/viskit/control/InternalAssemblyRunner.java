@@ -109,9 +109,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     /** The name of the basicAssembly to run */
     private String simulationRunAssemblyClassName;
     private SimulationRunPanel simulationRunPanel;
-    private ActionListener saveListener;
     private JMenuBar myMenuBar;
     private JMenu  simulationRunMenu;
+    private JMenu  simulationButtonsMenu;
+    private  JMenuItem rewindButtonMI, runButtonMI, stepButtonMI, stopButtonMI, clearAllConsoleTextMI;
     private Thread simulationRunThread;
     private BasicAssembly basicAssembly;
 
@@ -149,8 +150,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     
     public InternalAssemblyRunner(boolean analystReportPanelVisible) 
     {
-        saveListener = new SaveListener();
-
         simulationRunPanel = new SimulationRunPanel(SIMULATION_RUN_PANEL_TITLE, true, analystReportPanelVisible);
         buildMenus();
         simulationRunPanel.vcrRewindButton   .addActionListener(new RewindListener());
@@ -170,6 +169,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
         // Provide access to Enable Analyst Report checkbox
         ViskitGlobals.instance().setSimulationRunPanel(simulationRunPanel);
+        
+        vcrButtonPressDisplayUpdate(SimulationState.INACTIVE);
     }
 
     public JMenuBar getMenus() {
@@ -241,7 +242,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage()
             );
-            vcrButtonPressDisplayUpdate(SimulationState.DONE);
+            vcrButtonPressDisplayUpdate(SimulationState.INACTIVE);
             simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HINT); // duplicative since handling exception
 //            throwable.printStackTrace();
             return;
@@ -254,6 +255,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 //            SwingUtilities.invokeLater(() -> {
                  simulationRunPanel.outputStreamTA.setText("");
                  simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HINT);
+                 vcrButtonPressDisplayUpdate(SimulationState.INACTIVE);
 //            });
 //        } 
 //        catch (Exception ex) {
@@ -506,6 +508,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent actionEvent) 
         {
+            ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
+            if (!ViskitGlobals.instance().getSimulationRunPanel().vcrRunResumeButton.isEnabled())
+            {
+                ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                "Simulation controller button selection ignored", "Run/resume button not currently enabled");
+                return;
+            }
+            
 //          simulationRunPanel.vcrStartTimeTF.setText("0.0");        // because no pausing ?? TODO check
             
             vcrButtonPressDisplayUpdate(SimulationState.RUN_RESUME); // resolves RUN or RESUME
@@ -528,6 +538,15 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent actionEvent) // TODO development in progress, not fully tested
         {
+            ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
+            if (!ViskitGlobals.instance().getSimulationRunPanel().vcrPauseStepButton.isEnabled())
+            {
+                
+                ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                "Simulation controller button selection ignored", "Pause/step button not currently enabled");
+                return;
+            }
+            
             // the following method threaded basicAssembly includes simkit.Schedule.stopSimulation();
             basicAssembly.setPauseSimulationRun(true);
             
@@ -611,6 +630,15 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent actionEvent)
         {
+            ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
+            if (!ViskitGlobals.instance().getSimulationRunPanel().vcrStopButton.isEnabled())
+            {
+                
+                ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                "Simulation controller button selection ignored", "Stop button not currently enabled");
+                return;
+            }
+            
             if (mutex > 0)
                 mutex--;
             
@@ -673,8 +701,16 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent actionEvent) 
         {
+            ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
+            if (!ViskitGlobals.instance().getSimulationRunPanel().vcrRewindButton.isEnabled())
+            {
+                ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                "Simulation controller button selection ignored", "Rewind button not currently enabled");
+                return;
+            }
+            
             String title, message;
-            title = "Rewind and reset simulation?";
+            title = "Rewind, clear console, and reset simulation?";
             message = "<html><p align='center'>Are you sure that you want to reset this simulation?</p><br/>";
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
@@ -717,7 +753,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            ViskitGlobals.instance().selectSimulationRunTab();
+            ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
             if (saveChooser == null) {
                 saveChooser = new JFileChooser(ViskitGlobals.instance().getViskitProject().getProjectDirectory());
             }
@@ -798,13 +834,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     /** Simulation state machine: states plus transitions,
      *  see Viskit Assembly Simulation State Machine diagram */
     public enum SimulationState {
-        READY, RUN_RESUME, RUN, RESUME, PAUSE_STEP, PAUSE, STEP, STOP, REWIND, DONE
+        READY, RUN_RESUME, RUN, RESUME, PAUSE_STEP, PAUSE, STEP, STOP, REWIND, DONE, INACTIVE
     }
 
     /** Simulation State Machine transition logic, initiated by user button selection.
      * @param newEvent triggered by button push
      */
-    public void vcrButtonPressDisplayUpdate(SimulationState newEvent) 
+    public final void vcrButtonPressDisplayUpdate(SimulationState newEvent) 
     {
         SimulationState newState = newEvent; // save original value
         
@@ -889,11 +925,23 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
                  LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                  break;
+                 
+            case INACTIVE: // no assembly is ready
+                 simulationRunPanel.vcrRewindButton      .setEnabled(false);
+                 simulationRunPanel.vcrRunResumeButton   .setEnabled(false);
+                 simulationRunPanel.vcrPauseStepButton   .setEnabled(false);
+                 simulationRunPanel.vcrStopButton        .setEnabled(false);
+                 simulationRunPanel.vcrClearConsoleButton.setEnabled(false);
+                 LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
+                 break;
                 
             default:
                  LOG.warn("*** Unrecognized vcrButtonListener(event=" + newEvent + ")");
                  break;
         }
+        // now that buttons enabled/disabled are all up to date, can update corresponding menu items to match
+        updateSimulationControllerButtonsMenu();
+        
         logSimulationRunState(); // development diagnostics
     }
     /** diagnostic utility
@@ -938,6 +986,36 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         simulationRunMenu = new JMenu("Simulation Run");
         simulationRunMenu.setToolTipText("Simulation Run performs multiple replications of a compiled Assembly model");
         simulationRunMenu.setMnemonic('S');
+        
+        simulationButtonsMenu = new JMenu("Simulation controller buttons");
+        simulationButtonsMenu.setEnabled(false); // initial condition while SimulationState is INACTIVE
+        rewindButtonMI = new JMenuItem("Rewind");
+        rewindButtonMI.setMnemonic('R');
+        rewindButtonMI.setToolTipText("Reset the simulation run");
+       runButtonMI = new JMenuItem("Run/Resume");
+        runButtonMI.setMnemonic('R');
+        runButtonMI.setToolTipText("Run or resume the simulation replications");
+       stepButtonMI = new JMenuItem("Pause/Step");
+        stepButtonMI.setMnemonic('S');
+        stepButtonMI.setToolTipText("Pause current replication, or single step the next replication");
+       stopButtonMI = new JMenuItem("Stop");
+        stopButtonMI.setMnemonic('S');
+        stopButtonMI.setToolTipText("Stop the simulation replications");
+        
+        rewindButtonMI.addActionListener(new RewindListener());
+           runButtonMI.addActionListener(new RunResumeListener());
+          stepButtonMI.addActionListener(new PauseStepListener());
+          stopButtonMI.addActionListener(assemblySimulationRunStopListener); // = new StopListener());
+        
+        simulationButtonsMenu.add(rewindButtonMI);
+        simulationButtonsMenu.add(   runButtonMI);
+        simulationButtonsMenu.add(  stepButtonMI);
+        simulationButtonsMenu.add(  stopButtonMI);
+        simulationRunMenu.add(simulationButtonsMenu);
+                
+        clearAllConsoleTextMI = new JMenuItem("Clear all console text");
+        clearAllConsoleTextMI.setMnemonic('C');
+        clearAllConsoleTextMI.setToolTipText("Clear the console text area");
         JMenuItem copyMI = new JMenuItem("Copy console text selection");
         copyMI.setMnemonic('C');
         copyMI.setToolTipText("Copy simulation run console output");
@@ -947,9 +1025,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         JMenuItem selectAllMI = new JMenuItem("Select all console text");
         selectAllMI.setMnemonic('S');
         selectAllMI.setToolTipText("Select all text in the console log");
-        JMenuItem clearAllMI = new JMenuItem("Clear all console text");
-        clearAllMI.setMnemonic('C');
-        clearAllMI.setToolTipText("Clear the console text area");
         JMenuItem viewConsoleOutputMI = new JMenuItem("View console output in text editor");
         viewConsoleOutputMI.setMnemonic('V');
         viewConsoleOutputMI.setToolTipText("Directly launch console output to text editor");
@@ -957,17 +1032,17 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         viewLogsDirectoryMI.setMnemonic('V');
         viewLogsDirectoryMI.setToolTipText("View simulation logs directory in system");
 
-        copyMI.addActionListener(new CopyConsoleTextListener());
-        saveMI.addActionListener(saveListener);
-        selectAllMI.addActionListener(new SelectAllConsoleTextListener());
-        clearAllMI.addActionListener(new ClearConsoleListener());
-        viewConsoleOutputMI.addActionListener(new ViewConsoleListener());
-        viewLogsDirectoryMI.addActionListener(new ViewLogsDirectoryListener());
+        clearAllConsoleTextMI.addActionListener(new ClearConsoleListener());
+                       copyMI.addActionListener(new CopyConsoleTextListener());
+                       saveMI.addActionListener(new SaveListener());
+                  selectAllMI.addActionListener(new SelectAllConsoleTextListener());
+          viewConsoleOutputMI.addActionListener(new ViewConsoleListener());
+          viewLogsDirectoryMI.addActionListener(new ViewLogsDirectoryListener());
 
+        simulationRunMenu.add(clearAllConsoleTextMI);
         simulationRunMenu.add(copyMI);
         simulationRunMenu.add(saveMI);
         simulationRunMenu.add(selectAllMI);
-        simulationRunMenu.add(clearAllMI);
         simulationRunMenu.add(viewConsoleOutputMI);
         simulationRunMenu.add(viewLogsDirectoryMI);
 
@@ -991,7 +1066,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e) 
         {
-            ViskitGlobals.instance().selectSimulationRunTab();
+            ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
             String selectedText = simulationRunPanel.outputStreamTA.getSelectedText();
             StringSelection stringSelection = new StringSelection(selectedText);
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -1004,24 +1079,33 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            ViskitGlobals.instance().selectSimulationRunTab();
+            ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
             simulationRunPanel.outputStreamTA.requestFocus();
             simulationRunPanel.outputStreamTA.selectAll();
         }
     }
 
-    class ClearConsoleListener implements ActionListener
+    public class ClearConsoleListener implements ActionListener
     {
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            // TODO vcrButtonPressDisplayUpdate(SimulationState._); not appropriate, ClearConsole is not a state
+            // TODO vcrButtonPressDisplayUpdate(SimulationState._); ... not appropriate, ClearConsole is not a state
             
-            ViskitGlobals.instance().selectSimulationRunTab(); // making sure
-            simulationRunPanel.outputStreamTA.setText("");
-            LOG.info("Simulation Run Manager: clear console");
-            // no need to update 
-            simulationRunPanel.vcrButtonStatusLabel.setText(" CLEAR" );
+            ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
+            if (!ViskitGlobals.instance().getSimulationRunPanel().vcrClearConsoleButton.isEnabled())
+            {
+                ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                "Simulation controller button selection ignored", "Clear console button not currently enabled");
+                return;
+            }
+                
+            int returnValue = JOptionPane.showConfirmDialog(ViskitGlobals.instance().getSimulationRunPanel(), "Are you sure?", "Confirm clearing all console information", JOptionPane.YES_NO_OPTION);
+            if (returnValue == JOptionPane.YES_OPTION) 
+            {
+                simulationRunPanel.outputStreamTA.setText("");
+                LOG.info("ClearConsoleListener: clear console");
+            }
         }
     }
 
@@ -1030,7 +1114,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            ViskitGlobals.instance().selectSimulationRunTab();
+            ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
+            
             File f; // = tmpFile;
             String osName = ViskitStatics.OPERATING_SYSTEM;
             String filePath = "";
@@ -1220,6 +1305,23 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         this.simulationState = newSimulationState;
         if (basicAssembly != null) // also update superclass
             basicAssembly.setSimulationState(newSimulationState);
+    }
+
+    /**
+     * @return whether simulationState is active
+     */
+    public boolean isAssemblySimulationEnabled() {
+        return !(simulationState == SimulationState.INACTIVE);
+    }
+    
+    private void updateSimulationControllerButtonsMenu()
+    {
+        simulationButtonsMenu.setEnabled(isAssemblySimulationEnabled());
+        rewindButtonMI.setEnabled(simulationRunPanel.vcrRewindButton.isEnabled());
+           runButtonMI.setEnabled(simulationRunPanel.vcrRunResumeButton.isEnabled());
+          stepButtonMI.setEnabled(simulationRunPanel.vcrPauseStepButton.isEnabled());
+          stopButtonMI.setEnabled(simulationRunPanel.vcrStopButton.isEnabled());
+ clearAllConsoleTextMI.setEnabled(simulationRunPanel.vcrClearConsoleButton.isEnabled());
     }
 
 }  // end class file InternalAssemblyRunner.java

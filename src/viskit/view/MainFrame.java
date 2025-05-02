@@ -99,7 +99,7 @@ public class MainFrame extends JFrame
     EventGraphViewFrame  eventGraphFrame;
     AssemblyViewFrame    assemblyFrame;
     AnalystReportViewFrame analystReportEditorPanel;
-    InternalAssemblyRunner internalSimulationRunner;
+    public InternalAssemblyRunner internalAssemblyRunner;
     JobLauncherTab2 runGridComponent;
 
     private Action myQuitAction;
@@ -259,7 +259,8 @@ public class MainFrame extends JFrame
         runTabbedPanePanel.add(getSimulationRunTabbedPane(), BorderLayout.CENTER);
 
         // Always selected as visible
-        if (ViskitUserPreferencesDialog.isAssemblySimulationRunVisible()) {
+        if (ViskitUserPreferencesDialog.isAssemblySimulationRunVisible()) 
+        {
             topTabbedPane.add(runTabbedPanePanel);
             assemblyPaneIndex = topTabbedPane.indexOfComponent(runTabbedPanePanel);
             topTabbedPane.setTitleAt(assemblyPaneIndex, "Simulation Run Manager");
@@ -306,23 +307,23 @@ public class MainFrame extends JFrame
         }
 
         // Assembly Simulation Run
-        internalSimulationRunner = new InternalAssemblyRunner(analystReportPanelVisible);
-        ViskitGlobals.instance().setInternalSimulationRunner(internalSimulationRunner);
+        internalAssemblyRunner = new InternalAssemblyRunner(analystReportPanelVisible);
+        ViskitGlobals.instance().setInternalSimulationRunner(internalAssemblyRunner);
         
         getSimulationRunTabbedPane().add(ViskitGlobals.instance().getSimulationRunPanel(), TAB1_LOCALRUN_INDEX);
         getSimulationRunTabbedPane().setTitleAt(TAB1_LOCALRUN_INDEX, SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT);
         getSimulationRunTabbedPane().setToolTipTextAt(TAB1_LOCALRUN_INDEX, "Run replications of assembly simulation on local host");
-        mainFrameMenuBar = internalSimulationRunner.getMenus();
+        mainFrameMenuBar = internalAssemblyRunner.getMenus();
         modalMenuBarList.add(mainFrameMenuBar);
         doCommonHelp(mainFrameMenuBar);
         jamSettingsHandler(mainFrameMenuBar);
         
         // TODO is this needed?
-        // internalSimulationRunner.setTitleListener(myTitleListener, topTabbedAssemblyPane.getTabCount() + TAB1_LOCALRUN_INDEX);
+        // internalAssemblyRunner.setTitleListener(myTitleListener, topTabbedAssemblyPane.getTabCount() + TAB1_LOCALRUN_INDEX);
         
         if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
-        jamQuitHandler(internalSimulationRunner.getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
+        jamQuitHandler(internalAssemblyRunner.getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
         }
         
 // TODO unhide, unify?
@@ -681,7 +682,7 @@ public class MainFrame extends JFrame
                 getSimulationRunTabbedPane().setSelectedIndex(TAB1_LOCALRUN_INDEX);
 
                 // initializes a RunSimulation class loader
-                internalSimulationRunner.preRunInitialization(execStrings);
+                internalAssemblyRunner.preRunInitialization(execStrings);
             }
         }
 
@@ -697,9 +698,8 @@ public class MainFrame extends JFrame
             simulationRunPanel.printReplicationReportsCB.setSelected(false);
             simulationRunPanel.printSummaryReportsCB.setSelected(false);
 
-            internalSimulationRunner.vcrButtonPressDisplayUpdate(InternalAssemblyRunner.SimulationState.DONE); // initialize
             simulationRunPanel.outputStreamTA       .setText(INITIAL_SIMULATION_RUN_HINT);
-            internalSimulationRunner.doTitle(null);
+            internalAssemblyRunner.doTitle(null);
             
             simulationRunPanel.stateMachineMessageLabel.setText("");
         }

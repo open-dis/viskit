@@ -46,6 +46,7 @@ import org.apache.logging.log4j.Logger;
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import viskit.control.InternalAssemblyRunner.ClearConsoleListener;
 import static viskit.control.InternalAssemblyRunner.SimulationState.READY;
 
 /**
@@ -65,7 +66,7 @@ public class SimulationRunPanel extends JPanel
     
     public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 30; // also defined twice in viskit.xsd schema
     
-    public final static String INITIAL_SIMULATION_RUN_HINT = "First initialize an Assembly in the Assembly Editor before commencing a Simulation Run..."; // Local Run Simulation
+    public final static String INITIAL_SIMULATION_RUN_HINT = "First initialize an Assembly in Assembly Editor before commencing Simulation Run..."; // Local Run Simulation
 
     public static final String lineEnd = System.getProperty("line.separator");
     
@@ -202,7 +203,7 @@ public class SimulationRunPanel extends JPanel
         vcrRewindButton.setBorder(BorderFactory.createEtchedBorder());
         vcrRewindButton.setText(null);
         vcrRewindButton.setToolTipText("Reset the simulation run");
-        vcrRewindButton.setEnabled(true); // false true
+        vcrRewindButton.setEnabled(false); // initial state
         if (showIncompleteButtons) 
         {
             vcrButtonsPanel.add(vcrRewindButton);
@@ -211,22 +212,22 @@ public class SimulationRunPanel extends JPanel
         vcrRunResumeButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Play24.gif")));
         vcrRunResumeButton.setBorder(BorderFactory.createEtchedBorder());
         vcrRunResumeButton.setText(null);
-        vcrRunResumeButton.setToolTipText("Run or resume the simulation");
-        vcrRunResumeButton.setEnabled(true);
+        vcrRunResumeButton.setToolTipText("Run or resume the simulation replications");
+        vcrRunResumeButton.setEnabled(false);
         vcrButtonsPanel.add(vcrRunResumeButton);
 
         vcrPauseStepButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/StepForward24.gif")));
         vcrPauseStepButton.setBorder(BorderFactory.createEtchedBorder());
         vcrPauseStepButton.setText(null);
-        vcrPauseStepButton.setToolTipText("Single step the simulation");
-        vcrPauseStepButton.setEnabled(true); // false true
+        vcrPauseStepButton.setToolTipText("Single step the next replication");
+        vcrPauseStepButton.setEnabled(false); // initial state
         vcrButtonsPanel.add(vcrPauseStepButton); // i.e. vcrPause
 
         vcrStopButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Stop24.gif")));
         vcrStopButton.setBorder(BorderFactory.createEtchedBorder());
         vcrStopButton.setText(null);
-        vcrStopButton.setToolTipText("Stop the simulation run");
-        vcrStopButton.setEnabled(true); // false true
+        vcrStopButton.setToolTipText("Stop the simulation replications");
+        vcrStopButton.setEnabled(false); // initial state
         vcrButtonsPanel.add(vcrStopButton);
         
         vcrClearConsoleButton = new JButton(new ImageIcon(getClass().getClassLoader().getResource("viskit/images/Delete24.gif"))); // Clear
@@ -235,12 +236,29 @@ public class SimulationRunPanel extends JPanel
         // https://stackoverflow.com/questions/1954674/can-i-make-swing-jbuttons-have-smaller-margins
         vcrClearConsoleButton.setMargin(new Insets(3, 4, 3, 4));
         vcrClearConsoleButton.setToolTipText("Clear all console text");
+        vcrClearConsoleButton.setEnabled(false); // initial state
+        
         // https://stackoverflow.com/questions/9569700/java-call-method-via-jbutton
+        // see similar listener at  viskit.control.InternalAssemblyRunner.ClearConsoleListener()
         vcrClearConsoleButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                outputStreamTA.selectAll();
-                outputStreamTA.replaceSelection(""); // cleears
+            public void actionPerformed(ActionEvent e)
+            {
+                ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
+                if (!vcrClearConsoleButton.isEnabled())
+                {
+                    ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+                    "Simulation controller button selection ignored", "Clear console button not currently enabled");
+                    return;
+                }
+
+                int returnValue = JOptionPane.showConfirmDialog(ViskitGlobals.instance().getSimulationRunPanel(), "Are you sure?", "Confirm clearing all console information", JOptionPane.YES_NO_OPTION);
+                if (returnValue == JOptionPane.YES_OPTION) 
+                {
+                    outputStreamTA.selectAll();
+                    outputStreamTA.replaceSelection(""); // clears
+                    LOG.info("makeReplicationSettingsVCRPanel() clear console");
+                }
             }
         });
         vcrButtonsPanel.add(vcrClearConsoleButton);

@@ -128,14 +128,15 @@ public class ReportStatisticsConfiguration {
                 {
                       entityIndexArray[entityIndex] = currentKeyValue.substring(0, separatorColumn);
                     propertyIndexArray[entityIndex] = currentKeyValue.substring(separatorColumn + 1, currentKeyValue.length());
+                    System.out.println("entity='" + entityIndexArray[entityIndex] + "', property='" + propertyIndexArray[entityIndex] + "'");
                 }
                 else
                 {
-                      entityIndexArray[entityIndex] = currentKeyValue.substring(0, separatorColumn);
+                    // if separatorColumn is zero, entity is empty string
+                      entityIndexArray[entityIndex] = currentKeyValue.substring(0, separatorColumn); 
                     propertyIndexArray[entityIndex] = currentKeyValue.substring(separatorColumn, currentKeyValue.length());
+                    System.out.println(                                                "property='" + propertyIndexArray[entityIndex] + "'");
                 }
-
-                System.out.println("entity='" + entityIndexArray[entityIndex] + "', property='" + propertyIndexArray[entityIndex] + "'");
                 entityIndex++;
             }
             System.out.println();
@@ -147,19 +148,19 @@ public class ReportStatisticsConfiguration {
      * Performs simple string parsing to find the underscore separating the
      * EntityName and the Property Name
      *
-     * @param str the string entry for the name of a property change listener
-     * @return the index of the underscore
+     * @param stringValue the string entry for the name of a property change listener
+     * @return the index of the underscore, 0 if not found
      */
-    private int findUnderscore(String str) {
+    private int findUnderscore(String stringValue) {
         char letter;
-        int idx = 0;
-        for (int i = 0; i < str.length(); i++) {
-            letter = str.charAt(i);
+        int underscoreIndex = 0; // default - not found
+        for (int i = 0; i < stringValue.length(); i++) {
+            letter = stringValue.charAt(i);
             if (letter == '_') {
-                idx = i;
+                underscoreIndex = i;
             }
         }
-        return idx;
+        return underscoreIndex;
     }
 
     /**
