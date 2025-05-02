@@ -939,6 +939,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  LOG.warn("*** Unrecognized vcrButtonListener(event=" + newEvent + ")");
                  break;
         }
+        if (simulationRunPanel.vcrClearConsoleButton.isEnabled()) // check if empty
+            simulationRunPanel.vcrClearConsoleButton.setEnabled(!simulationRunPanel.outputStreamTA.getText().isEmpty());
+        
         // now that buttons enabled/disabled are all up to date, can update corresponding menu items to match
         updateSimulationControllerButtonsMenu();
         
@@ -1105,6 +1108,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             {
                 simulationRunPanel.outputStreamTA.setText("");
                 LOG.info("ClearConsoleListener: clear console");
+                simulationRunPanel.vcrClearConsoleButton.setEnabled(false);
+                updateSimulationControllerButtonsMenu();
             }
         }
     }
@@ -1314,7 +1319,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         return !(simulationState == SimulationState.INACTIVE);
     }
     
-    private void updateSimulationControllerButtonsMenu()
+    public void updateSimulationControllerButtonsMenu()
     {
         simulationButtonsMenu.setEnabled(isAssemblySimulationEnabled());
         rewindButtonMI.setEnabled(simulationRunPanel.vcrRewindButton.isEnabled());

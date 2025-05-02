@@ -1,5 +1,5 @@
 /*
-Copyright (c) 1995-2024 held by the author(s).  All rights reserved.
+Copyright (c) 1995-2025 held by the author(s).  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -88,8 +88,8 @@ import viskit.mvc.MvcController;
  * @since 2:47:03 PM
  * @version $Id$
  */
-public class AnalystReportViewFrame extends MvcAbstractViewFrame implements OpenAssembly.AssemblyChangeListener {
-
+public class AnalystReportViewFrame extends MvcAbstractViewFrame implements OpenAssembly.AssemblyChangeListener 
+{
     static final Logger LOG = LogManager.getLogger();
     private final static String FRAME_DEFAULT_TITLE = "Viskit Analyst Report Editor";
     private AnalystReportModel analystReportModel;
@@ -110,6 +110,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JComboBox<String> documentAccessRightsLabelTF = new JComboBox<>(new String[] {"","Informational"}); // ,"CONTROLLED UNCLASSIFIED INFORMATION (CUI)"
     JTextField analysisDateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssemblyFile;
+        
+    JTabbedPane tabbedPane;
 
     public AnalystReportViewFrame()
     {
@@ -117,13 +119,18 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         analystReportController = ViskitGlobals.instance().getAnalystReportController();
         initMVC((MvcController) analystReportController);
         initializeAnalystReportController(analystReportController); // TODO unscramble this hierarchy
-                
-        setLayout();
+
+        if (tabbedPane == null)
+        {
+            tabbedPane = new JTabbedPane();
+            tabbedPane.setBackground(Color.white);
+            setLayout(); // initialize panel
+            add(tabbedPane);
+        }
         setBackground(new Color(251, 251, 229)); // yellow
         buildMenus();
 
         locationImageFileChooser = new JFileChooser("./images/");
-        
     }
     
     private void initMVC(MvcController mvcController) {
@@ -272,9 +279,6 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         getContentPane().setBackground(Color.white);
 
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.setBackground(Color.white);
-
         JPanel headerPanel = new JPanel(new SpringLayout());
         headerPanel.add(new JLabel("Title"));
         headerPanel.add(titleTF);
@@ -324,16 +328,15 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         headerPanel.setAlignmentY(JComponent.RIGHT_ALIGNMENT);
         headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, headerPanel.getPreferredSize().height));
 
-        tabs.add("1 Header", headerPanel);
-        tabs.add("2 Executive Summary",               makeExecutiveSummaryPanel());
-        tabs.add("3 Scenario Location",               makeScenarioLocationPanel());
-        tabs.add("4 Simulation Configuration",                 makeSimulationConfigurationAssemblyDesignPanel());
-        tabs.add("5 Entity Parameters",               makeEntityParametersTablesPanel());
-        tabs.add("6 Behavior Descriptions",           makeBehaviorDescriptionsPanel());
-        tabs.add("7 Statistical Results",             makeStatisticalResultsPanel());
-        tabs.add("8 Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
+        tabbedPane.add("1 Header", headerPanel);
+        tabbedPane.add("2 Executive Summary",               makeExecutiveSummaryPanel());
+        tabbedPane.add("3 Scenario Location",               makeScenarioLocationPanel());
+        tabbedPane.add("4 Simulation Configuration",                 makeSimulationConfigurationAssemblyDesignPanel());
+        tabbedPane.add("5 Entity Parameters",               makeEntityParametersTablesPanel());
+        tabbedPane.add("6 Behavior Descriptions",           makeBehaviorDescriptionsPanel());
+        tabbedPane.add("7 Statistical Results",             makeStatisticalResultsPanel());
+        tabbedPane.add("8 Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
 
-        add(tabs);
     //setBorder(new EmptyBorder(10,10,10,10));
     }
     JCheckBox showExecutiveSummaryCB;

@@ -46,7 +46,6 @@ import org.apache.logging.log4j.Logger;
 import viskit.ViskitUserConfiguration;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
-import viskit.control.InternalAssemblyRunner.ClearConsoleListener;
 import static viskit.control.InternalAssemblyRunner.SimulationState.READY;
 
 /**
@@ -258,6 +257,8 @@ public class SimulationRunPanel extends JPanel
                     outputStreamTA.selectAll();
                     outputStreamTA.replaceSelection(""); // clears
                     LOG.info("makeReplicationSettingsVCRPanel() clear console");
+                    vcrClearConsoleButton.setEnabled(false);
+                    ViskitGlobals.instance().getInternalSimulationRunner().updateSimulationControllerButtonsMenu();
                 }
             }
         });
