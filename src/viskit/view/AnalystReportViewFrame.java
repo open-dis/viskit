@@ -288,7 +288,40 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         getContentPane().setBackground(Color.white);
+        
+        if (tabbedPane.getTabCount() == 0)
+        {
+            tabbedPane.removeAll(); // reset
+            tabbedPane.add("1 Header",                          makeHeaderPanel());
+            tabbedPane.add("2 Executive Summary",               makeExecutiveSummaryPanel());
+            tabbedPane.add("3 Scenario Location",               makeScenarioLocationPanel());
+            tabbedPane.add("4 Simulation Configuration",        makeSimulationConfigurationAssemblyDesignPanel());
+            tabbedPane.add("5 Entity Parameters",               makeEntityParametersTablesPanel());
+            tabbedPane.add("6 Behavior Descriptions",           makeBehaviorDescriptionsPanel());
+            tabbedPane.add("7 Statistical Results",             makeStatisticalResultsPanel());
+            tabbedPane.add("8 Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
+        }
+        else
+        {
+            tabbedPane.setComponentAt(1, makeHeaderPanel());
+            tabbedPane.setComponentAt(2, makeExecutiveSummaryPanel());
+            tabbedPane.setComponentAt(3, makeScenarioLocationPanel());
+            tabbedPane.setComponentAt(4, makeSimulationConfigurationAssemblyDesignPanel());
+            tabbedPane.setComponentAt(5, makeEntityParametersTablesPanel());
+            tabbedPane.setComponentAt(6, makeBehaviorDescriptionsPanel());
+            tabbedPane.setComponentAt(7, makeStatisticalResultsPanel());
+            tabbedPane.setComponentAt(8, makeConclusionsRecommendationsPanel());
+        }
 
+
+    //setBorder(new EmptyBorder(10,10,10,10));
+    }
+    JCheckBox showExecutiveSummaryCB;
+    JTextArea executiveSummaryTA;
+
+    /** user interface creation */
+    private JPanel makeHeaderPanel()
+    {
         if (headerPanel == null)
             headerPanel = new JPanel(new SpringLayout());
         headerPanel.add(new JLabel("Title"));
@@ -339,35 +372,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         headerPanel.setAlignmentY(JComponent.RIGHT_ALIGNMENT);
         headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, headerPanel.getPreferredSize().height));
         
-        if (tabbedPane.getTabCount() == 0)
-        {
-            tabbedPane.removeAll(); // reset
-            tabbedPane.add("1 Header", headerPanel);
-            tabbedPane.add("2 Executive Summary",               makeExecutiveSummaryPanel());
-            tabbedPane.add("3 Scenario Location",               makeScenarioLocationPanel());
-            tabbedPane.add("4 Simulation Configuration",        makeSimulationConfigurationAssemblyDesignPanel());
-            tabbedPane.add("5 Entity Parameters",               makeEntityParametersTablesPanel());
-            tabbedPane.add("6 Behavior Descriptions",           makeBehaviorDescriptionsPanel());
-            tabbedPane.add("7 Statistical Results",             makeStatisticalResultsPanel());
-            tabbedPane.add("8 Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
-        }
-        else
-        {
-            tabbedPane.setComponentAt(1, headerPanel);
-            tabbedPane.setComponentAt(2, makeExecutiveSummaryPanel());
-            tabbedPane.setComponentAt(3, makeScenarioLocationPanel());
-            tabbedPane.setComponentAt(4, makeSimulationConfigurationAssemblyDesignPanel());
-            tabbedPane.setComponentAt(5, makeEntityParametersTablesPanel());
-            tabbedPane.setComponentAt(6, makeBehaviorDescriptionsPanel());
-            tabbedPane.setComponentAt(7, makeStatisticalResultsPanel());
-            tabbedPane.setComponentAt(8, makeConclusionsRecommendationsPanel());
-        }
-
-
-    //setBorder(new EmptyBorder(10,10,10,10));
+        return headerPanel;
     }
-    JCheckBox showExecutiveSummaryCB;
-    JTextArea executiveSummaryTA;
 
     /** user interface creation */
     private JPanel makeExecutiveSummaryPanel() 
