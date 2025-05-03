@@ -462,9 +462,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             
             vcrButtonPressDisplayUpdate(SimulationState.DONE); // also sets simulationState
 
-            System.out.println("+------------------------------+"); // output goes to console TextArea
-            System.out.println("| Simulation replications DONE |");
-            System.out.println("+------------------------------+");
+            String message = ViskitGlobals.instance().getActiveAssemblyName() + " simulation replications DONE";
+            
+            // https://stackoverflow.com/questions/1235179/simple-way-to-repeat-a-string
+            String repeated = new String(new char[ViskitGlobals.instance().getActiveAssemblyName().length()+1]).replace("\0", "-");
+            
+            System.out.println("+-" + repeated + "-----------------------------+"); // output goes to console TextArea
+            System.out.println("| " + message  + " |");
+            System.out.println("+-" + repeated + "-----------------------------+");
 
             notifyUserAnalystReportReady(); // saves temp report
 
@@ -710,7 +715,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             }
             
             String title, message;
-            title = "Rewind, clear console, and reset simulation?";
+            title = "Rewind: clear console and reset simulation?";
             message = "<html><p align='center'>Are you sure that you want to reset this simulation?</p><br/>";
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
@@ -939,7 +944,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  LOG.warn("*** Unrecognized vcrButtonListener(event=" + newEvent + ")");
                  break;
         }
-        if (simulationRunPanel.vcrClearConsoleButton.isEnabled()) // check if empty
+        if (simulationRunPanel.vcrClearConsoleButton.isEnabled()) // also check if console is empty
             simulationRunPanel.vcrClearConsoleButton.setEnabled(!simulationRunPanel.outputStreamTA.getText().isEmpty());
         
         // now that buttons enabled/disabled are all up to date, can update corresponding menu items to match

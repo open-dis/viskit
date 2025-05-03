@@ -91,9 +91,15 @@ import viskit.mvc.MvcController;
 public class AnalystReportViewFrame extends MvcAbstractViewFrame implements OpenAssembly.AssemblyChangeListener 
 {
     static final Logger LOG = LogManager.getLogger();
+    
     private final static String FRAME_DEFAULT_TITLE = "Viskit Analyst Report Editor";
     private AnalystReportModel analystReportModel;
+    private JTabbedPane tabbedPane;
     private JMenu analystReportMenu;
+    
+    JPanel headerPanel,                 executiveSummaryPanel,       scenarioLocationPanel,     
+           simulationConfigurationAssemblyDesignPanel,               entityParametersTablesPanel, 
+           behaviorDescriptionsPanel,   statisticalResultsPanel,     conclusionsRecommendationsPanel;
 
     /**
      * TODO: rewire this functionality?
@@ -104,20 +110,21 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     private JFileChooser locationImageFileChooser;
     private static AnalystReportController analystReportController;
     
-    JTextField titleTF = new JTextField();
+    JTextField titleTF       = new JTextField();
     JTextField analystNameTF = new JTextField();
+    
     // , "CONFIDENTIAL", "SECRET", "TOP SECRET"
     JComboBox<String> documentAccessRightsLabelTF = new JComboBox<>(new String[] {"","Informational"}); // ,"CONTROLLED UNCLASSIFIED INFORMATION (CUI)"
+    
     JTextField analysisDateTF = new JTextField(DateFormat.getDateInstance(DateFormat.LONG).format(new Date()));
     File currentAssemblyFile;
-        
-    JTabbedPane tabbedPane;
 
     public AnalystReportViewFrame()
     {
         super(FRAME_DEFAULT_TITLE); // necessary
-        analystReportController = ViskitGlobals.instance().getAnalystReportController();
-        initMVC((MvcController) analystReportController);
+        if (analystReportController == null)
+            analystReportController = ViskitGlobals.instance().getAnalystReportController();
+        initializeMVC((MvcController) analystReportController);
         initializeAnalystReportController(analystReportController); // TODO unscramble this hierarchy
 
         if (tabbedPane == null)
@@ -125,7 +132,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
             tabbedPane = new JTabbedPane();
             tabbedPane.setBackground(Color.white);
             setLayout(); // initialize panel
-            add(tabbedPane);
+            setContentPane(tabbedPane); // not add!
         }
         setBackground(new Color(251, 251, 229)); // yellow
         buildMenus();
@@ -133,7 +140,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         locationImageFileChooser = new JFileChooser("./images/");
     }
     
-    private void initMVC(MvcController mvcController) {
+    private void initializeMVC(MvcController mvcController) {
         setController(mvcController);
     }
     
@@ -152,7 +159,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         switch (action) {
             case NEW_ASSEMBLY:
                 currentAssemblyFile = (File) param;
-                AnalystReportController analystReportController = (AnalystReportController) getController();
+                analystReportController = (AnalystReportController) getController();
                 if ((analystReportController != null) && (analystReportController.getAnalystReportModel() != null) && (currentAssemblyFile != null))
                     analystReportController.setCurrentAssemblyFile(currentAssemblyFile);
                 break;
@@ -233,6 +240,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
+    /** update analystReportModel data using values from AnalystReport user interface */
     public void unFillLayout() 
     {
         unFillHeader();
@@ -245,6 +253,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         unFillConclusionsRecommendationsPanel();
     }
 
+    /** update AnalystReport user interface using analystReportModel values */
     private void fillHeader()
     {
         try {
@@ -266,11 +275,12 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
+    /** update analystReportModel data using values from AnalystReport user interface */
     private void unFillHeader() 
     {
-        analystReportModel.setReportName(titleTF.getText());
-        analystReportModel.setAuthor(analystNameTF.getText());
-        analystReportModel.setDateOfReport(analysisDateTF.getText());
+        analystReportModel.setReportName(                                     titleTF.getText());
+        analystReportModel.setAuthor(                                   analystNameTF.getText());
+        analystReportModel.setDateOfReport(                            analysisDateTF.getText());
         analystReportModel.setDocumentAccessRights((String) documentAccessRightsLabelTF.getSelectedItem());
     }
 
@@ -279,7 +289,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         getContentPane().setBackground(Color.white);
 
-        JPanel headerPanel = new JPanel(new SpringLayout());
+        if (headerPanel == null)
+            headerPanel = new JPanel(new SpringLayout());
         headerPanel.add(new JLabel("Title"));
         headerPanel.add(titleTF);
         headerPanel.add(new JLabel("Author"));
@@ -327,24 +338,42 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         headerPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
         headerPanel.setAlignmentY(JComponent.RIGHT_ALIGNMENT);
         headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, headerPanel.getPreferredSize().height));
+        
+        if (tabbedPane.getTabCount() == 0)
+        {
+            tabbedPane.removeAll(); // reset
+            tabbedPane.add("1 Header", headerPanel);
+            tabbedPane.add("2 Executive Summary",               makeExecutiveSummaryPanel());
+            tabbedPane.add("3 Scenario Location",               makeScenarioLocationPanel());
+            tabbedPane.add("4 Simulation Configuration",        makeSimulationConfigurationAssemblyDesignPanel());
+            tabbedPane.add("5 Entity Parameters",               makeEntityParametersTablesPanel());
+            tabbedPane.add("6 Behavior Descriptions",           makeBehaviorDescriptionsPanel());
+            tabbedPane.add("7 Statistical Results",             makeStatisticalResultsPanel());
+            tabbedPane.add("8 Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
+        }
+        else
+        {
+            tabbedPane.setComponentAt(1, headerPanel);
+            tabbedPane.setComponentAt(2, makeExecutiveSummaryPanel());
+            tabbedPane.setComponentAt(3, makeScenarioLocationPanel());
+            tabbedPane.setComponentAt(4, makeSimulationConfigurationAssemblyDesignPanel());
+            tabbedPane.setComponentAt(5, makeEntityParametersTablesPanel());
+            tabbedPane.setComponentAt(6, makeBehaviorDescriptionsPanel());
+            tabbedPane.setComponentAt(7, makeStatisticalResultsPanel());
+            tabbedPane.setComponentAt(8, makeConclusionsRecommendationsPanel());
+        }
 
-        tabbedPane.add("1 Header", headerPanel);
-        tabbedPane.add("2 Executive Summary",               makeExecutiveSummaryPanel());
-        tabbedPane.add("3 Scenario Location",               makeScenarioLocationPanel());
-        tabbedPane.add("4 Simulation Configuration",                 makeSimulationConfigurationAssemblyDesignPanel());
-        tabbedPane.add("5 Entity Parameters",               makeEntityParametersTablesPanel());
-        tabbedPane.add("6 Behavior Descriptions",           makeBehaviorDescriptionsPanel());
-        tabbedPane.add("7 Statistical Results",             makeStatisticalResultsPanel());
-        tabbedPane.add("8 Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
 
     //setBorder(new EmptyBorder(10,10,10,10));
     }
     JCheckBox showExecutiveSummaryCB;
     JTextArea executiveSummaryTA;
 
+    /** user interface creation */
     private JPanel makeExecutiveSummaryPanel() 
     {
-        JPanel executiveSummaryPanel = new JPanel();
+        if (executiveSummaryPanel == null)
+            executiveSummaryPanel = new JPanel();
         executiveSummaryPanel.setLayout(new BoxLayout(executiveSummaryPanel, BoxLayout.Y_AXIS));
         showExecutiveSummaryCB = new JCheckBox("Show Executive Summary", true);
         showExecutiveSummaryCB.setToolTipText("Show entries in output report");
@@ -361,6 +390,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return executiveSummaryPanel;
     }
 
+    /** update AnalystReport user interface using analystReportModel values */
     private void fillExecutiveSummary() 
     {
         try {
@@ -374,23 +404,26 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
+    /** update analystReportModel data using values from AnalystReport user interface */
     private void unFillExecutiveSummary() 
     {
         analystReportModel.setShowExecutiveSummary(showExecutiveSummaryCB.isSelected());
         analystReportModel.setExecutiveSummary(executiveSummaryTA.getText());
     }
     /************************/
-    JCheckBox showScenarioLocationDescriptionsCB;
-    JCheckBox showScenarioLocationImagesCB;
-    JTextArea scenarioLocationDesignConsiderationsTA, scenarioLocationConclusionsTA, scenarioLocationProductionNotesTA;
+    JCheckBox  showScenarioLocationDescriptionsCB;
+    JCheckBox  showScenarioLocationImagesCB;
+    JTextArea  scenarioLocationDesignConsiderationsTA, scenarioLocationConclusionsTA, scenarioLocationProductionNotesTA;
     JTextField scenarioLocationImageTF;
-    JButton scenarioLocationImageButton;
+    JButton    scenarioLocationImageButton;
     JTextField simulationChartImageTF;
-    JButton simulationChartImageButton;
+    JButton    simulationChartImageButton;
 
+    /** user interface creation */
     private JPanel makeScenarioLocationPanel() 
     {
-        JPanel scenarioLocationPanel = new JPanel();
+        if (scenarioLocationPanel == null)
+            scenarioLocationPanel = new JPanel();
         scenarioLocationPanel.setLayout(new BoxLayout(scenarioLocationPanel, BoxLayout.Y_AXIS));
         showScenarioLocationDescriptionsCB = new JCheckBox("Show location features and post-experiment descriptions", true);
         showScenarioLocationDescriptionsCB.setToolTipText("Show entries in output report");
@@ -446,6 +479,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return scenarioLocationPanel;
     }
 
+    /** update AnalystReport user interface using analystReportModel values */
     private void fillScenarioLocationPanel()
     {
         try
@@ -471,6 +505,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
+    /** update analystReportModel data using values from AnalystReport user interface */
     private void unFillScenarioLocationPanel() 
     {
         try
@@ -504,9 +539,11 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JTextField simulationConfigurationAssemblyImagePathTF;
     JButton simulationConfigurationAssemblyImageButton;
 
+    /** user interface creation */
     private JPanel makeSimulationConfigurationAssemblyDesignPanel()
     {
-        JPanel simulationConfigurationAssemblyDesignPanel = new JPanel();
+        if (simulationConfigurationAssemblyDesignPanel == null)
+            simulationConfigurationAssemblyDesignPanel = new JPanel();
         simulationConfigurationAssemblyDesignPanel.setLayout(new BoxLayout(simulationConfigurationAssemblyDesignPanel, BoxLayout.Y_AXIS));
         showSimulationConfigurationAndAnalysisCB = new JCheckBox("Show Simulation Configuration Considerations, Simulation Configuration Production Notes, and Post-Experiment Analysis", true);
         showSimulationConfigurationAndAnalysisCB.setToolTipText("Show entries in output report");
@@ -564,6 +601,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return simulationConfigurationAssemblyDesignPanel;
     }
 
+    /** update AnalystReport user interface using analystReportModel values */
     private void fillSimulationConfigurationPanel() 
     {
         try
@@ -596,6 +634,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
+    /** update analystReportModel data using values from AnalystReport user interface */
     private void unFillSimulationConfigurationPanel() 
     {
         analystReportModel.setShowSimulationConfiguration(showSimulationConfigurationAndAnalysisCB.isSelected());
@@ -616,9 +655,11 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JCheckBox showEntityParametersTablesCB;
     JTabbedPane   entityParametersTablesTabbedPane;
 
+    /** user interface creation */
     private JPanel makeEntityParametersTablesPanel()
     {
-        JPanel entityParametersTablesPanel = new JPanel();
+        if (entityParametersTablesPanel == null)
+            entityParametersTablesPanel = new JPanel();
         entityParametersTablesPanel.setLayout(new BoxLayout(entityParametersTablesPanel, BoxLayout.Y_AXIS));
         showEntityParametersOverviewCB = new JCheckBox("Show Entity Parameters Overview", true);
         showEntityParametersOverviewCB.setToolTipText("Show overview in output report");
@@ -645,6 +686,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return entityParametersTablesPanel;
     }
 
+    /** update AnalystReport user interface using analystReportModel values */
     @SuppressWarnings("unchecked")
     private void fillEntityParametersTablesPanel() 
     {
@@ -667,7 +709,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
                 return;
             }
 
-            for (Object[] objectArray : entityParametersTablesArray) {
+            for (Object[] objectArray : entityParametersTablesArray) 
+            {
                 Vector<Vector<String>> tableVector = new Vector<>();
                 String name = (String) objectArray[0];
                 Vector<Object[]> v0 = (Vector) objectArray[1];
@@ -698,6 +741,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
+    /** update analystReportModel data using values from AnalystReport user interface */
     private void unFillEntityParameterTablesPanel() 
     {
         analystReportModel.setShowEntityParametersOverview(showEntityParametersOverviewCB.isSelected());
@@ -711,9 +755,11 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JTextArea   behaviorConclusionsTA;
     JTabbedPane behaviorTabbedPane;
 
+    /** user interface creation */
     private JPanel makeBehaviorDescriptionsPanel() 
     {
-        JPanel behaviorDescriptionsPanel = new JPanel();
+        if (behaviorDescriptionsPanel == null)
+            behaviorDescriptionsPanel = new JPanel();
         behaviorDescriptionsPanel.setLayout(new BoxLayout(behaviorDescriptionsPanel, BoxLayout.Y_AXIS));
         showBehaviorDesignAnalysisDescriptions = new JCheckBox("Show Event Graph Behavior Considerations and Post-Experiment Analysis", true);
         showBehaviorDesignAnalysisDescriptions.setToolTipText("Show entries in output report");
@@ -748,6 +794,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return behaviorDescriptionsPanel;
     }
 
+    /** update analystReportModel data using values from AnalystReport user interface */
     private void unFillBehaviorDescriptionsPanel()
     {
         analystReportModel.setShowBehaviorDesignAnalysisDescriptions(showBehaviorDesignAnalysisDescriptions.isSelected());
@@ -759,6 +806,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         // tables are uneditable
     }
 
+    /** update AnalystReport user interface using analystReportModel values */
     private void fillBehaviorDescriptionsPanel() 
     {
         try
@@ -849,9 +897,11 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JScrollPane replicationStatisticsScrollPane;
     JScrollPane statisticsSummaryScrollPane;
 
+    /** user interface creation */
     private JPanel makeStatisticalResultsPanel() 
     {
-        JPanel statisticalResultsPanel = new JPanel();
+        if (statisticalResultsPanel == null)
+            statisticalResultsPanel = new JPanel();
         statisticalResultsPanel.setLayout(new BoxLayout(statisticalResultsPanel, BoxLayout.Y_AXIS));
         showStatisticsDescriptionAnalysisCB = new JCheckBox("Show statistical description and analysis", true);
         showStatisticsDescriptionAnalysisCB.setToolTipText("Show entries in output report");
@@ -893,6 +943,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return statisticalResultsPanel;
     }
 
+    /** update AnalystReport user interface using analystReportModel values */
     private void fillStatisticalResultsPanel() 
     {
         try
@@ -971,6 +1022,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
+    /** update analystReportModel data using values from AnalystReport user interface */
     private void unFillStatisticalResultsPanel()
     {
         analystReportModel.setShowStatisticsDescriptionAnalysis(showStatisticsDescriptionAnalysisCB.isSelected());
@@ -984,9 +1036,11 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JTextArea conRecConclusionsTA;
     JTextArea conRecRecommendationsTA;
 
+    /** user interface creation */
     private JPanel makeConclusionsRecommendationsPanel() 
     {
-        JPanel conclusionsRecommendationsPanel = new JPanel();
+        if (conclusionsRecommendationsPanel == null)
+            conclusionsRecommendationsPanel = new JPanel();
         conclusionsRecommendationsPanel.setLayout(new BoxLayout(conclusionsRecommendationsPanel, BoxLayout.Y_AXIS));
         showConclusionsRecommendationsCB = new JCheckBox("Show Conclusions and Recommendations for Future Work", true);
         showConclusionsRecommendationsCB.setToolTipText("Show entries in output report");
@@ -1006,6 +1060,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return conclusionsRecommendationsPanel;
     }
 
+    /** update AnalystReport user interface using analystReportModel values */
     private void fillConclusionsRecommendationsPanel() 
     {
         try
@@ -1023,6 +1078,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
+    /** update analystReportModel data using values from AnalystReport user interface */
     private void unFillConclusionsRecommendationsPanel() {
         analystReportModel.setShowRecommendationsConclusions(showConclusionsRecommendationsCB.isSelected());
         analystReportModel.setConclusions(conRecConclusionsTA.getText());

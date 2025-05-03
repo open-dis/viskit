@@ -96,9 +96,9 @@ public class MainFrame extends JFrame
     JMenuBar combinedMenuBar = new JMenuBar();
     java.util.List<JMenuBar> modalMenuBarList = new ArrayList<>();
     
-    EventGraphViewFrame  eventGraphFrame;
-    AssemblyViewFrame    assemblyFrame;
-    AnalystReportViewFrame analystReportEditorPanel;
+    EventGraphViewFrame    eventGraphViewFrame;
+    AssemblyViewFrame      assemblyViewFrame;
+    AnalystReportViewFrame analystReportViewFrame;
     public InternalAssemblyRunner internalAssemblyRunner;
     JobLauncherTab2 runGridComponent;
 
@@ -109,10 +109,10 @@ public class MainFrame extends JFrame
 
     /** The initial assembly to load. */
     private       final String initialAssemblyFile;
-    public static final int TAB_INDEX_EVENTGRAPH_EDITOR = 0;
-    public static final int TAB_INDEX_ASSEMBLY_EDITOR   = 1;
-    public static final int TAB_INDEX_SIMULATION_RUN    = 2; /* SimulationRun */
-    public static final int TAB_INDEX_ANALYST_REPORT    = 3; /* AnalystReport */
+    public static final int TAB_INDEX_EVENTGRAPH_EDITOR = 0; /* EventGraphEditor */
+    public static final int TAB_INDEX_ASSEMBLY_EDITOR   = 1; /* AssemblyEditor   */
+    public static final int TAB_INDEX_SIMULATION_RUN    = 2; /* SimulationRun    */
+    public static final int TAB_INDEX_ANALYST_REPORT    = 3; /* AnalystReport    */
     public static final int[] tabIndices = {
         TAB_INDEX_EVENTGRAPH_EDITOR,
         TAB_INDEX_ASSEMBLY_EDITOR,
@@ -120,8 +120,8 @@ public class MainFrame extends JFrame
         TAB_INDEX_ANALYST_REPORT,
     };
     public static final int TAB1_LOCALRUN_INDEX = 0;
-    public static final int TAB1_DESIGN_OF_EXPERIMENTS_INDEX = 1;
-    public static final int TAB1_CLUSTERUN_INDEX = 2;
+    public static final int TAB1_DESIGN_OF_EXPERIMENTS_INDEX = 4; // obsolete, requires refactoring someday
+    public static final int TAB1_CLUSTERUN_INDEX             = 5; // obsolete, requires refactoring someday
 
     private AssemblyControllerImpl     assemblyController;
     private EventGraphControllerImpl eventGraphController;
@@ -172,9 +172,9 @@ public class MainFrame extends JFrame
     {
 //        ViskitGlobals.instance().setAssemblyQuitActionListener(null);
 //        ViskitGlobals.instance().setEventGraphQuitHandler(null); <- TODO: investigate why these are here
-        int assemblyPaneIndex;
+        int currentPaneIndex;
 
-        ChangeListener tabChangeListener = new myTabChangeListener();
+        ChangeListener tabChangeListener = new MyTabChangeListener();
         myQuitAction = new QuitAction("Quit");
 
         topTabbedPane = new JTabbedPane(JTabbedPane.TOP); // windows tabs are left justified, macOS is t
@@ -184,26 +184,26 @@ public class MainFrame extends JFrame
         topTabbedPane.setFont(topTabbedPane.getFont().deriveFont(Font.BOLD));
 
         // Tabbed event graph editor
-        eventGraphFrame = ViskitGlobals.instance().buildEventGraphViewFrame();
+        eventGraphViewFrame = ViskitGlobals.instance().buildEventGraphViewFrame();
         if (ViskitUserPreferencesDialog.isEventGraphEditorVisible()) 
         {
-            topTabbedPane.add(((EventGraphViewFrame) eventGraphFrame).getContent());
-            assemblyPaneIndex = topTabbedPane.indexOfComponent(((EventGraphViewFrame) eventGraphFrame).getContent());
-            topTabbedPane.setTitleAt(assemblyPaneIndex, "Event Graph Editor");
-            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Visual editor for Event Graph definitions");
-            mainFrameMenuBar = ((EventGraphViewFrame) eventGraphFrame).getMenus();
+            topTabbedPane.add(((EventGraphViewFrame) eventGraphViewFrame).getContent());
+            currentPaneIndex = topTabbedPane.indexOfComponent(((EventGraphViewFrame) eventGraphViewFrame).getContent());
+            topTabbedPane.setTitleAt(currentPaneIndex, "Event Graph Editor");
+            topTabbedPane.setToolTipTextAt(currentPaneIndex, "Visual editor for Event Graph definitions");
+            mainFrameMenuBar = ((EventGraphViewFrame) eventGraphViewFrame).getMenus();
             modalMenuBarList.add(mainFrameMenuBar);
             doCommonHelp(mainFrameMenuBar);
             jamSettingsHandler(mainFrameMenuBar);
             // TODO no longer needed?
-            // eventGraphFrame.setTitleListener(myTitleListener, assemblyPaneIndex);
+            // eventGraphViewFrame.setTitleListener(myTitleListener, currentPaneIndex);
             setJMenuBar(mainFrameMenuBar);
             
         if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
-            jamQuitHandler(((EventGraphViewFrame) eventGraphFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
+            jamQuitHandler(((EventGraphViewFrame) eventGraphViewFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
         }
-            tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR] = assemblyPaneIndex;
+            tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR] = currentPaneIndex;
         } 
         else {
             tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR] = -1;
@@ -213,25 +213,25 @@ public class MainFrame extends JFrame
         topTabbedPane.addChangeListener(tabChangeListener);
 
         // Assembly editor
-        assemblyFrame = ViskitGlobals.instance().buildAssemblyViewFrame();
+        assemblyViewFrame = ViskitGlobals.instance().buildAssemblyViewFrame();
         if (ViskitUserPreferencesDialog.isAssemblyEditorVisible())
         {
-            topTabbedPane.add(((AssemblyViewFrame) assemblyFrame).getContent());
-            assemblyPaneIndex = topTabbedPane.indexOfComponent(((AssemblyViewFrame) assemblyFrame).getContent());
-            topTabbedPane.setTitleAt(assemblyPaneIndex, "Assembly Editor");
-            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Visual editor for assembly definitions");
-            mainFrameMenuBar = ((AssemblyViewFrame) assemblyFrame).getMenus();
+            topTabbedPane.add(((AssemblyViewFrame) assemblyViewFrame).getContent());
+            currentPaneIndex = topTabbedPane.indexOfComponent(((AssemblyViewFrame) assemblyViewFrame).getContent());
+            topTabbedPane.setTitleAt(currentPaneIndex, "Assembly Editor");
+            topTabbedPane.setToolTipTextAt(currentPaneIndex, "Visual editor for assembly definitions");
+            mainFrameMenuBar = ((AssemblyViewFrame) assemblyViewFrame).getMenus();
             modalMenuBarList.add(mainFrameMenuBar);
             doCommonHelp(mainFrameMenuBar);
             jamSettingsHandler(mainFrameMenuBar);
             // TODO is this needed?
-            // assemblyFrame.setTitleListener(myTitleListener, assemblyPaneIndex);
+            // assemblyViewFrame.setTitleListener(myTitleListener, assemblyPaneIndex);
             setJMenuBar(mainFrameMenuBar);
         if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
-            jamQuitHandler(((AssemblyViewFrame) assemblyFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
+            jamQuitHandler(((AssemblyViewFrame) assemblyViewFrame).getQuitMenuItem(), myQuitAction, mainFrameMenuBar);
         }
-            tabIndices[TAB_INDEX_ASSEMBLY_EDITOR] = assemblyPaneIndex;
+            tabIndices[TAB_INDEX_ASSEMBLY_EDITOR] = currentPaneIndex;
         } 
         else 
         {
@@ -242,10 +242,10 @@ public class MainFrame extends JFrame
         assemblyController.setMainTabbedPane(topTabbedPane, TAB_INDEX_ASSEMBLY_EDITOR);
         eventGraphController = ViskitGlobals.instance().getEventGraphController();
 
-        // Now set the recent open project's file listener for the eventGraphFrame now
-        // that we have an assemblyFrame reference
-        RecentProjectFileSetListener recentProjectFileSetListener = ((AssemblyViewFrame) assemblyFrame).getRecentProjectFileSetListener();
-        recentProjectFileSetListener.addMenuItem(((EventGraphViewFrame) eventGraphFrame).getOpenRecentProjectMenu());
+        // Now set the recent open project's file listener for the eventGraphViewFrame now
+        // that we have an assemblyViewFrame reference
+        RecentProjectFileSetListener recentProjectFileSetListener = ((AssemblyViewFrame) assemblyViewFrame).getRecentProjectFileSetListener();
+        recentProjectFileSetListener.addMenuItem(((EventGraphViewFrame) eventGraphViewFrame).getOpenRecentProjectMenu());
 
         // Now setup the assembly and event graph file change listener(s)
         getAssemblyController().addAssemblyFileListener(getAssemblyController().getAssemblyChangeListener());
@@ -254,19 +254,19 @@ public class MainFrame extends JFrame
         // Assembly Simulation Run
         simulationRunTabbedPane = new JTabbedPane();
         getSimulationRunTabbedPane().addChangeListener(tabChangeListener);
-        JPanel runTabbedPanePanel = new JPanel(new BorderLayout());
-        runTabbedPanePanel.setBackground(new Color(206, 206, 255)); // light blue
-        runTabbedPanePanel.add(getSimulationRunTabbedPane(), BorderLayout.CENTER);
+        JPanel simulationRunTabbedPaneParentPanel = new JPanel(new BorderLayout());
+        simulationRunTabbedPaneParentPanel.setBackground(new Color(206, 206, 255)); // light blue
+        simulationRunTabbedPaneParentPanel.add(getSimulationRunTabbedPane(), BorderLayout.CENTER);
 
         // Always selected as visible
         if (ViskitUserPreferencesDialog.isAssemblySimulationRunVisible()) 
         {
-            topTabbedPane.add(runTabbedPanePanel);
-            assemblyPaneIndex = topTabbedPane.indexOfComponent(runTabbedPanePanel);
-            topTabbedPane.setTitleAt(assemblyPaneIndex, "Simulation Run Manager");
-            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, INITIAL_SIMULATION_RUN_HINT);
+            topTabbedPane.add(simulationRunTabbedPaneParentPanel);
+            currentPaneIndex = topTabbedPane.indexOfComponent(simulationRunTabbedPaneParentPanel);
+            topTabbedPane.setTitleAt(currentPaneIndex, "Simulation Run Manager");
+            topTabbedPane.setToolTipTextAt(currentPaneIndex, INITIAL_SIMULATION_RUN_HINT);
             modalMenuBarList.add(null); // placeholder
-            tabIndices[TAB_INDEX_SIMULATION_RUN] = assemblyPaneIndex;
+            tabIndices[TAB_INDEX_SIMULATION_RUN] = currentPaneIndex;
 //          tabbedPane.setEnabledAt(idx, false); // TODO do not disable?
         } 
         else 
@@ -278,28 +278,33 @@ public class MainFrame extends JFrame
         boolean analystReportPanelVisible = ViskitUserPreferencesDialog.isAnalystReportVisible();
         if (analystReportPanelVisible)
         {
-            analystReportEditorPanel = (AnalystReportViewFrame)ViskitGlobals.instance().buildAnalystReportFrame();
-            topTabbedPane.add(analystReportEditorPanel.getContentPane());
-            assemblyPaneIndex = topTabbedPane.indexOfComponent(analystReportEditorPanel.getContentPane());
-            topTabbedPane.setTitleAt(assemblyPaneIndex, "Analyst Report Editor");
-            topTabbedPane.setToolTipTextAt(assemblyPaneIndex, "Editor for analyst assessment and report generation");
-            mainFrameMenuBar = ((AnalystReportViewFrame) analystReportEditorPanel).getMenus();
+            analystReportViewFrame = (AnalystReportViewFrame)ViskitGlobals.instance().buildAnalystReportFrame();
+            if  (topTabbedPane.getTabCount() <= TAB_INDEX_ANALYST_REPORT) // index counts are zero-based
+                 topTabbedPane.add(analystReportViewFrame.getContentPane(), BorderLayout.CENTER);
+            else 
+            {
+                 // this line should be unnecessary
+                topTabbedPane.setComponentAt(TAB_INDEX_ANALYST_REPORT,analystReportViewFrame.getContentPane());
+            }
+            
+            currentPaneIndex = topTabbedPane.indexOfComponent(analystReportViewFrame.getContentPane());
+            topTabbedPane.setTitleAt(currentPaneIndex, "Analyst Report Editor");
+            topTabbedPane.setToolTipTextAt(currentPaneIndex, "Editor for analyst assessment and report generation");
+            mainFrameMenuBar = ((AnalystReportViewFrame) analystReportViewFrame).getMenus();
             modalMenuBarList.add(mainFrameMenuBar);
             doCommonHelp(mainFrameMenuBar);
             jamSettingsHandler(mainFrameMenuBar);
             if (getJMenuBar() == null) {
                 setJMenuBar(mainFrameMenuBar);
             }
-            // TODO is this needed?
-            // analystReportEditorPanel.setTitleListener(myTitleListener, assemblyPaneIndex);
         if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
             jamQuitHandler(null, myQuitAction, mainFrameMenuBar);
         }
-            tabIndices[TAB_INDEX_ANALYST_REPORT] = assemblyPaneIndex;
-            AnalystReportController analystReportController = (AnalystReportController) analystReportEditorPanel.getController();
-            analystReportController.setMainTabbedPane(topTabbedPane, assemblyPaneIndex);
-            getAssemblyController().addAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportEditorPanel);
+            tabIndices[TAB_INDEX_ANALYST_REPORT] = currentPaneIndex;
+            AnalystReportController analystReportController = (AnalystReportController) analystReportViewFrame.getController();
+            analystReportController.setMainTabbedPane(topTabbedPane, currentPaneIndex);
+            getAssemblyController().addAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportViewFrame);
         } 
         else
         {
@@ -327,16 +332,15 @@ public class MainFrame extends JFrame
         }
         
 // TODO unhide, unify?
-        AssemblyControllerImpl assemblyControllerImpl = ((AssemblyControllerImpl) assemblyFrame.getController());
+        AssemblyControllerImpl assemblyControllerImpl = ((AssemblyControllerImpl) assemblyViewFrame.getController());
         assemblyControllerImpl.setInitialAssemblyFile(initialAssemblyFile);
         assemblyControllerImpl.setAssemblyRunner(new SimulationRunPlug());
-        
-        /* DIFF between OA3302 branch and trunk */
 
         // Design of experiments
         DoeMainFrame doeFrame = null;
         boolean isDOEVisible = ViskitUserPreferencesDialog.isDesignOfExperimentsVisible();
-        if (isDOEVisible) {
+        if (isDOEVisible) 
+        {
             doeMain = DoeMain.main2();
             doeFrame = doeMain.getMainFrame();
             getSimulationRunTabbedPane().add(doeFrame.getContent(), TAB1_DESIGN_OF_EXPERIMENTS_INDEX);
@@ -357,7 +361,8 @@ public class MainFrame extends JFrame
         }
 
         // Grid run panel
-        if (ViskitUserPreferencesDialog.isCloudSimulationRunVisible() && isDOEVisible) {
+        if (ViskitUserPreferencesDialog.isCloudSimulationRunVisible() && isDOEVisible) 
+        {
             runGridComponent = new JobLauncherTab2(doeMain.getController(), null, null, this);
             if (doeFrame != null)
                 doeFrame.getController().setJobLauncher(runGridComponent);
@@ -376,7 +381,8 @@ public class MainFrame extends JFrame
 
         // let the event graph controller establish Viskit's classpath and open
         // EventGraphs first if an assembly file has not been submitted at startup
-        if (initialAssemblyFile == null || initialAssemblyFile.isBlank() || initialAssemblyFile.contains("$")) {
+        if (initialAssemblyFile == null || initialAssemblyFile.isBlank() || initialAssemblyFile.contains("$")) 
+        {
             runLater(100L, () -> {
                 getEventGraphController().begin();
             });
@@ -387,8 +393,8 @@ public class MainFrame extends JFrame
         });
     }
 
-    public static void runLater(final long ms, final Runnable runnable) {
-
+    public static void runLater(final long ms, final Runnable runnable) 
+    {
         java.util.Timer timer = new java.util.Timer("DelayedRunner", true);
 
         TimerTask delayedThreadStartTask = new TimerTask() {
@@ -403,7 +409,7 @@ public class MainFrame extends JFrame
     }
 
     /** Utility class to handle tab selections on the main frame */
-    class myTabChangeListener implements ChangeListener {
+    class MyTabChangeListener implements ChangeListener {
 
         @Override
         public void stateChanged(ChangeEvent e)
@@ -563,13 +569,13 @@ public class MainFrame extends JFrame
             {
                 if (tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR] != -1) {
                     topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR]);
-                    if (!((EventGraphController) eventGraphFrame.getController()).preQuit()) {
+                    if (!((EventGraphController) eventGraphViewFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
                 if (tabIndices[TAB_INDEX_ASSEMBLY_EDITOR] != -1) {
                     topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_ASSEMBLY_EDITOR]);
-                    if (!((AssemblyControllerImpl) assemblyFrame.getController()).preQuit()) {
+                    if (!((AssemblyControllerImpl) assemblyViewFrame.getController()).preQuit()) {
                         break outer;
                     }
                 }
@@ -594,17 +600,17 @@ public class MainFrame extends JFrame
 
                     // TODO: Need doe listener removal (tdn) 9/13/24
 
-                    ((EventGraphController) eventGraphFrame.getController()).postQuit();
+                    ((EventGraphController) eventGraphViewFrame.getController()).postQuit();
                 }
                 if (tabIndices[TAB_INDEX_ASSEMBLY_EDITOR] != -1) {
                     getAssemblyController().removeAssemblyFileListener(getAssemblyController().getAssemblyChangeListener());
-                    getAssemblyController().removeAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportEditorPanel);
+                    getAssemblyController().removeAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportViewFrame);
                     getAssemblyController().removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentAssemblyFileListener());
                     getAssemblyController().removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentProjectFileSetListener());
 
                     // TODO: Need grid and doe listener removal (tdn) 9/13/24
 
-                    ((AssemblyControllerImpl) assemblyFrame.getController()).postQuit();
+                    ((AssemblyControllerImpl) assemblyViewFrame.getController()).postQuit();
                 }
 
                 /* DIFF between OA3302 branch and trunk */
@@ -663,7 +669,7 @@ public class MainFrame extends JFrame
         simulationRunPanel.outputStreamTA.setText("+-" + repeated + " +" + "\n");
         simulationRunPanel.outputStreamTA.append ("| " + header   + " |" + "\n");
         simulationRunPanel.outputStreamTA.append ("+-" + repeated + "-+" + "\n");
-        simulationRunPanel.outputStreamTA.append ("\n");
+//        simulationRunPanel.outputStreamTA.append ("\n");
     }
 
     /** Prepares the Assembly with a RunSimulation class loader free of static artifacts for

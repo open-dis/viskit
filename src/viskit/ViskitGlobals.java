@@ -252,6 +252,10 @@ public class ViskitGlobals
         return (AssemblyModelImpl) assemblyController.getModel();
     }
 
+    public String getActiveAssemblyName() {
+        return getActiveAssemblyModel().getName();
+    }
+
     public AssemblyControllerImpl getAssemblyController() {
         return assemblyController;
     }
