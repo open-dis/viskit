@@ -38,33 +38,34 @@
                 <meta http-equiv="Content-Language" content="en-us"/>
                 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
                 <link rel="shortcut icon" href="Viskit.ico" type="image/x-icon"/>
+                <!--
                 <style type="text/css">
-                    <!-- Limit the width of the entire HTML page to be printer friendly -->
-                    body {width: 1024px}
-                </style>
+                </style>-->
+                <!-- Limit the width of the entire HTML page to be printer friendly
+                body {width: 1024px} -->
             </head>
             <body>
                 <!-- Link anchor for the top of the page -->
                 <a name="top"/>
+                
+                <p style="text-align: center">
+                    <img src="ViskitSplash2.png"/><!-- TODO link this image to website -->
+                </p>
+                
                 <!-- Title information -->
                 <xsl:apply-templates select="/AnalystReport"/>
                 <!-- Bookmarks for various sections of the report -->
-                <center>
-                    <p>
-                        <img src="ViskitSplash2.png"/><!-- TODO link this image to website -->
-                    </p>
-                    <p>
-                        <font size="-1">
-                            <a href="#ExecutiveSummary">Executive<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Summary</a> |
-                            <a href="#ScenarioLocation">Scenario Location</a> |
-                            <a href="#SimulationConfiguration">Simulation<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Configuration</a> |
-                            <a href="#EntityParameters">Entity<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Parameters</a> |
-                            <a href="#BehaviorDescriptions">Behavior<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Descriptions</a> |
-                            <a href="#StatisticalResults">Statistical<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Results</a> |
-                            <a href="#ConclusionsRecommendations">Conclusions<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>and<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Recommendations</a>
-                        </font>
-                    </p>
-                </center>
+                <p style="text-align: center">
+                    <font size="-1">
+                        <a href="#ExecutiveSummary">Executive<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Summary</a> |
+                        <a href="#ScenarioLocation">Scenario Location</a> |
+                        <a href="#SimulationConfiguration">Simulation<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Configuration</a> |
+                        <a href="#EntityParameters">Entity<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Parameters</a> |
+                        <a href="#BehaviorDescriptions">Behavior<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Descriptions</a> |
+                        <a href="#StatisticalResults">Statistical<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Results</a> |
+                        <a href="#ConclusionsRecommendations">Conclusions<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>and<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>Recommendations</a>
+                    </font>
+                </p>
                 <hr/>
                 <!-- Executive Summary: NOTE - omitted if analyst did not include comments -->
                 <xsl:apply-templates select="//ExecutiveSummaryDescription"/>
@@ -121,7 +122,7 @@
     <!-- Title information template -->
     <xsl:template match="AnalystReport">
         <xsl:if test="(string-length(@accessRights) > 0)">
-            <p align="center">
+            <p style="text-align: center">
                 <font size="2">
                     Access rights for this report:
                     <b>
@@ -130,7 +131,7 @@
                 </font>
             </p>
         </xsl:if>
-        <p align="center">
+        <p style="text-align: center">
             <font size="6">
                 <xsl:value-of select="@name"/>
             </font>
@@ -159,7 +160,8 @@
                 </xsl:element>
             </xsl:otherwise>
         </xsl:choose>
-        <p align="center">Analysis date:
+        <p style="text-align: center">
+            Analysis date:
             <b>
                 <xsl:value-of select="@date"/><!-- TODO problem with stray character when displaying date -->
             </b>
@@ -225,7 +227,7 @@
         </p>
     </xsl:template>
     <xsl:template match="ScenarioLocationImage">
-        <div align="center">
+        <div style="text-align: center">
             <xsl:element name="a">
                 <xsl:attribute name="href">
                     <xsl:value-of select="@dir"/>
@@ -259,7 +261,7 @@
         <xsl:if test="@dir != ''">
             <p/>
             <p/>
-            <div align="center">
+            <div style="text-align: center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <xsl:value-of select="@dir"/>
@@ -361,10 +363,10 @@
                 <xsl:value-of select="@text"/>
             </font>
         </p>
-        <p align="center">
+        <p style="text-align: center">
             <b>Summary of Simulation Entities</b>
         </p>
-        <div align="center">
+        <div style="text-align: center">
             <table border="1">
                 <tr>
                     <th bgcolor="#FFFFCC">Simulation Entity</th>
@@ -378,7 +380,7 @@
     </xsl:template>
     
     <xsl:template match="AssemblyImage">
-        <div align="center">
+        <div style="text-align: center">
             <xsl:element name="a">
                 <xsl:attribute name="href">
                     <xsl:value-of select="@dir"/>
@@ -508,7 +510,7 @@
             <xsl:for-each select="Classification">
                 <tr>
                     <th colspan="2" bgcolor="#CCCCCC">Classification</th>
-                    <th colspan="1" width="132" align="center" bgcolor="#CCCCCC">Candidate Factor</th>
+                    <th colspan="1" width="132" style="text-align: center" bgcolor="#CCCCCC">Candidate Factor</th>
                 </tr>
                 <xsl:for-each select="parameter">
                     <tr colspan="4">
@@ -674,7 +676,7 @@
 
         <!-- Add the image of the Event Ggraph -->
         <xsl:for-each select="EventGraphImage">
-            <div align="center">
+            <div style="text-align: center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <xsl:value-of select="@dir"/>
@@ -702,7 +704,7 @@
             <!-- TODO add Event Graph name from XML, rename Behavior element, add linked name to figure caption -->
             </div>
         </xsl:for-each>
-        <div align="center">
+        <div style="text-align: center">
             <table border="1">
                 <tr>
                     <th bgcolor="#FFFFCC">Initialization Parameter</th>
@@ -728,7 +730,7 @@
         <p/>
         <p/>
         <xsl:if test="stateVariable">
-            <div align="center">
+            <div style="text-align: center">
                 <table border="1">
                     <tr>
                         <th bgcolor="#FFFFCC">State Variable</th>
@@ -817,7 +819,7 @@
             <xsl:value-of select="@property"/>
         </p>
         <xsl:for-each select="HistogramChart">
-            <div align="center">
+            <div style="text-align: center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <xsl:value-of select="@dir"/>
@@ -844,7 +846,7 @@
             </div>
         </xsl:for-each>
         <xsl:for-each select="LinearRegressionChart">
-            <div align="center">
+            <div style="text-align: center">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <xsl:value-of select="@dir"/>
@@ -870,7 +872,7 @@
                 <p>Figure <xsl:number value="java:size($javaCounter)" format="1"/>: Replications Regression Plot for <xsl:value-of select="$entityProperty"/></p>
             </div>
         </xsl:for-each>
-        <div align="center">
+        <div style="text-align: center">
             <!--p>
                 <xsl:variable name="allCountsZero">
                     <xsl:choose>
@@ -1013,7 +1015,7 @@
                 <b><a name="SummaryReport">Summary Report</a></b>
             </font>
         </p>
-        <div align="center">
+        <div style="text-align: center">
             <table border="1" width="80%">
                 <tr>
                     <th bgcolor="#FFFFCC">
