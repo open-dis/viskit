@@ -117,14 +117,16 @@ public class AnalystReportController extends MvcAbstractController
         isFileReady(xmlSourceFile);
         // watch out: (file empty, can't save) exceptions occur if somehow a diretory is there with same name
         try {
-            Files.copy(xmlSourceFile.toPath(), analystReportXmlFileDated.toPath());
+            // https://stackoverflow.com/questions/17169541/copy-file-in-java-and-replace-existing-target
+            Files.copy(xmlSourceFile.toPath(), analystReportXmlFileDated.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } 
         catch (IOException ioe)
         {
             LOG.error("error saving " + analystReportXmlFileDated.getAbsolutePath() + "\n{}", ioe);  // typically this file does not already exists
         }
         try {
-            Files.copy(xmlSourceFile.toPath(), analystReportXmlFile.toPath());
+            // https://stackoverflow.com/questions/17169541/copy-file-in-java-and-replace-existing-target
+            Files.copy(xmlSourceFile.toPath(), analystReportXmlFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } 
         catch (IOException ioe)
         {
