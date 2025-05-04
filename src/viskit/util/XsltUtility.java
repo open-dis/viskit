@@ -33,7 +33,10 @@ public class XsltUtility
     public static boolean runXsltStylesheet(String inputFilePath, String outputFilePath, String xsltStylesheetFilePath) 
     {
         File xsltStylesheetFile = new File(xsltStylesheetFilePath);
-        LOG.info("runXslt() commence stylesheet conversion\n      {}\n      {}\n      {} (from viskit.jar)",
+        LOG.info("runXslt() commence stylesheet conversion\n" + 
+                 "           input {}\n" + 
+                 "          output {}\n" + 
+                 "      stylesheet {} (from viskit.jar)",
                 inputFilePath, outputFilePath,  // TODO actual absolute paths from File
                 xsltStylesheetFile.getAbsolutePath());
         try {

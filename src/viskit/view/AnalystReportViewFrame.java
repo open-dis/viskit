@@ -131,7 +131,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         {
             tabbedPane = new JTabbedPane();
             tabbedPane.setBackground(Color.white);
-            setLayout(); // initialize panel
+            createPanelsSetLayout(); // initialize panel
             setContentPane(tabbedPane); // not add!
         }
         setBackground(new Color(251, 251, 229)); // yellow
@@ -210,58 +210,60 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         //  This is because experience shows that a multi-threaded GUI is impossible to get rignt."
         
         SwingUtilities.invokeLater(() -> {
-            _fillLayout();
+            refreshValuesAllPanels();
             repaint();    // making sure
             revalidate();
             analystReportModel.announceAnalystReportReadyToView();
         });
     }
 
-    private void _fillLayout() 
+    private void refreshValuesAllPanels() 
     {
         if (!isFileReady(analystReportModel.getAnalystReportXmlFile()))
         {
-            LOG.error ("_fillLayout() problem, analystReportModel.getAnalystReportXmlFile() not ready");
+            LOG.error ("refreshValuesAllPanels() problem, analystReportModel.getAnalystReportXmlFile() not ready");
             return;
         }
         try {
-            fillHeader();
-            fillExecutiveSummary();
-            fillScenarioLocationPanel();
-            fillSimulationConfigurationPanel();
-            fillEntityParametersTablesPanel();
-            fillBehaviorDescriptionsPanel();
-            fillStatisticalResultsPanel();
-            fillConclusionsRecommendationsPanel();
+            refreshValuesHeaderPanel();
+            refreshValuesExecutiveSummaryPanel();
+            refreshValuesScenarioLocationPanel();
+            refreshValuesSimulationConfigurationPanel();
+            refreshValuesEntityParametersTablesPanel();
+            refreshValuesBehaviorDescriptionsPanel();
+            refreshValuesStatisticalResultsPanel();
+            refreshValuesConclusionsRecommendationsPanel();
         }
         catch (Exception ex)
         {
-            LOG.error (" _fillLayout() exception: " + ex.getMessage());
+            LOG.error ("refreshValuesAllPanels() exception: " + ex.getMessage());
         }
     }
 
-    /** update analystReportModel data using values from AnalystReport user interface */
-    public void unFillLayout() 
+    /** update analystReportModel data using values saved from AnalystReport user interface */
+    public void updateAnalystReportDataModelFromAllPanels() 
     {
-        unFillHeader();
-        unFillExecutiveSummary();
-        unFillScenarioLocationPanel();
-        unFillSimulationConfigurationPanel();
-        unFillEntityParameterTablesPanel();
-        unFillBehaviorDescriptionsPanel();
-        unFillStatisticalResultsPanel();
-        unFillConclusionsRecommendationsPanel();
+        updateAnalystReportDataModelFromHeaderPanel();
+        updateAnalystReportDataModelFromExecutiveSummaryPanel();
+        updateAnalystReportDataModelFromScenarioLocationPanel();
+        updateAnalystReportDataModelFromSimulationConfigurationPanel();
+        updateAnalystReportDataModelFromEntityParameterTablesPanel();
+        updateAnalystReportDataModelFromBehaviorDescriptionsPanel();
+        updateAnalystReportDataModelFromStatisticalResultsPanel();
+        updateAnalystReportDataModelFromConclusionsRecommendationsPanel();
     }
 
     /** update AnalystReport user interface using analystReportModel values */
-    private void fillHeader()
+    private void refreshValuesHeaderPanel()
     {
         try {
                   titleTF.setText(analystReportModel.getReportName());
             analystNameTF.setText(analystReportModel.getAuthor());
-            String date = analystReportModel.getDateOfReport();
-            if (date != null && date.length() > 0) {
-                analysisDateTF.setText(date);
+            
+            // TODO is date field getting updated?
+            String reportDate = analystReportModel.getDateOfReport();
+            if (reportDate != null && reportDate.length() > 0) {
+                analysisDateTF.setText(reportDate);
             } 
             else 
             {
@@ -275,8 +277,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
-    /** update analystReportModel data using values from AnalystReport user interface */
-    private void unFillHeader() 
+    /** update analystReportModel data using values saved from AnalystReport user interface */
+    private void updateAnalystReportDataModelFromHeaderPanel() 
     {
         analystReportModel.setReportName(                                     titleTF.getText());
         analystReportModel.setAuthor(                                   analystNameTF.getText());
@@ -284,33 +286,33 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         analystReportModel.setDocumentAccessRights((String) documentAccessRightsLabelTF.getSelectedItem());
     }
 
-    private void setLayout()
+    private void createPanelsSetLayout()
     {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         getContentPane().setBackground(Color.white);
         
         if (tabbedPane.getTabCount() == 0)
         {
-            tabbedPane.removeAll(); // reset
-            tabbedPane.add("1 Header",                          makeHeaderPanel());
-            tabbedPane.add("2 Executive Summary",               makeExecutiveSummaryPanel());
-            tabbedPane.add("3 Scenario Location",               makeScenarioLocationPanel());
-            tabbedPane.add("4 Simulation Configuration",        makeSimulationConfigurationAssemblyDesignPanel());
-            tabbedPane.add("5 Entity Parameters",               makeEntityParametersTablesPanel());
-            tabbedPane.add("6 Behavior Descriptions",           makeBehaviorDescriptionsPanel());
-            tabbedPane.add("7 Statistical Results",             makeStatisticalResultsPanel());
-            tabbedPane.add("8 Conclusions and Recommendations", makeConclusionsRecommendationsPanel());
+            tabbedPane.removeAll(); // reset (redundant)
+            tabbedPane.add("1 Header",                          createHeaderPanel());
+            tabbedPane.add("2 Executive Summary",               createExecutiveSummaryPanel());
+            tabbedPane.add("3 Scenario Location",               createScenarioLocationPanel());
+            tabbedPane.add("4 Simulation Configuration",        createSimulationConfigurationAssemblyDesignPanel());
+            tabbedPane.add("5 Entity Parameters",               createEntityParametersTablesPanel());
+            tabbedPane.add("6 Behavior Descriptions",           createBehaviorDescriptionsPanel());
+            tabbedPane.add("7 Statistical Results",             createStatisticalResultsPanel());
+            tabbedPane.add("8 Conclusions and Recommendations", createConclusionsRecommendationsPanel());
         }
-        else
+        else // unused, can delete?
         {
-            tabbedPane.setComponentAt(1, makeHeaderPanel());
-            tabbedPane.setComponentAt(2, makeExecutiveSummaryPanel());
-            tabbedPane.setComponentAt(3, makeScenarioLocationPanel());
-            tabbedPane.setComponentAt(4, makeSimulationConfigurationAssemblyDesignPanel());
-            tabbedPane.setComponentAt(5, makeEntityParametersTablesPanel());
-            tabbedPane.setComponentAt(6, makeBehaviorDescriptionsPanel());
-            tabbedPane.setComponentAt(7, makeStatisticalResultsPanel());
-            tabbedPane.setComponentAt(8, makeConclusionsRecommendationsPanel());
+            tabbedPane.setComponentAt(1, createHeaderPanel());
+            tabbedPane.setComponentAt(2, createExecutiveSummaryPanel());
+            tabbedPane.setComponentAt(3, createScenarioLocationPanel());
+            tabbedPane.setComponentAt(4, createSimulationConfigurationAssemblyDesignPanel());
+            tabbedPane.setComponentAt(5, createEntityParametersTablesPanel());
+            tabbedPane.setComponentAt(6, createBehaviorDescriptionsPanel());
+            tabbedPane.setComponentAt(7, createStatisticalResultsPanel());
+            tabbedPane.setComponentAt(8, createConclusionsRecommendationsPanel());
         }
 
 
@@ -320,7 +322,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JTextArea executiveSummaryTA;
 
     /** user interface creation */
-    private JPanel makeHeaderPanel()
+    private JPanel createHeaderPanel()
     {
         if (headerPanel == null)
             headerPanel = new JPanel(new SpringLayout());
@@ -376,7 +378,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     /** user interface creation */
-    private JPanel makeExecutiveSummaryPanel() 
+    private JPanel createExecutiveSummaryPanel() 
     {
         if (executiveSummaryPanel == null)
             executiveSummaryPanel = new JPanel();
@@ -397,7 +399,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     /** update AnalystReport user interface using analystReportModel values */
-    private void fillExecutiveSummary() 
+    private void refreshValuesExecutiveSummaryPanel() 
     {
         try {
             showExecutiveSummaryCB.setSelected(analystReportModel.isShowExecutiveSummary());
@@ -410,8 +412,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
-    /** update analystReportModel data using values from AnalystReport user interface */
-    private void unFillExecutiveSummary() 
+    /** update analystReportModel data using values saved from AnalystReport user interface */
+    private void updateAnalystReportDataModelFromExecutiveSummaryPanel() 
     {
         analystReportModel.setShowExecutiveSummary(showExecutiveSummaryCB.isSelected());
         analystReportModel.setExecutiveSummary(executiveSummaryTA.getText());
@@ -426,7 +428,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JButton    simulationChartImageButton;
 
     /** user interface creation */
-    private JPanel makeScenarioLocationPanel() 
+    private JPanel createScenarioLocationPanel() 
     {
         if (scenarioLocationPanel == null)
             scenarioLocationPanel = new JPanel();
@@ -486,7 +488,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     /** update AnalystReport user interface using analystReportModel values */
-    private void fillScenarioLocationPanel()
+    private void refreshValuesScenarioLocationPanel()
     {
         try
         {
@@ -511,8 +513,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
-    /** update analystReportModel data using values from AnalystReport user interface */
-    private void unFillScenarioLocationPanel() 
+    /** update analystReportModel data using values saved from AnalystReport user interface */
+    private void updateAnalystReportDataModelFromScenarioLocationPanel() 
     {
         try
         {
@@ -546,7 +548,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JButton simulationConfigurationAssemblyImageButton;
 
     /** user interface creation */
-    private JPanel makeSimulationConfigurationAssemblyDesignPanel()
+    private JPanel createSimulationConfigurationAssemblyDesignPanel()
     {
         if (simulationConfigurationAssemblyDesignPanel == null)
             simulationConfigurationAssemblyDesignPanel = new JPanel();
@@ -608,7 +610,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     /** update AnalystReport user interface using analystReportModel values */
-    private void fillSimulationConfigurationPanel() 
+    private void refreshValuesSimulationConfigurationPanel() 
     {
         try
         {
@@ -640,8 +642,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
-    /** update analystReportModel data using values from AnalystReport user interface */
-    private void unFillSimulationConfigurationPanel() 
+    /** update analystReportModel data using values saved from AnalystReport user interface */
+    private void updateAnalystReportDataModelFromSimulationConfigurationPanel() 
     {
         analystReportModel.setShowSimulationConfiguration(showSimulationConfigurationAndAnalysisCB.isSelected());
         analystReportModel.setSimulationConfigurationConsiderations(simulationConfigurationTA.getText());
@@ -662,7 +664,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JTabbedPane   entityParametersTablesTabbedPane;
 
     /** user interface creation */
-    private JPanel makeEntityParametersTablesPanel()
+    private JPanel createEntityParametersTablesPanel()
     {
         if (entityParametersTablesPanel == null)
             entityParametersTablesPanel = new JPanel();
@@ -694,7 +696,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
 
     /** update AnalystReport user interface using analystReportModel values */
     @SuppressWarnings("unchecked")
-    private void fillEntityParametersTablesPanel() 
+    private void refreshValuesEntityParametersTablesPanel() 
     {
         try
         {
@@ -747,8 +749,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
-    /** update analystReportModel data using values from AnalystReport user interface */
-    private void unFillEntityParameterTablesPanel() 
+    /** update analystReportModel data using values saved from AnalystReport user interface */
+    private void updateAnalystReportDataModelFromEntityParameterTablesPanel() 
     {
         analystReportModel.setShowEntityParametersOverview(showEntityParametersOverviewCB.isSelected());
         analystReportModel.setShowEntityParametersTables(showEntityParametersTablesCB.isSelected());
@@ -762,7 +764,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JTabbedPane behaviorTabbedPane;
 
     /** user interface creation */
-    private JPanel makeBehaviorDescriptionsPanel() 
+    private JPanel createBehaviorDescriptionsPanel() 
     {
         if (behaviorDescriptionsPanel == null)
             behaviorDescriptionsPanel = new JPanel();
@@ -800,8 +802,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return behaviorDescriptionsPanel;
     }
 
-    /** update analystReportModel data using values from AnalystReport user interface */
-    private void unFillBehaviorDescriptionsPanel()
+    /** update analystReportModel data using values saved from AnalystReport user interface */
+    private void updateAnalystReportDataModelFromBehaviorDescriptionsPanel()
     {
         analystReportModel.setShowBehaviorDesignAnalysisDescriptions(showBehaviorDesignAnalysisDescriptions.isSelected());
         analystReportModel.setBehaviorDescription(behaviorDescriptionsTA.getText());
@@ -813,7 +815,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     /** update AnalystReport user interface using analystReportModel values */
-    private void fillBehaviorDescriptionsPanel() 
+    private void refreshValuesBehaviorDescriptionsPanel() 
     {
         try
         {
@@ -904,7 +906,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JScrollPane statisticsSummaryScrollPane;
 
     /** user interface creation */
-    private JPanel makeStatisticalResultsPanel() 
+    private JPanel createStatisticalResultsPanel() 
     {
         if (statisticalResultsPanel == null)
             statisticalResultsPanel = new JPanel();
@@ -950,7 +952,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     /** update AnalystReport user interface using analystReportModel values */
-    private void fillStatisticalResultsPanel() 
+    private void refreshValuesStatisticalResultsPanel() 
     {
         try
         {
@@ -1028,8 +1030,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
-    /** update analystReportModel data using values from AnalystReport user interface */
-    private void unFillStatisticalResultsPanel()
+    /** update analystReportModel data using values saved from AnalystReport user interface */
+    private void updateAnalystReportDataModelFromStatisticalResultsPanel()
     {
         analystReportModel.setShowStatisticsDescriptionAnalysis(showStatisticsDescriptionAnalysisCB.isSelected());
         analystReportModel.setStatisticsDescription(statisticsDescriptionTextArea.getText());
@@ -1043,7 +1045,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     JTextArea conRecRecommendationsTA;
 
     /** user interface creation */
-    private JPanel makeConclusionsRecommendationsPanel() 
+    private JPanel createConclusionsRecommendationsPanel() 
     {
         if (conclusionsRecommendationsPanel == null)
             conclusionsRecommendationsPanel = new JPanel();
@@ -1067,7 +1069,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     }
 
     /** update AnalystReport user interface using analystReportModel values */
-    private void fillConclusionsRecommendationsPanel() 
+    private void refreshValuesConclusionsRecommendationsPanel() 
     {
         try
         {
@@ -1084,8 +1086,8 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         }
     }
 
-    /** update analystReportModel data using values from AnalystReport user interface */
-    private void unFillConclusionsRecommendationsPanel() {
+    /** update analystReportModel data using values saved from AnalystReport user interface */
+    private void updateAnalystReportDataModelFromConclusionsRecommendationsPanel() {
         analystReportModel.setShowRecommendationsConclusions(showConclusionsRecommendationsCB.isSelected());
         analystReportModel.setConclusions(conRecConclusionsTA.getText());
         analystReportModel.setRecommendations(conRecRecommendationsTA.getText());

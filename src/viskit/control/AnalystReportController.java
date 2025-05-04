@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JComponent;
@@ -109,16 +110,26 @@ public class AnalystReportController extends MvcAbstractController
         String outputFilenameDated = (assemblyName + "_AnalystReport_" + dateOutput + ".xml");
         String outputFilename      = (assemblyName + "_AnalystReport"               + ".xml");
 
-        File analystReportXmlFile = new File(analystReportDirectory, outputFilename);
+        File analystReportXmlFile      = new File(analystReportDirectory, outputFilename);
+        File analystReportXmlFileDated = new File(analystReportDirectory, outputFilenameDated);
         
         LOG.info("xmlSourceFile.getAbsolutePath()=\n      " + xmlSourceFile.getAbsolutePath());
         isFileReady(xmlSourceFile);
+        // watch out: (file empty, can't save) exceptions occur if somehow a diretory is there with same name
+        try {
+            Files.copy(xmlSourceFile.toPath(), analystReportXmlFileDated.toPath());
+        } 
+        catch (IOException ioe)
+        {
+            LOG.error("error saving " + analystReportXmlFileDated.getAbsolutePath() + "\n{}", ioe);  // typically this file does not already exists
+        }
         try {
             Files.copy(xmlSourceFile.toPath(), analystReportXmlFile.toPath());
         } 
         catch (IOException ioe)
         {
-            LOG.debug(ioe);  // typically this file already exists, authors are progressively/iteratively editing it
+            // typically this file already exists, authors are progressively/iteratively editing it
+            LOG.error("error saving " + analystReportXmlFile.getAbsolutePath() + "\n{}", ioe);
         }
         LOG.info("analystReportXmlFile.toPath()=\n      " + analystReportXmlFile.getAbsolutePath());
         isFileReady(xmlSourceFile);
@@ -235,7 +246,7 @@ public class AnalystReportController extends MvcAbstractController
         if (response != JFileChooser.APPROVE_OPTION) { // cancel
             return;
         }
-        analystReportViewFrame.unFillLayout();
+        analystReportViewFrame.updateAnalystReportDataModelFromAllPanels();
 
         // Ensure user can save a unique name for Analyst Report (Bug fix: 1260)
         getAnalystReportModel().setAnalystReportFile(saveAnalystReportXmlChooser.getSelectedFile());
@@ -275,7 +286,7 @@ public class AnalystReportController extends MvcAbstractController
             );
             return;
         }
-        analystReportViewFrame.unFillLayout();
+        analystReportViewFrame.updateAnalystReportDataModelFromAllPanels();
         saveReport(getAnalystReportModel().getAnalystReportXmlFile());
 
         String outputHtmlFilePath = getAnalystReportModel().getAnalystReportXmlFile().getAbsolutePath();

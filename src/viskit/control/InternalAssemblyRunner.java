@@ -566,13 +566,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                         // TODO duplicative?
                         
                         // Pause (from Run mode)
-                        Schedule.setSingleStep(true);
-                        Schedule.setPauseAfterEachEvent(true);
-                        Schedule.pause();
+                        Schedule.setSingleStep(true); // simkit
+                        Schedule.pause(); // simkit  
+//                      Schedule.setPauseAfterEachEvent(true); // simkit method; no, blocks console for text-based thread console
                         
                         // TODO runaway thread; is any action needed at this point?
                         // Likely problem:  pause event is not being recieved in threaded event loop, rather in between replications
 //                        Schedule.startSimulation();
+//                        return;
                     }
                     else
                     {
@@ -580,8 +581,12 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                         
                         // Step (while in single-step mode)
                         // TODO run one step and return
-                        Schedule.startSimulation(); // TODO is this correct method for single stepping?
+                       Schedule.startSimulation(); // TODO is this correct method for single stepping?
                     }
+//                    else
+//                    {
+//                        LOG.error("PauseStepListener actionPerformed({}) unexpected state received: {}", actionEvent, getSimulationState());
+//                    }
                     
                     if (priorRunSimulationClassLoader == null)
                     {
@@ -975,6 +980,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  simkitState = "(inactive)"; // likely between replications
         else
                  simkitState = "(unknown)  simTime=" + Schedule.getSimTime();
+        
         LOG.info("logSimulationRunState()" +
                    " play=" + isOnOff(simulationRunPanel.vcrRunResumeButton.isEnabled()) +
                    " step=" + isOnOff(simulationRunPanel.vcrPauseStepButton.isEnabled()) +
@@ -1108,7 +1114,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 return;
             }
                 
-            int returnValue = JOptionPane.showConfirmDialog(ViskitGlobals.instance().getSimulationRunPanel(), "Are you sure?", "Confirm clearing all console information", JOptionPane.YES_NO_OPTION);
+            int returnValue = JOptionPane.showConfirmDialog(ViskitGlobals.instance().getSimulationRunPanel(), 
+                    "Are you sure that you want to clear the console?", 
+                     "Confirm clearing all console information", JOptionPane.YES_NO_OPTION);
             if (returnValue == JOptionPane.YES_OPTION) 
             {
                 simulationRunPanel.outputStreamTA.setText("");
@@ -1126,13 +1134,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
             
-            File f; // = tmpFile;
-            String osName = ViskitStatics.OPERATING_SYSTEM;
-            String filePath = "";
+            File tempFile; // = tmpFile;
+            String operatingSystemName = ViskitStatics.OPERATING_SYSTEM;
+            String tempFilePath = "";
             String tool;
-            if (osName.toLowerCase().contains("win")) {
+            if (operatingSystemName.toLowerCase().contains("win")) {
                 tool = "notepad";
-            } else if (osName.toLowerCase().contains("mac")) {
+            } else if (operatingSystemName.toLowerCase().contains("mac")) {
                 tool = "open -a";
             } else {
                 tool = "gedit"; // assuming Linux here
@@ -1140,19 +1148,21 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
             String consoleText = simulationRunPanel.outputStreamTA.getText().trim();
             try {
-                f = TempFileManager.createTempFile("ViskitOutput", ".txt");
-                f.deleteOnExit();
-                try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(f))) {
+                tempFile = TempFileManager.createTempFile("ViskitOutput", ".txt");
+                tempFile.deleteOnExit();
+                try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tempFile))) 
+                {
                     bufferedWriter.append(consoleText);
                 }
-                filePath = f.getCanonicalPath();
-                Desktop.getDesktop().open(new File(filePath));
+                tempFilePath = tempFile.getCanonicalPath();
+                Desktop.getDesktop().open(new File(tempFilePath));
               }
             catch (IOException ex) {
             }
-            catch (UnsupportedOperationException ex) {
+            catch (UnsupportedOperationException ex) 
+            {
               try {
-                  Runtime.getRuntime().exec(new String[] {tool + " " + filePath});
+                  Runtime.getRuntime().exec(new String[] {tool + " " + tempFilePath});
               }
               catch (IOException ex1) {
                   LOG.error(ex1);

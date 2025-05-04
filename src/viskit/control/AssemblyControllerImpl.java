@@ -122,7 +122,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      *This method is for Assembly compilation
      * @param assemblyPath an assembly file to compile
      */
-    private void compileAssembly(String assemblyPath) {
+    private void compileAssembly(String assemblyPath) 
+    {
         LOG.debug("Compiling assembly: {}", assemblyPath);
         File assemblyFile = new File(assemblyPath);
         _doOpen(assemblyFile);
@@ -138,20 +139,24 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // The initialAssemblyFilePath is set if we have stated a file "arg" upon startup from the command line
 
-        if (initialAssemblyFilePath != null && !initialAssemblyFilePath.isBlank() && !initialAssemblyFilePath.contains("$")) { // Check for $ makes sure that a property key isn't being used
-            LOG.debug("Loading initial file: {}", initialAssemblyFilePath);                             // pointing to a assembly path isn't commented
-                                                                                                         // out
+        if (initialAssemblyFilePath != null && !initialAssemblyFilePath.isBlank() && 
+           !initialAssemblyFilePath.contains("$")) // Check for $ makes sure that a property key isn't being used
+        {
             // Switch to the project that this Assembly file is located in if paths do not coincide
             if (!initialAssemblyFilePath.contains(projectDirectory.getPath())) 
             {
+                LOG.info("Switch to the project that this Assembly file is located");
                 doProjectCleanup();
                 projectDirectory = new File(initialAssemblyFilePath).getParentFile().getParentFile().getParentFile();
                 openProject(projectDirectory); // calls EventGraphViewFrame setTitleProjectName
 
                 // Add a new project EventGraphs for LEGO tree inclusion of our SimEntities
-                ViskitUserPreferencesDialog.RebuildLEGOTreePanelTask t = new ViskitUserPreferencesDialog.RebuildLEGOTreePanelTask();
-                t.execute();
+                ViskitUserPreferencesDialog.RebuildLEGOTreePanelTask rebuildLEGOTreePanelTask = new ViskitUserPreferencesDialog.RebuildLEGOTreePanelTask();
+                rebuildLEGOTreePanelTask.execute();
             }
+            LOG.info("\n=============================");
+            LOG.info("Loading initial assembly: {}", initialAssemblyFilePath);
+            
             compileAssembly(initialAssemblyFilePath);
         } 
         else 
@@ -1951,6 +1956,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 }
                 else
                 {
+                    String assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetadata().name;
+                    
+                    LOG.info("\n" + "      =================================================================================================" + 
+                             "\n" + "      prepareSimulationRunner() {}",assemblyName);
+                    
                     // TODO reset SimulationRunPanel simulation start and stop time to match graph metadata if new Assembly found
                     
                     // in case of rewind/rerun, get SimulationRunPanel startTime, stopTime, number of replications
@@ -1978,7 +1988,6 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     // Ensure any changes to the Assembly Properties dialog get saved
                     save();
         
-                    String assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getMetadata().name;
                     String  consoleName = SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
                     if (!assemblyName.isBlank() && assemblyName.toLowerCase().contains("assembly"))
                          consoleName += " for " + assemblyName;

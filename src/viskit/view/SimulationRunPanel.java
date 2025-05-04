@@ -251,7 +251,9 @@ public class SimulationRunPanel extends JPanel
                     return;
                 }
 
-                int returnValue = JOptionPane.showConfirmDialog(ViskitGlobals.instance().getSimulationRunPanel(), "Are you sure?", "Confirm clearing all console information", JOptionPane.YES_NO_OPTION);
+                int returnValue = JOptionPane.showConfirmDialog(ViskitGlobals.instance().getSimulationRunPanel(), 
+                        "Are you sure that you want to clear the console?", 
+                         "Confirm clearing all console information", JOptionPane.YES_NO_OPTION);
                 if (returnValue == JOptionPane.YES_OPTION) 
                 {
                     outputStreamTA.selectAll();

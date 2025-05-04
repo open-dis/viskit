@@ -407,7 +407,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     public void setStopTime(double newStopTime) 
     {
-        if (isDebugThread()) logThreadState(METHOD_setStopTime + " newStopTime=" + newStopTime);
+        if (isDebugThread()) logThreadStatus(METHOD_setStopTime + " newStopTime=" + newStopTime);
         
         if (newStopTime < 0.0) {
             throw new IllegalArgumentException("Stop time must be >= 0.0: " + newStopTime);
@@ -427,7 +427,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     public void setSingleStep(boolean newValue) 
     {
-        if (isDebugThread()) logThreadState(METHOD_setSingleStep + " newValue=" + newValue);
+        if (isDebugThread()) logThreadStatus(METHOD_setSingleStep + " newValue=" + newValue);
         
         singleStep = newValue;
     }
@@ -448,7 +448,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     {
         // do not set debug breakpoint in this method or else thread is not notified to stop
         
-        if (isDebugThread()) logThreadState(METHOD_setStopSimulationRun);
+        if (isDebugThread()) logThreadStatus(METHOD_setStopSimulationRun);
         
         stopSimulationRun = newValue;
         if (stopSimulationRun)
@@ -468,14 +468,15 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     {
         // do not set debug breakpoint in this method or else thread is not notified to pause
         
-        if (isDebugThread()) logThreadState(METHOD_setPauseSimulationRun);
+        if (isDebugThread()) logThreadStatus(METHOD_setPauseSimulationRun + "(" + newValue + ")");
         
         pauseSimulationRun = newValue;
         if (pauseSimulationRun)
         {
-            // TODO advance sim clock when in single step mode?
+            // advance simkit sim clock when in single step mode?  no, stay at per-replication level
 
             Schedule.pause();// simkit
+            LOG.info("setPauseSimulationRun({})", pauseSimulationRun);
         }
     }
     
@@ -497,7 +498,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     public void resumeSimulation()
     {
-        if (isDebugThread()) logThreadState(METHOD_resumeSimulation);
+        if (isDebugThread()) logThreadStatus(METHOD_resumeSimulation);
         
         pauseSimulationRun = false;
         
@@ -954,7 +955,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         if (!methodName.equals(METHOD_run))
             LOG.error("Reflection error: methodName=" + methodName + " does not match METHOD_run=" + METHOD_run);
         
-        if (isDebugThread()) logThreadState(METHOD_run);
+        if (isDebugThread()) logThreadStatus(METHOD_run);
         
         fixThreadedName();
         LOG.info(assemblyName + " is now running inside BasicAssembly run() Simulation Run thread...");
@@ -1063,12 +1064,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         
         LOG.info("Begin running simulation replications for " + getName());
 
-        for (int replication = 0; replication < getNumberPlannedReplications(); replication++)
+        for (int replicationNumber = 0; replicationNumber < getNumberPlannedReplications(); replicationNumber++)
         {
-            // TODO check for pause
+            if (pauseSimulationRun)
+            {
+                // now pause before resuming the replication?
+                LOG.info("run() paused prior to replication loop... pauseSimulationRun={}", pauseSimulationRun);
+////                return;
+            }
             
-            firePropertyChange("replicationNumber", (replication + 1));
-            if ((replication + 1) == getVerboseReplicationNumber())
+            firePropertyChange("replicationNumber", (replicationNumber + 1));
+            if ((replicationNumber + 1) == getVerboseReplicationNumber())
             {
                 Schedule.setVerbose(true);       // simkit
                 Schedule.setReallyVerbose(true); // simkit
@@ -1100,7 +1106,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             }
             if (stopSimulationRun) 
             {
-                String stopMessage = "Simulation stopped in Replication # " + (replication + 1);
+                String stopMessage = "Simulation stopped in Replication # " + (replicationNumber + 1);
                 LOG.info(stopMessage);
                 // breaks simulation threading if not deferred, nevertheless not reachable at tuntime due to different classloader
                 // not a problem since console notes number of completed replication
@@ -1111,7 +1117,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             } 
             else if (pauseSimulationRun) 
             {
-                String pauseMessage = "Simulation paused in Replication # " + (replication + 1);
+                String pauseMessage = "Simulation paused in Replication # " + (replicationNumber + 1);
                 LOG.info(pauseMessage);
                 // breaks simulation threading if not deferred, nevertheless not reachable at tuntime due to different classloader
                 // not a problem since console notes number of completed replication
@@ -1129,10 +1135,18 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                         LOG.error("run() initialization discrepancy: Simulation is already running in single step mode, continuing anyway...");
                 
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
+                String seedString = String.valueOf(seed);
+                String indexSpacing = new String();
+                if (replicationNumber < 9)
+                    indexSpacing = " ";
                 String spacing = new String();
-                if (seed > 0)
-                    spacing = " ";
-                LOG.info("Simulation starting Replication #" + (replication + 1) + " with RNG seed state = " + spacing + seed);
+                if      (seedString.length() == 10)
+                         spacing = " ";
+                else if (seedString.length() == 9)
+                         spacing = "  ";
+                else if (seedString.length() == 8)
+                         spacing = "   ";
+                LOG.info("Simulation starting Replication #" + indexSpacing + (replicationNumber + 1) + " with RNG seed state = " + spacing + seed);
                 try {
                     Schedule.reset(); // simkit
                 } 
@@ -1143,12 +1157,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                             "Assembly Run Error",
                             cme + "\nSimulation will terminate"
                     );
+                    
                     int newEventListId = Schedule.addNewEventList(); // simkit
                     Schedule.setDefaultEventList(Schedule.getEventList(newEventListId)); // simkit
                     for (SimEntity entity : simEntity) {
                         entity.setEventListID(newEventListId);
                     }
-
                     Schedule.stopSimulation(); // simkit
                     Schedule.clearRerun();     // simkit
                     runEntitiesSet.forEach(entity -> {
@@ -1159,7 +1173,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 //                if (!Schedule.isRunning() && !Schedule.isSingleStep()) // simkit
 //                {
 //                }
-
+                                    
                 if (!pauseSimulationRun)
                 {
                     // now run the replication
@@ -1169,7 +1183,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 {
                     LOG.info("run() paused...");
                 }
-                    
+
 
                 String typeStatistics, nodeType;
                 int ix = 0;
@@ -1218,7 +1232,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                     }
                 }
                 if (isPrintReplicationReports()) {
-                    printWriter.println(getReplicationReport(replication));
+                    printWriter.println(getReplicationReport(replicationNumber));
                     printWriter.flush();
                 }
             }
@@ -1409,10 +1423,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     public void setDebugThread(boolean debugThread) {
         this.debugThread = debugThread;
     }
-    private void logThreadState(String methodInvocation)
+    private void logThreadStatus(String threadMethodInvocationMessage)
     {
-        LOG.info("logThreadState() methodInvocation=" + methodInvocation);
-        // TODO print more state information
+        LOG.info("logThreadStatus(): {}", threadMethodInvocationMessage);
     }
     
     /**
