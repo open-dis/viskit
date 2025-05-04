@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="InventoryModel" package="examples" version="1.0" author="terry" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" description="Implementation of an Event Graph for an Inventory Model employing an (s, S) ordering policy depicted on page 4-6 of the Discrete Event Simulation (DES) Modeling guide by Arnie Buss.">
+<SimEntity name="InventoryModel" package="examples" version="1.0" author="terry" extend="SimEntityBase" description="Implementation of an Event Graph for an Inventory Model employing an (s, S) ordering policy depicted on page 4-6 of the Discrete Event Simulation (DES) Modeling guide by Arnie Buss." xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="D" type="simkit.random.RandomVariate" description="Number of Parts demanded by a customer"/>
     <Parameter name="tL" type="simkit.random.RandomVariate" description="Lead time for orders received by the company"/>
     <Parameter name="tR" type="simkit.random.RandomVariate" description="Deterministic time between company reviews"/>
@@ -39,8 +39,8 @@
         <Coordinate x="40.0" y="100.0"/>
     </Event>
     <Event name="Demand" description="">
-        <LocalVariable name="demand" type="int" value="((DiscreteRandomVariate) D).generateInt()"/>
-        <LocalVariable name="net" type="int" value="I-B-demand"/>
+        <LocalVariable name="demand" type="int" value="((DiscreteRandomVariate) D).generateInt()" description=""/>
+        <LocalVariable name="net" type="int" value="I-B-demand" description=""/>
         <StateTransition state="I">
             <Assignment value="Math.max(0, net)"/>
         </StateTransition>
@@ -64,7 +64,7 @@ if (net &gt;= 0) {
         <Coordinate x="140.0" y="290.0"/>
     </Event>
     <Event name="PlaceOrder">
-        <Argument name="A" type="int"/>
+        <Argument name="A" type="int" description=""/>
         <StateTransition state="T">
             <Assignment value="T+A"/>
         </StateTransition>
@@ -81,8 +81,8 @@ if (net &gt;= 0) {
         <Coordinate x="280.0" y="300.0"/>
     </Event>
     <Event name="OrderArrives">
-        <Argument name="A" type="int"/>
-        <LocalVariable name="net" type="int" value="I - B + A"/>
+        <Argument name="A" type="int" description=""/>
+        <LocalVariable name="net" type="int" value="I - B + A" description=""/>
         <StateTransition state="T">
             <Assignment value="T - A"/>
         </StateTransition>
