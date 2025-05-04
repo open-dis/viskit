@@ -13,7 +13,7 @@
         <StateTransition state="numberArrivals">
             <Assignment value="numberArrivals + 1"/>
         </StateTransition>
-        <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT"/>
+        <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT" description=""/>
         <Code></Code>
         <Coordinate x="260.0" y="70.0"/>
     </Event>
