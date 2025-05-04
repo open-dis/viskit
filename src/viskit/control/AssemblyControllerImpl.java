@@ -101,8 +101,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     JTabbedPane mainTabbedPane;
     int mainTabbedPaneIndex;
 
-    /** Creates a new instance of AssemblyController */
-    public AssemblyControllerImpl() {
+    /** Constructor that creates a new instance of AssemblyController */
+    public AssemblyControllerImpl() 
+    {
         initializeConfiguration();
     }
 
@@ -711,17 +712,17 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 //                    try {
 //                        URL mailtoURL = new URI("mailto:" + ViskitStatics.VISKIT_MAILING_LIST
 //                                + "?subject=Viskit%20Project%20Submission%20for%20"
-//                                + projectDirectory.getName() + "&body=see%20attachment").toURL();
+//                                + projectDirectory.getAssemblyName() + "&body=see%20attachment").toURL();
 //                        
 //                        String message = "Please navigate to<br/>"
 //                                + projectZipFile.getParent()
-//                                + "<br/>and email the " + projectZipFile.getName()
+//                                + "<br/>and email the " + projectZipFile.getAssemblyName()
 //                                + " file to "
 //                                + "<b><a href=\"" + mailtoURL.toString() + "\">"
 //                                + ViskitStatics.VISKIT_MAILING_LIST + "</a></b>"
 //                                + "<br/><br/>Click the link to open up an email "
 //                                + "form, then attach the zip file";
-//                        ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projectDirectory.getName(), mailtoURL, message, false);
+//                        ViskitStatics.showHyperlinkedDialog((Component) getView(), "Viskit Project: " + projectDirectory.getAssemblyName(), mailtoURL, message, false);
 //                    } catch (MalformedURLException | URISyntaxException e) {
 //                        LOG.error(e);
 //                    }

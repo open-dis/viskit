@@ -258,15 +258,15 @@ public class ViskitUserConfiguration
         return projectCombinedConfiguration.getStringArray(key);
     }
     
-    public String getAuthorName()
+    public String getAnalystName()
     {
-        String userName = getValue(ViskitUserConfiguration.USER_NAME_KEY);
+        String analystName = getValue(ViskitUserConfiguration.USER_NAME_KEY);
         // if null or "SYSTEM" then this field has not yet been saved after user initializion
-        if ((userName == null) || userName.equals(ViskitUserConfiguration.USER_SYSTEM))
+        if ((analystName == null) || analystName.equals(ViskitUserConfiguration.USER_SYSTEM))
         {
-             userName = "";
+             analystName = "";
         }
-        return userName;
+        return analystName;
     }
     
     FileBasedConfigurationBuilder<XMLConfiguration> fileBasedConfigurationBuilder;

@@ -38,7 +38,7 @@ import edu.nps.util.TempFileManager;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -58,6 +58,7 @@ import static viskit.ViskitProject.ASSEMBLIES_DIRECTORY_NAME;
 import static viskit.ViskitProject.VISKIT_VERSION;
 import viskit.ViskitStatics;
 import static viskit.ViskitStatics.isFileReady;
+import viskit.ViskitUserConfiguration;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.doe.FileHandler;
@@ -1100,10 +1101,18 @@ public final class AnalystReportModel extends MvcAbstractModel
     private void setDefaultPanelValues() 
     {
         // Header values
-        setReportName          ("***ENTER REPORT TITLE HERE***");
-        setAuthor              ("***ENTER NAME OF AUTHOR HERE***");
-        setDateOfReport        (DateFormat.getInstance().format(new Date()));
-        setDocumentAccessRights("");
+        if  (!assemblyName.isBlank())
+              setReportName         (assemblyName + " Analyst Report");
+        else  setReportName         ("***ENTER REPORT TITLE HERE***");
+        if (!ViskitUserConfiguration.instance().getAnalystName().isBlank())
+             setAuthor              (ViskitUserConfiguration.instance().getAnalystName());
+        else setAuthor              ("***ENTER NAME OF AUTHOR HERE***");
+        
+        // https://docs.oracle.com/javase/tutorial/i18n/format/simpleDateFormat.html
+        Date             currentDate = new Date();
+        SimpleDateFormat formatter   = new SimpleDateFormat("d MMM yyyy, hhmm z");
+        setDateOfReport        (formatter.format(currentDate));
+        setDocumentAccessRights(""); // panel interface offers choices
         
         setShowExecutiveSummary(true);
         setExecutiveSummary   ("***ENTER EXECUTIVE SUMMARY HERE***");

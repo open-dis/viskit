@@ -140,7 +140,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 myGraphMetadata.name                  = ViskitStatics.emptyIfNull(jaxbRoot.getName());
                 myGraphMetadata.author                = ViskitStatics.emptyIfNull(jaxbRoot.getAuthor());
                 if (myGraphMetadata.author.isBlank())
-                    myGraphMetadata.author = ViskitUserConfiguration.instance().getAuthorName();
+                    myGraphMetadata.author = ViskitUserConfiguration.instance().getAnalystName();
                 myGraphMetadata.description           = ViskitStatics.emptyIfNull(jaxbRoot.getDescription());
                 myGraphMetadata.version               = ViskitStatics.emptyIfNull(jaxbRoot.getVersion());
                 myGraphMetadata.packageName           = ViskitStatics.emptyIfNull(jaxbRoot.getPackage());

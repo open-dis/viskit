@@ -39,7 +39,7 @@ public class GraphMetadata
     public GraphMetadata(Object caller) 
     {
 //      author = System.getProperty("user.name"); // TODO make this a viskit user property
-        author = ViskitUserConfiguration.instance().getAuthorName();
+        author = ViskitUserConfiguration.instance().getAnalystName();
         
         packageName = "test"; // default
         
@@ -73,7 +73,7 @@ public class GraphMetadata
         packageName           = ViskitStatics.emptyIfNull(newPackageName);
         author                = ViskitStatics.emptyIfNull(newAuthor);
         if (author.isBlank())
-            author = ViskitUserConfiguration.instance().getAuthorName();
+            author = ViskitUserConfiguration.instance().getAnalystName();
         
         version               = ViskitStatics.emptyIfNull(newVersion);
         extendsPackageName    = ViskitStatics.emptyIfNull(newExtendsPackageName);

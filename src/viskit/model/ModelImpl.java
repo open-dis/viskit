@@ -79,7 +79,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         graphMetadata.name                  = ViskitStatics.emptyIfNull(graphMetadata.name);
         graphMetadata.author                = ViskitStatics.emptyIfNull(graphMetadata.author);
         if (graphMetadata.author.isBlank())
-            graphMetadata.author = ViskitUserConfiguration.instance().getAuthorName();
+            graphMetadata.author = ViskitUserConfiguration.instance().getAnalystName();
         graphMetadata.description           = ViskitStatics.emptyIfNull(graphMetadata.description);
         graphMetadata.version               = ViskitStatics.emptyIfNull(graphMetadata.version);
         graphMetadata.packageName           = ViskitStatics.emptyIfNull(graphMetadata.packageName);
@@ -150,7 +150,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
                 myGraphMetadata.name                  = ViskitStatics.emptyIfNull(jaxbRoot.getName());
                 myGraphMetadata.author                = ViskitStatics.emptyIfNull(jaxbRoot.getAuthor());
 //              if (myGraphMetadata.author.isBlank()) // don't override an already-existing file
-//                  myGraphMetadata.author =  ViskitUserConfiguration.instance().getAuthorName();
+//                  myGraphMetadata.author =  ViskitUserConfiguration.instance().getAnalystName();
                 myGraphMetadata.version               = ViskitStatics.emptyIfNull(jaxbRoot.getVersion());
                 myGraphMetadata.description           = ViskitStatics.emptyIfNull(jaxbRoot.getDescription());
                 myGraphMetadata.packageName           = ViskitStatics.emptyIfNull(jaxbRoot.getPackage());

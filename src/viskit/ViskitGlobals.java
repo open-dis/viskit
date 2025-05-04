@@ -205,8 +205,8 @@ public class ViskitGlobals
     /* Configuration constants and methods */
 
     /* routines to manage the singleton-aspect of the views. */
-    AssemblyViewFrame      assemblyViewFrame;
-    AssemblyControllerImpl assemblyController;
+    private AssemblyViewFrame      assemblyViewFrame;
+    private AssemblyControllerImpl assemblyController;
 
     private static final String BEAN_SHELL_ERROR = "BeanShell eval error";
     private Interpreter interpreter;
@@ -248,12 +248,27 @@ public class ViskitGlobals
         ((AssemblyViewFrame) assemblyViewFrame).rebuildLEGOTreePanels();
     }
 
-    public AssemblyModelImpl getActiveAssemblyModel() {
-        return (AssemblyModelImpl) assemblyController.getModel();
+    public AssemblyModelImpl getActiveAssemblyModel() 
+    {
+        if (assemblyController == null)
+        {
+            LOG.error("getActiveAssemblyModel() retrieval of assemblyController returned null object");
+             return null;
+        } 
+        // getModel() is typlically checked by invoking code block
+//        else if (assemblyController.getModel() == null)
+//        {
+//             LOG.error("getActiveAssemblyModel() assemblyController.getModel() returned null object");
+//             return null;
+//        } 
+        else return (AssemblyModelImpl) assemblyController.getModel();
     }
 
-    public String getActiveAssemblyName() {
-        return getActiveAssemblyModel().getName();
+    public String getActiveAssemblyName() 
+    {
+        if  (getActiveAssemblyModel() == null)
+             return "";
+        else return getActiveAssemblyModel().getName();
     }
 
     public AssemblyControllerImpl getAssemblyController() {

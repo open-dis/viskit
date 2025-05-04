@@ -225,7 +225,9 @@ public class EventGraphCache
         int lastDotIndex   = eventGraphFile.getPath().lastIndexOf(".");
 
         String    packageName = eventGraphFile.getParentFile().getName();
-        String   assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getName();
+        String    assemblyName = new String();
+        if (ViskitGlobals.instance().getActiveAssemblyModel() != null)
+                  assemblyName = ViskitGlobals.instance().getActiveAssemblyModel().getName();
         String eventGraphName = eventGraphFile.getPath().substring(lastSlashIndex + 1, lastDotIndex);
         eventGraphNamesList.add(packageName + "." + eventGraphName);
 

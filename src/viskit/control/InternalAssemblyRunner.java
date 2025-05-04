@@ -573,15 +573,22 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                         // TODO runaway thread; is any action needed at this point?
                         // Likely problem:  pause event is not being recieved in threaded event loop, rather in between replications
 //                        Schedule.startSimulation();
-//                        return;
+                        return;
+                    }
+                    else if (getSimulationState() != SimulationState.PAUSE)
+                    {
+                        // TODO single step
                     }
                     else
                     {
                         vcrButtonPressDisplayUpdate(SimulationState.STEP);
                         
+                        LOG.error("PauseStepListener actionPerformed({}) received unexpected state event: {}", actionEvent, getSimulationState());
+                        
                         // Step (while in single-step mode)
                         // TODO run one step and return
                        Schedule.startSimulation(); // TODO is this correct method for single stepping?
+                       return;
                     }
 //                    else
 //                    {

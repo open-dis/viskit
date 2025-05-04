@@ -85,7 +85,8 @@ public class ViskitUserPreferencesDialog extends JDialog
     private static ViskitUserPreferencesDialog settingsDialog;
     private static boolean modified = false;
     private final JButton cancelButton;
-    private final JButton okButton;
+    private final JButton clearButton;
+    private final JButton closeButton;
     private final JTabbedPane tabbedPane;
     private JList<String> classpathJList;
     private JCheckBox eventGraphCB;
@@ -100,11 +101,11 @@ public class ViskitUserPreferencesDialog extends JDialog
     private JRadioButton platformLafRB;
     private JRadioButton otherLafRB;
     private JTextField   otherLafTF;
-    private JTextField   author_nameTF;
-    private JTextField   author_emailTF;
-    private JTextField   author_websiteTF;
+    private JTextField   analyst_nameTF;
+    private JTextField   analyst_emailTF;
+    private JTextField   analyst_websiteTF;
     
-    private static final int         AUTHOR_TAB_INDEX = 0;
+    private static final int        ANALYST_TAB_INDEX = 0;
     private static final int      CLASSPATH_TAB_INDEX = 1;
     private static final int    CLEAR_LISTS_TAB_INDEX = 2;
     private static final int  LOOK_AND_FEEL_TAB_INDEX = 3;
@@ -133,13 +134,13 @@ public class ViskitUserPreferencesDialog extends JDialog
         super(parentFrame, "Viskit User Preferences", true);
 
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        this.addWindowListener(new myCloseListener());
+        this.addWindowListener(new CloseButtonListener());
         getXMLConfigurations();
 
-        JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBorder(new EmptyBorder(10, 10, 10, 10));
-        setContentPane(content);
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        setContentPane(contentPanel);
 
         tabbedPane = new JTabbedPane();
         buildWidgets();
@@ -147,20 +148,26 @@ public class ViskitUserPreferencesDialog extends JDialog
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         cancelButton = new JButton("Cancel"); // not used
-        okButton     = new JButton("Close");
-        okButton.setToolTipText("Close dialog with changed values saved");
+        closeButton     = new JButton("Close");
+        closeButton.setToolTipText("Close dialog with changed values saved");
+        clearButton     = new JButton("Clear");
+        clearButton.setToolTipText("Clear and save values");
         buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(okButton);
+        buttonPanel.add(clearButton);
+        // https://stackoverflow.com/questions/8335997/how-can-i-add-a-space-in-between-two-buttons-in-a-boxlayout
+        buttonPanel.add(Box.createRigidArea(new Dimension(5, 0)));
+        buttonPanel.add(closeButton);
 //      buttonPanel.add(Box.createHorizontalGlue());
 //      buttonPanel.add(cancelButton); // not used
 
-        content.add(tabbedPane);
-        content.add(Box.createVerticalStrut(5));
-        content.add(buttonPanel);
+        contentPanel.add(tabbedPane);
+        contentPanel.add(Box.createVerticalStrut(5));
+        contentPanel.add(buttonPanel);
 
         // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-        okButton.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new CancelButtonListener());
+        clearButton.addActionListener(new ClearButtonListener());
+        closeButton.addActionListener(new ApplyButtonListener());
         VisibilityHandler visibilityHandler = new VisibilityHandler();
         eventGraphCB.addActionListener(visibilityHandler);
         assemblyCB.addActionListener(visibilityHandler);
@@ -188,50 +195,43 @@ public class ViskitUserPreferencesDialog extends JDialog
 
     private void buildWidgets() 
     {
-        JPanel authorPanel = new JPanel();
-        authorPanel.setToolTipText("Author information for use in Analyst Report");
-        authorPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        authorPanel.setLayout(new BoxLayout(authorPanel, BoxLayout.Y_AXIS));
-//        JLabel authorLabel = new JLabel ("Author entries");
-//        authorLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-//        authorPanel.add(Box.createVerticalStrut(10));
-//        authorPanel.add(authorLabel);
-        authorPanel.add(Box.createVerticalStrut(10));
+        JPanel analystPanel = new JPanel();
+        analystPanel.setToolTipText("Analyst information for use in Analyst Report");
+        analystPanel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        analystPanel.setLayout(new BoxLayout(analystPanel, BoxLayout.Y_AXIS));
+        analystPanel.add(Box.createVerticalStrut(10));
         
         // TODO add listeners to save values
-        JLabel author_nameLabel = new JLabel("Author name");
-        author_nameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-//      authorPanel.add(Box.createHorizontalGlue());
-        author_nameTF    = new JTextField();
-        author_nameTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        authorPanel.add(author_nameLabel);
-        authorPanel.add(author_nameTF);
-        authorPanel.add(Box.createVerticalStrut(10));
+        JLabel analyst_nameLabel = new JLabel("Analyst name");
+        analyst_nameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+//      analystPanel.add(Box.createHorizontalGlue());
+        analyst_nameTF    = new JTextField();
+        analyst_nameTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        analystPanel.add(analyst_nameLabel);
+        analystPanel.add(analyst_nameTF);
+        analystPanel.add(Box.createVerticalStrut(10));
         
-        JLabel author_emailLabel = new JLabel("Author email");
-        author_emailLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        author_emailTF   = new JTextField();
-        author_emailTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        authorPanel.add(author_emailLabel);
-//      authorPanel.add(Box.createHorizontalGlue());
-        authorPanel.add(author_emailTF);
-        authorPanel.add(Box.createVerticalStrut(10));
+        JLabel analyst_emailLabel = new JLabel("Analyst email");
+        analyst_emailLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        analyst_emailTF   = new JTextField();
+        analyst_emailTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        analystPanel.add(analyst_emailLabel);
+//      analystPanel.add(Box.createHorizontalGlue());
+        analystPanel.add(analyst_emailTF);
+        analystPanel.add(Box.createVerticalStrut(10));
         
-        JLabel author_websiteLabel = new JLabel("Author website");
-        author_websiteLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        author_websiteTF = new JTextField();
-        author_websiteTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        authorPanel.add(author_websiteLabel);
-//      authorPanel.add(Box.createHorizontalGlue());
-        authorPanel.add(author_websiteTF);
-        authorPanel.add(Box.createVerticalStrut(10));
+        JLabel analyst_websiteLabel = new JLabel("Analyst website");
+        analyst_websiteLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        analyst_websiteTF = new JTextField();
+        analyst_websiteTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        analystPanel.add(analyst_websiteLabel);
+//      analystPanel.add(Box.createHorizontalGlue());
+        analystPanel.add(analyst_websiteTF);
+        analystPanel.add(Box.createVerticalStrut(10));
         
         // name, affilation, email; where does this information get saved? .viskit somewhere?
 
-        tabbedPane.addTab("Author", authorPanel);
-        
-//        tabbedPane.addTab("Author", authorPanel);
-              
+        tabbedPane.addTab("Analyst", analystPanel);              
         
         JPanel additionalClasspathPanel = new JPanel();
         additionalClasspathPanel.setLayout(new BoxLayout(additionalClasspathPanel, BoxLayout.Y_AXIS));
@@ -251,14 +251,14 @@ public class ViskitUserPreferencesDialog extends JDialog
         classpathButtonPanel.add(Box.createHorizontalGlue());
         JButton upClasspathButton = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/upArrow.png")));
         upClasspathButton.setBorder(null);
-        upClasspathButton.addActionListener(new upClasspathHandler());
+        upClasspathButton.addActionListener(new UpButtonClasspathHandler());
         JButton addClasspathButton = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/plus.png")));
-        addClasspathButton.addActionListener(new addClasspathHandler());
+        addClasspathButton.addActionListener(new AddClasspathEntryHandler());
         JButton removeClasspathButton = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/minus.png")));
-        removeClasspathButton.addActionListener(new deleteClasspathHandler());
+        removeClasspathButton.addActionListener(new DeleteClasspathEntryHandler());
         JButton downClasspathButton = new JButton(new ImageIcon(ClassLoader.getSystemResource("viskit/images/downArrow.png")));
         downClasspathButton.setBorder(null);
-        downClasspathButton.addActionListener(new downClasspathHandler());
+        downClasspathButton.addActionListener(new DownButtonClasspathHandler());
         classpathButtonPanel.add(upClasspathButton);
         classpathButtonPanel.add(addClasspathButton);
         classpathButtonPanel.add(removeClasspathButton);
@@ -374,7 +374,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         otherLafRB.addActionListener(lis);
         otherLafTF.addActionListener(lis);
         
-        // TODO when implemented, prefer author pane if not yet filled out
+        // TODO when implemented, prefer analyst pane if not yet filled out
         tabbedPane.setSelectedIndex(3); // Tab visibility pane
      }
 
@@ -524,16 +524,16 @@ public class ViskitUserPreferencesDialog extends JDialog
         // developer convenience support
         if (getUserName().equalsIgnoreCase("brutzman"))
         {
-               author_nameTF.setText("Don Brutzman");
-              author_emailTF.setText("brutzman@nps.edu");
-            author_websiteTF.setText("https://faculty.nps.edu/brutzman");
+               analyst_nameTF.setText("Don Brutzman");
+              analyst_emailTF.setText("brutzman@nps.edu");
+            analyst_websiteTF.setText("https://faculty.nps.edu/brutzman");
             repaint();
         }
         else
         {
-            author_nameTF.setText(getUserName());
-           author_emailTF.setText(getUserEmail());
-         author_websiteTF.setText(getUserWebsite());
+            analyst_nameTF.setText(getUserName());
+           analyst_emailTF.setText(getUserEmail());
+         analyst_websiteTF.setText(getUserWebsite());
         }
         
         DefaultListModel<String> mod = (DefaultListModel<String>) classpathJList.getModel();
@@ -577,14 +577,14 @@ public class ViskitUserPreferencesDialog extends JDialog
     private void unloadWidgets() 
     {
         // immediately save value rather than waiting for eventual unfillWidgets()
-        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_NAME_KEY,    author_nameTF.getText());
-        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_NAME_KEY,    author_nameTF.getText());
+        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_NAME_KEY,    analyst_nameTF.getText());
+        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_NAME_KEY,    analyst_nameTF.getText());
         
-        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_EMAIL_KEY,   author_emailTF.getText());
-        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_EMAIL_KEY,   author_emailTF.getText());
+        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_EMAIL_KEY,   analyst_emailTF.getText());
+        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_EMAIL_KEY,   analyst_emailTF.getText());
         
-        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_WEBSITE_KEY, author_websiteTF.getText());
-        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_WEBSITE_KEY, author_websiteTF.getText());
+        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_WEBSITE_KEY, analyst_websiteTF.getText());
+        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_WEBSITE_KEY, analyst_websiteTF.getText());
                     
         // most everything gets instantly updated;  check for pending text entry
         if(otherLafRB.isSelected()) {
@@ -592,7 +592,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         }
     }
 
-    class cancelButtonListener implements ActionListener {
+    class CancelButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -601,7 +601,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         }
     }
 
-    class applyButtonListener implements ActionListener {
+    class ApplyButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -610,7 +610,19 @@ public class ViskitUserPreferencesDialog extends JDialog
         }
     }
 
-    class myCloseListener extends WindowAdapter {
+    class ClearButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent event)
+        {
+            analyst_nameTF   .setText("");
+            analyst_emailTF  .setText("");
+            analyst_websiteTF.setText("");
+            unloadWidgets();
+        }
+    }
+
+    class CloseButtonListener extends WindowAdapter {
 
         @Override
         public void windowClosing(WindowEvent e) {
@@ -618,7 +630,7 @@ public class ViskitUserPreferencesDialog extends JDialog
                 int ret = JOptionPane.showConfirmDialog(ViskitUserPreferencesDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButton.doClick();
+                    closeButton.doClick();
                 } else {
                     cancelButton.doClick();
                 }
@@ -629,7 +641,7 @@ public class ViskitUserPreferencesDialog extends JDialog
     }
     JFileChooser addChooser;
 
-    class addClasspathHandler implements ActionListener {
+    class AddClasspathEntryHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -683,7 +695,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         saveExtraClasspathEntries(sa);
     }
 
-    class deleteClasspathHandler implements ActionListener {
+    class DeleteClasspathEntryHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -698,7 +710,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         }
     }
 
-    class upClasspathHandler implements ActionListener {
+    class UpButtonClasspathHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -720,7 +732,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         classpathJList.setSelectedIndex(idx + polarity);
     }
 
-    class downClasspathHandler implements ActionListener {
+    class DownButtonClasspathHandler implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -852,34 +864,34 @@ public class ViskitUserPreferencesDialog extends JDialog
      */
     public String getUserName()
     {
-        String userName = new String(); // but might get null from configuration file
+        String analystName = new String(); // but might get null from configuration file
         try // troubleshooting for threading issues, perhaps unneeded now
         {
             if (ViskitUserConfiguration.instance() != null)
             {
-                userName = ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.USER_NAME_KEY);
+                analystName = ViskitUserConfiguration.instance().getValue(ViskitUserConfiguration.USER_NAME_KEY);
                 // if null or "SYSTEM" then this field has not yet been saved after user initializion
-                if (userName == null)
+                if (analystName == null)
                 {
                     LOG.error("getUserName() received null result from ViskitUserConfiguration.USER_NAME_KEY=" + ViskitUserConfiguration.USER_NAME_KEY);
-                    userName = USER_SYSTEM; // blunder ahead
+                    analystName = USER_SYSTEM; // blunder ahead
                 }
-                else if (userName.equals(USER_SYSTEM)) // "SYSTEM"
+                else if (analystName.equals(USER_SYSTEM)) // "SYSTEM"
                 {
                     // initialize user metadata
-                    userName = System.getProperty("user.name"); // reset to logged-in user name
+                    analystName = System.getProperty("user.name"); // reset to logged-in user name
                     
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            tabbedPane.setSelectedIndex(AUTHOR_TAB_INDEX);
-                            String message = "Please confirm your author entries";
+                            tabbedPane.setSelectedIndex(ANALYST_TAB_INDEX);
+                            String message = "Please confirm your analyst entries";
                             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                                     "Metadata initialization", message);
                         }
                     });
                 }
-                return userName;
+                return analystName;
             }
             else 
             {
@@ -890,7 +902,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         catch (Exception e)
         {
             LOG.error("getUserName() exception: " + e.getMessage());
-            return ViskitStatics.emptyIfNull(userName); // if reached, then possibly invoked too soon
+            return ViskitStatics.emptyIfNull(analystName); // if reached, then possibly invoked too soon
         }
     }
 
