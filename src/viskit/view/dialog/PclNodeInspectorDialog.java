@@ -186,19 +186,19 @@ public class PclNodeInspectorDialog extends JDialog {
             /* Put up a "clear statistics after each replication" checkbox if
              * type is descendent of one of these:
              */
-            if (pclNode.isSampleStats()) {
-                clearStatsCB.setSelected(pclNode.isClearStatsAfterEachRun());
+            if (pclNode.isSampleStatistics()) {
+                clearStatsCB.setSelected(pclNode.isClearStatisticsAfterEachRun());
                 content.add(clearStatsCB);
                 content.add(Box.createVerticalStrut(3));
             }
 
             // No need to display mean and count CBs for a SPD PCL
             if (!pclNode.getType().contains("SimplePropertyDumper")) {
-                getMeanStatsCB.setSelected(pclNode.isGetMean());
+                getMeanStatsCB.setSelected(pclNode.isStatisticTypeMean());
                 content.add(getMeanStatsCB);
                 content.add(Box.createVerticalStrut(3));
 
-                getCountStatsCB.setSelected(pclNode.isGetCount());
+                getCountStatsCB.setSelected(pclNode.isStatisticTypeCount());
                 content.add(getCountStatsCB);
                 content.add(Box.createVerticalStrut(3));
             }
@@ -219,12 +219,12 @@ public class PclNodeInspectorDialog extends JDialog {
             pclNode.setName(nm);
             pclNode.setDescription(descriptionTF.getText().trim());
             pclNode.setInstantiator(ip.getData());
-            if (pclNode.isSampleStats()) {
-                pclNode.setClearStatsAfterEachRun(clearStatsCB.isSelected());
+            if (pclNode.isSampleStatistics()) {
+                pclNode.setClearStatisticsAfterEachRun(clearStatsCB.isSelected());
             }
 
-            pclNode.setGetCount(getCountStatsCB.isSelected());
-            pclNode.setGetMean(getMeanStatsCB.isSelected());
+            pclNode.setStatisticTypeCount(getCountStatsCB.isSelected());
+            pclNode.setStatisticTypeMean(getMeanStatsCB.isSelected());
         }
     }
 

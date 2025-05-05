@@ -1,12 +1,12 @@
 package viskit.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitStatics;
 
 /**
+ * An event as seen by the model (not the view).
+ * 
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
  * MOVES Institute
  * Naval Postgraduate School, Monterey CA
@@ -15,8 +15,6 @@ import viskit.ViskitStatics;
  * @since Mar 8, 2004
  * @since 9:08:08 AM
  * @version $Id$
- *
- * An event as seen by the model (not the view)
  */
 public class PropertyChangeListenerNode extends AssemblyNode
 {
@@ -29,8 +27,8 @@ public class PropertyChangeListenerNode extends AssemblyNode
     private String value;
 //    private String comment; // obsolete
 //    private List<String> descriptionArray = new ArrayList<>(); // obsolete
-    private boolean getMean = false;
-    private boolean getCount = false;
+    private boolean statisticTypeMean  = false;
+    private boolean statisticTypeCount = false;
 
     PropertyChangeListenerNode(String name, String type) // package access on constructor
     {
@@ -39,14 +37,16 @@ public class PropertyChangeListenerNode extends AssemblyNode
     }
 
     @Override
-    public final void setType(String typ) {
-        super.setType(typ);
+    public final void setType(String newType)
+    {
+        super.setType(newType);
 
-        Class<?> myClass = ViskitStatics.classForName(typ);
-        if (myClass != null) {
-            Class<?> sampstatcls = ViskitStatics.classForName("simkit.stat.SampleStatistics");
-            if (sampstatcls != null) {
-                if (sampstatcls.isAssignableFrom(myClass)) {
+        Class<?> newTypeClass = ViskitStatics.classForName(newType);
+        if (newTypeClass != null) 
+        {
+            Class<?> sampleStatisticsClass = ViskitStatics.classForName("simkit.stat.SampleStatistics");
+            if (sampleStatisticsClass != null) {
+                if (sampleStatisticsClass.isAssignableFrom(newTypeClass)) {
                     isSampleStatistics = true;
                 }
             }
@@ -54,41 +54,41 @@ public class PropertyChangeListenerNode extends AssemblyNode
     }
     private boolean isSampleStatistics = false;
 
-    public boolean isSampleStats() {
+    public boolean isSampleStatistics() {
         return isSampleStatistics;
     }
 
-    public void setIsSampleStats(boolean b) {
-        isSampleStatistics = b;
+    public void setSampleStatistics(boolean newValue) {
+        isSampleStatistics = newValue;
     }
 
-    private boolean clearStatsAfterEachRun = true; // bug 706
+    private boolean clearStatisticsAfterEachRun = true; // bug 706
 
-    public boolean isClearStatsAfterEachRun() {
-        return clearStatsAfterEachRun;
+    public boolean isClearStatisticsAfterEachRun() {
+        return clearStatisticsAfterEachRun;
     }
 
-    public void setClearStatsAfterEachRun(boolean b) {
-        clearStatsAfterEachRun = b;
+    public void setClearStatisticsAfterEachRun(boolean newValue) {
+        clearStatisticsAfterEachRun = newValue;
     }
 
-    public boolean isGetMean() {
-        return getMean;
+    public boolean isStatisticTypeMean() {
+        return statisticTypeMean;
     }
 
-    public void setGetMean(boolean b) {
-        getMean = b;
+    public void setStatisticTypeMean(boolean newValue) {
+        statisticTypeMean = newValue;
     }
     
     /** method name for reflection use */
-    public static final String METHOD_isGetCount  = "isGetCount";
+    public static final String METHOD_isStatisticTypeCount  = "isStatisticTypeCount";
 
-    public boolean isGetCount() {
-        return getCount;
+    public boolean isStatisticTypeCount() {
+        return statisticTypeCount;
     }
 
-    public void setGetCount(boolean b) {
-        getCount = b;
+    public void setStatisticTypeCount(boolean newValue) {
+        statisticTypeCount = newValue;
     }
 
     @Override

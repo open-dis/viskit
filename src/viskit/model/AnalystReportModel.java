@@ -62,10 +62,10 @@ import viskit.ViskitUserConfiguration;
 import viskit.control.AssemblyControllerImpl;
 import viskit.control.EventGraphController;
 import viskit.doe.FileHandler;
-import static viskit.model.PropertyChangeListenerNode.METHOD_isGetCount;
 import viskit.mvc.MvcAbstractModel;
 import viskit.reports.HistogramChart;
 import viskit.reports.LinearRegressionChart;
+import static viskit.model.PropertyChangeListenerNode.METHOD_isStatisticTypeCount;
 
 /** This class constructs and exports an analyst report based on the parameters
  * selected by the Analyst Report panel in the Viskit UI.  This file uses the
@@ -872,7 +872,7 @@ public final class AnalystReportModel extends MvcAbstractModel
                     if (obj.getClass().toString().contains("PropertyChangeListenerNode")) 
                     {
                         try {
-                            isCount = Boolean.parseBoolean(obj.getClass().getMethod(METHOD_isGetCount).invoke(obj).toString());
+                            isCount = Boolean.parseBoolean(obj.getClass().getMethod(METHOD_isStatisticTypeCount).invoke(obj).toString());
                             typeStatistic = isCount ? "count" : "mean";
                             break;
                         } 

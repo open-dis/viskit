@@ -73,13 +73,13 @@ import viskit.model.AnalystReportModel;
 // import static viskit.ViskitGlobals.isFileReady; // while in thread, do not invoke ViskitGlobals!
 
 import viskit.model.AssemblyNode;
-import static viskit.model.PropertyChangeListenerNode.METHOD_isGetCount;
 import static viskit.model.ViskitElement.METHOD_getName;
 import static viskit.model.ViskitElement.METHOD_getType;
 
 import viskit.reports.ReportStatisticsConfiguration;
 import viskit.view.SimulationRunPanel;
 import static viskit.view.SimulationRunPanel.METHOD_setNumberOfReplications;
+import static viskit.model.PropertyChangeListenerNode.METHOD_isStatisticTypeCount;
 
 /**
  * Abstract base class for running assembly simulations, invoked in a thread by InternalAssemblyRunner.
@@ -358,7 +358,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                         continue;
                     }
 
-                    isCount = Boolean.parseBoolean(obj.getClass().getMethod(METHOD_isGetCount).invoke(obj).toString());
+                    isCount = Boolean.parseBoolean(obj.getClass().getMethod(METHOD_isStatisticTypeCount).invoke(obj).toString());
                     LOG.debug("createDesignPointStatistics(): isGetCount: " + isCount);
 
                     statisticType = isCount ? ".count" : ".mean";
@@ -1062,6 +1062,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         {
             LOG.info("Begin running " + getName() + " simulation replications");
         }
+        
+        // here is the loop for each replication within the current simulation
         for (int replicationNumber = initialReplicationNumber; replicationNumber <= getNumberPlannedReplications(); replicationNumber++)
         {
             firePropertyChange("replicationNumber", (replicationNumber));
@@ -1089,27 +1091,31 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             
             if (stopSimulationRun)       // from within thread
             {
-                replicationNumber--; // we are prior to actually conducting this replication loop
-                String stopMessage = "Simulation stopped after Replication # " + (replicationNumber);
+                replicationNumber--; // at this pointe we are just prior to actually conducting the replication loop
+                String stopMessage = "Threaded assembly simulation run() stopped after Replication # " + (replicationNumber);
                 LOG.info(stopMessage);
                 break;
             } 
             else if (pauseSimulationRun) // from within thread
             {
-                replicationNumber--; // we are prior to actually conducting this replication loop
+                replicationNumber--; // at this pointe we are just prior to actually conducting the replication loop
                 pausedReplicationNumber = replicationNumber; // prepare for return by remembering how many replications were complete
-                String pauseMessage = "Simulation run() paused after Replication # " + (replicationNumber);
+                String pauseMessage = "Threaded assembly simulation run() paused after Replication # " + (replicationNumber);
                 LOG.info(pauseMessage);
                 return;
             }
             else // continue running replications
             {
                 // simkit execution consistency checks:
-                if      (Schedule.isRunning())   // simkit
-                        LOG.error("run() initialization discrepancy: Simulation is already running, continuing anyway...");
-                else if(Schedule.isSingleStep()) // simkit
-                        LOG.error("run() initialization discrepancy: Simulation is already running in single step mode, continuing anyway...");
+                if (Schedule.isRunning())   // simkit
+                    LOG.error("run() replication #{} discrepancy: simkit.Schedule.isRunning() already, continuing anyway...",
+                            replicationNumber);
+                if (Schedule.isSingleStep()) // simkit
+                    LOG.error("run() replication #{} discrepancy: simkit.Schedule.isSingleStep() already, continuing anyway...",
+                            replicationNumber);
                 
+                // use pseudorandom number generator (RNG) to get next seed
+                // https://en.wikipedia.org/Pseudorandom_number_generator
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 String seedString = String.valueOf(seed);
                 String indexSpacing = new String();
@@ -1146,17 +1152,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                     runEntitiesSet.forEach(entity -> {
                         Schedule.addRerun(entity); // simkit
                     });
-                }
-                {
-                    // now run the replication
-                    Schedule.startSimulation();
-                }
+                } // end exception catch for Schedule.reset(); // simkit
+
+                // now tell simkit to run the replication
+                Schedule.startSimulation(); // simkit
 
                 String typeStatistics, nodeType;
-                int ix = 0;
-                boolean isCount;
+                int propertyIndex = 0;
+                boolean isCountStatistic; // statistics property type, "count" or "mean"
                 SampleStatistics sampleStatistics;
-                Object obj;
+                Object pclObject;
                 
                 // Outer statistics output
                 // # of PropertyChangeListenerNodes is == to replicationStatisticsPropertyChangeListenerArray.length
@@ -1167,42 +1172,42 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 {
                     LOG.debug("entry is: {}", entry);
 
-                    obj = pclNodeCache.get(entry.getKey());
-                    if (obj.getClass().toString().contains("PropertyChangeListenerNode")) {
+                    pclObject = pclNodeCache.get(entry.getKey());
+                    if (pclObject.getClass().toString().contains("PropertyChangeListenerNode")) {
 
                         try {
                             // Since the pclNodeCache was created under a previous ClassLoader
                             // we must use reflection to invoke the methods on the AssemblyNodes
                             // that it contains, otherwise we will throw ClassCastExceptions
-                            nodeType = obj.getClass().getMethod(METHOD_getType).invoke(obj).toString();
+                            nodeType = pclObject.getClass().getMethod(METHOD_getType).invoke(pclObject).toString();
 
                             // This is not a designPoint, so skip
                             if (nodeType.equals(ViskitStatics.SIMPLE_PROPERTY_DUMPER)) {
                                 LOG.debug("SimplePropertyDumper encountered");
                                 continue;
                             }
-                            isCount = Boolean.parseBoolean(obj.getClass().getMethod(METHOD_isGetCount).invoke(obj).toString());
-                            typeStatistics = isCount ? ".count" : ".mean";
-                            sampleStatistics = (SampleStatistics) BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray()[ix];
-                            fireIndexedPropertyChange(ix, sampleStatistics.getName(), sampleStatistics);
+                            isCountStatistic = Boolean.parseBoolean(pclObject.getClass().getMethod(METHOD_isStatisticTypeCount).invoke(pclObject).toString());
+                            typeStatistics = isCountStatistic ? ".count" : ".mean";
+                            sampleStatistics = (SampleStatistics) BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray()[propertyIndex];
+                            fireIndexedPropertyChange(propertyIndex, sampleStatistics.getName(), sampleStatistics);
 
-                            if (isCount)
-                                fireIndexedPropertyChange(ix, sampleStatistics.getName() + typeStatistics, sampleStatistics.getCount());
+                            if (isCountStatistic)
+                                fireIndexedPropertyChange(propertyIndex, sampleStatistics.getName() + typeStatistics, sampleStatistics.getCount());
                             else
-                                fireIndexedPropertyChange(ix, sampleStatistics.getName() + typeStatistics, sampleStatistics.getMean());
+                                fireIndexedPropertyChange(propertyIndex, sampleStatistics.getName() + typeStatistics, sampleStatistics.getMean());
 
-                            ix++;
+                            propertyIndex++;
                         } 
                         catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException ex) {
                             LOG.error("run() error during PropertyChangeListenerNode checks: " + ex);
                         }
                     }
-                }
+                } // end for
                 if (isPrintReplicationReports()) {
                     printWriter.println(getReplicationReport(replicationNumber));
                     printWriter.flush();
                 }
-            }
+            } // continue running replications
         } // end of replication loop
         LOG.info("All simulation replications now complete.");
 

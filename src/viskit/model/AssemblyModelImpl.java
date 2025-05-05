@@ -707,17 +707,17 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         jaxbPropertyChangeListener.setDescription(propertyChangeListenerNode.getDescription());
 
         // Modes should be singular.  All new Assemblies will be with singular mode
-        if (propertyChangeListenerNode.isSampleStats()) {
-            if (propertyChangeListenerNode.isClearStatsAfterEachRun())
+        if (propertyChangeListenerNode.isSampleStatistics()) {
+            if (propertyChangeListenerNode.isClearStatisticsAfterEachRun())
                 jaxbPropertyChangeListener.setMode("replicationStat");
             else
                 jaxbPropertyChangeListener.setMode("designPointStat");
         }
 
-        String isMeanStatistics = propertyChangeListenerNode.isGetCount() ? "true" : "false";
+        String isMeanStatistics = propertyChangeListenerNode.isStatisticTypeCount() ? "true" : "false";
         jaxbPropertyChangeListener.setCountStatistics(isMeanStatistics);
 
-        isMeanStatistics = propertyChangeListenerNode.isGetMean() ? "true" : "false";
+        isMeanStatistics = propertyChangeListenerNode.isStatisticTypeMean() ? "true" : "false";
         jaxbPropertyChangeListener.setMeanStatistics(isMeanStatistics);
 
         double x = propertyChangeListenerNode.getPosition().getX();
@@ -1120,9 +1120,9 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         pNode = new PropertyChangeListenerNode(pcl.getName(), pcl.getType());
 
         // For backwards compatibility, bug 706
-        pNode.setClearStatsAfterEachRun(pcl.getMode().contains("replicationStat"));
-        pNode.setGetMean(Boolean.parseBoolean(pcl.getMeanStatistics()));
-        pNode.setGetCount(Boolean.parseBoolean(pcl.getCountStatistics()));
+        pNode.setClearStatisticsAfterEachRun(pcl.getMode().contains("replicationStat"));
+        pNode.setStatisticTypeMean(Boolean.parseBoolean(pcl.getMeanStatistics()));
+        pNode.setStatisticTypeCount(Boolean.parseBoolean(pcl.getCountStatistics()));
         pNode.setDescription(pcl.getDescription());
         Coordinate coor = pcl.getCoordinate();
         if (coor == null) {
