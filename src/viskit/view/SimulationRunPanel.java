@@ -63,7 +63,7 @@ public class SimulationRunPanel extends JPanel
 {
     static final Logger LOG = LogManager.getLogger();
     
-    public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 30; // also defined twice in viskit.xsd schema
+    public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 100; // also defined twice in viskit.xsd schema
     
     public final static String INITIAL_SIMULATION_RUN_HINT = "First initialize an Assembly in Assembly Editor before commencing Simulation Run..."; // Local Run Simulation
 

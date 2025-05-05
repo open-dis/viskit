@@ -89,6 +89,8 @@ import viskit.view.dialog.ViskitUserPreferencesDialog;
 import static viskit.assembly.BasicAssembly.METHOD_setVerboseReplicationNumber;
 import static viskit.assembly.BasicAssembly.METHOD_getNumberPlannedReplications;
 import static viskit.assembly.BasicAssembly.METHOD_setNumberPlannedReplications;
+import static viskit.assembly.BasicAssembly.METHOD_setPauseSimulationRun;
+import static viskit.assembly.BasicAssembly.METHOD_runResumeSimulation;
 
 /** Controller for the Assembly RunSimulation panel, which
  * spawns the BasicAssembly thread
@@ -170,7 +172,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         // Provide access to Enable Analyst Report checkbox
         ViskitGlobals.instance().setSimulationRunPanel(simulationRunPanel);
         
-        vcrButtonPressDisplayUpdate(SimulationState.INACTIVE);
+        vcrButtonPressSimulationStateDisplayUpdate(SimulationState.INACTIVE);
     }
 
     public JMenuBar getMenus() {
@@ -242,20 +244,20 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     "Java Error",
                     "Error initializing Assembly:\n" + throwable.getMessage()
             );
-            vcrButtonPressDisplayUpdate(SimulationState.INACTIVE);
+            vcrButtonPressSimulationStateDisplayUpdate(SimulationState.INACTIVE);
             simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HINT); // duplicative since handling exception
 //            throwable.printStackTrace();
             return;
         }
         // reset state machine
-        vcrButtonPressDisplayUpdate(SimulationState.REWIND);
-        vcrButtonPressDisplayUpdate(SimulationState.READY);
+        vcrButtonPressSimulationStateDisplayUpdate(SimulationState.REWIND);
+        vcrButtonPressSimulationStateDisplayUpdate(SimulationState.READY);
         
 //        try {
 //            SwingUtilities.invokeLater(() -> {
                  simulationRunPanel.outputStreamTA.setText("");
                  simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HINT);
-                 vcrButtonPressDisplayUpdate(SimulationState.INACTIVE);
+                 vcrButtonPressSimulationStateDisplayUpdate(SimulationState.INACTIVE);
 //            });
 //        } 
 //        catch (Exception ex) {
@@ -460,7 +462,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 return;
             }
             
-            vcrButtonPressDisplayUpdate(SimulationState.DONE); // also sets simulationState
+            vcrButtonPressSimulationStateDisplayUpdate(SimulationState.DONE);
 
             String message = ViskitGlobals.instance().getActiveAssemblyName() + " simulation replications DONE";
             
@@ -520,21 +522,37 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 "Simulation controller button selection ignored", "Run/resume button not currently enabled");
                 return;
             }
-            
-//          simulationRunPanel.vcrStartTimeTF.setText("0.0");        // because no pausing ?? TODO check
-            
-            vcrButtonPressDisplayUpdate(SimulationState.RUN_RESUME); // resolves RUN or RESUME
-            
-            Schedule.setSingleStep(false);        // simkit ensure no longer in single-step mode
-            Schedule.setPauseAfterEachEvent(false); // simkit ensure no longer in single-step mode
-            
-            if (simulationRunPanel.outputStreamTA.getText().isBlank() ||
-                simulationRunPanel.outputStreamTA.getText().trim().equals(INITIAL_SIMULATION_RUN_HINT)) // TODO fix
+            try // RunResumeListener
             {
-                simulationRunPanel.outputStreamTA.setText(SIMULATION_RUN_PANEL_TITLE);
-            }
+                if (simulationRunAssemblyInstance != null)
+                {
+                    if (priorRunSimulationClassLoader == null) // restore while in thread
+                        priorRunSimulationClassLoader = getRunSimulationClassLoader();
+                    Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
+                    LOG.info("RunResumeListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
+                    
+                    Method resumeSimulationMethod = simulationRunAssemblyClass.getMethod(METHOD_runResumeSimulation);
+                    resumeSimulationMethod.invoke(simulationRunAssemblyInstance);
+                }
             
-            prepareAndStartAssemblySimulationRun(); // keep this last, launches thread
+//              simulationRunPanel.vcrStartTimeTF.setText("0.0");        // because no pausing ?? TODO check
+
+                vcrButtonPressSimulationStateDisplayUpdate(SimulationState.RUN_RESUME); // resolves RUN or RESUME
+
+                Schedule.setSingleStep(false); // simkit ensure no longer in single-step mode
+
+                if (simulationRunPanel.outputStreamTA.getText().isBlank() ||
+                    simulationRunPanel.outputStreamTA.getText().trim().equals(INITIAL_SIMULATION_RUN_HINT)) // TODO fix
+                {
+                    simulationRunPanel.outputStreamTA.setText(SIMULATION_RUN_PANEL_TITLE);
+                }
+
+                prepareAndStartAssemblySimulationRun(); // keep this last, launches thread
+            }
+            catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException exception)
+            {
+                LOG.error("RunResumeListener.actionPerformed(" + actionEvent + ") exception in thread: {}", exception);
+            }
         }
     }
 
@@ -546,59 +564,64 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
             if (!ViskitGlobals.instance().getSimulationRunPanel().vcrPauseStepButton.isEnabled())
             {
-                
                 ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Simulation controller button selection ignored", "Pause/step button not currently enabled");
                 return;
             }
             
-            // the following method threaded basicAssembly includes simkit.Schedule.stopSimulation();
-            basicAssembly.setPauseSimulationRun(true);
-            
             try // PauseStepListener
             {
-                if (simulationRunAssemblyInstance != null) 
+                if (simulationRunAssemblyInstance != null)
                 {
-                    if (getSimulationState() != SimulationState.PAUSE)
+                    if (priorRunSimulationClassLoader == null) // restore while in thread
+                        priorRunSimulationClassLoader = getRunSimulationClassLoader();
+                    
+                    Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
+                    LOG.info("PauseStepListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
+                    
+                    Method setPauseSimulationRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setPauseSimulationRun, boolean.class);
+                    setPauseSimulationRunMethod.invoke(simulationRunAssemblyInstance, true);
+                    
+                    if (simulationState != SimulationState.PAUSE)
                     {
-                        vcrButtonPressDisplayUpdate(SimulationState.PAUSE);
+                        vcrButtonPressSimulationStateDisplayUpdate(SimulationState.PAUSE);
                         
                         // TODO duplicative?
                         
                         // Pause (from Run mode)
                         Schedule.setSingleStep(true); // simkit
-                        Schedule.pause(); // simkit  
-//                      Schedule.setPauseAfterEachEvent(true); // simkit method; no, blocks console for text-based thread console
+                        Schedule.setPauseAfterEachEvent(true); // simkit
+                        
+//                      Schedule.pause(); // simkit method; no, blocks console for text-based thread console
                         
                         // TODO runaway thread; is any action needed at this point?
                         // Likely problem:  pause event is not being recieved in threaded event loop, rather in between replications
 //                        Schedule.startSimulation();
                         return;
                     }
-                    else if (getSimulationState() != SimulationState.PAUSE)
+                    else if (simulationState != SimulationState.PAUSE)
                     {
-                        // TODO single step
+                        // TODO single step for single replication
+                        // Step (while in single-step mode)
+                        // TODO run one step and return
                     }
                     else
                     {
-                        vcrButtonPressDisplayUpdate(SimulationState.STEP);
+                        vcrButtonPressSimulationStateDisplayUpdate(SimulationState.STEP);
                         
-                        LOG.error("PauseStepListener actionPerformed({}) received unexpected state event: {}", actionEvent, getSimulationState());
+                        LOG.error("PauseStepListener actionPerformed({}) received unexpected state event: {}", actionEvent, simulationState);
                         
-                        // Step (while in single-step mode)
-                        // TODO run one step and return
                        Schedule.startSimulation(); // TODO is this correct method for single stepping?
                        return;
                     }
 //                    else
 //                    {
-//                        LOG.error("PauseStepListener actionPerformed({}) unexpected state received: {}", actionEvent, getSimulationState());
+//                        LOG.error("PauseStepListener actionPerformed({}) unexpected state received: {}", actionEvent, simulationState);
 //                    }
                     
                     if (priorRunSimulationClassLoader == null)
                     {
                         priorRunSimulationClassLoader = getRunSimulationClassLoader(); // can occur if stepping prior to running
-                        
                         LOG.debug("StepListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     }
                     
@@ -608,11 +631,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     // TODO where is this method? "setStepRun" ... not certain it turned into METHOD_setSingleStep
                     Method setStepRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setSingleStep, boolean.class);
                     setStepRunMethod.invoke(simulationRunAssemblyInstance, true);
-
-//                    if (textAreaOutputStream != null)
-//                        textAreaOutputStream.stop();
-//
-//                    mutex--;
                 }
 //              Schedule.coldReset(); // simkit
 
@@ -625,16 +643,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 } // rejoin regular thread
 
                 // TODO should prior thread be removed?
-            } 
-            catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
-
-                // Some screwy stuff can happen here if a user jams around with
-                // the Prepare Assembly Run button and tabs back and forth
-                // between the Assembly editor and the Assembly runner panel, but it
-                // won't impede a correct Assembly run.  Catch the
-                // IllegalArgumentException and move on.
-//                LOG.error(ex);
-//                ex.printStackTrace();
+            }
+            catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException exception)
+            {
+                LOG.error("PauseStepListener.actionPerformed(" + actionEvent + ") exception in thread: {}", exception);
             }
         }
     }
@@ -650,7 +662,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
             if (!ViskitGlobals.instance().getSimulationRunPanel().vcrStopButton.isEnabled())
             {
-                
                 ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Simulation controller button selection ignored", "Stop button not currently enabled");
                 return;
@@ -659,31 +670,24 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             if (mutex > 0)
                 mutex--;
             
-            // the following method threaded basicAssembly includes simkit.Schedule.stopSimulation();
-            basicAssembly.setStopSimulationRun(true);
-            
             try // StopListener
             {
                 if (simulationRunAssemblyInstance != null) 
                 {
+                    if (priorRunSimulationClassLoader == null) // restore while in thread
+                        priorRunSimulationClassLoader = getRunSimulationClassLoader();
                     Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
                     LOG.info("StopListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     
-                    // TODO where is this method? "setStopRun" is likely METHOD_setStopSimulationRun
+                    // TODO where was this original method? "setStopRun" is likely now METHOD_setStopSimulationRun
                     Method setStopRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setStopSimulationRun, boolean.class);
                     setStopRunMethod.invoke(simulationRunAssemblyInstance, true);
-
-//////                    if (textAreaOutputStream != null)
-//////                    {
-//////                        textAreaOutputStream.stop(); // TODO misleading?  loses output if thread continues
-////////                        textAreaOutputStream.
-//////                    }
                 }
                 else
                 {
                     LOG.error("StopListener.actionPerformed(" + actionEvent + ") unable to find simulationRunAssemblyInstance");
                 }
-                vcrButtonPressDisplayUpdate(SimulationState.STOP);
+                vcrButtonPressSimulationStateDisplayUpdate(SimulationState.STOP);
                 Schedule.coldReset(); // simkit
 
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -700,15 +704,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             } 
             catch (SecurityException | IllegalArgumentException | NoSuchMethodException | InvocationTargetException | IllegalAccessException exception) 
             {
-                // Some screwy stuff can happen here if a user jams around with
-                // the Prepare Assembly Run button and tabs back and forth
-                // between the Assembly editor and the Assembly runner panel, but it
-                // won't impede a correct Assembly run.  Catch the
-                // IllegalArgumentException and move on.
-//                LOG.error(ex);
-//                ex.printStackTrace();
-
-                 LOG.error("StopListener.actionPerformed(" + actionEvent + ") exception: {}", exception);
+                 LOG.error("StopListener.actionPerformed(" + actionEvent + ") exception in thread: {}", exception);
             }
         }
     }
@@ -732,7 +728,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
             {
-                vcrButtonPressDisplayUpdate(SimulationState.REWIND);
+                vcrButtonPressSimulationStateDisplayUpdate(SimulationState.REWIND);
                 
                 Schedule.reset(); // simkit reset event list
             
@@ -742,7 +738,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 // TODO reset simulation clock
                 try {
                     SwingUtilities.invokeLater(() -> {
-                        vcrButtonPressDisplayUpdate(SimulationState.READY);
+                        vcrButtonPressSimulationStateDisplayUpdate(SimulationState.READY);
                     });
                 }
                 catch (Exception ex) {
@@ -857,7 +853,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     /** Simulation State Machine transition logic, initiated by user button selection.
      * @param newEvent triggered by button push
      */
-    public final void vcrButtonPressDisplayUpdate(SimulationState newEvent) 
+    public final void vcrButtonPressSimulationStateDisplayUpdate(SimulationState newEvent) 
     {
         SimulationState newState = newEvent; // save original value
         
@@ -1111,7 +1107,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent e)
         {
-            // TODO vcrButtonPressDisplayUpdate(SimulationState._); ... not appropriate, ClearConsole is not a state
+            // TODO vcrButtonPressSimulationStateDisplayUpdate(SimulationState._); ... not appropriate, ClearConsole is not a state
             
             ViskitGlobals.instance().selectSimulationRunTab(); // ensure correct tab selected if invoked by menu item
             if (!ViskitGlobals.instance().getSimulationRunPanel().vcrClearConsoleButton.isEnabled())

@@ -1271,12 +1271,15 @@ public final class AnalystReportModel extends MvcAbstractModel
         
         int numberOfReplications = ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications();
         String popupTitle = "Simulation Run Data Collected, Analyst Report Ready";
+        int expectedNumberOfReplications = ViskitGlobals.instance().getSimulationRunPanel().getTotalReplications();
+        if (numberOfReplications < expectedNumberOfReplications)
+            numberOfReplications--; // off-by-one counting adjustment
         String message =
                 "<html><body>" +
                 "<p align='center'>" + numberOfReplications + " total replication";
-        if (numberOfReplications > 1)
-            message = message + "s";
-        message = message +  " performed, with data saved.</p><br />" +
+                if (numberOfReplications > 1)
+                    message = message + "s";
+                message = message +  " performed, with data saved.</p><br />" +
                   // Elapsed clock time: TODO
                 "<p align='center'>" + assemblyName + " Analyst Report</p><br />" +
                 "<p align='center'>is now loaded and ready for further analysis.</p><br /></body></html>";

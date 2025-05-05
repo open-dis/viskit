@@ -2007,7 +2007,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
                     ViskitGlobals.instance().getSimulationRunPanel().setHasLoadedAssembly(true);
                     // pretty awkward, need cleaner invocation
-                    ViskitGlobals.instance().getMainFrame().internalAssemblyRunner.vcrButtonPressDisplayUpdate(SimulationState.READY); // initialize
+                    ViskitGlobals.instance().getMainFrame().internalAssemblyRunner.vcrButtonPressSimulationStateDisplayUpdate(SimulationState.READY); // initialize
                     announceReadyToCommenceSimulationRun(assemblyName); // initialization complete
                 }
                 
