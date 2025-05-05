@@ -367,7 +367,7 @@
             <b>Summary of Simulation Entities</b>
         </p>
         <div style="text-align: center">
-            <table border="1">
+            <table style="margin-left: auto; margin-right: auto; border: 1px solid;">
                 <tr>
                     <th bgcolor="#FFFFCC">Simulation Entity</th>
                     <th bgcolor="#FFFFCC">Behavior Definitions</th>
@@ -705,7 +705,7 @@
             </div>
         </xsl:for-each>
         <div style="text-align: center">
-            <table border="1">
+            <table  style="margin-left: auto; margin-right: auto; border: 1px solid;">
                 <tr>
                     <th bgcolor="#FFFFCC">Initialization Parameter</th>
                     <th bgcolor="#FFFFCC">Parameter Type</th>
@@ -731,7 +731,7 @@
         <p/>
         <xsl:if test="stateVariable">
             <div style="text-align: center">
-                <table border="1">
+                <table style="margin-left: auto; margin-right: auto; border: 1px solid;">
                     <tr>
                         <th bgcolor="#FFFFCC">State Variable</th>
                         <th bgcolor="#FFFFCC">Variable Type</th>
@@ -909,7 +909,7 @@
                 </xsl:variable>
                 <xsl:value-of select=" $allMeansEqual"/>
             </p-->
-            <table border="1" width="60%">
+            <table style="margin-left: auto; margin-right: auto; width: 60%; border: 1px solid;">
                 <tr>
                     <th bgcolor="#FFFFCC">
                         <b>Replication #</b>
@@ -1016,7 +1016,7 @@
             </font>
         </p>
         <div style="text-align: center">
-            <table border="1" width="80%">
+            <table style="margin-left: auto; margin-right: auto; width: 60%; border: 1px solid;">
                 <tr>
                     <th bgcolor="#FFFFCC">
                         <b>Entity</b>
