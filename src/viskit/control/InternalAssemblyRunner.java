@@ -449,6 +449,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void done()
         {
+            if (getSimulationState() == SimulationState.PAUSE)
+                return; // not yet done
+            
             setProgress(100); // TODO what happens here, exactly? SwingWorker method
             mutex--; // this thread is complete, decrement mutual exclusion (mutex) safety-net counter
             
@@ -607,6 +610,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                         // TODO single step for single replication
                         // Step (while in single-step mode)
                         // TODO run one step and return
+                        LOG.info("PauseStepListener() in simulationState={} and receuved actionEvent={}", simulationState, actionEvent);
                     }
                     else
                     {

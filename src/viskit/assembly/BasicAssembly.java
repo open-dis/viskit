@@ -568,6 +568,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     /** @return the absolute path to the temporary analyst report if user enabled */
     public String getAnalystReport() 
     {
+        if ((stopSimulationRun) || (pauseSimulationRun))
+            return "";
         if (analystReportFile == null)
         {
             LOG.error("getAnalystReport() found (analystReportFile == null)"); // unexpected condition

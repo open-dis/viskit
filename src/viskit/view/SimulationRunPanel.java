@@ -566,6 +566,7 @@ public class SimulationRunPanel extends JPanel
     public void setNumberReplications(int value)
     {
         numberOfReplications = value;
+        numberReplicationsTF.setText(String.valueOf(numberOfReplications));
     }
 
     /**
