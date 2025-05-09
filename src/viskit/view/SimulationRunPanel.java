@@ -63,7 +63,7 @@ public class SimulationRunPanel extends JPanel
 {
     static final Logger LOG = LogManager.getLogger();
     
-    public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 100; // also defined twice in viskit.xsd schema
+    public final static int DEFAULT_NUMBER_OF_REPLICATIONS = 30; // also defined twice in viskit.xsd schema
     
     public final static String INITIAL_SIMULATION_RUN_HINT = "First initialize an Assembly in Assembly Editor before commencing Simulation Run..."; // Local Run Simulation
 
@@ -332,13 +332,7 @@ public class SimulationRunPanel extends JPanel
         numberReplicationsTF.setText(Integer.toString(DEFAULT_NUMBER_OF_REPLICATIONS));
         // https://stackoverflow.com/questions/33172555/how-to-set-padding-at-jlabel
         numberReplicationsTF.setBorder(new EmptyBorder(0,2,0,0));
-        numberReplicationsTF.addActionListener((ActionEvent e) -> {
-            int numberReplications = Integer.parseInt(numberReplicationsTF.getText().trim());
-            if (numberReplications < 1) 
-            {
-                numberReplicationsTF.setText(Integer.toString(DEFAULT_NUMBER_OF_REPLICATIONS));
-            }
-        });
+        numberReplicationsTF.addActionListener(new NumberReplicationsActionListener());
         ViskitStatics.clampComponentSize(numberReplicationsTF, vcrStartTimeTF, vcrStartTimeTF);
         
         String[] exampleReplicationCounts =
@@ -357,11 +351,12 @@ public class SimulationRunPanel extends JPanel
         numberReplicationsComboBox.addActionListener(new ActionListener()
         {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) 
+            {
                 JComboBox cb = (JComboBox) e.getSource();
                 String count = (String) cb.getSelectedItem();
                 numberReplicationsTF.setText(count);
-                // TODO any further updates?
+                updateNumberReplications();
             }
         });
         ViskitStatics.clampComponentSize(numberReplicationsComboBox, vcrStartTimeTF, vcrStartTimeTF);
@@ -441,6 +436,33 @@ public class SimulationRunPanel extends JPanel
             }
         }
     }
+    private void updateNumberReplications()
+    {
+        int newNumberReplications;
+        try
+        {
+            newNumberReplications = Integer.parseInt(numberReplicationsTF.getText().trim());
+        }
+        catch (NumberFormatException nfe)
+        {
+            newNumberReplications = DEFAULT_NUMBER_OF_REPLICATIONS;
+        }
+        if (newNumberReplications < 1) 
+        {
+            newNumberReplications = DEFAULT_NUMBER_OF_REPLICATIONS;
+        }
+        numberReplicationsTF.setText(Integer.toString(newNumberReplications));
+        ViskitGlobals.instance().getInternalSimulationRunner().getBasicAssembly().setNumberReplicationsPlanned(newNumberReplications); // unthreaded
+    }
+    
+    class NumberReplicationsActionListener implements ActionListener 
+    {
+        @Override
+        public void actionPerformed(ActionEvent event) 
+        {
+            updateNumberReplications();
+        }
+    }
 
     class VerboseReplicationNumberTFListener implements CaretListener, ActionListener {
 
@@ -474,6 +496,23 @@ public class SimulationRunPanel extends JPanel
     
     public int getNumberOfReplications()
     {
+        int newNumberReplications = DEFAULT_NUMBER_OF_REPLICATIONS;
+        if (!numberReplicationsTF.getText().isBlank() && ViskitGlobals.isNumeric(numberReplicationsTF.getText().trim()))
+        {
+            try
+            {
+                newNumberReplications = Integer.parseInt(numberReplicationsTF.getText().trim());
+            }
+            catch (NumberFormatException nfe)
+            {
+                newNumberReplications = DEFAULT_NUMBER_OF_REPLICATIONS;
+            }
+            if (newNumberReplications < 1) 
+            {
+                newNumberReplications = DEFAULT_NUMBER_OF_REPLICATIONS;
+            }
+        }
+        numberOfReplications = newNumberReplications;
         return numberOfReplications;
     }
     public double getStartTime()
@@ -522,9 +561,9 @@ public class SimulationRunPanel extends JPanel
     }
     
     /** method name for reflection use */
-    public static final String METHOD_setNumberOfReplications = "setNumberOfReplications";
+    public static final String METHOD_setNumberReplications = "setNumberReplications";
     
-    public void setNumberOfReplications(int value)
+    public void setNumberReplications(int value)
     {
         numberOfReplications = value;
     }
