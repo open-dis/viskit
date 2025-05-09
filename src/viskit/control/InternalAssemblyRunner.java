@@ -143,13 +143,15 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     Runnable assemblyRunnable;
     
     private AnalystReportModel analystReportModel;
+    
+    private SimulationState simulationState;
+    
+    private Method setNumberReplicationsMethod;
+    
     /**
      * The internal logic for the Assembly Runner panel
      * @param analystReportPanelVisible if true, the Analyst Report panel will be visible
      */
-    
-    private SimulationState simulationState;
-    
     public InternalAssemblyRunner(boolean analystReportPanelVisible) 
     {
         simulationRunPanel = new SimulationRunPanel(SIMULATION_RUN_PANEL_TITLE, true, analystReportPanelVisible);
@@ -307,7 +309,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             // must occur prior to threading and new RunSimulationClassLoader
 ////            basicAssembly.resetRunSimulationClassLoader(); // TODO wrong place for this, likely out of place
             
-            basicAssembly.setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory()); // TODO duplicate invocation?
+            getBasicAssembly().setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory()); // TODO duplicate invocation?
             setClassPathUrlArray(ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray());
             
             // originally VGlobals().instance().getFreshClassLoader(), then moved into this class
@@ -329,7 +331,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             simulationRunAssemblyInstance = simulationRunAssemblyClass.getDeclaredConstructor().newInstance(); // TODO needed?
 
             Method setOutputStreamMethod             = simulationRunAssemblyClass.getMethod(METHOD_setOutputStream, OutputStream.class);
-            Method setNumberReplicationsMethod       = simulationRunAssemblyClass.getMethod(METHOD_setNumberReplicationsPlanned, int.class);
+            if (setNumberReplicationsMethod == null)
+                setNumberReplicationsMethod          = simulationRunAssemblyClass.getMethod(METHOD_setNumberReplicationsPlanned, int.class);
             Method setPrintReplicationReportsMethod  = simulationRunAssemblyClass.getMethod(METHOD_setPrintReplicationReports, boolean.class);
             Method setPrintSummaryReportMethod       = simulationRunAssemblyClass.getMethod(METHOD_setPrintSummaryReport, boolean.class);
             Method setSaveReplicationDataMethod      = simulationRunAssemblyClass.getMethod(METHOD_setSaveReplicationData, boolean.class);
@@ -370,8 +373,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
             // TODO update panel values for Simulation Run
 
+            setNumberReplicationsMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.getNumberOfReplications());
             setOutputStreamMethod.invoke(simulationRunAssemblyInstance, textAreaOutputStream); // redirect output
-            setNumberReplicationsMethod.invoke(simulationRunAssemblyInstance, Integer.valueOf(simulationRunPanel.numberReplicationsTF.getText().trim()));
             setPrintReplicationReportsMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.printReplicationReportsCB.isSelected());
             setPrintSummaryReportMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.printSummaryReportsCB.isSelected());
 
@@ -397,7 +400,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             if  (priorWorkingClassLoaderNoReset != null)
             {
                 Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
-                LOG.info ("prepareAndStartAssemblySimulationRun() complete for " + basicAssembly.getFixedName());
+                LOG.info ("prepareAndStartAssemblySimulationRun() complete for " + getBasicAssembly().getFixedName());
                 LOG.debug("restored currentThread contextClassLoader='" + priorWorkingClassLoaderNoReset.getName() + "'");
             }
             else LOG.error("prepareAssemblySimulationRun() complete, but priorWorkingClassLoaderNoReset is unexpectedly null");
@@ -411,7 +414,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             LOG.error("prepareAssemblySimulationRun() reflection uncaught exception: " + ue);
         }
-    }
+    } // end prepareAndStartAssemblySimulationRun()
 
     /** Thread to perform simulation run and end of run cleanup items */
     public class SimulationRunMonitor extends SwingWorker<Void, Void> 
@@ -754,8 +757,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void actionPerformed(ActionEvent actionEvent) 
         {
-            if (basicAssembly == null) {return;}
-            basicAssembly.setVerbose(((AbstractButton) actionEvent.getSource()).isSelected());
+            if (getBasicAssembly() == null) {return;}
+            getBasicAssembly().setVerbose(((AbstractButton) actionEvent.getSource()).isSelected());
         }
     }
 
@@ -1227,7 +1230,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             int beginLength = nowRunningMessageBuilder.length();
             nowRunningMessageBuilder.append(event.getNewValue());
-            simulationRunPanel.setNumberOfReplications(Integer.parseInt(event.getNewValue().toString()));
+            simulationRunPanel.setNumberReplications(Integer.parseInt(event.getNewValue().toString()));
             nowRunningMessageBuilder.append(" of ");
             nowRunningMessageBuilder.append(Integer.parseInt(simulationRunPanel.numberReplicationsTF.getText()));
             nowRunningMessageBuilder.append("...</b>\n");
@@ -1326,8 +1329,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     public void setSimulationState(SimulationState newSimulationState) 
     {
         this.simulationState = newSimulationState;
-        if (basicAssembly != null) // also update superclass
-            basicAssembly.setSimulationState(newSimulationState);
+        if (getBasicAssembly() != null) // also update superclass
+            getBasicAssembly().setSimulationState(newSimulationState);
     }
 
     /**
@@ -1345,6 +1348,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener
           stepButtonMI.setEnabled(simulationRunPanel.vcrPauseStepButton.isEnabled());
           stopButtonMI.setEnabled(simulationRunPanel.vcrStopButton.isEnabled());
  clearAllConsoleTextMI.setEnabled(simulationRunPanel.vcrClearConsoleButton.isEnabled());
+    }
+
+    /**
+     * @return the basicAssembly
+     */
+    public BasicAssembly getBasicAssembly() {
+        return basicAssembly;
     }
 
 }  // end class file InternalAssemblyRunner.java

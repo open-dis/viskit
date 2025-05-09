@@ -764,8 +764,20 @@
                 <b><a name="StatisticalResults">Statistical Results for the Simulation</a></b>
             </font>
         </p>
+        <xsl:variable name="numberReplications" select="count(ReplicationReports/SimEntity[1]/Replication)"/><!-- one-based indexing, if any are found -->
+        <xsl:if test="($numberReplications > 0)">
+            <p align="left">
+                <xsl:text>This simulation included </xsl:text>
+                <xsl:value-of select="$numberReplications"/>
+                <xsl:text> replication repetition</xsl:text>
+                <xsl:if test="($numberReplications > 1)">
+                    <xsl:text>s</xsl:text>
+                </xsl:if>
+                <xsl:text> for the assembly of interest.</xsl:text>
+            </p>
+        </xsl:if>
         <p>
-            Statistical results are produced by Property Change Listener (PCL) definitions
+            Statistical results are collected and produced by Property Change Listener (PCL) definitions
             in the Assembly model.
         </p>
         <xsl:apply-templates select="StatisticalResultsDescription"/>

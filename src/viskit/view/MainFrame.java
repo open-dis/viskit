@@ -699,7 +699,9 @@ public class MainFrame extends JFrame
             initializeSimulationRunPanelOutputStreamTA();
             simulationRunPanel.vcrStartTimeTF.setText("");
             simulationRunPanel.vcrStopTimeTF.setText("");
-            simulationRunPanel.numberReplicationsTF.setText(Integer.toString(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS)); // initialized in XML and panel
+            // do not reset numberReplications
+//            simulationRunPanel.numberReplicationsTF.setText(Integer.toString(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS)); // initialized in XML and panel
+
             simulationRunPanel.vcrVerboseCB.setSelected(false);
             simulationRunPanel.printReplicationReportsCB.setSelected(false);
             simulationRunPanel.printSummaryReportsCB.setSelected(false);

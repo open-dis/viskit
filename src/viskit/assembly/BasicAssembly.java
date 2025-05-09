@@ -78,8 +78,8 @@ import static viskit.model.ViskitElement.METHOD_getType;
 
 import viskit.reports.ReportStatisticsConfiguration;
 import viskit.view.SimulationRunPanel;
-import static viskit.view.SimulationRunPanel.METHOD_setNumberOfReplications;
 import static viskit.model.PropertyChangeListenerNode.METHOD_isStatisticTypeCount;
+import static viskit.view.SimulationRunPanel.METHOD_setNumberReplications;
 
 /**
  * Abstract base class for running assembly simulations, invoked in a thread by InternalAssemblyRunner.
@@ -195,8 +195,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         replicationStatisticsPropertyChangeListenerArray = new PropertyChangeListener[0];
         designPointSimpleStatisticsTally = new SampleStatistics[0];
         propertyChangeListenerArray = new PropertyChangeListener[0];
-        setNumberReplicationsPlanned(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
         hookupsCalled = false;
+//      setNumberReplicationsPlanned(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS); // do not perform this, it is handled elsewhere
         
         fixThreadedName();
     }
@@ -519,7 +519,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     public final void setNumberReplicationsPlanned(int newNumberReplicationsPlanned) 
     {
         if (newNumberReplicationsPlanned < 1) {
-            throw new IllegalArgumentException("setNumberReplicationsPlanned(): number replications must be > 0: " + newNumberReplicationsPlanned);
+            throw new IllegalArgumentException("setNumberReplicationsPlanned(): planned number of replications must be > 0: " + newNumberReplicationsPlanned);
         }
         numberReplicationsPlanned = newNumberReplicationsPlanned;
     }
@@ -1032,7 +1032,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
         runEntitiesSet = Schedule.getReruns(); // simkit
 
-        Method setNumberOfReplicationsMethod;
+        Method setNumberReplicationsMethod;
         // Convenience for Diskit if on the classpath
         for (ReRunnable entity : runEntitiesSet)
         {
@@ -1042,14 +1042,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             {
                 scenarioManager = entity;
                 try {
-                    setNumberOfReplicationsMethod = scenarioManager.getClass().getMethod(METHOD_setNumberOfReplications, int.class);
-                    setNumberOfReplicationsMethod.invoke(scenarioManager, getNumberReplicationsPlanned());
+                    setNumberReplicationsMethod = scenarioManager.getClass().getMethod(METHOD_setNumberReplications, int.class);
+                    setNumberReplicationsMethod.invoke(scenarioManager, getNumberReplicationsPlanned());
                 } 
                 catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
                     LOG.error("run() error during ScenarioManager checks: " + ex);
                 }
             }
         }
+        // TODO ensure using latest value SimulationRunPanel().getNumberOfReplications(), must be set outside of thread
+//        setNumberReplicationsPlanned(ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications());
 
         int runCount = runEntitiesSet.size();
         
@@ -1064,7 +1066,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             LOG.info("Begin running " + getName() + " simulation replications for {} total planned replications", getNumberReplicationsPlanned());
         }
         
-        // here is the loop for each replication within the current simulation
+        // here is the primary loop for each replication within the current simulation
         for (int replicationNumber = initialReplicationNumber; replicationNumber <= getNumberReplicationsPlanned(); replicationNumber++)
         {
             firePropertyChange("replicationNumber", (replicationNumber));

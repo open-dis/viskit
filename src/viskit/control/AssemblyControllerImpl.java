@@ -1983,7 +1983,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     if (priorStopTime != -1.0)
                         ViskitGlobals.instance().getSimulationRunPanel().setStopTime(priorStopTime);
                     if (priorNumberReplications != 0)
-                        ViskitGlobals.instance().getSimulationRunPanel().setNumberOfReplications(priorNumberReplications);
+                    {
+                        ViskitGlobals.instance().getSimulationRunPanel().setNumberReplications(priorNumberReplications);
+                    }
                     if (priorVerboseReplicationNumber != -1)
                         ViskitGlobals.instance().getSimulationRunPanel().setVerboseReplicationNumber(priorVerboseReplicationNumber);
                     ViskitGlobals.instance().getSimulationRunPanel().setVerboseOutput(priorVerboseOutput);
@@ -2042,7 +2044,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         ViskitGlobals.instance().getMainFrame().initializeSimulationRunPanelOutputStreamTA();
         
-        LOG.info("Ready to Commence Simulation Run.  numberOfReplications={}", 
+        LOG.info("Ready to Commence Simulation Run.\n      planned numberOfReplications={}", 
                 ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications());
         
         String message =

@@ -154,6 +154,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     public static final String SHOW_IMAGE                  = "showImage";
     public static final String SHOW_IMAGES                 = "images"; // TODO
     public static final String SHOW_OVERVIEW               = "showOverview";
+    public static final String SIZE                        = "size";
     public static final String SUMMARY_STATISTICS          = "summaryStatistics";
     public static final String TEXT                        = "text";
     public static final String TYPE                        = "type";
@@ -470,32 +471,32 @@ public final class AnalystReportModel extends MvcAbstractModel
     @SuppressWarnings("unchecked")
     public List<Object> unMakeReplicationList(Element statisticalResults) {
         Vector<Object> v = new Vector<>();
-        Vector<Object> se;
+        Vector<Object> simEntityVector;
         Vector<String[]> r;
         String[] sa;
-        Element repReports = statisticalResults.getChild("ReplicationReports");
-        List<Element> simEnts = repReports.getChildren(SIM_ENTITY);
-        for (Element sEnt : simEnts) {
+        Element replicatioReportsElementELement = statisticalResults.getChild("ReplicationReports");
+        List<Element> simEntityList = replicatioReportsElementELement.getChildren(SIM_ENTITY);
+        for (Element simEntityElement : simEntityList) {
 
-            se = new Vector<>(3);
-            se.add(sEnt.getAttributeValue(NAME));
-            se.add(sEnt.getAttributeValue(PROPERTY));
+            simEntityVector = new Vector<>(3);
+            simEntityVector.add(simEntityElement.getAttributeValue(NAME));
+            simEntityVector.add(simEntityElement.getAttributeValue(PROPERTY));
 
             r = new Vector<>();
-            List<Element> repLis = sEnt.getChildren(REPLICATION);
-            for(Element rep : repLis) {
+            List<Element> replicationElementList = simEntityElement.getChildren(REPLICATION);
+            for(Element replicationElement : replicationElementList) {
                 sa = new String[7];
-                sa[0] = rep.getAttributeValue("number");
-                sa[1] = rep.getAttributeValue("count");
-                sa[2] = rep.getAttributeValue("minObs");
-                sa[3] = rep.getAttributeValue("maxObs");
-                sa[4] = rep.getAttributeValue("mean");
-                sa[5] = rep.getAttributeValue("stdDeviation");
-                sa[6] = rep.getAttributeValue("variance");
+                sa[0] = replicationElement.getAttributeValue("number");
+                sa[1] = replicationElement.getAttributeValue("count");
+                sa[2] = replicationElement.getAttributeValue("minObs");
+                sa[3] = replicationElement.getAttributeValue("maxObs");
+                sa[4] = replicationElement.getAttributeValue("mean");
+                sa[5] = replicationElement.getAttributeValue("stdDeviation");
+                sa[6] = replicationElement.getAttributeValue("variance");
                 r.add(sa);
             }
-            se.add(r);
-            v.add(se);
+            simEntityVector.add(r);
+            v.add(simEntityVector);
         }
         return v;
     }
@@ -847,7 +848,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     @SuppressWarnings("unchecked")
     private Element makeReplicationReport() 
     {
-        Element replicatioReportsElement = new Element("ReplicationReports");
+        Element replicationReportsElement = new Element("ReplicationReports");
         List<Element> simEntitiesElementList = statisticsReportDocument.getRootElement().getChildren(SIM_ENTITY);
 
         // variables for JFreeChart construction
@@ -933,11 +934,11 @@ public final class AnalystReportModel extends MvcAbstractModel
                         entityElement.addContent(linearRegressionChartUrlElement);
                     }
 
-                    replicatioReportsElement.addContent(entityElement);
+                    replicationReportsElement.addContent(entityElement);
                 }
             }
         }
-        return replicatioReportsElement;
+        return replicationReportsElement;
     }
 
     /**
