@@ -87,10 +87,10 @@ import static viskit.view.SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
 import static viskit.view.SimulationRunPanel.VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT;
 import viskit.view.dialog.ViskitUserPreferencesDialog;
 import static viskit.assembly.BasicAssembly.METHOD_setVerboseReplicationNumber;
-import static viskit.assembly.BasicAssembly.METHOD_getNumberPlannedReplications;
-import static viskit.assembly.BasicAssembly.METHOD_setNumberPlannedReplications;
 import static viskit.assembly.BasicAssembly.METHOD_setPauseSimulationRun;
 import static viskit.assembly.BasicAssembly.METHOD_runResumeSimulation;
+import static viskit.assembly.BasicAssembly.METHOD_setNumberReplicationsPlanned;
+import static viskit.assembly.BasicAssembly.METHOD_getNumberReplicationsPlanned;
 
 /** Controller for the Assembly RunSimulation panel, which
  * spawns the BasicAssembly thread
@@ -270,7 +270,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     {
         setClassPathUrlArray(ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray());
 
-        Method getNumberReplicationsMethod     = simulationRunAssemblyClass.getMethod(METHOD_getNumberPlannedReplications);
+        Method getNumberReplicationsMethod     = simulationRunAssemblyClass.getMethod(METHOD_getNumberReplicationsPlanned);
         Method isSaveReplicationData           = simulationRunAssemblyClass.getMethod(METHOD_isSaveReplicationData); // TODO hook this up
         Method isPrintReplicationReportsMethod = simulationRunAssemblyClass.getMethod(METHOD_isPrintReplicationReports);
         Method isPrintSummaryReportMethod      = simulationRunAssemblyClass.getMethod(METHOD_isPrintSummaryReport);
@@ -329,7 +329,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             simulationRunAssemblyInstance = simulationRunAssemblyClass.getDeclaredConstructor().newInstance(); // TODO needed?
 
             Method setOutputStreamMethod             = simulationRunAssemblyClass.getMethod(METHOD_setOutputStream, OutputStream.class);
-            Method setNumberReplicationsMethod       = simulationRunAssemblyClass.getMethod(METHOD_setNumberPlannedReplications, int.class);
+            Method setNumberReplicationsMethod       = simulationRunAssemblyClass.getMethod(METHOD_setNumberReplicationsPlanned, int.class);
             Method setPrintReplicationReportsMethod  = simulationRunAssemblyClass.getMethod(METHOD_setPrintReplicationReports, boolean.class);
             Method setPrintSummaryReportMethod       = simulationRunAssemblyClass.getMethod(METHOD_setPrintSummaryReport, boolean.class);
             Method setSaveReplicationDataMethod      = simulationRunAssemblyClass.getMethod(METHOD_setSaveReplicationData, boolean.class);
@@ -732,7 +732,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 
                 Schedule.reset(); // simkit reset event list
             
-                AssemblyController assemblyController = ViskitGlobals.instance().getAssemblyController();
+                AssemblyController assemblyController = ViskitGlobals.instance().getActiveAssemblyController();
                 assemblyController.prepareSimulationRunner();
 
                 // TODO reset simulation clock

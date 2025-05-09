@@ -167,7 +167,7 @@ private void openExistingProjectButtonActionPerformed(java.awt.event.ActionEvent
     File file;
     if (!firstTime) 
     {
-        MvcController mvcController = ViskitGlobals.instance().getAssemblyController();
+        MvcController mvcController = ViskitGlobals.instance().getActiveAssemblyController();
         if (mvcController != null) {
 
             AssemblyView assemblyView = (AssemblyView) mvcController.getView();

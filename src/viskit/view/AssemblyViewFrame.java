@@ -345,7 +345,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             String nameOnly;
             Action currentAction;
             JMenuItem menuItem;
-            assemblyController = ViskitGlobals.instance().getAssemblyController(); // TODO repetitive
+            assemblyController = ViskitGlobals.instance().getActiveAssemblyController(); // TODO repetitive
             Set<String> files = assemblyController.getRecentAssemblyFileSet();
             openRecentAssemblyMenu.removeAll(); // clear prior to rebuilding menu
             openRecentAssemblyMenu.setEnabled(false); // disable unless file is found
@@ -917,7 +917,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             getToolBar().setVisible(true);
             // If an assembly is loaded, make assembly frame active 
 //            if (assemblyController == null)
-//                assemblyController = ViskitGlobals.instance().getAssemblyController(); // unexpected
+//                assemblyController = ViskitGlobals.instance().getActiveAssemblyController(); // unexpected
 //            assemblyController.makeTopPaneAssemblyTabActive();
             ViskitGlobals.instance().selectAssemblyEditorTab();
         };
@@ -1240,7 +1240,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     public void closeProject()
     {
-        assemblyController = ViskitGlobals.instance().getAssemblyController();
+        assemblyController = ViskitGlobals.instance().getActiveAssemblyController();
         
         assemblyController.closeProject();
 
@@ -1251,7 +1251,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     @Override
     public void openProject()
     {
-        assemblyController = ViskitGlobals.instance().getAssemblyController();
+        assemblyController = ViskitGlobals.instance().getActiveAssemblyController();
 
         if (!assemblyController.closeProject())
             return;

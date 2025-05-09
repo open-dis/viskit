@@ -459,7 +459,7 @@ public class ViskitUserPreferencesDialog extends JDialog
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getAssemblyController();
+            AssemblyControllerImpl assemblyController = ViskitGlobals.instance().getActiveAssemblyController();
             assemblyController.clearRecentAssemblyFileList();
         }
     }

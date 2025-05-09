@@ -101,12 +101,12 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     @Override
     public void showViskitUserPreferences() 
     {
-        ViskitGlobals.instance().getAssemblyController().showViskitUserPreferences();
+        ViskitGlobals.instance().getActiveAssemblyController().showViskitUserPreferences();
     }
 
     @Override
     public void newProject() {
-        ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).newProject();
+        ((AssemblyControllerImpl)ViskitGlobals.instance().getActiveAssemblyController()).newProject();
     }
     
     /** method name for reflection use */
@@ -114,7 +114,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     @Override
     public void zipAndMailProject() {
-        ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).zipProject();
+        ((AssemblyControllerImpl)ViskitGlobals.instance().getActiveAssemblyController()).zipProject();
     }
     
     /** method name for reflection use */
@@ -353,7 +353,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         String nm = f.getName();
         File ofile = new File(watchDirectoryFile, nm);
         ofile.delete();
-        AssemblyView view = (AssemblyView) ViskitGlobals.instance().getAssemblyController().getView();
+        AssemblyView view = (AssemblyView) ViskitGlobals.instance().getActiveAssemblyController().getView();
         view.removeEventGraphFromLEGOTree(f);
     }
 
@@ -1090,7 +1090,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             LOG.error(fnfe);
         }
 
-        String sourceString = ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).buildJavaEventGraphSource(xml2Java);
+        String sourceString = ((AssemblyControllerImpl)ViskitGlobals.instance().getActiveAssemblyController()).buildJavaEventGraphSource(xml2Java);
         LOG.debug(sourceString);
         if (sourceString != null && sourceString.length() > 0) {
             String className = model.getMetadata().packageName + "." + model.getMetadata().name;

@@ -238,7 +238,7 @@ public class MainFrame extends JFrame
             tabIndices[TAB_INDEX_ASSEMBLY_EDITOR] = -1;
         }
 
-        assemblyController = ViskitGlobals.instance().getAssemblyController();
+        assemblyController = ViskitGlobals.instance().getActiveAssemblyController();
         assemblyController.setMainTabbedPane(topTabbedPane, TAB_INDEX_ASSEMBLY_EDITOR);
         eventGraphController = ViskitGlobals.instance().getEventGraphController();
 
@@ -560,7 +560,7 @@ public class MainFrame extends JFrame
 
             // Tell Visit to not recompile open SimulationState Graphs from any remaining open
             // Assemblies when we perform a Viskit exit
-            ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).setCloseAll(true);
+            ((AssemblyControllerImpl) ViskitGlobals.instance().getActiveAssemblyController()).setCloseAll(true);
 
             outer: // Java block label
             // https://stackoverflow.com/questions/14147821/labeled-statement-block-in-java

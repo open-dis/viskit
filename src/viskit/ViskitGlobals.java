@@ -271,7 +271,7 @@ public class ViskitGlobals
         else return getActiveAssemblyModel().getName();
     }
 
-    public AssemblyControllerImpl getAssemblyController() {
+    public AssemblyControllerImpl getActiveAssemblyController() {
         return assemblyController;
     }
 

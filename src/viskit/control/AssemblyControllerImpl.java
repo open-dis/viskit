@@ -1780,12 +1780,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             LOG.debug("compileJavaClassFromString() compiledClassFile=\n      " + compiledClassFile.getAbsolutePath());
             if (compileSuccess) 
             {
-                LOG.info("compileJavaClassFromString() " + diagnostic + "\n");
+                LOG.info("compileJavaClassFromString(): " + diagnostic + "\n");
                 return compiledClassFile;
             } 
             else
             {
-                LOG.error("compileJavaClassFromString() " + diagnostic);
+                LOG.error("compileJavaClassFromString(): " + diagnostic);
                 if (!baosOutputStream.toString().isEmpty())
                     LOG.error("compileJavaClassFromString() " + baosOutputStream.toString());
             }
@@ -1799,7 +1799,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 if (sourceCodeFileWriter != null)
                     sourceCodeFileWriter.close();
             } 
-            catch (IOException e) {}
+            catch (IOException ioe) {
+                LOG.error("compileJavaClassFromString() sourceCodeFileWriter.close() exception: {}", ioe);
+            }
         }
         return null;
     }
@@ -1981,7 +1983,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     if (priorStopTime != -1.0)
                         ViskitGlobals.instance().getSimulationRunPanel().setStopTime(priorStopTime);
                     if (priorNumberReplications != 0)
-                        ViskitGlobals.instance().getSimulationRunPanel().setNumberOfReplications(priorNumberReplications);
+                        ViskitGlobals.instance().getSimulationRunPanel().setNumberOfReplications(priorNumberReplications); // TODO no-op?
                     if (priorVerboseReplicationNumber != -1)
                         ViskitGlobals.instance().getSimulationRunPanel().setVerboseReplicationNumber(priorVerboseReplicationNumber);
                     ViskitGlobals.instance().getSimulationRunPanel().setVerboseOutput(priorVerboseOutput);
@@ -2039,6 +2041,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private void announceReadyToCommenceSimulationRun(String newAssemblyName)
     {
         ViskitGlobals.instance().getMainFrame().initializeSimulationRunPanelOutputStreamTA();
+        
+        LOG.info("Ready to Commence Simulation Run.  numberOfReplications={}", 
+                ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications());
         
         String message =
                 "<html><body>" +

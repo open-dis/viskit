@@ -122,7 +122,7 @@ public class FileBasedClassManager {
                 if (!isCacheMiss(f)) {
 
                     // This will compile first time found Event Graphs
-                    paf = ((AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController()).createTemporaryEventGraphClass(f);
+                    paf = ((AssemblyControllerImpl) ViskitGlobals.instance().getActiveAssemblyController()).createTemporaryEventGraphClass(f);
 
                     // Compile fail of an EventGraph, so just return here
                     if (paf == null) {

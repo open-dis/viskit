@@ -1253,7 +1253,7 @@ public final class AnalystReportModel extends MvcAbstractModel
              assemblyImageFile.mkdirs();
 
         setAssemblyImageLocation(assemblyImageFile.getPath());
-        ((AssemblyControllerImpl)ViskitGlobals.instance().getAssemblyController()).captureAssemblyImage(
+        ((AssemblyControllerImpl)ViskitGlobals.instance().getActiveAssemblyController()).captureAssemblyImage(
                 assemblyImageFile);
         LOG.info("Assembly graph image saved at\n      " + assemblyImageFile.getAbsolutePath());
     }

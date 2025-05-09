@@ -109,7 +109,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     private double  stopTime;
     private boolean singleStep;
-    private int     numberPlannedReplications;
+    private int     numberReplicationsPlanned;
     private boolean printReplicationReports;
     private boolean printSummaryReport;
     private boolean saveReplicationData;
@@ -181,7 +181,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
  printReplicationReports = true
  printSummaryReport = true
  saveReplicationData = false
- numberPlannedReplications = 1
+ numberReplicationsPlanned = 1
  </pre>
      */
     public BasicAssembly() 
@@ -195,7 +195,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         replicationStatisticsPropertyChangeListenerArray = new PropertyChangeListener[0];
         designPointSimpleStatisticsTally = new SampleStatistics[0];
         propertyChangeListenerArray = new PropertyChangeListener[0];
-        setNumberPlannedReplications(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
+        setNumberReplicationsPlanned(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS);
         hookupsCalled = false;
         
         fixThreadedName();
@@ -514,24 +514,24 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     public boolean isEnableAnalystReports() {return enableAnalystReports;}
     
     /** method name for reflection use */
-    public static final String METHOD_setNumberPlannedReplications = "setNumberPlannedReplications";
+    public static final String METHOD_setNumberReplicationsPlanned = "setNumberReplicationsPlanned";
     
-    public final void setNumberPlannedReplications(int newNumberReplications) 
+    public final void setNumberReplicationsPlanned(int newNumberReplicationsPlanned) 
     {
-        if (newNumberReplications < 1) {
-            throw new IllegalArgumentException("setNumberPlannedReplications() Number replications must be > 0: " + newNumberReplications);
+        if (newNumberReplicationsPlanned < 1) {
+            throw new IllegalArgumentException("setNumberReplicationsPlanned(): number replications must be > 0: " + newNumberReplicationsPlanned);
         }
-        numberPlannedReplications = newNumberReplications;
+        numberReplicationsPlanned = newNumberReplicationsPlanned;
     }
     
     /** method name for reflection use */
-    public static final String METHOD_getNumberPlannedReplications = "getNumberPlannedReplications";
+    public static final String METHOD_getNumberReplicationsPlanned = "getNumberReplicationsPlanned";
 
     /** How many replications have occurred so far during this simulation
      * @return number of replications completed, so far */
-    public int getNumberPlannedReplications()
+    public int getNumberReplicationsPlanned()
     {
-        return numberPlannedReplications;
+        return numberReplicationsPlanned;
     }
     
     /** method name for reflection use */
@@ -725,12 +725,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         StringBuilder outputReportStringBuilder = new StringBuilder();
         
         if ((simulationState != null) && (simulationState != SimulationState.RUN) && 
-            (replicationNumber != getNumberPlannedReplications()))
+            (replicationNumber != getNumberReplicationsPlanned()))
         {
             // likely the STOP button was pressed
             outputReportStringBuilder.append(System.getProperty("line.separator"));
             outputReportStringBuilder.append("(Simulation did not complete ")
-                                     .append(getNumberPlannedReplications()).append(" replications as originally planned)");
+                                     .append(getNumberReplicationsPlanned()).append(" replications as originally planned)");
             outputReportStringBuilder.append(System.getProperty("line.separator"));
         }
         outputReportStringBuilder.append("\nOutput Report following Replication #");
@@ -1043,7 +1043,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 scenarioManager = entity;
                 try {
                     setNumberOfReplicationsMethod = scenarioManager.getClass().getMethod(METHOD_setNumberOfReplications, int.class);
-                    setNumberOfReplicationsMethod.invoke(scenarioManager, getNumberPlannedReplications());
+                    setNumberOfReplicationsMethod.invoke(scenarioManager, getNumberReplicationsPlanned());
                 } 
                 catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException | SecurityException | NoSuchMethodException ex) {
                     LOG.error("run() error during ScenarioManager checks: " + ex);
@@ -1056,15 +1056,16 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         if (pausedReplicationNumber > 0)
         {
             initialReplicationNumber = pausedReplicationNumber;
-            LOG.info("Resume running " + getName() + " simulation replication " + initialReplicationNumber);
+            LOG.info("Resume running " + getName() + " simulation replication " + initialReplicationNumber +
+                     " for {} total planned replications", getNumberReplicationsPlanned());
         }
         else
         {
-            LOG.info("Begin running " + getName() + " simulation replications");
+            LOG.info("Begin running " + getName() + " simulation replications for {} total planned replications", getNumberReplicationsPlanned());
         }
         
         // here is the loop for each replication within the current simulation
-        for (int replicationNumber = initialReplicationNumber; replicationNumber <= getNumberPlannedReplications(); replicationNumber++)
+        for (int replicationNumber = initialReplicationNumber; replicationNumber <= getNumberReplicationsPlanned(); replicationNumber++)
         {
             firePropertyChange("replicationNumber", (replicationNumber));
             // look ahead at next replication
@@ -1102,6 +1103,13 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 pausedReplicationNumber = replicationNumber; // prepare for return by remembering how many replications were complete
                 String pauseMessage = "Threaded assembly simulation run() paused after Replication # " + (replicationNumber);
                 LOG.info(pauseMessage);
+                
+                // TODO is it important to return; or rather 
+                // - briefly sleep within this specific thread, 
+                // - re-loop waiting for next button (STEP or RUN or STOP),
+                // - perhaps a time-out popup every 100 loops to ask user if still there...
+                // this avoids multiple pause/restart loop repair steps
+
                 return;
             }
             else // continue running replications

@@ -46,7 +46,7 @@ public class ViskitGraphAssemblyUI extends BasicGraphUI {
 
     private void createEditDialog(Object cell) 
     {
-        AssemblyController cntl = (AssemblyControllerImpl) ViskitGlobals.instance().getAssemblyController();
+        AssemblyController cntl = (AssemblyControllerImpl) ViskitGlobals.instance().getActiveAssemblyController();
         Object obj = ((DefaultMutableTreeNode) cell).getUserObject();
         if (cell instanceof ViskitAssemblyEdgeCell) {
             if (obj instanceof AdapterEdge) {
