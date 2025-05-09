@@ -294,9 +294,6 @@ public class SimkitAssemblyXML2Java
             pw.print(sp8 + "setVerbose");
             pw.println(lp + schedule.getVerbose() + rp + sc);
 
-            pw.print(sp8 + "setNumberReplicationsPlanned");
-            pw.println(lp + schedule.getNumberReplications() + rp + sc);
-
             pw.print(sp8 + "setPrintReplicationReports");
             pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
 
@@ -305,6 +302,11 @@ public class SimkitAssemblyXML2Java
 
             pw.print(sp8 + "setSaveReplicationData");
             pw.println(lp + schedule.getSaveReplicationData() + rp + sc);
+
+            pw.println();
+            pw.println(sp8 + "// let controlling simulation manager determine number of replications planned");
+            pw.print  (sp8 + "// setNumberReplicationsPlanned");
+            pw.println(lp + schedule.getNumberReplications() + rp + sc);
         }
         pw.println(sp4 + cb);
         pw.println();

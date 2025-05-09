@@ -1983,7 +1983,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     if (priorStopTime != -1.0)
                         ViskitGlobals.instance().getSimulationRunPanel().setStopTime(priorStopTime);
                     if (priorNumberReplications != 0)
-                        ViskitGlobals.instance().getSimulationRunPanel().setNumberOfReplications(priorNumberReplications); // TODO no-op?
+                        ViskitGlobals.instance().getSimulationRunPanel().setNumberOfReplications(priorNumberReplications);
                     if (priorVerboseReplicationNumber != -1)
                         ViskitGlobals.instance().getSimulationRunPanel().setVerboseReplicationNumber(priorVerboseReplicationNumber);
                     ViskitGlobals.instance().getSimulationRunPanel().setVerboseOutput(priorVerboseOutput);
