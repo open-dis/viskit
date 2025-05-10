@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="SimpleInventory" package="examples" version="0.1" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="SimpleInventory" package="examples" version="2.0" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="timeBetweenDemands" type="simkit.random.RandomVariate"/>
     <Parameter name="demand" type="simkit.random.RandomVariate"/>
     <Parameter name="leadTime" type="simkit.random.RandomVariate"/>

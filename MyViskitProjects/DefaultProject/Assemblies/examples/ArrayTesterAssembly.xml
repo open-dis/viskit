@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ArrayTestAssembly" version="1.0" package="examples" author="Terry D. Norbraten" extend="viskit.assembly.ViskitAssembly" description="Test a simple property dumper for an array" xsi:noNamespaceSchemaLocation="../../../../Schemas/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="ArrayTestAssembly" version="2.0" package="examples" author="Terry D. Norbraten" extend="viskit.assembly.ViskitAssembly" description="Test a simple property dumper for an array" xsi:noNamespaceSchemaLocation="../../../../Schemas/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity name="ArrayTester_3" type="examples.ArrayTester" description="">
         <MultiParameter type="int[]">
             <TerminalParameter name="" value="17" type="int"/>
@@ -12,6 +12,6 @@
     </PropertyChangeListener>
     <PropertyChangeListenerConnection listener="SimplePropertyDumper_4" source="ArrayTester_3"/>
     <Output entity="ArrayTester_3"/>
-    <Schedule stopTime="100." verbose="false" saveReplicationData="true"/>
+    <Schedule stopTime="100" verbose="false" saveReplicationData="true"/>
     <Experiment replicationsPerDesignPoint="30" totalSamples="1" timeout="5000"/>
 </SimkitAssembly>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="TestServerGenericAssembly" version="2.0" package="examples" author="ahbuss" extend="viskit.assembly.ViskitAssembly" description="Provide a unit test for ServerGeneric event graph" xsi:noNamespaceSchemaLocation="../../../../Schemas/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="TestServerGenericAssembly" version="2.0" package="examples" author="Arnie Buss" extend="viskit.assembly.ViskitAssembly" description="Provide a unit test for ServerGeneric event graph" xsi:noNamespaceSchemaLocation="../../../../Schemas/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity name="ServerGeneric" type="examples.ServerGeneric" description="">
         <TerminalParameter name="totalNumberServers" value="1" type="int"/>
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
@@ -20,6 +20,6 @@
     </SimEntity>
     <SimEventListenerConnection listener="EntityCreator" source="ArrivalProcess"/>
     <Adapter name="arrivalAdapter" eventHeard="EntityArrival" eventSent="Arrival" from="EntityCreator" to="ServerGeneric" description=""/>
-    <Schedule stopTime="100." verbose="false" saveReplicationData="true"/>
+    <Schedule stopTime="100" verbose="false" saveReplicationData="true"/>
     <Experiment replicationsPerDesignPoint="30" totalSamples="1" timeout="5000"/>
 </SimkitAssembly>
