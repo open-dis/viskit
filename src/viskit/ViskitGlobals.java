@@ -330,7 +330,7 @@ public class ViskitGlobals
     public Model getActiveEventGraphModel() {
         return (Model) eventGraphController.getModel();
     }
-
+    
     ActionListener defaultEventGraphQuitActionListener = new ActionListener() {
 
         @Override
@@ -348,8 +348,8 @@ public class ViskitGlobals
         }
     }
 
-    public void setEventGraphQuitHandler(ActionListener lis) {
-        eventGraphQuitHandler = lis;
+    public void setEventGraphQuitHandler(ActionListener actionListener) {
+        eventGraphQuitHandler = actionListener;
     }
 
     public Vector<ViskitElement> getStateVariablesList() {
@@ -360,12 +360,12 @@ public class ViskitGlobals
         return new DefaultComboBoxModel<>(getStateVariablesList());
     }
 
-    public Vector<ViskitElement> getSimParametersList() {
+    public Vector<ViskitElement> getSimulationParametersList() {
         return getActiveEventGraphModel().getSimulationParameters();
     }
 
-    public ComboBoxModel<ViskitElement> getSimParamsComboBoxModel() {
-        return new DefaultComboBoxModel<>(getSimParametersList());
+    public ComboBoxModel<ViskitElement> getSimulationParametersComboBoxModel() {
+        return new DefaultComboBoxModel<>(getSimulationParametersList());
     }
 
     /* AnalystReport model / view / controller, now shifted to stronger class typing */
@@ -519,7 +519,7 @@ public class ViskitGlobals
         }
 
         // Sim parameters
-        for (ViskitElement simParameter : getSimParametersList())
+        for (ViskitElement simParameter : getSimulationParametersList())
         {
             String result;
             type = simParameter.getType();

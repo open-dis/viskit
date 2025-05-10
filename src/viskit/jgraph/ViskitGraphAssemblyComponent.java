@@ -431,13 +431,13 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
         switch (parentFrame.getCurrentMode())
         {
             case AssemblyViewFrame.ADAPTER_MODE:
-                assemblyController.newAdapterArc(objectArray);
+                assemblyController.newAdapterEdge(objectArray);
                 break;
             case AssemblyViewFrame.SIMEVENT_LISTENER_MODE:
-                assemblyController.newSimEventListenerArc(objectArray);
+                assemblyController.newSimEventListenerEdge(objectArray);
                 break;
             case AssemblyViewFrame.PROPERTY_CHANGE_LISTENER_MODE:
-                assemblyController.newPropertyChangeListenerArc(objectArray);
+                assemblyController.newPropertyChangeListenerEdge(objectArray);
                 break;
             default:
                 break;

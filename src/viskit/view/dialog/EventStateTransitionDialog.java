@@ -377,7 +377,7 @@ public class EventStateTransitionDialog extends JDialog
             type = ViskitStatics.classForName(newType);
 
             if (type == null) {
-                ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).messageUser(
+                ViskitGlobals.instance().messageUser(
                         JOptionPane.WARNING_MESSAGE,
                         newType + " not found on the Classpath",
                         "Please make sure you are using fully qualified java "
@@ -643,7 +643,7 @@ public class EventStateTransitionDialog extends JDialog
             } else if (invokeOnRadioButton.isSelected()) {
                 String ty = ((ViskitElement) stateVariablesCB.getSelectedItem()).getType();
                 if (ViskitGlobals.instance().isPrimitive(ty)) {
-                    ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
+                    ViskitGlobals.instance().messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Java Language Error",
                             "A method may not be invoked on a primitive type.");

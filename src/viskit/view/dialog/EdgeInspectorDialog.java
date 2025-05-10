@@ -371,7 +371,7 @@ public class EdgeInspectorDialog extends JDialog
     private JComboBox<ViskitElement> buildTimeDelayVarsComboBox() {
         JComboBox<ViskitElement> cb = new JComboBox<>();
 
-        ComboBoxModel<ViskitElement> m = ViskitGlobals.instance().getSimParamsComboBoxModel();
+        ComboBoxModel<ViskitElement> m = ViskitGlobals.instance().getSimulationParametersComboBoxModel();
 
         // First item should be empty to allow for default zero delay
         ((MutableComboBoxModel<ViskitElement>)m).insertElementAt(new EventLocalVariable("", "", ""), 0);
@@ -395,7 +395,7 @@ public class EdgeInspectorDialog extends JDialog
 
         java.util.List<ViskitElement> types = new ArrayList<>(edge.getFrom().getLocalVariables());
         types.addAll(edge.getFrom().getArguments());
-        types.addAll(ViskitGlobals.instance().getSimParametersList());
+        types.addAll(ViskitGlobals.instance().getSimulationParametersList());
 
         String className;
         for (ViskitElement e : types) {
@@ -410,7 +410,7 @@ public class EdgeInspectorDialog extends JDialog
             type = ViskitStatics.classForName(typ);
 
             if (type == null) {
-                ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).messageUser(
+                ViskitGlobals.instance().messageUser(
                         JOptionPane.WARNING_MESSAGE,
                         typ + " not found on the Classpath",
                         "Please make sure you are using fully qualified java "

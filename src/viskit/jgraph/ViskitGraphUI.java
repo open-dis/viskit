@@ -56,9 +56,9 @@ public class ViskitGraphUI extends BasicGraphUI {
             Edge e = (Edge) ((DefaultMutableTreeNode) cell).getUserObject();
             
             if (e instanceof SchedulingEdge)
-                cntl.schedulingArcEdit(e);
+                cntl.schedulingEdgeEdit(e);
             else
-                cntl.cancellingArcEdit(e);
+                cntl.cancellingEdgeEdit(e);
             
         } else if (cell instanceof vCircleCell) {
             EventNode en = (EventNode) ((DefaultMutableTreeNode) cell).getUserObject();

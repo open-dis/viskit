@@ -568,8 +568,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     /** @return the absolute path to the temporary analyst report if user enabled */
     public String getAnalystReport() 
     {
-        if ((stopSimulationRun) || (pauseSimulationRun))
-            return "";
+        if (pauseSimulationRun)
+            return null; // not ready yet
+        
         if (analystReportFile == null)
         {
             LOG.error("getAnalystReport() found (analystReportFile == null)"); // unexpected condition
@@ -1052,8 +1053,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 }
             }
         }
-        // TODO ensure using latest value SimulationRunPanel().getNumberOfReplications(), must be set outside of thread
-//        setNumberReplicationsPlanned(ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications());
+        // TODO ensure using latest value SimulationRunPanel().getNumberReplications(), must be set outside of thread
+//        setNumberReplicationsPlanned(ViskitGlobals.instance().getSimulationRunPanel().getNumberReplications());
 
         int runCount = runEntitiesSet.size();
         
@@ -1114,6 +1115,17 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 // - perhaps a time-out popup every 100 loops to ask user if still there...
                 // this avoids multiple pause/restart loop repair steps
 
+
+                        // TODO stop and wait here for resume, then restore loop before continuing...
+                        try
+                        {
+                            Thread.sleep(1000);
+                        }
+                        catch (InterruptedException ie)
+                        {
+                            Thread.currentThread().interrupt();
+                            LOG.error("PauseStepListener Thread.sleep interruption");
+                        }
                 return;
             }
             else // continue running replications

@@ -101,8 +101,8 @@ import static viskit.control.EventGraphControllerImpl.METHOD_zipAndMailProject;
 import viskit.control.RecentProjectFileSetListener;
 import viskit.doe.LocalBootLoader;
 import viskit.images.AdapterIcon;
-import viskit.images.PropChangListenerImageIcon;
-import viskit.images.PropChangeListenerIcon;
+import viskit.images.PropertyChangeListenerImageIcon;
+import viskit.images.PropertyChangeListenerIcon;
 import viskit.images.SimEventListenerIcon;
 import viskit.jgraph.ViskitGraphAssemblyComponentWrapper;
 import viskit.jgraph.ViskitGraphAssemblyModel;
@@ -695,9 +695,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     /**
-     * @return the current mode--select, add, arc, cancelArc
+     * @return the current mode--select, add, schedulingEdge, cancellingEdge
      */
-    public int getCurrentMode() {
+    public int getCurrentMode() 
+    {
         // Use the button's selected status to figure out what mode
         // we are in.
 
@@ -744,9 +745,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         defBor = simEventListenerModeToggleButton.getBorder();
         simEventListenerModeToggleButton.setBorder(BorderFactory.createCompoundBorder(defBor, BorderFactory.createLineBorder(new Color(0xce, 0xce, 0xff), 2)));
 
-        propertyChangeListenerModeToggleButton = makeJToggleButton(
-                null,
-                new PropChangeListenerIcon(24, 24),
+        propertyChangeListenerModeToggleButton = makeJToggleButton(null,
+                new PropertyChangeListenerIcon(24, 24),
                 "Connect a property change listener to a SimEntity"
         );
         defBor = propertyChangeListenerModeToggleButton.getBorder();
@@ -988,7 +988,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         legoEventGraphsTree = new LegoTree("simkit.BasicSimEntity", "viskit/images/assembly.png",
                 this, "Drag an Event Graph onto the canvas to add it to the assembly");
 
-        propertyChangeListenerTree = new LegoTree("java.beans.PropertyChangeListener", new PropChangListenerImageIcon(20, 20),
+        propertyChangeListenerTree = new LegoTree("java.beans.PropertyChangeListener", new PropertyChangeListenerImageIcon(20, 20),
                 this, "Drag a PropertyChangeListener onto the canvas to add it to the assembly");
 
         // Parse any extra/additional classpath for any required dependencies

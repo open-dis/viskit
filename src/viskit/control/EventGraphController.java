@@ -52,13 +52,13 @@ public interface EventGraphController {
      *
      * @param nodes an array of source and target nodes
      */
-    void buildNewSchedulingArc(Object[] nodes);
+    void buildNewSchedulingEdge(Object[] nodes);
 
     /** Connect a canceling edge between two nodes
      *
      * @param nodes an array of source and target nodes
      */
-    void buildNewCancelingArc(Object[] nodes);
+    void buildNewCancelingEdge(Object[] nodes);
 
     /**
      * Provides an automatic capture of all Event Graphs images used in an
@@ -93,14 +93,6 @@ public interface EventGraphController {
     void viewXML();
 
     /** 
-     *A component wants to say something.
-     * @param messageType the type of message, i.e. JOptionPane.ERROR, JOptionPane.WARN, JOptionPane.INFO, JOptionPane.QUESTION, etc.
-     * @param title the title of the message in the dialog frame
-     * @param message the message to transmit
-     */
-    void messageUser(int messageType, String title, String message);    // typ is one of JOptionPane types
-
-    /** 
      * Requests to the controller to perform editing operations on existing entities
      * @param eventNode the node to edit
      */
@@ -110,13 +102,13 @@ public interface EventGraphController {
      * Edit a scheduling edge
      * @param schedulingEdge the edge to edit
      */
-    void schedulingArcEdit(Edge schedulingEdge);
+    void schedulingEdgeEdit(Edge schedulingEdge);
 
     /**
      * Edit a canceling edge
-     * @param cancellingArcEdge the edge to edit
+     * @param cancellingEdge the edge to edit
      */
-    void cancellingArcEdit(Edge cancellingArcEdge);
+    void cancellingEdgeEdit(Edge cancellingEdge);
 
     void simParameterEdit(ViskitParameter simParameter);
 

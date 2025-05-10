@@ -303,7 +303,7 @@ public class StateVariableDialog extends ViskitSmallDialog
                 if (nam.length() <= 0 ||
                         typ.length() <= 0 ||
                         (ViskitGlobals.instance().isArray(typ) && arsz.length() <= 0)) {
-                    ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
+                    ViskitGlobals.instance().messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Name, type and (if array) array size must be entered.");
@@ -311,13 +311,13 @@ public class StateVariableDialog extends ViskitSmallDialog
                     arraySizeField.requestFocus();
                     return;
                 } else if (ViskitGlobals.instance().isArray(typ) && !isGoodArray(typ)) {
-                    ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
+                    ViskitGlobals.instance().messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Use a single trailing pair of empty square brackets\nto signify a one-dimensional array.");
                     return;
                 } else if (isGenericType(typ)) {
-                    ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
+                    ViskitGlobals.instance().messageUser(
                             JOptionPane.ERROR_MESSAGE,
                             "Data entry error",
                             "Actual Keys, Values or Element types must replace " +

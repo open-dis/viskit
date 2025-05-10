@@ -492,9 +492,9 @@ public class SimulationRunPanel extends JPanel
         else return 0;
     }
     
-    private int numberOfReplications;
+    private int numberReplications;
     
-    public int getNumberOfReplications()
+    public int getNumberReplications()
     {
         int newNumberReplications = DEFAULT_NUMBER_OF_REPLICATIONS;
         if (!numberReplicationsTF.getText().isBlank() && ViskitGlobals.isNumeric(numberReplicationsTF.getText().trim()))
@@ -512,8 +512,8 @@ public class SimulationRunPanel extends JPanel
                 newNumberReplications = DEFAULT_NUMBER_OF_REPLICATIONS;
             }
         }
-        numberOfReplications = newNumberReplications;
-        return numberOfReplications;
+        numberReplications = newNumberReplications;
+        return numberReplications;
     }
     public double getStartTime()
     {
@@ -565,8 +565,8 @@ public class SimulationRunPanel extends JPanel
     
     public void setNumberReplications(int value)
     {
-        numberOfReplications = value;
-        numberReplicationsTF.setText(String.valueOf(numberOfReplications));
+        numberReplications = value;
+        numberReplicationsTF.setText(String.valueOf(numberReplications));
     }
 
     /**

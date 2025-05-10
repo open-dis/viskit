@@ -67,6 +67,8 @@ import viskit.mvc.MvcRecentFileListener;
 public class EventGraphControllerImpl extends MvcAbstractController implements EventGraphController 
 {
     static final Logger LOG = LogManager.getLogger();
+    
+    private GraphMetadata graphMetadata;
 
     public EventGraphControllerImpl() {
         initConfig();
@@ -144,18 +146,18 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
         // If we have models already opened, then use their package names for
         // this new Event Graph
-        GraphMetadata graphMetadata = newModelImpl.getMetadata();
+        GraphMetadata newGraphMetadata = newModelImpl.getMetadata();
         if (oldGraphMetadata != null) {
-            graphMetadata.packageName = oldGraphMetadata.packageName;
+            newGraphMetadata.packageName = oldGraphMetadata.packageName;
         }
 
         boolean modified =
-                EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
+                EventGraphMetadataDialog.showDialog((JFrame) getView(), newGraphMetadata);
         if (modified) 
         {
             // update title bar
-            ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name);
-            ((EventGraphView) getView()).setSelectedEventGraphDescription(ViskitStatics.emptyIfNull(graphMetadata.description));
+            ((EventGraphView) getView()).setSelectedEventGraphName(newGraphMetadata.name);
+            ((EventGraphView) getView()).setSelectedEventGraphDescription(ViskitStatics.emptyIfNull(newGraphMetadata.description));
 
             // Bugfix 1398
             String message =
@@ -169,9 +171,11 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 dirty = true;
             }
             ((Model) getModel()).setDirty(dirty);
-        } else {
+        } 
+        else {
            ((EventGraphView) getView()).deleteTab(newModelImpl);
         }
+        graphMetadata = newGraphMetadata;
     }
 
     /**
@@ -335,56 +339,58 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     /** A temporary location to store copies of EventGraphs in XML form.
      * This is to compare against any changes to and whether to re-cache the
      * MD5 hash generated for this Event Graph.
-     * @param f the EventGraph file to generate MD5 hash for
+     * @param file the EventGraph file to generate MD5 hash for
      */
-    private void fileWatchOpen(File f) {
-        String nm = f.getName();
-        File ofile = new File(watchDirectoryFile, nm);
-        LOG.debug("f is: {} and ofile is: {}", f, ofile);
+    private void fileWatchOpen(File file) 
+    {
+        String fileName = file.getName();
+        File ofile = new File(watchDirectoryFile, fileName);
+        LOG.debug("f is: {} and ofile is: {}", file, ofile);
         try {
-            Files.copy(f.toPath(), ofile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
+            Files.copy(file.toPath(), ofile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } 
+        catch (IOException e) {
             LOG.error(e);
 //            e.printStackTrace();
         }
     }
 
-    private void fileWatchClose(File f) {
-        String nm = f.getName();
-        File ofile = new File(watchDirectoryFile, nm);
+    private void fileWatchClose(File file) {
+        String fileName = file.getName();
+        File ofile = new File(watchDirectoryFile, fileName);
         ofile.delete();
-        AssemblyView view = (AssemblyView) ViskitGlobals.instance().getActiveAssemblyController().getView();
-        view.removeEventGraphFromLEGOTree(f);
+        AssemblyView assemblyView = (AssemblyView) ViskitGlobals.instance().getActiveAssemblyController().getView();
+        assemblyView.removeEventGraphFromLEGOTree(file);
     }
 
     @Override
-    public void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis) {
-        directoryWatch.addListener(lis);
+    public void addEventGraphFileListener(DirectoryWatch.DirectoryChangeListener directoryChangeListener) {
+        directoryWatch.addListener(directoryChangeListener);
     }
 
     @Override
-    public void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener lis) {
-        directoryWatch.removeListener(lis);
+    public void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener directoryChangeListener) {
+        directoryWatch.removeListener(directoryChangeListener);
     }
 
-    Set<MvcRecentFileListener> recentListeners = new HashSet<>();
+    Set<MvcRecentFileListener> recentFileListenerSet = new HashSet<>();
 
     @Override
-    public void addRecentEventGraphFileListener(MvcRecentFileListener lis)
+    public void addRecentEventGraphFileListener(MvcRecentFileListener mvcRecentFileListener)
     {
-      recentListeners.add(lis);
+      recentFileListenerSet.add(mvcRecentFileListener);
     }
 
     @Override
-    public void removeRecentEventGraphFileListener(MvcRecentFileListener lis)
+    public void removeRecentEventGraphFileListener(MvcRecentFileListener recentFileListener)
     {
-      recentListeners.remove(lis);
+      recentFileListenerSet.remove(recentFileListener);
     }
 
     private void notifyRecentFileListeners()
     {
-      for(MvcRecentFileListener lis : recentListeners) {
-            lis.listChanged();
+      for(MvcRecentFileListener recentFileListener : recentFileListenerSet) {
+            recentFileListener.listChanged();
         }
     }
 
@@ -397,11 +403,11 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
      * @param file an event graph file to add to the list
      */
     private void adjustRecentEventGraphFileSet(File file) {
-        String f;
-        for (Iterator<String> itr = recentEventGraphFileSet.iterator(); itr.hasNext();) {
-            f = itr.next();
-            if (file.getPath().equals(f)) {
-                itr.remove();
+        String eventGraphName;
+        for (Iterator<String> iterator = recentEventGraphFileSet.iterator(); iterator.hasNext();) {
+            eventGraphName = iterator.next();
+            if (file.getPath().equals(eventGraphName)) {
+                iterator.remove();
                 break;
             }
         }
@@ -416,7 +422,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private List<String> openEventGraphsList;
 
     @SuppressWarnings("unchecked")
-    private void recordEventGraphFiles() {
+    private void recordEventGraphFiles() 
+    {
         if (historyXMLConfiguration == null) {initConfig();}
         openEventGraphsList = new ArrayList<>(4);
         List<Object> valueAr = historyXMLConfiguration.getList(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "[@value]");
@@ -475,12 +482,6 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
         return openEventGraphsList;
     }
-
-    @Override
-    public void messageUser(int messageType, String title, String message) // typ is one of JOptionPane types
-    {
-        ViskitGlobals.instance().getMainFrame().genericReport(messageType, title, message);
-    }
     
     /** method name for reflection use */
     public static final String METHOD_quit = "quit";
@@ -519,8 +520,30 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public static final String METHOD_closeAll = "closeAll";
 
     @Override
-    public void closeAll() 
+    public void closeAll()
     {
+        int numberOfEventGraphs = ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded();
+        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && (numberOfEventGraphs != 0))
+        {
+            ViskitGlobals.instance().selectEventGraphEditorTab(); // making sure
+            String title = new String(), message = new String();
+            if  (numberOfEventGraphs == 1)
+            {
+                title   = "Inspect Event Graph before closing";
+                message = "First inspect open Event Graph in Event Graph Editor before closing";
+            }
+            else if (numberOfEventGraphs > 1) // more that one
+            {
+                title   = "Inspect Event Graphs before closing";
+                message = "First inspect open Event Graphs in Event Graph Editor before closing them";
+            }
+            ViskitGlobals.instance().selectEventGraphEditorTab();
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, 
+                    title, message);
+                return;
+        }
+        ViskitGlobals.instance().selectEventGraphEditorTab(); // making sure
+        
         boolean hasDirtyEventGraph = false; // TODO if needed
         
         Model[] eventGraphModels = ((EventGraphView) getView()).getOpenModels();
@@ -535,7 +558,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && hasDirtyEventGraph)
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
-            messageUser(JOptionPane.INFORMATION_MESSAGE, "View Event Graph Editor", "First review Event Graphs before closing");
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "View Event Graph Editor", "First review Event Graphs before closing");
             return;
         }
         for (Model model : eventGraphModels) 
@@ -548,16 +571,41 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     /** method name for reflection use */
     public static final String METHOD_close = "close";
 
-
     @Override
     public void close()
     {
         if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && // closing without checking first
             !ViskitGlobals.instance().isSelectedAssemblyEditorTab())     // closing automatically when closing parent Assembly
         {
-            ViskitGlobals.instance().selectEventGraphEditorTab();
-            messageUser(JOptionPane.INFORMATION_MESSAGE, "Check Event Graph Editor", "First select an Event Graph before closing");
-            return;
+            // OK for closing Assembly to close all corresponding Event Graphs, otherwise check
+            
+            int numberOfEventGraphs = ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded();
+            if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && (numberOfEventGraphs > 1))
+            {
+                ViskitGlobals.instance().selectEventGraphEditorTab();
+                ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, 
+                        "Confirm Event Graph choice", 
+                        "First select one of the open Event Graphs before closing");
+                return;
+            }
+            if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && (numberOfEventGraphs == 0))
+            {
+                ViskitGlobals.instance().selectEventGraphEditorTab();
+                return;
+            }
+            if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab()) // only one open Event Graph, but it wasn't visible
+            {
+                ViskitGlobals.instance().selectEventGraphEditorTab();
+                String title   = "Please confirm...";
+                String message;
+                graphMetadata = ViskitGlobals.instance().getActiveEventGraphModel().getMetadata();
+                if (graphMetadata != null)
+                     message= "Close " + graphMetadata.name + "?";
+                else message= "Close Event Graph?";
+                int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
+                if (returnValue == JOptionPane.NO_OPTION)
+                    return;
+            }
         }
         ViskitGlobals.instance().selectEventGraphEditorTab();
         if (preClose()) {
@@ -566,39 +614,40 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public boolean preClose() {
-        ModelImpl mod = (ModelImpl) getModel();
-        if (mod == null) {
+    public boolean preClose() 
+    {
+        ModelImpl eventGraphModel = (ModelImpl) getModel();
+        if (eventGraphModel == null) 
+        {
             return false;
         }
-
-        if (mod.isDirty()) {
+        if (eventGraphModel.isDirty())
+        {
             return askToSaveAndContinue();
         }
-
         return true;
     }
 
     @Override
-    public void postClose() {
-
-        ModelImpl mod = (ModelImpl) getModel();
-        if (mod.getLastFile() != null) {
-            fileWatchClose(mod.getLastFile());
-            markConfigClosed(mod.getLastFile());
+    public void postClose()
+    {
+        ModelImpl eventGraphModel = (ModelImpl) getModel();
+        if (eventGraphModel.getLastFile() != null) 
+        {
+            fileWatchClose(eventGraphModel.getLastFile());
+            markConfigClosed(eventGraphModel.getLastFile());
         }
-
-        ((EventGraphView) getView()).deleteTab(mod);
+        ((EventGraphView) getView()).deleteTab(eventGraphModel);
     }
 
-    private void markConfigClosed(File f) {
+    private void markConfigClosed(File file) {
 
         // Someone may try to close a file that hasn't been saved
-        if (f == null) {return;}
+        if (file == null) {return;}
 
         int idx = 0;
         for (String key : recentEventGraphFileSet) {
-            if (key.contains(f.getName()))
+            if (key.contains(file.getName()))
                 historyXMLConfiguration.setProperty(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "false");
 
             idx++;
@@ -607,13 +656,15 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     // NOTE: The open attribute is zeroed out for all recent files the first
     // time a file is opened
-    private void markConfigOpen(File f) {
-        int idx = 0;
-        for (String key : recentEventGraphFileSet) {
-            if (key.contains(f.getName()))
-                historyXMLConfiguration.setProperty(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + idx + ")[@open]", "true");
+    private void markConfigOpen(File file) 
+    {
+        int index = 0;
+        for (String key : recentEventGraphFileSet) 
+        {
+            if (key.contains(file.getName()))
+                historyXMLConfiguration.setProperty(ViskitUserConfiguration.EVENTGRAPH_HISTORY_KEY + "(" + index + ")[@open]", "true");
 
-            idx++;
+            index++;
         }
     }
     
@@ -626,7 +677,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab())
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
-            messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph before saving");
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph before saving");
             return;
         }
         ViskitGlobals.instance().selectEventGraphEditorTab();
@@ -656,7 +707,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab())
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
-            messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph before saving");
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph before saving");
             return;
         }
         ViskitGlobals.instance().selectEventGraphEditorTab();
@@ -856,7 +907,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void copy() //----------------
     {
         if (!nodeSelected()) {
-            messageUser(JOptionPane.WARNING_MESSAGE,
+            ViskitGlobals.instance().messageUser(JOptionPane.WARNING_MESSAGE,
                     "Unsupported Action",
                     "Edges cannot be copied, only nodes.");
             return;
@@ -1143,7 +1194,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void buildNewSchedulingArc(Object[] nodes) //--------------------------------
+    public void buildNewSchedulingEdge(Object[] nodes) //--------------------------------
     {
         // My node view objects hold node model objects and vice versa
         EventNode src = (EventNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
@@ -1152,7 +1203,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void buildNewCancelingArc(Object[] nodes) //--------------------------------------
+    public void buildNewCancelingEdge(Object[] nodes) //--------------------------------------
     {
         // My node view objects hold node model objects and vice versa
         EventNode src = (EventNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
@@ -1235,7 +1286,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void schedulingArcEdit(Edge edge) {
+    public void schedulingEdgeEdit(Edge edge) {
         boolean modified = ((EventGraphView) getView()).doEditEdge(edge);
         if (modified) {
             ((viskit.model.Model) getModel()).changeSchedulingEdge(edge);
@@ -1243,7 +1294,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void cancellingArcEdit(Edge edge) {
+    public void cancellingEdgeEdit(Edge edge) {
         boolean modified = ((EventGraphView) getView()).doEditCancelEdge(edge);
         if (modified) {
             ((viskit.model.Model) getModel()).changeCancelingEdge(edge);

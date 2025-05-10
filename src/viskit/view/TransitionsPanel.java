@@ -208,7 +208,7 @@ public class TransitionsPanel extends JPanel {
         {
             if (ViskitGlobals.instance().getStateVariablesComboBoxModel().getSize() <= 0) 
             {
-                ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).messageUser(
+                ViskitGlobals.instance().messageUser(
                     JOptionPane.ERROR_MESSAGE,
                     "Alert",
                     "No state variables have been defined,\n" +

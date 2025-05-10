@@ -1270,7 +1270,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         
         assemblyName = assemblyFile.getName().substring(0, assemblyFile.getName().indexOf(".xml"));
         
-        int numberOfReplications = ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications();
+        int numberOfReplications = ViskitGlobals.instance().getSimulationRunPanel().getNumberReplications();
         String popupTitle = "Simulation Run Data Collected, Analyst Report Ready";
         int expectedNumberOfReplications = ViskitGlobals.instance().getSimulationRunPanel().getTotalReplications();
         if (numberOfReplications < expectedNumberOfReplications)

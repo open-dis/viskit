@@ -88,9 +88,9 @@ import static viskit.control.EventGraphControllerImpl.METHOD_saveAs;
 import static viskit.control.EventGraphControllerImpl.METHOD_undo;
 import static viskit.control.EventGraphControllerImpl.METHOD_viewXML;
 import static viskit.control.EventGraphControllerImpl.METHOD_zipAndMailProject;
-import viskit.images.CanArcIcon;
+import viskit.images.CancellingEdgeIcon;
 import viskit.images.EventNodeIcon;
-import viskit.images.SchedArcIcon;
+import viskit.images.SchedulingEdgeIcon;
 import viskit.jgraph.ViskitGraphComponentWrapper;
 import viskit.jgraph.ViskitGraphModel;
 import viskit.model.*;
@@ -155,7 +155,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     private JLabel addSelfCancelRef;
     private JToggleButton selectMode;
     private JToggleButton arcMode;
-    private JToggleButton cancelArcMode;
+    private JToggleButton cancellingEdgeMode;
     private JTabbedPane tabbedPane;
     private JMenuBar myMenuBar;
     private JMenu editMenu;
@@ -200,7 +200,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         if (arcMode.isSelected()) {
             return ARC_MODE;
         }
-        if (cancelArcMode.isSelected()) {
+        if (cancellingEdgeMode.isSelected()) {
             return CANCEL_ARC_MODE;
         }
 
@@ -952,13 +952,13 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
         addEvent.setIcon(new EventNodeIcon());
 
-        addSelfRef = makeJLabel("viskit/images/selfArc.png",
+        addSelfRef = makeJLabel("viskit/images/selfConnectingEdge.png",
                 "Drag onto an existing event node to add a self-referential scheduling edge");
         addSelfRef.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
-        addSelfCancelRef = makeJLabel("viskit/images/selfCancelArc.png",
+        addSelfCancelRef = makeJLabel("viskit/images/selfCancellingEdge.png",
                 "Drag onto an existing event node to add a self-referential canceling edge");
         addSelfCancelRef.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
@@ -967,17 +967,17 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         selectMode = makeJToggleButton(null, "viskit/images/selectNode.png",
                 "Select an item on the graph");
 
-        arcMode = makeJToggleButton(null, "viskit/images/schedArc.png",
+        arcMode = makeJToggleButton(null, "viskit/images/schedulingEdge.png",
                 "Connect nodes with a scheduling edge");
-        arcMode.setIcon(new SchedArcIcon());
+        arcMode.setIcon(new SchedulingEdgeIcon());
 
-        cancelArcMode = makeJToggleButton(null, "viskit/images/canArc.png",
+        cancellingEdgeMode = makeJToggleButton(null, "viskit/images/cancellingEdge.png",
                 "Connect nodes with a cancelling edge");
-        cancelArcMode.setIcon(new CanArcIcon());
+        cancellingEdgeMode.setIcon(new CancellingEdgeIcon());
 
         modeButtonGroup.add(selectMode);
         modeButtonGroup.add(arcMode);
-        modeButtonGroup.add(cancelArcMode);
+        modeButtonGroup.add(cancellingEdgeMode);
 
         JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
                 "Zoom in on the graph");
@@ -1002,7 +1002,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(arcMode);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(cancelArcMode);
+        getToolBar().add(cancellingEdgeMode);
 
         getToolBar().addSeparator(new Dimension(24, 24));
         getToolBar().add(new JLabel("Zoom: "));
@@ -1039,7 +1039,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         arcMode.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setPortsVisible(true);
         });
-        cancelArcMode.addActionListener((ActionEvent e) -> {
+        cancellingEdgeMode.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setPortsVisible(true);
         });
     }
@@ -1092,7 +1092,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             super();
             select = Cursor.getDefaultCursor();
             arc = new Cursor(Cursor.CROSSHAIR_CURSOR);
-            Image img = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/canArcCursor.png")).getImage();
+            Image img = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/cancellingEdgeCursor.png")).getImage();
 
             // Check if we should size the cursor
             Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);
@@ -1239,14 +1239,14 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                     if (o != null && o instanceof EventNode) {
                         EventNode en = (EventNode) o;
                         // We're making a self-referential arc
-                        ((EventGraphController) getController()).buildNewCancelingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
+                        ((EventGraphController) getController()).buildNewCancelingEdge(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
                     }
                     break;
                 default:
                     if (o != null && o instanceof EventNode) {
                         EventNode en = (EventNode) o;
                         // We're making a self-referential arc
-                        ((EventGraphController) getController()).buildNewSchedulingArc(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
+                        ((EventGraphController) getController()).buildNewSchedulingEdge(new Object[]{en.opaqueViewObject, en.opaqueViewObject});
                     }
                     break;
             }

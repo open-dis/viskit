@@ -72,15 +72,15 @@ public interface AssemblyController {
     void selectNodeOrEdge(Vector<Object> v);
 
     /**
-     * Creates an adapter arc between two assembly nodes
+     * Creates an adapter edge between two assembly nodes
      *
-     * @param nodes and array of Nodes to connect with an adapter
+     * @param nodeArray and array of Nodes to connect with an adapter
      */
-    void newAdapterArc(Object[] nodes);
+    void newAdapterEdge(Object[] nodeArray);
 
-    void newSimEventListenerArc(Object[] nodes);
+    void newSimEventListenerEdge(Object[] nodeArray);
 
-    void newPropertyChangeListenerArc(Object[] nodes);
+    void newPropertyChangeListenerEdge(Object[] rnodeArray);
 
     void propertyChangeListenerEdit(PropertyChangeListenerNode pclNode);
 

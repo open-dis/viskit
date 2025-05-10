@@ -69,6 +69,7 @@ import viskit.mvc.MvcRecentFileListener;
 import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
 import viskit.assembly.SimulationRunInterface;
 import viskit.control.InternalAssemblyRunner.SimulationState;
+import viskit.view.EventGraphView;
 import viskit.view.SimulationRunPanel;
 
 /**
@@ -903,7 +904,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public static final String METHOD_closeAll = "closeAll";
 
     @Override
-    public void closeAll() 
+    public void closeAll()
     {
         int numberOfAssemblies = ViskitGlobals.instance().getAssemblyViewFrame().getNumberAssembliesLoaded();
         if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab() && (numberOfAssemblies != 0))
@@ -925,7 +926,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     title, message);
                 return;
         }
-        ViskitGlobals.instance().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
         AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyViewFrame().getOpenAssemblyModels();
         for (AssemblyModel assemblyModel : assemblyModelArray) 
         {
@@ -966,6 +967,24 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 return;
         }
         ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
+        
+        boolean hasDirtyEventGraph = false; // TODO if needed
+        
+        Model[] eventGraphModels = ((EventGraphView) getView()).getOpenModels();
+        for (Model model : eventGraphModels) 
+        {
+            if (model.isDirty())
+            {
+                hasDirtyEventGraph = true;
+                break;
+            }
+        }
+        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && hasDirtyEventGraph)
+        {
+            ViskitGlobals.instance().selectEventGraphEditorTab();
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "View Event Graph Editor", "First review Event Graphs before closing");
+            return;
+        }
         if (preClose()) {
             postClose();
         }
@@ -979,7 +998,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             return false;
         }
         LOG.debug("preClose() close assembly {}", assemblyModel.getCurrentAssemblyModelName());
-        if (assemblyModel.isDirty()) {
+        if (assemblyModel.isDirty()) 
+        {
             return checkSaveIfDirty();
         }
         return true;
@@ -1136,61 +1156,62 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void newAdapterArc(Object[] nodes) {
-        AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
-        AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
+    public void newAdapterEdge(Object[] nodes) 
+    {
+        AssemblyNode assemblyNodeA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
+        AssemblyNode assemblyNodeB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
-        AssemblyNode[] oArr;
+        AssemblyNode[] assemblyNodeArray;
         try {
-            oArr = checkLegalForSEListenerArc(oA, oB);
+            assemblyNodeArray = checkLegalForSEListenerEdge(assemblyNodeA, assemblyNodeB);
         } 
         catch (Exception e) {
             ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Connection error.", "Possible class not found.  All referenced entities must be in a list at left.");
             return;
         }
-        if (oArr == null) {
+        if (assemblyNodeArray == null) {
             ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
-        adapterEdgeEdit(((AssemblyModel) getModel()).newAdapterEdge(shortAdapterName(""), oArr[0], oArr[1]));
+        adapterEdgeEdit(((AssemblyModel) getModel()).newAdapterEdge(shortAdapterName(""), assemblyNodeArray[0], assemblyNodeArray[1]));
     }
 
     @Override
-    public void newSimEventListenerArc(Object[] nodes) {
-        AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
-        AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
+    public void newSimEventListenerEdge(Object[] nodes) {
+        AssemblyNode assemblyNodeA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
+        AssemblyNode assemblyNodeB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
-        AssemblyNode[] oArr = checkLegalForSEListenerArc(oA, oB);
+        AssemblyNode[] assemblyNodeArray = checkLegalForSEListenerEdge(assemblyNodeA, assemblyNodeB);
 
-        if (oArr == null) {
+        if (assemblyNodeArray == null) {
             ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a SimEventListener and SimEventSource combination.");
             return;
         }
-        ((AssemblyModel) getModel()).newSimEventListenerEdge(oArr[0], oArr[1]);
+        ((AssemblyModel) getModel()).newSimEventListenerEdge(assemblyNodeArray[0], assemblyNodeArray[1]);
     }
 
     @Override
-    public void newPropertyChangeListenerArc(Object[] nodes) {
+    public void newPropertyChangeListenerEdge(Object[] nodes) {
         // One and only one has to be a prop change listener
-        AssemblyNode oA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
-        AssemblyNode oB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
+        AssemblyNode assemblyNodeA = (AssemblyNode) ((DefaultMutableTreeNode) nodes[0]).getUserObject();
+        AssemblyNode assemblyNodeB = (AssemblyNode) ((DefaultMutableTreeNode) nodes[1]).getUserObject();
 
-        AssemblyNode[] oArr = checkLegalForPropChangeArc(oA, oB);
+        AssemblyNode[] assemblyNodeArray = checkLegalForPropertyChangeEdge(assemblyNodeA, assemblyNodeB);
 
-        if (oArr == null) {
+        if (assemblyNodeArray == null) {
             ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Incompatible connection", "The nodes must be a PropertyChangeListener and PropertyChangeSource combination.");
             return;
         }
-        propertyChangeListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(oArr[0], oArr[1]));
+        propertyChangeListenerEdgeEdit(((AssemblyModel) getModel()).newPropChangeEdge(assemblyNodeArray[0], assemblyNodeArray[1]));
     }
 
-    AssemblyNode[] checkLegalForSEListenerArc(AssemblyNode a, AssemblyNode b) {
+    AssemblyNode[] checkLegalForSEListenerEdge(AssemblyNode a, AssemblyNode b) {
         Class<?> ca = findClass(a);
         Class<?> cb = findClass(b);
         return orderSELSrcAndLis(a, b, ca, cb);
     }
 
-    AssemblyNode[] checkLegalForPropChangeArc(AssemblyNode a, AssemblyNode b) {
+    AssemblyNode[] checkLegalForPropertyChangeEdge(AssemblyNode a, AssemblyNode b) {
         Class<?> ca = findClass(a);
         Class<?> cb = findClass(b);
         return orderPCLSrcAndLis(a, b, ca, cb);
@@ -2000,7 +2021,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     // in case of rewind/rerun, get SimulationRunPanel startTime, stopTime, number of replications
                     double  priorStartTime                = ViskitGlobals.instance().getSimulationRunPanel().getStartTime();
                     double  priorStopTime                 = ViskitGlobals.instance().getSimulationRunPanel().getStopTime();
-                    int     priorNumberReplications       = ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications();
+                    int     priorNumberReplications       = ViskitGlobals.instance().getSimulationRunPanel().getNumberReplications();
                     int     priorVerboseReplicationNumber = ViskitGlobals.instance().getSimulationRunPanel().getVerboseReplicationNumber();
                     boolean priorVerboseOutput            = ViskitGlobals.instance().getSimulationRunPanel().getVerboseOutput();
                     
@@ -2076,7 +2097,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().getMainFrame().initializeSimulationRunPanelOutputStreamTA();
         
         LOG.info("Ready to Commence Simulation Run.\n      planned numberOfReplications={}", 
-                ViskitGlobals.instance().getSimulationRunPanel().getNumberOfReplications());
+                ViskitGlobals.instance().getSimulationRunPanel().getNumberReplications());
         
         String message =
                 "<html><body>" +

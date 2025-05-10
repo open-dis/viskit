@@ -373,7 +373,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
             // TODO update panel values for Simulation Run
 
-            setNumberReplicationsMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.getNumberOfReplications());
+            setNumberReplicationsMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.getNumberReplications());
             setOutputStreamMethod.invoke(simulationRunAssemblyInstance, textAreaOutputStream); // redirect output
             setPrintReplicationReportsMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.printReplicationReportsCB.isSelected());
             setPrintSummaryReportMethod.invoke(simulationRunAssemblyInstance, simulationRunPanel.printSummaryReportsCB.isSelected());
@@ -588,21 +588,30 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     Method setPauseSimulationRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setPauseSimulationRun, boolean.class);
                     setPauseSimulationRunMethod.invoke(simulationRunAssemblyInstance, true);
                     
-                    if (simulationState != SimulationState.PAUSE)
+                    if ((simulationState == SimulationState.PAUSE) || (simulationState != SimulationState.STEP))
                     {
                         vcrButtonPressSimulationStateDisplayUpdate(SimulationState.PAUSE);
                         
-                        // TODO duplicative?
-                        
+                        // avoid simkit fiddling, just handle replications
                         // Pause (from Run mode)
-                        Schedule.setSingleStep(true); // simkit
-                        Schedule.setPauseAfterEachEvent(true); // simkit
-                        
+//                      Schedule.setSingleStep(true); // simkit
+//                      Schedule.setPauseAfterEachEvent(true); // simkit
 //                      Schedule.pause(); // simkit method; no, blocks console for text-based thread console
+//                      Schedule.startSimulation();
                         
                         // TODO runaway thread; is any action needed at this point?
                         // Likely problem:  pause event is not being recieved in threaded event loop, rather in between replications
-//                        Schedule.startSimulation();
+
+                        // TODO stop and wait here for resume, then restore loop before continuing...
+                        try
+                        {
+                            Thread.sleep(1000);
+                        }
+                        catch (InterruptedException ie)
+                        {
+                            Thread.currentThread().interrupt();
+                            LOG.error("PauseStepListener Thread.sleep interruption");
+                        }
                         return;
                     }
                     else if (simulationState != SimulationState.PAUSE)
@@ -695,6 +704,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     LOG.error("StopListener.actionPerformed(" + actionEvent + ") unable to find simulationRunAssemblyInstance");
                 }
                 vcrButtonPressSimulationStateDisplayUpdate(SimulationState.STOP);
+                simulationRunPanel.setNumberReplications(simulationRunPanel.getNumberReplications() - 1); // STOP occurs at beginning of replication loop
                 Schedule.coldReset(); // simkit
 
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -731,7 +741,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             
             String title, message;
             title = "Rewind: clear console and reset simulation?";
-            message = "<html><p align='center'>Are you sure that you want to reset this simulation?</p><br/>";
+            message = "<html><p align='center'>Are you sure that you want to rewind and reset this simulation?</p><br/>";
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
             if (returnValue == JOptionPane.YES_OPTION)
             {
