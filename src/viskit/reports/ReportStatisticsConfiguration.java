@@ -143,6 +143,7 @@ public class ReportStatisticsConfiguration {
             }
             System.out.println();
         }
+        // TODO missing names :(
         reportStatisticsDOM.initializeEntities(entityIndexArray, propertyIndexArray);
     }
 

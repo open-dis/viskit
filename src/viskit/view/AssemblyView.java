@@ -133,5 +133,5 @@ public interface AssemblyView {
     void deleteTab(AssemblyModel mod);
 
     /** @return an array of open ViskitAssemblyModels */
-    AssemblyModel[] getOpenModels();
+    AssemblyModel[] getOpenAssemblyModels();
 }

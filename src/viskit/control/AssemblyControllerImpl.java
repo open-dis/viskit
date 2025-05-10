@@ -265,7 +265,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         // before doing any openAlready lookups
         AssemblyModel[] assemblyModelOpenAlreadyArray = null;
         if (assemblyViewFrame != null)
-            assemblyModelOpenAlreadyArray = assemblyViewFrame.getOpenModels();
+            assemblyModelOpenAlreadyArray = assemblyViewFrame.getOpenAssemblyModels();
 
         boolean isOpenAlready = false;
         String path;
@@ -316,7 +316,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private void markAssemblyFilesOpened() {
 
         // Mark every vAMod opened as "open"
-        AssemblyModel[] openAlready = ViskitGlobals.instance().getAssemblyViewFrame().getOpenModels();
+        AssemblyModel[] openAlready = ViskitGlobals.instance().getAssemblyViewFrame().getOpenAssemblyModels();
         for (AssemblyModel assemblyModel : openAlready) {
             if (assemblyModel.getCurrentFile() != null)
                 markAssemblyConfigurationOpen(assemblyModel.getCurrentFile());
@@ -387,7 +387,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     // using an open Event Graph cache system that relies on parsing an
                     // Assembly file to find its associated Event Graphs to open
                     if (!isCloseAll()) {
-                        AssemblyModel[] assemblyModelArray = assemblyView.getOpenModels();
+                        AssemblyModel[] assemblyModelArray = assemblyView.getOpenAssemblyModels();
                         for (AssemblyModel nextAssemblyModel : assemblyModelArray) {
                             if (!nextAssemblyModel.equals(assemblyModel))
                                 openEventGraphs(nextAssemblyModel.getCurrentFile());
@@ -880,7 +880,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public boolean preQuit() {
 
         // Check for dirty models before exiting
-        AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyViewFrame().getOpenModels();
+        AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyViewFrame().getOpenAssemblyModels();
         for (AssemblyModel vmod : assemblyModelArray) {
             setModel((MvcModel) vmod);
 
@@ -905,19 +905,33 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void closeAll() 
     {
-        if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab())
+        int numberOfAssemblies = ViskitGlobals.instance().getAssemblyViewFrame().getNumberAssembliesLoaded();
+        if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab() && (numberOfAssemblies != 0))
         {
+            ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
+            String title = new String(), message = new String();
+            if  (numberOfAssemblies == 1)
+            {
+                title   = "Inspect assembly before closing";
+                message = "First inspect open assembly in Assembly Editor before closing";
+            }
+            else if (numberOfAssemblies > 1) // more that one
+            {
+                title   = "Inspect assemblies before closing";
+                message = "First inspect open assemblies in Assembly Editor before closing them";
+            }
             ViskitGlobals.instance().selectAssemblyEditorTab();
-            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Assembly Editor", "First select Assembly Editor before closing an Aasembly");
-            return;
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, 
+                    title, message);
+                return;
         }
         ViskitGlobals.instance().selectAssemblyEditorTab();
-        AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyViewFrame().getOpenModels();
+        AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyViewFrame().getOpenAssemblyModels();
         for (AssemblyModel assemblyModel : assemblyModelArray) 
         {
             setModel((MvcModel) assemblyModel);
             setCloseAll(true);
-            close();
+            close(); // each one
         }
         setCloseAll(false);
     }
@@ -928,13 +942,30 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void close()
     {
-        if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab())
+        int numberOfAssemblies = ViskitGlobals.instance().getAssemblyViewFrame().getNumberAssembliesLoaded();
+        if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab() && (numberOfAssemblies > 1))
         {
             ViskitGlobals.instance().selectAssemblyEditorTab();
-            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Assembly Editor", "First select Assembly Editor before closing an Aasembly");
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, 
+                    "Confirm Assembly choice", 
+                    "First select one of the open Assemblies before closing");
             return;
         }
-        ViskitGlobals.instance().selectAssemblyEditorTab();
+        if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab() && (numberOfAssemblies == 0))
+        {
+            ViskitGlobals.instance().selectAssemblyEditorTab();
+            return;
+        }
+        if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab()) // only one open Assembly, but it wasn't visible
+        {
+            ViskitGlobals.instance().selectAssemblyEditorTab();
+            String title   = "Please confirm...";
+            String message = "Close " + ViskitGlobals.instance().getActiveAssemblyName() + "?";
+            int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
+            if (returnValue == JOptionPane.NO_OPTION)
+                return;
+        }
+        ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
         if (preClose()) {
             postClose();
         }

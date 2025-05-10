@@ -96,8 +96,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     
     protected Map<Integer, List<SavedStats>> replicationDataSavedStatisticsList;
     protected PropertyChangeListener[]       replicationStatisticsPropertyChangeListenerArray;
-    protected SampleStatistics[]             designPointSimpleStatisticsTally;
-    protected SimEntity[]                    simEntity;
+    protected SampleStatistics[]             designPointSimpleStatisticsTallyArray;
+    protected SimEntity[]                    simEntityArray;
     protected PropertyChangeListener[]       propertyChangeListenerArray;
     
     protected boolean hookupsCalled;
@@ -113,7 +113,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     private boolean printReplicationReports;
     private boolean printSummaryReport;
     private boolean saveReplicationData;
-    private int     numberOfPlannedReplications;
 
     /** Ordering is essential for this collection */
     private Map<String, AssemblyNode> pclNodeCache;
@@ -191,9 +190,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         setPrintReplicationReports(true); // TODO false
         setPrintSummaryReport(true);
         replicationDataSavedStatisticsList = new LinkedHashMap<>();
-        simEntity = new SimEntity[0];
+        simEntityArray = new SimEntity[0];
         replicationStatisticsPropertyChangeListenerArray = new PropertyChangeListener[0];
-        designPointSimpleStatisticsTally = new SampleStatistics[0];
+        designPointSimpleStatisticsTallyArray = new SampleStatistics[0];
         propertyChangeListenerArray = new PropertyChangeListener[0];
         hookupsCalled = false;
 //      setNumberReplicationsPlanned(SimulationRunPanel.DEFAULT_NUMBER_OF_REPLICATIONS); // do not perform this, it is handled elsewhere
@@ -333,7 +332,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         {
             return;
         }
-        designPointSimpleStatisticsTally = new SampleStatistics[BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray().length];
+        designPointSimpleStatisticsTallyArray = new SampleStatistics[BasicAssembly.this.getReplicationStatisticsPropertyChangeListenerArray().length];
         String statisticType, nodeType;
         int index = 0;
         boolean isCount;
@@ -370,9 +369,9 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                     if (sampleStatistics.getName().equals("%unnamed%"))
                         sampleStatistics.setName(obj.getClass().getMethod(METHOD_getName).invoke(obj).toString());
                     
-                    designPointSimpleStatisticsTally[index] = new SimpleStatsTally(sampleStatistics.getName() + statisticType);
+                    designPointSimpleStatisticsTallyArray[index] = new SimpleStatsTally(sampleStatistics.getName() + statisticType);
 
-                    LOG.debug("createDesignPointStatistics(): Design point statistic: {}", designPointSimpleStatisticsTally[index]);
+                    LOG.debug("createDesignPointStatistics(): Design point statistic: {}", designPointSimpleStatisticsTallyArray[index]);
                     index++;
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassCastException ex) {
                     LOG.error("createDesignPointStatistics() exception: " + ex);
@@ -393,7 +392,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     /** Set up all outer statistics propertyChangeListeners */
     protected void hookupDesignPointListeners() 
     {
-        for (SampleStatistics designPointStatistics : designPointSimpleStatisticsTally) 
+        for (SampleStatistics designPointStatistics : designPointSimpleStatisticsTallyArray) 
         {
             this.addPropertyChangeListener(designPointStatistics); // add designPointStatistics listener using superclass method
         }
@@ -618,7 +617,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     /** @return an array of design point statistics for this Assembly */
     public SampleStatistics[] getDesignPointSampleStatistics() {
-        return designPointSimpleStatisticsTally.clone();
+        return designPointSimpleStatisticsTallyArray.clone();
     }
 
     /** @return an array of ProperChangeListeners for this Assembly  */
@@ -799,7 +798,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * @return the SimEntities in this scenario in a copy of the array.
      */
     public SimEntity[] getSimEntities() {
-        return simEntity.clone();
+        return simEntityArray.clone();
     }
     
     /** method name for reflection use */
@@ -1157,7 +1156,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                     
                     int newEventListId = Schedule.addNewEventList(); // simkit
                     Schedule.setDefaultEventList(Schedule.getEventList(newEventListId)); // simkit
-                    for (SimEntity entity : simEntity) {
+                    for (SimEntity entity : simEntityArray) {
                         entity.setEventListID(newEventListId);
                     }
                     Schedule.stopSimulation(); // simkit
@@ -1165,7 +1164,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                     runEntitiesSet.forEach(entity -> {
                         Schedule.addRerun(entity); // simkit
                     });
-                } // end exception catch for Schedule.reset(); // simkit
+                } // end exception catch for Schedule.reset(); // simkit // end exception catch for Schedule.reset(); // simkit
 
                 // now tell simkit to run the replication
                 Schedule.startSimulation(); // simkit

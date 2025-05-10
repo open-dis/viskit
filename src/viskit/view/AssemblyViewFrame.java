@@ -952,7 +952,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public AssemblyModel[] getOpenModels() {
+    public AssemblyModel[] getOpenAssemblyModels() {
         Component[] ca = tabbedPane.getComponents();
         AssemblyModel[] vm = new AssemblyModel[ca.length];
         JSplitPane jsplt;

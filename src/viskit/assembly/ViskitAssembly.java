@@ -22,7 +22,7 @@ import simkit.stat.SampleStatistics;
  */
 public class ViskitAssembly extends BasicAssembly
 {
-    protected Map<String, SimEntity> simEntitiesMap;
+    protected Map<String, SimEntity>               simEntitiesMap;
     protected Map<String, PropertyChangeListener>  replicationStatisticsMap;
     protected Map<String, PropertyChangeListener>  designPointStatisticsMap;
     protected Map<String, PropertyChangeListener>  propertyChangeListenersMap;
@@ -47,15 +47,15 @@ public class ViskitAssembly extends BasicAssembly
      */
     public ViskitAssembly()
     {        
-        simEntitiesMap = new LinkedHashMap<>();
-        replicationStatisticsMap = new LinkedHashMap<>();
-        designPointStatisticsMap = new LinkedHashMap<>();
-        propertyChangeListenersMap = new LinkedHashMap<>();
-        propertyChangeListenerConnectionsMap = new LinkedHashMap<>();
+        simEntitiesMap                              = new LinkedHashMap<>();
+        replicationStatisticsMap                    = new LinkedHashMap<>();
+        designPointStatisticsMap                    = new LinkedHashMap<>();
+        propertyChangeListenersMap                  = new LinkedHashMap<>();
+        propertyChangeListenerConnectionsMap        = new LinkedHashMap<>();
         designPointStatisticsListenerConnectionsMap = new LinkedHashMap<>();
         replicationStatisticsListenerConnectionsMap = new LinkedHashMap<>();
-        simEventListenerConnectionsMap = new LinkedHashMap<>();
-        adapterMap = new LinkedHashMap<>();
+        simEventListenerConnectionsMap              = new LinkedHashMap<>();
+        adapterMap                                  = new LinkedHashMap<>();
     }
 
     @Override
@@ -70,10 +70,12 @@ public class ViskitAssembly extends BasicAssembly
     }
 
     @Override
-    protected void createSimEntities() {
+    protected void createSimEntities() 
+    {
         if (simEntitiesMap != null) {
-            if (simEntitiesMap.values() != null) {
-                simEntity = GenericConversion.toArray(simEntitiesMap.values(), new SimEntity[0]);
+            if (simEntitiesMap.values() != null) 
+            {
+                simEntityArray = GenericConversion.toArray(simEntitiesMap.values(), new SimEntity[0]);
             }
         }
     }
@@ -91,7 +93,7 @@ public class ViskitAssembly extends BasicAssembly
         super.createDesignPointStatistics();
 
         // the super.
-        for (SampleStatistics sampleStatisticsListeners : super.designPointSimpleStatisticsTally) {
+        for (SampleStatistics sampleStatisticsListeners : super.designPointSimpleStatisticsTallyArray) {
 //            LOG.debug(sampleStatisticsListeners.getName() + " sampleStatisticsListeners created");
             designPointStatisticsMap.put(sampleStatisticsListeners.getName(), sampleStatisticsListeners);
         }
@@ -323,11 +325,12 @@ public class ViskitAssembly extends BasicAssembly
         return (SampleStatistics) replicationStatisticsMap.get(name);
     }
 
-    public SimEntity getSimEntityByName(String name) {
+    public SimEntity getSimEntityByName(String name)
+    {
         if (DEBUG) {
             LOG.info("getSimEntityByName for {}: {}",name, simEntitiesMap.get(name));
         }
-        return simEntitiesMap.get(name);
+        return simEntitiesMap.get(name); // typically the same
     }
 
     @Override
