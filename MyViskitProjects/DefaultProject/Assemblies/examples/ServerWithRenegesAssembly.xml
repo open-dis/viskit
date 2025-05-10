@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimkitAssembly name="ServerWithRenegesAssembly" version="1.0" package="examples" extend="viskit.assembly.ViskitAssembly" description="TODO add description" xsi:noNamespaceSchemaLocation="../../../../Schemas/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimkitAssembly name="ServerWithRenegesAssembly" version="1.0" package="examples" author="Arnie Buss" extend="viskit.assembly.ViskitAssembly" description="Show server operations when waiting customers have option to renege and leave the input queue" xsi:noNamespaceSchemaLocation="../../../../Schemas/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <SimEntity name="arrivalProcess" type="examples.ArrivalProcess" description="customers are produced sequentially at random intervals.">
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter name="" value="Exponential" type="java.lang.String"/>
