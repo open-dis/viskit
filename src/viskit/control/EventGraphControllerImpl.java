@@ -523,7 +523,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void closeAll()
     {
         int numberOfEventGraphs = ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded();
-        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && (numberOfEventGraphs != 0))
+        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && // closing without checking first
+            (numberOfEventGraphs != 0) &&
+            !ViskitGlobals.instance().isSelectedAssemblyEditorTab())     // closing automatically when closing parent Assembly
         {
             ViskitGlobals.instance().selectEventGraphEditorTab(); // making sure
             String title = new String(), message = new String();

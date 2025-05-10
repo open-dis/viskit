@@ -927,6 +927,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 return;
         }
         ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
+        
+        int numberOfEventGraphs = ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded();
+        if (numberOfEventGraphs > 1)
+            LOG.info("Closing all assemblies also closes corresponding event graphs");
+        
         AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyViewFrame().getOpenAssemblyModels();
         for (AssemblyModel assemblyModel : assemblyModelArray) 
         {
