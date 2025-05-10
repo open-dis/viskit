@@ -31,11 +31,11 @@ public class ReportStatisticsDOM {
     /**
      * The collection of SimEntityRecords sorted by entityName
      */
-    private final Map<String, SimEntityRecord> entities;
+    private final Map<String, SimEntityRecord> simEntityRecordsMap;
     /**
      *The names that correspond to the order of the data being sent
      */
-    private String[] entityNamesArray;
+    private String[] simEntityNamesArray;
     /**
      * The properties in order of the data being sent
      */
@@ -46,61 +46,63 @@ public class ReportStatisticsDOM {
     {
         reportStatisticsDocument = new Document();
         rootElement = new Element("ReportStatistics");
-        entities = new HashMap<>();
+        simEntityRecordsMap = new HashMap<>();
         reportStatisticsDocument.setRootElement(rootElement);
     }
 
     /**
-     * Initializes all of the entities and properties in this object.  This step
-     * is currently necessary because Viskit has no notion of entities and therefore
-     * they cannot organize output.
+     * Initializes all of the entities and properties in this object.
+     * This step is currently necessary because Viskit has no notion of entities
+     * and therefore they cannot organize output.
      *
-     * @param simEntityNames the names of the entities for the simulation
-     * @param properties the name of the properties in the same order as the entities
+     * @param simEntityNamesArray the names of the simEntityRecordsMap for the simulation
+     * @param propertiesArray the name of the properties in the same order as the simEntityRecordsMap
      */
-    public void initializeEntities(String[] simEntityNames, String[] properties) 
+    public void initializeEntities(String[] simEntityNamesArray, String[] propertiesArray) 
     {
         SimEntityRecord simEntityRecord;
-        this.entityNamesArray = simEntityNames;
-        this.propertiesArray = properties;
+        this.simEntityNamesArray = simEntityNamesArray;
+        this.propertiesArray     = propertiesArray;
 
         // Create SimEntityRecords
-        for (int i = 0; i < simEntityNames.length; i++) 
+        for (int i = 0; i < simEntityNamesArray.length; i++) 
         {
-            if (!entities.containsKey(simEntityNames[i])) {
-                simEntityRecord = new SimEntityRecord(simEntityNames[i]);
-                entities.put(simEntityNames[i], simEntityRecord);
+            if (!simEntityRecordsMap.containsKey(simEntityNamesArray[i])) 
+            {
+                simEntityRecord = new SimEntityRecord(simEntityNamesArray[i]); // TODO missing name...
+                simEntityRecordsMap.put(simEntityNamesArray[i], simEntityRecord);
             }
-            SimEntityRecord rec = entities.get(simEntityNames[i]);
-            rec.addDataPoint(properties[i]);
+            SimEntityRecord rec = simEntityRecordsMap.get(simEntityNamesArray[i]);
+            rec.addDataPoint(propertiesArray[i]);
         }
     }
 
     /**
      * Stores the replication data as it is passed to this object
      *
-     * @param repData the replication information in jdom.Element form
+     * @param replicationDataElementArray the replication information in jdom.Element form
      */
-    public void storeReplicationData(Element[] repData) 
+    public void storeReplicationData(Element[] replicationDataElementArray) 
     {
-        SimEntityRecord temp;
-        for (int i = 0; i < repData.length; i++) {
-            temp = entities.get(entityNamesArray[i]);
-            temp.addReplicationRecord(propertiesArray[i], repData[i]);
+        SimEntityRecord tempSimEntityRecord;
+        for (int i = 0; i < replicationDataElementArray.length; i++) 
+        {
+            tempSimEntityRecord = simEntityRecordsMap.get(simEntityNamesArray[i]);
+            tempSimEntityRecord.addReplicationRecord(propertiesArray[i], replicationDataElementArray[i]);
         }
     }
 
     /**
      * Stores the summary data for the simulation
      *
-     * @param summaryData the summary data for this simulation in jdom.Element form
+     * @param summaryDataElementArray the summary data for this simulation in jdom.Element form
      */
-    public void storeSummaryData(Element[] summaryData)
+    public void storeSummaryData(Element[] summaryDataElementArray)
     {
-        SimEntityRecord temp;
-        for (int i = 0; i < summaryData.length; i++) {
-            temp = entities.get(entityNamesArray[i]);
-            temp.addSummaryRecord(summaryData[i]);
+        SimEntityRecord tempSimEntityRecord;
+        for (int i = 0; i < summaryDataElementArray.length; i++) {
+            tempSimEntityRecord = simEntityRecordsMap.get(simEntityNamesArray[i]);
+            tempSimEntityRecord.addSummaryRecord(summaryDataElementArray[i]);
         }
     }
 
@@ -112,8 +114,8 @@ public class ReportStatisticsDOM {
      */
     public Document getReport() 
     {
-        for (SimEntityRecord record : entities.values())
-            rootElement.addContent(record.getEntityRecord());
+        for (SimEntityRecord simEntityRecord : simEntityRecordsMap.values())
+            rootElement.addContent(simEntityRecord.getEntityRecord());
         
         reportStatisticsDocument.setRootElement(rootElement);
         return reportStatisticsDocument;
@@ -126,14 +128,16 @@ public class ReportStatisticsDOM {
     protected class SimEntityRecord 
     {
         String entityName;
-        Element simEntity, sumReport;
-        Map<String, Element> dataPointMap = new HashMap<>();
+        Element simEntityElement, summaryReportElement;
+        Map<String, Element> dataPointElementMap = new HashMap<>();
 
-        SimEntityRecord(String entityName) {
+        SimEntityRecord(String entityName) 
+        {
             //Initialize the default layout
-            simEntity = new Element("SimEntity");
-            simEntity.setAttribute("name", entityName);
-            sumReport = new Element("SummaryReport");
+            simEntityElement = new Element("SimEntity");
+            simEntityElement.setAttribute("name", entityName);
+            simEntityElement.setAttribute("name", entityName);
+            summaryReportElement = new Element("SummaryReport");
         }
 
         /**
@@ -142,25 +146,27 @@ public class ReportStatisticsDOM {
          *
          * @param property the name of the property for this data point
          */
-        protected void addDataPoint(String property) {
+        protected void addDataPoint(String property) 
+        {
             Element dataPoint = new Element("DataPoint");
             Element repReport = new Element("ReplicationReport");
             dataPoint.setAttribute("property", property);
             dataPoint.addContent(repReport);
-            dataPointMap.put(property, dataPoint);
+            dataPointElementMap.put(property, dataPoint);
         }
 
         /**
          * Returns this entity record object which is properly formatted
          *
-         * @return simEntity returns this entity in jdom.Element form
+         * @return simEntityElement returns this entity in jdom.Element form
          */
-        protected Element getEntityRecord() {
-            for (Element temp : dataPointMap.values())
-                simEntity.addContent(temp);
+        protected Element getEntityRecord() 
+        {
+            for (Element tempElement : dataPointElementMap.values())
+                simEntityElement.addContent(tempElement);
             
-            simEntity.addContent(sumReport);
-            return simEntity;
+            simEntityElement.addContent(summaryReportElement);
+            return simEntityElement;
         }
 
         /**
@@ -177,14 +183,16 @@ public class ReportStatisticsDOM {
          * SimEntities record.
          *
          * @param property the property to update
-         * @param repData the replication data in jdom.Element form
+         * @param replicationDataElement the replication data in jdom.Element form
          */
-        protected void addReplicationRecord(String property, Element repData) {
-            Element dataPoint;
-            for (String propertyKey : dataPointMap.keySet()) {
+        protected void addReplicationRecord(String property, Element replicationDataElement)
+        {
+            Element dataPointElement;
+            for (String propertyKey : dataPointElementMap.keySet()) 
+            {
                 if (propertyKey.equals(property)) {
-                    dataPoint = dataPointMap.get(propertyKey);
-                    dataPoint.getChild("ReplicationReport").addContent(repData);
+                    dataPointElement = dataPointElementMap.get(propertyKey);
+                    dataPointElement.getChild("ReplicationReport").addContent(replicationDataElement);
                 }
             }
         }
@@ -192,10 +200,11 @@ public class ReportStatisticsDOM {
         /**
          * Adds the summary report to this SimEntity record
          *
-         * @param summaryData
+         * @param summaryDataElement
          */
-        protected void addSummaryRecord(Element summaryData) {
-            sumReport.addContent(summaryData);
+        protected void addSummaryRecord(Element summaryDataElement) 
+        {
+            summaryReportElement.addContent(summaryDataElement);
         }
     }
 }

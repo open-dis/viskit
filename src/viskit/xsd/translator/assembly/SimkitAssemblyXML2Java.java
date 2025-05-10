@@ -1,6 +1,5 @@
 package viskit.xsd.translator.assembly;
 
-import edu.nps.util.Log4jUtilities;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -58,6 +57,8 @@ public class SimkitAssemblyXML2Java
     final private String eq  = SimkitXML2Java.EQ;
     /** period . */
     final private String pd  = SimkitXML2Java.PD;
+    /** period . */
+    final private String pl  = SimkitXML2Java.PL;
     /** quotation mark " */
     final private String qu  = SimkitXML2Java.QU;
     /** "new" literal */
@@ -847,6 +848,7 @@ public class SimkitAssemblyXML2Java
         List<PropertyChangeListener> pclList = getAssemblyRoot().getPropertyChangeListener();
         Object element;
         String name;
+        String description = new String();
         for (Output output : outputList) 
         {
             element = output.getEntity();
@@ -856,7 +858,8 @@ public class SimkitAssemblyXML2Java
             {
                 if (simEntity.getName().equals(element.toString())) 
                 {
-                    name = simEntity.getName();
+                    name        = simEntity.getName();
+                    description = simEntity.getDescription();
                     break;
                 }
             }
@@ -865,12 +868,14 @@ public class SimkitAssemblyXML2Java
             {
                 if (pcl.getName().equals(element.toString())) {
                     name = pcl.getName();
+                    description = pcl.getDescription();
                     break;
                 }
             }
 
             if (!name.contains("<FIX:")) {
-                pw.println(sp8 + "System.out.println" + lp + "getSimEntityByName" + lp + qu + name + qu + rp + rp + sc);
+                pw.println(sp8 + "System.out.println" + lp + "getSimEntityByName" + lp + qu + name + qu + rp + sp + 
+                                                        pl + sp + qu + sp + description + qu + rp + sc);
             }
         }
     }

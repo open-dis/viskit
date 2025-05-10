@@ -433,11 +433,11 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
             simulationRunMonitorThread.start(); // commence thread
             try {
-                LOG.info("SimulationRunMonitor.doInBackground() now commencing simulationRunMonitorThread.join()");
+                LOG.info("doInBackground() commencing simulationRunMonitorThread.join()");
                 simulationRunMonitorThread.join();
             } 
             catch (InterruptedException ex) {
-                LOG.error("SimulationRunMonitor.doInBackground() exception: {}", ex);
+                LOG.error("doInBackground() exception: {}", ex);
 //                ex.printStackTrace();
             }
             return null;

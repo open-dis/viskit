@@ -49,6 +49,8 @@ public class SimkitXML2Java
     public final static String EQ = "=";
     /** period */
     public final static String PD = ".";
+    /** plus sign */
+    public final static String PL = "+";
     /** quotation mark */
     public final static String QU = "\"";
     /** left bracket */

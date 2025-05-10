@@ -65,7 +65,7 @@ public class ReportStatisticsConfiguration {
     /**
      * Used to truncate the precision of statistical results
      */
-    private final DecimalFormat df1, df3;
+    private final DecimalFormat decimalFormat0, decimalFormat3;
 
     /**
      * The DOM object this class uses to create an XML record of the simulation
@@ -91,10 +91,10 @@ public class ReportStatisticsConfiguration {
     {
         this.assemblyName  = assemblyName;
         localViskitProject = viskitProject;
-        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
-        dfs.setInfinity("inf");  // xml chokes on default
-        df1 = new DecimalFormat("0.", dfs);
-        df3 = new DecimalFormat("0.000", dfs);
+        DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
+        decimalFormatSymbols.setInfinity("inf");  // xml chokes on default
+        decimalFormat0 = new DecimalFormat("0",     decimalFormatSymbols);
+        decimalFormat3 = new DecimalFormat("0.000", decimalFormatSymbols);
         reportStatisticsDOM = new ReportStatisticsDOM();
     }
 
@@ -105,21 +105,21 @@ public class ReportStatisticsConfiguration {
     /**
      * Parses the key value of the replicationStatistics LHMap to create a local
      * index of entities and properties
-     * @param keyValues list of keyValues
+     * @param keyValuesList list of keyValues
      */
-    public void setEntityIndex(List<String> keyValues) 
+    public void setEntityIndex(List<String> keyValuesList) 
     {
-          entityIndexArray = new String[keyValues.size()];
-        propertyIndexArray = new String[keyValues.size()];
+          entityIndexArray = new String[keyValuesList.size()];
+        propertyIndexArray = new String[keyValuesList.size()];
 
-        if (!keyValues.isEmpty()) 
+        if (!keyValuesList.isEmpty()) 
         {
             LOG.info(      "Replication Statistics created");
             System.out.println("Replication Statistics created"); // System output goes to console TextArea
             System.out.println("------------------------------");
             int separatorColumn;
             int entityIndex = 0;
-            for (String currentKeyValue : keyValues) 
+            for (String currentKeyValue : keyValuesList) 
             {
                 separatorColumn = findUnderscore(currentKeyValue);
 
@@ -130,12 +130,14 @@ public class ReportStatisticsConfiguration {
                     propertyIndexArray[entityIndex] = currentKeyValue.substring(separatorColumn + 1, currentKeyValue.length());
                     System.out.println("entity='" + entityIndexArray[entityIndex] + "', property='" + propertyIndexArray[entityIndex] + "'");
                 }
-                else
+                else // TODO how to get missing name?
                 {
-                    // if separatorColumn is zero, entity is empty string
+                    // if separatorColumn is zero, entity is empty string TODO this seems problematic
                       entityIndexArray[entityIndex] = currentKeyValue.substring(0, separatorColumn); 
                     propertyIndexArray[entityIndex] = currentKeyValue.substring(separatorColumn, currentKeyValue.length());
                     System.out.println(                                                "property='" + propertyIndexArray[entityIndex] + "'");
+                    LOG.error("Problem finding SimEntity name ({}) for statistic {}", 
+                                    entityIndexArray[entityIndex], propertyIndexArray[entityIndex]);
                 }
                 entityIndex++;
             }
@@ -181,11 +183,11 @@ public class ReportStatisticsConfiguration {
 
             replication.setAttribute("number", Integer.toString(repNumber));
             replication.setAttribute("count", new DecimalFormat("0").format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getCount()));
-            replication.setAttribute("minObs", df1.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getMinObs()));
-            replication.setAttribute("maxObs", df1.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getMaxObs()));
-            replication.setAttribute("mean", df3.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getMean()));
-            replication.setAttribute("stdDeviation", df3.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getStandardDeviation()));
-            replication.setAttribute("variance", df3.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getVariance()));
+            replication.setAttribute("minObs", decimalFormat0.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getMinObs()));
+            replication.setAttribute("maxObs", decimalFormat0.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getMaxObs()));
+            replication.setAttribute("mean", decimalFormat3.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getMean()));
+            replication.setAttribute("stdDeviation", decimalFormat3.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getStandardDeviation()));
+            replication.setAttribute("variance", decimalFormat3.format(((SampleStatistics) replicationStatisticsPropertyChangeListenerArray[i]).getVariance()));
 
             replicationUpdate[i] = replication;
         }
@@ -209,11 +211,11 @@ public class ReportStatisticsConfiguration {
 
             summary.setAttribute("property", propertyIndexArray[i]);
             summary.setAttribute("numRuns", new DecimalFormat("0").format(sum[i].getCount()));
-            summary.setAttribute("minObs", df1.format(sum[i].getMinObs()));
-            summary.setAttribute("maxObs", df1.format(sum[i].getMaxObs()));
-            summary.setAttribute("mean", df3.format(sum[i].getMean()));
-            summary.setAttribute("stdDeviation", df3.format(sum[i].getStandardDeviation()));
-            summary.setAttribute("variance", df3.format(sum[i].getVariance()));
+            summary.setAttribute("minObs", decimalFormat0.format(sum[i].getMinObs()));
+            summary.setAttribute("maxObs", decimalFormat0.format(sum[i].getMaxObs()));
+            summary.setAttribute("mean", decimalFormat3.format(sum[i].getMean()));
+            summary.setAttribute("stdDeviation", decimalFormat3.format(sum[i].getStandardDeviation()));
+            summary.setAttribute("variance", decimalFormat3.format(sum[i].getVariance()));
 
             summaryUpdate[i] = summary;
         }

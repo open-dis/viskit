@@ -303,13 +303,14 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * an automated key value
      * @param replicationStatistics a map containing collected statistics on a SimEntity's state variables
      */
-    protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> replicationStatistics) {
+    protected void setStatisticsKeyValues(Map<String, PropertyChangeListener> replicationStatistics)
+    {
         Set<Map.Entry<String, PropertyChangeListener>> entrySet = replicationStatistics.entrySet();
         entitiesWithStatisticsList = new LinkedList<>();
         entrySet.forEach(entry -> {
-            String ent = entry.getKey();
+            String entryKey = entry.getKey();
             LOG.debug("Entry is: " + entry);
-            entitiesWithStatisticsList.add(ent);
+            entitiesWithStatisticsList.add(entryKey);
         });
     }
 
