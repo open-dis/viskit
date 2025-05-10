@@ -968,23 +968,23 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
         
-        boolean hasDirtyEventGraph = false; // TODO if needed
-        
-        Model[] eventGraphModels = ((EventGraphView) getView()).getOpenModels();
-        for (Model model : eventGraphModels) 
-        {
-            if (model.isDirty())
-            {
-                hasDirtyEventGraph = true;
-                break;
-            }
-        }
-        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && hasDirtyEventGraph)
-        {
-            ViskitGlobals.instance().selectEventGraphEditorTab();
-            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "View Event Graph Editor", "First review Event Graphs before closing");
-            return;
-        }
+//        boolean hasDirtyEventGraph = false; // TODO if needed
+//        
+//        Model[] eventGraphModels = ((EventGraphView) getView()).getOpenModels();
+//        for (Model model : eventGraphModels) 
+//        {
+//            if (model.isDirty())
+//            {
+//                hasDirtyEventGraph = true;
+//                break;
+//            }
+//        }
+//        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && hasDirtyEventGraph)
+//        {
+//            ViskitGlobals.instance().selectEventGraphEditorTab();
+//            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "View Event Graph Editor", "First review Event Graphs before closing");
+//            return;
+//        }
         if (preClose()) {
             postClose();
         }
