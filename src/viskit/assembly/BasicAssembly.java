@@ -489,6 +489,12 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     {
         // do not set debug breakpoint in this method or else thread is not notified in a timely manner
         
+        if (newValue == false)
+            LOG.error("setPauseSimulationRun({}) received unexpected value, ignoring", newValue);
+        
+        if (pauseSimulationRun && newValue) // previous loop and current loop received PAUSE so we are in STEP mode
+            singleStepSimulationRun = true;
+        
         pauseSimulationRun = newValue; // save value
         if (!newValue)
             return;  // ignore if false
@@ -1139,6 +1145,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 String pauseMessage = "Threaded assembly simulation run() paused after Replication # " + (replicationNumber);
                 LOG.info(pauseMessage);
                 
+                return;
+                
                 // TODO is it important to return to regular vcrButton logic; or else rather 
                 // - briefly sleep within this specific thread, 
                 // - re-loop waiting for next button (STEP or RUN or STOP),
@@ -1155,7 +1163,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 //                    Thread.currentThread().interrupt();
 //                    LOG.error("PauseStepListener Thread.wait interruption");
 //                }
-                return;
             }
             else // continue running replications
             {
@@ -1263,7 +1270,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             } // continue running replications
         } // end of replication loop
         
-        setSimulationState(SimulationState.DONE); // TODO confirm OK
+        // pay attention locally, internal to simulation thread.  change to corresponding Viskit state occurs later.
+        setSimulationState(SimulationState.DONE);
         LOG.info("All simulation replications now complete.");
 
         if (isPrintSummaryReport()) 

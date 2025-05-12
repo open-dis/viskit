@@ -465,8 +465,18 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         @Override
         public void done() // SimulationRunMonitor
         {
-            if (isSimulationStatePaused() || isSimulationStateResumed()) // be sure to get correct isDone() method!!
-                return; // return if not yet done; this is a safety check on other state-machine logic
+            // first ensure simulationState is being correctly handled
+            if (isSimulationStatePaused() || isSimulationStateSingleStep() || 
+                isSimulationStateResumed()) // be sure to get correct isDone() method, not Thread isDone() !!
+            {
+                LOG.error("done() expecting RUN or DONE but looping incomplete, received simulationState={}", simulationState);
+                return; // return if not yet done; this test is a safety check on other state-machine logic
+            }
+            
+            if (!isSimulationStateRunning() && !isSimulationStateDone())
+                LOG.error("done() expecting RUN or DONE, but received unexpected simulationState={}", simulationState);
+            
+            vcrButtonPressSimulationStateDisplayUpdate(SimulationState.DONE);
             
             setProgress(100); // TODO what happens here, exactly? SwingWorker method
             mutex--; // this thread is complete, decrement mutual exclusion (mutex) safety-net counter
@@ -480,8 +490,6 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 LOG.error("SimulationRunMonitor.done(): {}", ex);
                 return;
             }
-            
-            vcrButtonPressSimulationStateDisplayUpdate(SimulationState.DONE);
 
             String message = ViskitGlobals.instance().getActiveAssemblyName() + " simulation replications DONE";
             
@@ -1371,7 +1379,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     }
 
     /**
-     * whether simulation state of replication loops is paused between replications
+     * whether simulation state of replication loops is paused between replications,
+     * determined by initial receipt of external signal PAUSE,
+     * pausing the replication loop
      * @return whether simulationState is PAUSE
      */
     public boolean isSimulationStatePaused() {
@@ -1379,7 +1389,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     }
 
     /**
-     * whether simulation state of replication loops is in single-step mode for each replication
+     * whether simulation state of replication loops is in single-step mode for each replication,
+     * determined internally by external signal PAUSE being received twice in a row,
+     * performing one iteration of the replication loop
      * @return whether simulationState is STEP
      */
     public boolean isSimulationStateSingleStep() {
@@ -1387,7 +1399,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     }
 
     /**
-     *whether simulation state of replication loops is running replications
+     * whether simulation state of replication loops is running replications,
+     * determined by receipt of external signal RUN when not previously in PAUSE/STEP mode,
+     * commencing the replication loop
      * @return whether simulationState is RUN
      */
     public boolean isSimulationStateRunning() {
@@ -1395,7 +1409,9 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     }
 
     /**
-     * whether simulation state of replication loops is running a single replication after pause/step
+     * whether simulation state of replication loops is running a single replication after pause/step,
+     * determined internally by loop logic if PAUSE/STEP is followed by RUN, 
+     * continuing the replication loop
      * @return whether simulationState is RESUME
      */
     public boolean isSimulationStateResumed() {
@@ -1403,28 +1419,31 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     }
 
     /**
-     * whether simulation state of replication loops is done
+     * whether simulation state of replication loops is done,
+     * determined internally by regular completion of replication loop
      * @return whether simulationState is DONE
      */
     public boolean isSimulationStateDone() {
         return (simulationState == SimulationState.DONE);
     }
 
-    /**
-     * whether simulation state of replication loops is inactive
-     * @return whether simulationState is INACTIVE
-     */
-    public boolean isSimulationStateInactive() {
-        return (simulationState == SimulationState.INACTIVE);
-    }
-
-    /**
-     * whether simulation state of replication loops is ready
-     * @return whether simulationState is READY
-     */
-    public boolean isSimulationStateReady() {
-        return (simulationState == SimulationState.READY);
-    }
+    // TODO signaling from external process not yet supported for these simulation states
+    
+//    /**
+//     * whether simulation state of replication loops is inactive
+//     * @return whether simulationState is INACTIVE
+//     */
+//    public boolean isSimulationStateInactive() {
+//        return (simulationState == SimulationState.INACTIVE);
+//    }
+//
+//    /**
+//     * whether simulation state of replication loops is ready
+//     * @return whether simulationState is READY
+//     */
+//    public boolean isSimulationStateReady() {
+//        return (simulationState == SimulationState.READY);
+//    }
 
     /**
      * @param newSimulationState the simulationState to set
