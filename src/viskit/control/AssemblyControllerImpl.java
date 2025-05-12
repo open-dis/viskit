@@ -645,8 +645,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public static final String METHOD_zipProject = "zipProject";
 
     @Override
-    public void zipProject() {
-
+    public void zipProject()
+    {
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() 
         {
             String projectName;
@@ -655,7 +655,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             File projectZipLogFile;
 
             @Override
-            public Void doInBackground() 
+            public Void doInBackground() // zipProject
             {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd.HHmm");
                 String dateOutput = formatter.format(new Date()); // today, now
@@ -693,7 +693,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
 
             @Override
-            public void done() {
+            public void done()  // zipProject
+            {
                 try {
                     // Waits for the zip process to finish
                     get();
@@ -2030,8 +2031,6 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     int     priorVerboseReplicationNumber = ViskitGlobals.instance().getSimulationRunPanel().getVerboseReplicationNumber();
                     boolean priorVerboseOutput            = ViskitGlobals.instance().getSimulationRunPanel().getVerboseOutput();
                     
-                    
-                    
                     // Ensure a cleared Simulation panel upon every Assembly compile
                     runnerSimulationRunInterface.resetSimulationRunPanel();
                     
@@ -2077,7 +2076,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             }
 
             @Override
-            protected void done() 
+            protected void done() // prepareSimulationRunner() SwingWorker
             {
                 try {
                     // Wait for the compile, save and Assembly preparations to finish

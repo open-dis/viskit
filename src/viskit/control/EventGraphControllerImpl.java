@@ -159,7 +159,6 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             ((EventGraphView) getView()).setSelectedEventGraphName(newGraphMetadata.name);
             ((EventGraphView) getView()).setSelectedEventGraphDescription(ViskitStatics.emptyIfNull(newGraphMetadata.description));
 
-            // Bugfix 1398
             String message =
                     "<html><body><p align='center'>Do you wish to start with a <b>\"Run\"</b> Event?</p></body></html>";
             String title = "Confirm Run Event";

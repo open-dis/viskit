@@ -453,6 +453,7 @@ public class SimulationRunPanel extends JPanel
         }
         numberReplicationsTF.setText(Integer.toString(newNumberReplications));
         ViskitGlobals.instance().getInternalSimulationRunner().getBasicAssembly().setNumberReplicationsPlanned(newNumberReplications); // unthreaded
+        LOG.info("updateNumberReplications() {}", newNumberReplications);
     }
     
     class NumberReplicationsActionListener implements ActionListener 

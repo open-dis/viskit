@@ -21,10 +21,12 @@ public class GraphMetadata
 {
     static final Logger LOG = LogManager.getLogger();
     
+    public final String DEFAULT_VERSION = "2.0";
+    
     public String name = "";
     public String packageName = "";
     public String author = "";
-    public String version = "1.0";
+    public String version = DEFAULT_VERSION;
     public String description = ""; // originally called "comment"
     public String stopTime = "100.0";    
     public String extendsPackageName = "";
@@ -52,6 +54,7 @@ public class GraphMetadata
                extendsPackageName = ViskitStatics.emptyIfNull(tempAssembly.getExtend());
             implementsPackageName = ViskitStatics.emptyIfNull(tempAssembly.getImplement());
             description           = ViskitStatics.emptyIfNull(tempAssembly.getDescription());
+            version               = DEFAULT_VERSION;
             // TODO stopTime?
         }
         else
@@ -63,6 +66,7 @@ public class GraphMetadata
                extendsPackageName = ViskitStatics.emptyIfNull(tempSimEntity.getExtend());
             implementsPackageName = ViskitStatics.emptyIfNull(tempSimEntity.getImplement());
             description           = ViskitStatics.emptyIfNull(tempSimEntity.getDescription());
+            version               = DEFAULT_VERSION;
             // TODO stopTime?
         }
     }

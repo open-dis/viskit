@@ -100,15 +100,22 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     protected SimEntity[]                    simEntityArray;
     protected PropertyChangeListener[]       propertyChangeListenerArray;
     
-    protected boolean hookupsCalled;
-    protected boolean  stopSimulationRun;
-    protected boolean pauseSimulationRun;
+    /** external notification received for thread to stop all replications, simulation complete */
+    protected boolean        stopSimulationRun;
+    /** external notification received for thread to pause, either pausing replications or running a single step simulation */
+    protected boolean       pauseSimulationRun;
+    /** only proceed with one replication at a time */
+    protected boolean  singleStepSimulationRun;
+    
+    /** if paused or single-step operation, next replication number of interest */
     protected int startReplicationNumber = 0;
+    private int verboseReplicationNumber;
+    
+    protected boolean hookupsCalled;
     protected Set<ReRunnable> runEntitiesSet;
     protected long seed;
 
     private double  stopTime;
-    private boolean singleStep;
     private int     numberReplicationsPlanned;
     private boolean printReplicationReports;
     private boolean printSummaryReport;
@@ -132,7 +139,6 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     private final DecimalFormat decimalFormat1, decimalFormat4;
     private List<String> entitiesWithStatisticsList;
     private PrintWriter printWriter;
-    private int verboseReplicationNumber;
     
     // private /*static*/ ClassLoader localWorkingClassLoader;       // TODO moved this out of ViskitGlobals due to thread-clobbering issues
     /** save local copies of these objects during setup, in order to avoid 
@@ -425,84 +431,106 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     }
     
     /** method name for reflection use */
-    public static final String METHOD_setSingleStep = "setSingleStep";
+    public static final String METHOD_setSingleStepSimulationRun = "setSingleStepSimulationRun";
 
-    public void setSingleStep(boolean newValue) 
+    /** Causes paused simulation runs to continue in single-step mode by receiving external signal inside the execution thread
+     * @param newValue signal whether to continue in single-step mode
+     */
+    public void setSingleStepSimulationRun(boolean newValue)
     {
-        if (isDebugThread()) logThreadStatus(METHOD_setSingleStep + " newValue=" + newValue);
+        // do not set debug breakpoint in this method or else thread is not notified in a timely manner
         
-        singleStep = newValue;
+        if (isDebugThread()) logThreadStatus(METHOD_setSingleStepSimulationRun + " newValue=" + newValue + " (threaded)");
+        
+        singleStepSimulationRun = newValue;
     }
 
     public boolean isSingleStep() 
     {
-        return singleStep;
+        return singleStepSimulationRun;
     }
     
     /** method name for reflection use */
     public static final String METHOD_setStopSimulationRun = "setStopSimulationRun";
 
-    /** Causes simulation runs to halt by signaling inside the execution thread
+    /** Causes simulation runs to stop by receiving external signal inside the execution thread
      *
-     * @param newValue if true, stops further simulation runs
+     * @param newValue signal whether to stop further simulation runs
      */
     public void setStopSimulationRun(boolean newValue) 
     {
-        // do not set debug breakpoint in this method or else thread is not notified to stop
+        // do not set debug breakpoint in this method or else thread is not notified in a timely manner
         
-        if (isDebugThread()) logThreadStatus(METHOD_setStopSimulationRun);
+        stopSimulationRun = newValue; // save value
+        if (!newValue)
+            return;  // ignore if false
         
-        stopSimulationRun = newValue;
+        if (isDebugThread()) logThreadStatus(METHOD_setStopSimulationRun + " newValue=" + newValue + " begun (threaded)");
+        
         if (stopSimulationRun)
         {
+            // reset other sentinels 
+                 pauseSimulationRun = false;
+            singleStepSimulationRun = false; // in case we were in single-step mode
             Schedule.stopSimulation(); // simkit
         }
+        
+        if (isDebugThread()) logThreadStatus(METHOD_setStopSimulationRun + "... complete");
     }
     
     /** method name for reflection use */
     public static final String METHOD_setPauseSimulationRun = "setPauseSimulationRun";
 
-    /** Causes simulation runs to halt by signaling inside the execution thread
+    /** Causes simulation runs to pause (or single step) by receiving external signal inside the execution thread
      *
-     * @param newValue if true, pauses further simulation runs
+     * @param newValue signal whether to pause further simulation runs
      */
     public void setPauseSimulationRun(boolean newValue) 
     {
-        // do not set debug breakpoint in this method or else thread is not notified to pause
+        // do not set debug breakpoint in this method or else thread is not notified in a timely manner
         
-        if (isDebugThread()) logThreadStatus(METHOD_setPauseSimulationRun + "(" + newValue + ")");
+        pauseSimulationRun = newValue; // save value
+        if (!newValue)
+            return;  // ignore if false
         
-        pauseSimulationRun = newValue;
+        if (isDebugThread()) logThreadStatus(METHOD_setPauseSimulationRun + "(" + newValue + ")" + " begun (threaded)");
+        
         if (pauseSimulationRun)
         {
             // advance the simkit event clock when in single step mode?  no, stay at per-replication level
-            Schedule.setPauseAfterEachEvent(true); // simkit
+//            Schedule.setPauseAfterEachEvent(true); // simkit
 
 //          Schedule.pause(); // simkit method; no, blocks console for text-based thread console
         }
-        LOG.info("setPauseSimulationRun({})", pauseSimulationRun);
+        LOG.info("setPauseSimulationRun({}), pauseSimulationRun={}, singleStepSimulationRun={}", newValue, pauseSimulationRun, singleStepSimulationRun); 
     }
     
     /** method name for reflection use */
-    public static final String METHOD_runResumeSimulation = "runResumeSimulation";
+    public static final String METHOD_setRunResumeSimulation = "setRunResumeSimulation";
 
-    public void runResumeSimulation()
+    /** Causes simulation runs to begin running (or resume running) by receiving external signal inside the execution thread
+     */
+    public void setRunResumeSimulation()
     {
-        if (isDebugThread()) logThreadStatus(METHOD_runResumeSimulation);
+        // do not set debug breakpoint in this method or else thread is not notified in a timely manner
         
-        pauseSimulationRun = false; // in case we were in single-step mode
+        if (isDebugThread()) logThreadStatus(METHOD_setRunResumeSimulation + " begun (threaded)");
+        
+        // reset other sentinels 
+             pauseSimulationRun = false;
+        singleStepSimulationRun = false; // in case we were in single-step mode
         
         Schedule.startSimulation(); // simkit
     }
 
-    /** this is getting called by the Assembly Runner stopSimulationRun
- button, which may get called on startup.
-     */
-    // TODO unused??  uncalled?
-    public void stopSimulationRun()
-    {
-        stopSimulationRun = true;
-    }
+//    /** this is getting called by the Assembly Runner stopSimulationRun
+// button, which may get called on startup.
+//     */
+//    // TODO unused??  uncalled?
+//    public void stopSimulationRun()
+//    {
+//        stopSimulationRun = true;
+//    }
     
     /** method name for reflection use */
     public static final String METHOD_setEnableAnalystReports = "setEnableAnalystReports";
@@ -1062,11 +1090,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         {
             initialReplicationNumber = pausedReplicationNumber;
             LOG.info("Resume running " + getName() + " simulation replication " + initialReplicationNumber +
-                     " for {} total planned replications", getNumberReplicationsPlanned());
+                     " for {} planned replications total", getNumberReplicationsPlanned());
         }
         else
         {
-            LOG.info("Begin running " + getName() + " simulation replications for {} total planned replications", getNumberReplicationsPlanned());
+            LOG.info("Begin running " + getName() + " simulation replications for {} planned replications total", getNumberReplicationsPlanned());
         }
         
         // here is the primary loop for each replication within the current simulation
@@ -1095,37 +1123,38 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
             
             // now look for interrupting signals into the thread
             
-            if (stopSimulationRun)       // from within thread
+            if (stopSimulationRun)       // signal received within thread, we are inside replication loop
             {
-                replicationNumber--; // at this pointe we are just prior to actually conducting the replication loop
+                replicationNumber--; // at this point we are just prior to actually conducting the replication loop
                 String stopMessage = "Threaded assembly simulation run() stopped after Replication # " + (replicationNumber);
                 LOG.info(stopMessage);
                 break;
             } 
-            else if (pauseSimulationRun) // from within thread
+            else if (pauseSimulationRun) // signal received within thread, we are inside replication loop
             {
-                replicationNumber--; // at this pointe we are just prior to actually conducting the replication loop
+                // the RUN has just gotten a PAUSE signal prior to starting/resuming/stepping another replication loop
+                // setup for another single STEP or else resumed RUN
                 pausedReplicationNumber = replicationNumber; // prepare for return by remembering how many replications were complete
+                replicationNumber--; // at this point we are just prior to actually conducting the replication loop
                 String pauseMessage = "Threaded assembly simulation run() paused after Replication # " + (replicationNumber);
                 LOG.info(pauseMessage);
                 
-                // TODO is it important to return; or rather 
+                // TODO is it important to return to regular vcrButton logic; or else rather 
                 // - briefly sleep within this specific thread, 
                 // - re-loop waiting for next button (STEP or RUN or STOP),
                 // - perhaps a time-out popup every 100 loops to ask user if still there...
                 // this avoids multiple pause/restart loop repair steps
 
-
-                        // TODO stop and wait here for resume, then restore loop before continuing...
-                        try
-                        {
-                            Thread.sleep(1000);
-                        }
-                        catch (InterruptedException ie)
-                        {
-                            Thread.currentThread().interrupt();
-                            LOG.error("PauseStepListener Thread.sleep interruption");
-                        }
+                // TODO experimental: stop and wait here for resume, then restore loop before continuing...
+//                try
+//                {
+//                    Thread.currentThread().wait(); // TODO sleeping likely unnecessary
+//                }
+//                catch (InterruptedException ie)
+//                {
+//                    Thread.currentThread().interrupt();
+//                    LOG.error("PauseStepListener Thread.wait interruption");
+//                }
                 return;
             }
             else // continue running replications
@@ -1153,7 +1182,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 else if (seedString.length() == 8)
                          spacing = "   ";
                 LOG.info("Simulation starting Replication #" + indexSpacing + (replicationNumber) + " with RNG seed state = " + spacing + seed
-                       + "\n     simulationState=" + simulationState // debug diagnostic, is thread seeing updates?
+//                       + "\n     simulationState=" + simulationState // debug diagnostic, is thread seeing updates? NO
                 );
                 try {
                     Schedule.reset(); // simkit
@@ -1233,6 +1262,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 }
             } // continue running replications
         } // end of replication loop
+        
+        setSimulationState(SimulationState.DONE); // TODO confirm OK
         LOG.info("All simulation replications now complete.");
 
         if (isPrintSummaryReport()) 

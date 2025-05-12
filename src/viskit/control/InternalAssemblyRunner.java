@@ -75,7 +75,6 @@ import static viskit.assembly.BasicAssembly.METHOD_setPclNodeCache;
 import static viskit.assembly.BasicAssembly.METHOD_setPrintReplicationReports;
 import static viskit.assembly.BasicAssembly.METHOD_setPrintSummaryReport;
 import static viskit.assembly.BasicAssembly.METHOD_setSaveReplicationData;
-import static viskit.assembly.BasicAssembly.METHOD_setSingleStep;
 import static viskit.assembly.BasicAssembly.METHOD_setStopSimulationRun;
 import static viskit.assembly.BasicAssembly.METHOD_setStopTime;
 import static viskit.assembly.BasicAssembly.METHOD_setVerbose;
@@ -88,9 +87,10 @@ import static viskit.view.SimulationRunPanel.VERBOSE_REPLICATION_NUMBER_DEFAULT_
 import viskit.view.dialog.ViskitUserPreferencesDialog;
 import static viskit.assembly.BasicAssembly.METHOD_setVerboseReplicationNumber;
 import static viskit.assembly.BasicAssembly.METHOD_setPauseSimulationRun;
-import static viskit.assembly.BasicAssembly.METHOD_runResumeSimulation;
 import static viskit.assembly.BasicAssembly.METHOD_setNumberReplicationsPlanned;
 import static viskit.assembly.BasicAssembly.METHOD_getNumberReplicationsPlanned;
+import static viskit.assembly.BasicAssembly.METHOD_setSingleStepSimulationRun;
+import static viskit.assembly.BasicAssembly.METHOD_setRunResumeSimulation;
 
 /** Controller for the Assembly RunSimulation panel, which
  * spawns the BasicAssembly thread
@@ -114,7 +114,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     private JMenuBar myMenuBar;
     private JMenu  simulationRunMenu;
     private JMenu  simulationButtonsMenu;
-    private  JMenuItem rewindButtonMI, runButtonMI, stepButtonMI, stopButtonMI, clearAllConsoleTextMI;
+    private  JMenuItem rewindButtonMI, runButtonMI, pauseStepButtonMI, stopButtonMI, clearAllConsoleTextMI;
     private Thread simulationRunThread;
     private BasicAssembly basicAssembly;
 
@@ -144,7 +144,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     
     private AnalystReportModel analystReportModel;
     
-    private SimulationState simulationState;
+    private SimulationState simulationState = SimulationState.INACTIVE;
     
     private Method setNumberReplicationsMethod;
     
@@ -257,7 +257,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         
 //        try {
 //            SwingUtilities.invokeLater(() -> {
-                 simulationRunPanel.outputStreamTA.setText("");
+                 simulationRunPanel.outputStreamTA.setText(""); // clear
                  simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HINT);
                  vcrButtonPressSimulationStateDisplayUpdate(SimulationState.INACTIVE);
 //            });
@@ -295,11 +295,27 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
     protected void prepareAndStartAssemblySimulationRun() // formerly initRun
     {
+        if ((mutex == 1) && (isSimulationStatePaused() || isSimulationStateSingleStep()))
+        {
+            LOG.info("prepareAndStartAssemblySimulationRun() attempted while in PAUSE/STEP mode, returning");
+            return;
+        }
+        else if ((mutex == 1) && (isSimulationStateResumed()))
+        {
+            LOG.info("prepareAndStartAssemblySimulationRun() now in RESUME mode, continuing");
+            // no further preparation needed, already completed earlier
+            return;
+        }
+        else if (isSimulationStateRunning())
+        {
+            mutex++;
+            LOG.info("prepareAndStartAssemblySimulationRun() now in RUN mode, mutex={}", mutex);
+            // continue
+        }
         // Ignore multiple pushes of the sim run button
-        mutex++;
         if (mutex > 1)
         {
-            LOG.error("prepareAndStartAssemblySimulationRun() unable to commence because mututal-exclusion count mutex={}", mutex);
+            LOG.error("prepareAndStartAssemblySimulationRun() unable to commence because mutual-exclusion count mutex={}", mutex);
             return;
         }
 
@@ -427,13 +443,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         }
 
         @Override
-        public Void doInBackground() 
+        public Void doInBackground() // SimulationRunMonitor
         {
             setProgress(0);
 
             simulationRunMonitorThread.start(); // commence thread
             try {
-                LOG.info("doInBackground() commencing simulationRunMonitorThread.join()");
+                LOG.info("doInBackground()\n      commencing simulationRunMonitorThread.join()");
                 simulationRunMonitorThread.join();
             } 
             catch (InterruptedException ex) {
@@ -447,17 +463,14 @@ public class InternalAssemblyRunner implements PropertyChangeListener
          *  Java javadoc: "Executed on the Event Dispatch Thread after the doInBackground method is finished."
          */
         @Override
-        public void done()
+        public void done() // SimulationRunMonitor
         {
-            if (getSimulationState() == SimulationState.PAUSE)
-                return; // not yet done
+            if (isSimulationStatePaused() || isSimulationStateResumed()) // be sure to get correct isDone() method!!
+                return; // return if not yet done; this is a safety check on other state-machine logic
             
             setProgress(100); // TODO what happens here, exactly? SwingWorker method
             mutex--; // this thread is complete, decrement mutual exclusion (mutex) safety-net counter
             
-            // TODO perform analyst report work here, avoid reflection!!
-            
-
             // Grab the temp Analyst Report and signal the AnalystReportFrame
             try {
                 Method getAnalystReportMethod = simulationRunAssemblyClass.getMethod(METHOD_getAnalystReport);
@@ -491,7 +504,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         }
     } // end SimulationRunMonitor class
 
-    public ActionListener getAssemblyRunStopListener() {
+    public ActionListener getAssemblyRunStopListener() 
+    {
         return assemblySimulationRunStopListener;
     }
 
@@ -537,7 +551,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
                     LOG.info("RunResumeListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     
-                    Method resumeSimulationMethod = simulationRunAssemblyClass.getMethod(METHOD_runResumeSimulation);
+                    Method resumeSimulationMethod = simulationRunAssemblyClass.getMethod(METHOD_setRunResumeSimulation);
                     resumeSimulationMethod.invoke(simulationRunAssemblyInstance);
                 }
             
@@ -583,18 +597,20 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                         priorRunSimulationClassLoader = getRunSimulationClassLoader();
                     
                     Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
-                    LOG.info("PauseStepListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
+                    LOG.info("currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     
                     Method setPauseSimulationRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setPauseSimulationRun, boolean.class);
                     setPauseSimulationRunMethod.invoke(simulationRunAssemblyInstance, true);
                     
-                    if ((simulationState == SimulationState.PAUSE) || (simulationState != SimulationState.STEP))
+                    if (isSimulationStateRunning())
                     {
+                        // transition from RUN to PAUSE
+                        LOG.info("actionPerformed({}) transition from RUN to PAUSE", simulationState);
                         vcrButtonPressSimulationStateDisplayUpdate(SimulationState.PAUSE);
                         
                         // avoid simkit fiddling, just handle replications
                         // Pause (from Run mode)
-//                      Schedule.setSingleStep(true); // simkit
+//                      Schedule.setSingleStepSimulationRun(true); // simkit
 //                      Schedule.setPauseAfterEachEvent(true); // simkit
 //                      Schedule.pause(); // simkit method; no, blocks console for text-based thread console
 //                      Schedule.startSimulation();
@@ -603,37 +619,44 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                         // Likely problem:  pause event is not being recieved in threaded event loop, rather in between replications
 
                         // TODO stop and wait here for resume, then restore loop before continuing...
-                        try
-                        {
-                            Thread.sleep(1000);
-                        }
-                        catch (InterruptedException ie)
-                        {
-                            Thread.currentThread().interrupt();
-                            LOG.error("PauseStepListener Thread.sleep interruption");
-                        }
+//                        try
+//                        {
+//                            Thread.sleep(100);
+//                            LOG.info("Thread.sleep...");
+//                        }
+//                        catch (InterruptedException ie)
+//                        {
+//                            Thread.currentThread().interrupt();
+//                            LOG.error("PauseStepListener Thread.sleep interruption");
+//                        }
                         return;
                     }
-                    else if (simulationState != SimulationState.PAUSE)
+                    else if (isSimulationStateSingleStep())
                     {
-                        // TODO single step for single replication
-                        // Step (while in single-step mode)
-                        // TODO run one step and return
-                        LOG.info("PauseStepListener() in simulationState={} and receuved actionEvent={}", simulationState, actionEvent);
-                    }
-                    else
-                    {
-                        vcrButtonPressSimulationStateDisplayUpdate(SimulationState.STEP);
                         
-                        LOG.error("PauseStepListener actionPerformed({}) received unexpected state event: {}", actionEvent, simulationState);
+                        LOG.info("actionPerformed({}) transition from STEP to STEP", simulationState);
+                        vcrButtonPressSimulationStateDisplayUpdate(SimulationState.STEP);
                         
                        Schedule.startSimulation(); // TODO is this correct method for single stepping?
                        return;
                     }
-//                    else
-//                    {
-//                        LOG.error("PauseStepListener actionPerformed({}) unexpected state received: {}", actionEvent, simulationState);
-//                    }
+                    else if (isSimulationStatePaused())  // || isSimulationStateSingleStep()))
+                    {
+                        // transition from PAUSE to STEP
+                        LOG.info("actionPerformed({}) transition from PAUSE to STEP", simulationState);
+                        vcrButtonPressSimulationStateDisplayUpdate(SimulationState.STEP);
+                        
+                        // TODO single step for single replication
+                        // Step (while in single-step mode)
+                        // TODO run one step and return
+//                        LOG.info("PauseStepListener() activated while in simulationState={}", simulationState);
+//                        LOG.info("actionPerformed({}) transition from PAUSE to STEP", simulationState);
+                        return; // TODO or continue
+                    }
+                    else
+                    {
+                        LOG.error("PauseStepListener actionPerformed({}) unexpected state received", simulationState);
+                    }
                     
                     if (priorRunSimulationClassLoader == null)
                     {
@@ -644,8 +667,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     if (priorRunSimulationClassLoader != null) // TODO necessary?
                         Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
 
-                    // TODO where is this method? "setStepRun" ... not certain it turned into METHOD_setSingleStep
-                    Method setStepRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setSingleStep, boolean.class);
+                    // TODO where is this method? "setStepRun" ... not certain it turned into METHOD_setSingleStepSimulationRun
+                    Method setStepRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setSingleStepSimulationRun, boolean.class);
                     setStepRunMethod.invoke(simulationRunAssemblyInstance, true);
                 }
 //              Schedule.coldReset(); // simkit
@@ -704,7 +727,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     LOG.error("StopListener.actionPerformed(" + actionEvent + ") unable to find simulationRunAssemblyInstance");
                 }
                 vcrButtonPressSimulationStateDisplayUpdate(SimulationState.STOP);
-                simulationRunPanel.setNumberReplications(simulationRunPanel.getNumberReplications() - 1); // STOP occurs at beginning of replication loop
+                // STOP occurs at beginning of replication loop, so adjust count:
+                simulationRunPanel.setNumberReplications(simulationRunPanel.getNumberReplications() - 1); 
                 Schedule.coldReset(); // simkit
 
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -889,13 +913,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             else newState =  SimulationState.PAUSE; // previously RUN,    now initial pause
         }
                 
+        LOG.info("vcrButtonPressSimulationStateDisplayUpdate()\n      state transition from {} to {}", 
+                getSimulationState(), newState);
         setSimulationState(newState); // update overall state
         simulationRunPanel.vcrButtonStatusLabel.setText(" " + newState.name());
-        
-        // debug
-//        simulationRunPanel.outputStreamTA.setText(
-//                simulationRunPanel.outputStreamTA.getText() + "\n" +
-//                "User button pressed: " + vcrState          + "\n");
 
         switch (getSimulationState()) 
         {
@@ -917,19 +938,20 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  LOG.info("vcrButtonPressDisplayUpdate({})", newEvent);
                  break;
                 
-            case RUN_RESUME:
-            case RUN:
             case RESUME:
+            case RUN:
+            case RUN_RESUME:
                  simulationRunPanel.vcrRewindButton      .setEnabled(false);
                  simulationRunPanel.vcrRunResumeButton   .setEnabled(false);
                  simulationRunPanel.vcrPauseStepButton   .setEnabled(true);
                  simulationRunPanel.vcrStopButton        .setEnabled(true);
-                 simulationRunPanel.vcrClearConsoleButton.setEnabled(false);   // avoid clearing console accidentally while running
+                 simulationRunPanel.vcrClearConsoleButton.setEnabled(true);
                  LOG.info("vcrButtonPressDisplayUpdate({})", newState); // newEvent);
                  break;
                 
             case PAUSE:
             case STEP:
+            case PAUSE_STEP:
                  simulationRunPanel.vcrRewindButton      .setEnabled(true);
                  simulationRunPanel.vcrRunResumeButton   .setEnabled(true);
                  simulationRunPanel.vcrPauseStepButton   .setEnabled(true);
@@ -969,14 +991,25 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  LOG.warn("*** Unrecognized vcrButtonListener(event=" + newEvent + ")");
                  break;
         }
-        if (simulationRunPanel.vcrClearConsoleButton.isEnabled()) // also check if console is empty
+        if (simulationRunPanel.vcrClearConsoleButton.isEnabled()) // also check if console is empty, if so then no need t clear it
             simulationRunPanel.vcrClearConsoleButton.setEnabled(!simulationRunPanel.outputStreamTA.getText().isEmpty());
         
         // now that buttons enabled/disabled are all up to date, can update corresponding menu items to match
         updateSimulationControllerButtonsMenu();
         
+        // system output goes to console TextArea
+        if      (getSimulationState() == SimulationState.PAUSE)
+                 System.out.println("[SIMULATION PAUSE]\n");
+        else if (getSimulationState() == SimulationState.STEP)
+                 System.out.println("[SIMULATION STEP]\n");
+        else if (getSimulationState() == SimulationState.RUN)
+                 System.out.println("[SIMULATION RUN]\n");
+        else if (getSimulationState() == SimulationState.RESUME)
+                 System.out.println("[SIMULATION RESUME]\n");
+        
         logSimulationRunState(); // development diagnostics
     }
+    
     /** diagnostic utility
      * @param booleanValue value of interest
      * @return true "on" or false "off"
@@ -1009,7 +1042,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                   " clear=" + isOnOff(simulationRunPanel.vcrClearConsoleButton.isEnabled()) +
                   "\n     " + // log readability
         " simulationState=" + getSimulationState().name() +
-            " simkitState=" + simkitState
+            " simkitState=" + simkitState // unneeded
         );
     }
 
@@ -1029,21 +1062,21 @@ public class InternalAssemblyRunner implements PropertyChangeListener
        runButtonMI = new JMenuItem("Run/Resume");
         runButtonMI.setMnemonic('R');
         runButtonMI.setToolTipText("Run or resume the simulation replications");
-       stepButtonMI = new JMenuItem("Pause/Step");
-        stepButtonMI.setMnemonic('S');
-        stepButtonMI.setToolTipText("Pause current replication, or single step the next replication");
+       pauseStepButtonMI = new JMenuItem("Pause/Step");
+        pauseStepButtonMI.setMnemonic('S');
+        pauseStepButtonMI.setToolTipText("Pause current replication, or single step the next replication");
        stopButtonMI = new JMenuItem("Stop");
         stopButtonMI.setMnemonic('S');
         stopButtonMI.setToolTipText("Stop the simulation replications");
         
         rewindButtonMI.addActionListener(new RewindListener());
            runButtonMI.addActionListener(new RunResumeListener());
-          stepButtonMI.addActionListener(new PauseStepListener());
+          pauseStepButtonMI.addActionListener(new PauseStepListener());
           stopButtonMI.addActionListener(assemblySimulationRunStopListener); // = new StopListener());
         
         simulationButtonsMenu.add(rewindButtonMI);
         simulationButtonsMenu.add(   runButtonMI);
-        simulationButtonsMenu.add(  stepButtonMI);
+        simulationButtonsMenu.add(  pauseStepButtonMI);
         simulationButtonsMenu.add(  stopButtonMI);
         simulationRunMenu.add(simulationButtonsMenu);
                 
@@ -1338,6 +1371,62 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     }
 
     /**
+     * whether simulation state of replication loops is paused between replications
+     * @return whether simulationState is PAUSE
+     */
+    public boolean isSimulationStatePaused() {
+        return (simulationState == SimulationState.PAUSE);
+    }
+
+    /**
+     * whether simulation state of replication loops is in single-step mode for each replication
+     * @return whether simulationState is STEP
+     */
+    public boolean isSimulationStateSingleStep() {
+        return (simulationState == SimulationState.STEP);
+    }
+
+    /**
+     *whether simulation state of replication loops is running replications
+     * @return whether simulationState is RUN
+     */
+    public boolean isSimulationStateRunning() {
+        return (simulationState == SimulationState.RUN);
+    }
+
+    /**
+     * whether simulation state of replication loops is running a single replication after pause/step
+     * @return whether simulationState is RESUME
+     */
+    public boolean isSimulationStateResumed() {
+        return (simulationState == SimulationState.RESUME);
+    }
+
+    /**
+     * whether simulation state of replication loops is done
+     * @return whether simulationState is DONE
+     */
+    public boolean isSimulationStateDone() {
+        return (simulationState == SimulationState.DONE);
+    }
+
+    /**
+     * whether simulation state of replication loops is inactive
+     * @return whether simulationState is INACTIVE
+     */
+    public boolean isSimulationStateInactive() {
+        return (simulationState == SimulationState.INACTIVE);
+    }
+
+    /**
+     * whether simulation state of replication loops is ready
+     * @return whether simulationState is READY
+     */
+    public boolean isSimulationStateReady() {
+        return (simulationState == SimulationState.READY);
+    }
+
+    /**
      * @param newSimulationState the simulationState to set
      */
     public void setSimulationState(SimulationState newSimulationState) 
@@ -1359,7 +1448,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         simulationButtonsMenu.setEnabled(isAssemblySimulationEnabled());
         rewindButtonMI.setEnabled(simulationRunPanel.vcrRewindButton.isEnabled());
            runButtonMI.setEnabled(simulationRunPanel.vcrRunResumeButton.isEnabled());
-          stepButtonMI.setEnabled(simulationRunPanel.vcrPauseStepButton.isEnabled());
+     pauseStepButtonMI.setEnabled(simulationRunPanel.vcrPauseStepButton.isEnabled());
           stopButtonMI.setEnabled(simulationRunPanel.vcrStopButton.isEnabled());
  clearAllConsoleTextMI.setEnabled(simulationRunPanel.vcrClearConsoleButton.isEnabled());
     }

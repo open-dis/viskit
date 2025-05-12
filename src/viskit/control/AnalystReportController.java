@@ -273,13 +273,13 @@ public class AnalystReportController extends MvcAbstractController
                                     "<p align='center'>in order to generate the HTML Analyst Report.</p><br />" +
                                     "<p align='center'>Please load a prior Analyst Report or else perform a simulation run first.</p><br />";
             LOG.error(message1);
-            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.WARNING_MESSAGE,
                 "Unable to show Analyst Report", message2);
             return;
         }
         ViskitGlobals.instance().selectAnalystReportTab();
         if (!ViskitGlobals.instance().getSimulationRunPanel().analystReportCB.isSelected()) {
-            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.WARNING_MESSAGE,
                     "Enable Analyst Reports not selected",
                     "<html><body><p align='center'>"
                     + "The checkbox for <code>Enable Analyst Reports </code>is not"

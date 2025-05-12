@@ -495,7 +495,8 @@ public class ViskitUserPreferencesDialog extends JDialog
     public static class RebuildLEGOTreePanelTask extends SwingWorker<Void, Void> {
 
         @Override
-        public Void doInBackground() {
+        public Void doInBackground() // RebuildLEGOTreePanelTask
+        {
             setProgress(0);
 
             // Incase we have custom jars, need to add these to the ClassLoader
@@ -514,7 +515,8 @@ public class ViskitUserPreferencesDialog extends JDialog
         }
 
         @Override
-        public void done() {
+        public void done() // RebuildLEGOTreePanelTask
+        {
             setProgress(100);
         }
     }
@@ -686,7 +688,8 @@ public class ViskitUserPreferencesDialog extends JDialog
         }
     }
 
-    private void installExtraClasspathIntoConfig() {
+    private void installExtraClasspathIntoConfig() 
+    {
         Object[] oa = ((DefaultListModel) classpathJList.getModel()).toArray();
         String[] sa = new String[oa.length];
 
@@ -695,8 +698,8 @@ public class ViskitUserPreferencesDialog extends JDialog
         saveExtraClasspathEntries(sa);
     }
 
-    class DeleteClasspathEntryHandler implements ActionListener {
-
+    class DeleteClasspathEntryHandler implements ActionListener 
+    {
         @Override
         public void actionPerformed(ActionEvent e) {
             int[] selected = classpathJList.getSelectedIndices();
@@ -710,8 +713,8 @@ public class ViskitUserPreferencesDialog extends JDialog
         }
     }
 
-    class UpButtonClasspathHandler implements ActionListener {
-
+    class UpButtonClasspathHandler implements ActionListener 
+    {
         @Override
         public void actionPerformed(ActionEvent e) {
             int[] selected = classpathJList.getSelectedIndices();
@@ -722,7 +725,8 @@ public class ViskitUserPreferencesDialog extends JDialog
         }
     }
 
-    private void moveLine(int idx, int polarity) {
+    private void moveLine(int idx, int polarity) 
+    {
         classpathJList.clearSelection();
         DefaultListModel<String> mod = (DefaultListModel<String>) classpathJList.getModel();
         Object o = mod.get(idx);
@@ -732,8 +736,8 @@ public class ViskitUserPreferencesDialog extends JDialog
         classpathJList.setSelectedIndex(idx + polarity);
     }
 
-    class DownButtonClasspathHandler implements ActionListener {
-
+    class DownButtonClasspathHandler implements ActionListener 
+    {
         @Override
         public void actionPerformed(ActionEvent e) {
             int[] selected = classpathJList.getSelectedIndices();
@@ -854,7 +858,8 @@ public class ViskitUserPreferencesDialog extends JDialog
      * Return if the Event Graph Editor is to be visible
      * @return if the Event Graph Editor is to be visible
      */
-    public static boolean isEventGraphEditorVisible() {
+    public static boolean isEventGraphEditorVisible() 
+    {
         return isUserPreferenceEnabled(ViskitUserConfiguration.EVENTGRAPH_EDITOR_VISIBLE_KEY);
     }
 
