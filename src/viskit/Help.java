@@ -74,11 +74,11 @@ public class Help
             "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR
             + "last modified: " + VERSION.getLastModified() + CR + CR;
     public static final String SIMKIT_URL   = "https://github.com/ahbuss/Simkit";
-    public static final String VISKIT_URL   = "https://gitlab.nps.edu/Savage/viskit";
-    public static final String ISSUES_URL   = "https://gitlab.nps.edu/Savage/viskit/issues";
-    public static final String BUGZILLA_URL = "https://github.com/terry-norbraten/viskit/issues";
+    public static final String VISKIT_URL   = "https://github.com/open-dis/viskit";
+    public static final String ISSUES_URL   = "https://github.com/open-dis/viskit/issues";
+//  public static final String BUGZILLA_URL = "https://github.com/terry-norbraten/viskit/issues";
     public static final String DEVELOPERS =
-            "Copyright &copy; 2004-2025 under the Lesser GNU Public License (LGPL)" + CR + CR
+            "Copyright &copy; 1995-2025 under BSD-style open-source license" + CR + CR
             + "<b>Developers:</b>" + CR
             + "&nbsp;&nbsp;&nbsp;Don Brutzman" + CR
             + "&nbsp;&nbsp;&nbsp;Terry Norbraten" + CR

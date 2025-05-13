@@ -31,12 +31,12 @@
       <timeoutErr>false</timeoutErr>
     </splash-->
     <versionInfo>
-      <fileVersion>1.0.16.0</fileVersion>
-      <txtFileVersion>1.0.16</txtFileVersion>
+      <fileVersion>2.0</fileVersion>
+      <txtFileVersion>2.0</txtFileVersion>
       <fileDescription>Viskit launcher</fileDescription>
       <copyright>Copyright (c) 1995-2025 held by the author(s).  All rights reserved.</copyright>
-      <productVersion>1.0.16.0</productVersion>
-      <txtProductVersion>1.0.16</txtProductVersion>
+      <productVersion>2.0</productVersion>
+      <txtProductVersion>2.0</txtProductVersion>
       <productName>Viskit</productName>
       <companyName>MOVES Institute, Naval Postgraduate School</companyName>
       <internalName>Viskit</internalName>

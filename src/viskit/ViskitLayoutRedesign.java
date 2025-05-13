@@ -39,7 +39,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         viskitTabbedPane = new javax.swing.JTabbedPane();
         eventGraphEditorPanel = new javax.swing.JPanel();
         assemblyEditorPanel = new javax.swing.JPanel();
-        assemblySimulationRunTabbedPane = new javax.swing.JTabbedPane();
+        simulationRunTabbedPane = new javax.swing.JTabbedPane();
         localSimulationRunPanel = new javax.swing.JPanel();
         assembly2_SimulationRunPanel = new javax.swing.JPanel();
         assembly3_SimulationRunPanel = new javax.swing.JPanel();
@@ -189,7 +189,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
             .addGap(0, 372, Short.MAX_VALUE)
         );
 
-        assemblySimulationRunTabbedPane.addTab("Local Simulation Run", localSimulationRunPanel);
+        simulationRunTabbedPane.addTab("Local Simulation Run", localSimulationRunPanel);
 
         javax.swing.GroupLayout assembly2_SimulationRunPanelLayout = new javax.swing.GroupLayout(assembly2_SimulationRunPanel);
         assembly2_SimulationRunPanel.setLayout(assembly2_SimulationRunPanelLayout);
@@ -202,7 +202,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
             .addGap(0, 372, Short.MAX_VALUE)
         );
 
-        assemblySimulationRunTabbedPane.addTab("(Assembly 2 Simulation Run)", assembly2_SimulationRunPanel);
+        simulationRunTabbedPane.addTab("(Assembly 2 Simulation Run)", assembly2_SimulationRunPanel);
 
         javax.swing.GroupLayout assembly3_SimulationRunPanelLayout = new javax.swing.GroupLayout(assembly3_SimulationRunPanel);
         assembly3_SimulationRunPanel.setLayout(assembly3_SimulationRunPanelLayout);
@@ -215,9 +215,9 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
             .addGap(0, 372, Short.MAX_VALUE)
         );
 
-        assemblySimulationRunTabbedPane.addTab("(Assembly 3 Simulation Run)", assembly3_SimulationRunPanel);
+        simulationRunTabbedPane.addTab("(Assembly 3 Simulation Run)", assembly3_SimulationRunPanel);
 
-        viskitTabbedPane.addTab("Simulation Run Manager", assemblySimulationRunTabbedPane);
+        viskitTabbedPane.addTab("Simulation Run Manager", simulationRunTabbedPane);
 
         analystReportTabbedPane.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -966,7 +966,6 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JMenu assemblyMenu;
     private javax.swing.JMenuItem assemblyMetadataPropertiesMI;
     private javax.swing.JMenu assemblySimulationRunMenu;
-    private javax.swing.JTabbedPane assemblySimulationRunTabbedPane;
     private javax.swing.JMenuItem clearSimulationConsoleMI;
     private javax.swing.JMenuItem closeAllAssembliesMI;
     private javax.swing.JMenuItem closeAllEventGraphsMI;
@@ -1037,6 +1036,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JMenuItem saveSimulationConsoleMI;
     private javax.swing.JMenuItem searchMI;
     private javax.swing.JMenuItem selectAllTextSimulationConsoleMI;
+    private javax.swing.JTabbedPane simulationRunTabbedPane;
     private javax.swing.JMenuItem tutorialMI;
     private javax.swing.JMenuItem undoAssemblyEditMenuItem;
     private javax.swing.JMenuItem undoEventEditMenuItem;
