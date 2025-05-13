@@ -794,10 +794,10 @@ public class ViskitProject
             if ((fileDirectory == null) || !fileDirectory.exists() || !fileDirectory.isDirectory()) {
                 return false;
             }
-
+            
             // http://www.avajava.com/tutorials/lessons/how-do-i-use-a-filenamefilter-to-display-a-subset-of-files-in-a-directory.html
             File[] files = fileDirectory.listFiles((File directory, String name) -> {
-                // configuration/ contains the template viskitProject.xml file
+                // config/ contains the template viskitProject.xml file
                 // so, don't show this directory as a potential Viskit project
                 if (directory.getName().equals(VISKIT_CONFIG_DIRECTORY)) {
                     return false;
@@ -807,13 +807,19 @@ public class ViskitProject
                 return name.equalsIgnoreCase(PROJECT_FILE_NAME);
             });
 
-            // This can happen on Win machines when parsing "My Computer" directory
-            if (files == null) {
-                return false;
-            }
+//            // This can happen on Win machines when parsing "My Computer" directory
+//            if (files == null) {
+//                return false;
+//            }
+//            
+            // TODO create project file if needed?
+
+//            File[] filesArray = fileDirectory.listFiles();
 
             // If this List is not empty, we found a project file
-            return files.length > 0;
+//            return files.length > 0;
+
+            return true;
         }
     }
 
