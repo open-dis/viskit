@@ -1451,7 +1451,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     /**
      * @return the recentAsyFileListener
      */
-    private RecentAssemblyFileListener getRecentAssemblyFileListener() {
+    @SuppressWarnings("NonPublicExported")
+    public RecentAssemblyFileListener getRecentAssemblyFileListener() {
         return recentAssemblyFileListener;
     }
 
