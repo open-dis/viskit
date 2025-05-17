@@ -494,44 +494,54 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
         return null;
     }
 
-    private String wrapStringAtPosition(String s, int length) {
+    private String wrapStringAtPosition(String s, int wrapLength) 
+    {
+        if (s.length() <= wrapLength)
+            return s;
         String[] sa = s.split(" ");
         StringBuilder sb = new StringBuilder();
-        int idx = 0;
+        int index = 0;
         int ll;
         do {
             ll = 0;
             sb.append("&nbsp;");
             do {
-                ll += sa[idx].length() + 1;
-                sb.append(sa[idx++]);
+                ll += sa[index].length() + 1;
+                sb.append(sa[index++]);
                 sb.append(" ");
-            } while (idx < sa.length && ll < length);
-            sb.append("<br>");
-        } while (idx < sa.length);
+            } 
+            while (index < sa.length && ll < wrapLength);
+            sb.append("<br />");
+        } 
+        while (index < sa.length);
 
-        String st = sb.toString();
-        if (st.endsWith("<br>")) {
-            st = st.substring(0, st.length() - 4);
+        String st = sb.toString().trim();
+        if (st.endsWith("<br />")) 
+        {
+            st = st.substring(0, st.length() - 5);
         }
-        return st.trim();
+        
+        return st;
     }
 
     @Override // Don't return null, fix for Issue #1
-    public String convertValueToString(Object value) {
+    public String convertValueToString(Object value) 
+    {
         CellView view = (value instanceof CellView)
                 ? (CellView) value
                 : getGraphLayoutCache().getMapping(value, false);
 
-        String retVal = null;
-        if (view instanceof VertexCircleView) {
+        String returnValue = null;
+        if (view instanceof VertexCircleView) 
+        {
             vCircleCell cc = (vCircleCell) view.getCell();
             Object en = cc.getUserObject();
 
             if (en instanceof EventNode) // should always be, except for our prototype examples
-                retVal = ((ViskitElement) en).getName();
-
-        } else if (view instanceof vEdgeView) {
+                returnValue = ((ViskitElement) en).getName();
+        } 
+        else if (view instanceof vEdgeView) 
+        {
             vEdgeCell cc = (vEdgeCell) view.getCell();
             Object e = cc.getUserObject();
 
@@ -539,13 +549,14 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                 SchedulingEdge se = (SchedulingEdge) e;
 
                 if (se.getConditional() == null || se.getConditional().isEmpty())
-                    retVal = "";
+                    returnValue = "";
                 else
-                    retVal = "\u01A7"; // https://www.compart.com/en/unicode/U+01A7
-            } else if (e instanceof CancelingEdge) // should always be one of these 2 except for proto examples
-                retVal = "";
+                    returnValue = "\u01A7"; // https://www.compart.com/en/unicode/U+01A7
+            } 
+            else if (e instanceof CancelingEdge) // should always be one of these 2 except for proto examples
+                returnValue = "";
         }
-        return retVal;
+        return returnValue;
     }
 
     /**
@@ -557,38 +568,42 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
 
     /** Inserts a new Edge between source and target nodes
      *
-     * @param source the source node to connect
-     * @param target the target node to connect
+     * @param sourcePort the jgraph source node to connect
+     * @param targetPort the jgraph target node to connect
      */
-    public void connect(Port source, Port target) {
-
-        DefaultGraphCell src = (DefaultGraphCell) getModel().getParent(source);
-        DefaultGraphCell tar = (DefaultGraphCell) getModel().getParent(target);
-        Object[] oa = new Object[]{src, tar};
-        EventGraphController controller = (EventGraphController) parent.getController();
-        if (parent.getCurrentMode() == EventGraphViewFrame.CANCEL_ARC_MODE) {
-            controller.buildNewCancelingEdge(oa);
-        } else {
-            controller.buildNewSchedulingEdge(oa);
+    public void connect(Port sourcePort, Port targetPort)
+    {
+        DefaultGraphCell sourceGraphCell = (DefaultGraphCell) getModel().getParent(sourcePort);
+        DefaultGraphCell targetGraphCell = (DefaultGraphCell) getModel().getParent(targetPort);
+        Object[] objectArray = new Object[]{sourceGraphCell, targetGraphCell};
+        EventGraphController eventGraphController = (EventGraphController) parent.getController();
+        
+        if (parent.getCurrentMode() == EventGraphViewFrame.CANCELLING_EDGE_MODE) {
+            eventGraphController.buildNewCancelingEdge(objectArray);
+        } 
+        else {
+            eventGraphController.buildNewSchedulingEdge(objectArray);
         }
     }
 
     final static double DEFAULT_CELL_SIZE = 54.0d;
 
-    /** Create the cell's final attributes before rendering on the graph. The
-     * edge attributes are set in the vGraphModel
+    /** Create the cell's final attributes before rendering on the graph.
+     * The edge attributes are set in the vGraphModel.
      *
-     * @param node the named EventNode to create attributes for
+     * @param eventNode the named EventNode to create attributes for
      * @return the cells attributes before rendering on the graph
      */
-    public Map createCellAttributes(EventNode node) {
+    public Map createCellAttributes(EventNode eventNode) 
+    {
         Map map = new Hashtable();
-        Point2D point = node.getPosition();
+        Point2D point = eventNode.getPosition();
 
         // Snap the Point to the Grid
         if (this != null) {
             point = snap((Point2D) point.clone());
-        } else {
+        } 
+        else {
             point = (Point2D) point.clone();
         }
 
@@ -624,27 +639,28 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
 
     /**
      * Creates a DefaultGraphCell with a given name
-     * @param node the named EventNode
+     * @param eventNode the named EventNode
      * @return a DefaultGraphCell with a given name
      */
-    protected DefaultGraphCell createDefaultGraphCell(EventNode node) {
-
-        DefaultGraphCell cell = new vCircleCell(node);
-        node.opaqueViewObject = cell;
+    protected DefaultGraphCell createDefaultGraphCell(EventNode eventNode) 
+    {
+        DefaultGraphCell cell = new vCircleCell(eventNode);
+        eventNode.opaqueViewObject = cell;
 
         // Add one Floating Port
-        cell.add(new vPortCell(node.getName() + "/Center"));
+        cell.add(new vPortCell(eventNode.getName() + "/Center"));
         return cell;
     }
 
     /** Insert a new Vertex at point
-     * @param node the EventNode to insert
+     * @param eventNode the EventNode to insert
      */
-    public void insert(EventNode node) {
-        DefaultGraphCell vertex = createDefaultGraphCell(node);
+    public void insert(EventNode eventNode) 
+    {
+        DefaultGraphCell vertex = createDefaultGraphCell(eventNode);
 
         // Create a Map that holds the attributes for the Vertex
-        vertex.getAttributes().applyMap(createCellAttributes(node));
+        vertex.getAttributes().applyMap(createCellAttributes(eventNode));
 
         // Insert the Vertex (including child port and attributes)
         getGraphLayoutCache().insert(vertex);

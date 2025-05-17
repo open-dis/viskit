@@ -187,8 +187,8 @@ public class MainFrame extends JFrame
         eventGraphViewFrame = ViskitGlobals.instance().buildEventGraphViewFrame();
         if (ViskitUserPreferencesDialog.isEventGraphEditorVisible()) 
         {
-            topTabbedPane.add(((EventGraphViewFrame) eventGraphViewFrame).getContent());
-            currentPaneIndex = topTabbedPane.indexOfComponent(((EventGraphViewFrame) eventGraphViewFrame).getContent());
+            topTabbedPane.add(((EventGraphViewFrame) eventGraphViewFrame).getContentPaneComponent());
+            currentPaneIndex = topTabbedPane.indexOfComponent(((EventGraphViewFrame) eventGraphViewFrame).getContentPaneComponent());
             topTabbedPane.setTitleAt(currentPaneIndex, "Event Graph Editor");
             topTabbedPane.setToolTipTextAt(currentPaneIndex, "Visual editor for Event Graph definitions");
             mainFrameMenuBar = ((EventGraphViewFrame) eventGraphViewFrame).getMenus();

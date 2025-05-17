@@ -68,6 +68,7 @@ import static viskit.control.AssemblyControllerImpl.METHOD_newProject;
 import static viskit.control.AssemblyControllerImpl.METHOD_openProject;
 import static viskit.control.AssemblyControllerImpl.METHOD_quit;
 import static viskit.control.AssemblyControllerImpl.METHOD_showViskitUserPreferences;
+import static viskit.control.EventGraphControllerImpl.METHOD_buildNewEventNode;
 import static viskit.control.EventGraphControllerImpl.METHOD_close;
 import static viskit.control.EventGraphControllerImpl.METHOD_closeAll;
 import static viskit.control.EventGraphControllerImpl.METHOD_copy;
@@ -105,7 +106,6 @@ import viskit.view.dialog.ViskitUserPreferencesDialog;
 import viskit.mvc.MvcController;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
-import static viskit.control.EventGraphControllerImpl.METHOD_buildNewEventNode;
 
 /**
  Main "view" of the Viskit app. This class controls a 3-paneled JFrame showing
@@ -138,10 +138,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     static final Logger LOG = LogManager.getLogger();
 
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
-    public final static int SELECT_MODE = 0;
+    public final static int SELECTION_MODE = 0;
     public final static int ADD_NODE_MODE = 1;
-    public final static int ARC_MODE = 2;
-    public final static int CANCEL_ARC_MODE = 3;
+    public final static int SCHEDULING_EDGE_MODE = 2;
+    public final static int CANCELLING_EDGE_MODE = 3;
     public final static int SELF_REF_MODE = 4;
     public final static int SELF_REF_CANCEL_MODE = 5;
 
@@ -149,13 +149,19 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     private static final String LOOK_AND_FEEL = ViskitUserPreferencesDialog.getLookAndFeel();
 
     /** Toolbar for dropping icons, connecting, etc. */
-    private JToolBar toolBar;    // Mode buttons on the toolbar
-    private JLabel addEvent;
-    private JLabel addSelfRef;
-    private JLabel addSelfCancelRef;
-    private JToggleButton selectMode;
-    private JToggleButton arcMode;
-    private JToggleButton cancellingEdgeMode;
+    private JToolBar eventGraphEditorToolbar;    // Mode buttons on the toolbar
+    private JLabel metadataLabel;
+    private JLabel addLabel;
+    private JLabel addEventLabel;
+    private JLabel addSelfReferentialEdgeLabel;
+    private JLabel addSelfCancellingEdgeLabel;
+    
+    private JLabel modeLabel;
+    private JToggleButton selectionModeButton;
+    private JToggleButton schedulingEdgeModeButton;
+    private JToggleButton cancellingEdgeModeButton;
+    private JLabel zoomLabel;
+    
     private JTabbedPane tabbedPane;
     private JMenuBar myMenuBar;
     private JMenu editMenu;
@@ -172,12 +178,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
      */
     public EventGraphViewFrame(MvcController mvcController) {
         super(FRAME_DEFAULT_TITLE);
-        initMVC(mvcController);       // set up mvc linkages
+        initializeMVC(mvcController);       // set up mvc linkages
         initializeUserInterface();    // build widgets
     }
 
     /** @return the JPanel which is the content of this JFrame */
-    public JComponent getContent() {
+    public JComponent getContentPaneComponent() {
         return (JComponent) getContentPane();
     }
 
@@ -190,21 +196,21 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     /** @return the current mode--select, add, arc, cancelArc */
-    public int getCurrentMode() {
-        // Use the button's selected status to figure out what mode
-        // we are in.
+    public int getCurrentMode() 
+    {
+        // Use the button's selected status to figure out what mode we are in.
 
-        if (selectMode.isSelected()) {
-            return SELECT_MODE;
+        if (selectionModeButton.isSelected()) {
+            return SELECTION_MODE;
         }
-        if (arcMode.isSelected()) {
-            return ARC_MODE;
+        if (schedulingEdgeModeButton.isSelected()) {
+            return SCHEDULING_EDGE_MODE;
         }
-        if (cancellingEdgeMode.isSelected()) {
-            return CANCEL_ARC_MODE;
+        if (cancellingEdgeModeButton.isSelected()) {
+            return CANCELLING_EDGE_MODE;
         }
 
-        LOG.error("assert false : \"getCurrentMode()\"");
+        LOG.error("assert false : \"getCurrentMode()\""); // TODO ??
         return 0;
     }
 
@@ -212,15 +218,15 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
      * Initialize the MVC connections
      * @param mvcController the controller for this view
      */
-    private void initMVC(MvcController mvcController) {
+    private void initializeMVC(MvcController mvcController) {
         setController(mvcController);
     }
 
     /**
      * Initialize the user interface
      */
-    private void initializeUserInterface() {
-
+    private void initializeUserInterface() 
+    {
         // Layout menus
         buildEditMenu(); // must be first
         buildMenus();
@@ -232,19 +238,20 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         // has a border layout, and contains the toolbar on the eventGraphViewerContent and
         // the main splitpane underneath.
 
-        getContent().setLayout(new BorderLayout());
-        getContent().add(getToolBar(), BorderLayout.NORTH);
+        getContentPaneComponent().setLayout(new BorderLayout());
+        getContentPaneComponent().add(getToolBar(), BorderLayout.NORTH);
 
         tabbedPane = new JTabbedPane();
         tabbedPane.addChangeListener(new TabSelectionHandler());
 
-        getContent().add(tabbedPane, BorderLayout.CENTER);
-        getContent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        getContentPaneComponent().add(tabbedPane, BorderLayout.CENTER);
+        getContentPaneComponent().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     }
     public int getNumberEventGraphsLoaded()
     {
         return tabbedPane.getTabCount();
     }
+    
     /** has one or more Event Graphs loaded
      * @return whether one or more Event Graphs are loaded */
     public boolean hasEventGraphsLoaded()
@@ -252,28 +259,33 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         return (getNumberEventGraphsLoaded() > 0);
     }
 
-    public ViskitGraphComponentWrapper getCurrentVgraphComponentWrapper() {
-        JSplitPane jsplt = (JSplitPane) tabbedPane.getSelectedComponent();
-        if (jsplt == null) {
+    public ViskitGraphComponentWrapper getCurrentVgraphComponentWrapper() 
+    {
+        JSplitPane splitPane = (JSplitPane) tabbedPane.getSelectedComponent();
+        if (splitPane == null) {
             return null;
         }
 
-        JScrollPane jsp = (JScrollPane) jsplt.getLeftComponent();
-        return (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
+        JScrollPane scrollPane = (JScrollPane) splitPane.getLeftComponent();
+        return (ViskitGraphComponentWrapper) scrollPane.getViewport().getComponent(0);
     }
 
-    public Component getCurrentJgraphComponent() {
-        ViskitGraphComponentWrapper vcw = getCurrentVgraphComponentWrapper();
-        if (vcw == null || vcw.drawingSplitPane == null) {return null;}
-        return vcw.drawingSplitPane.getLeftComponent();
+    public Component getCurrentJgraphComponent() 
+    {
+        ViskitGraphComponentWrapper graphComponentWrapper = getCurrentVgraphComponentWrapper();
+        if (graphComponentWrapper == null || graphComponentWrapper.drawingSplitPane == null) 
+        {
+             return null;
+        }
+        else return graphComponentWrapper.drawingSplitPane.getLeftComponent();
     }
 
     public JToolBar getToolBar() {
-        return toolBar;
+        return eventGraphEditorToolbar;
     }
 
-    public void setToolBar(JToolBar toolBar) {
-        this.toolBar = toolBar;
+    public void setToolBar(JToolBar newToolbar) {
+        this.eventGraphEditorToolbar = newToolbar;
     }
 
     /**
@@ -285,10 +297,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     /** Tab switch: this will come in with the newly selected tab in place */
-    class TabSelectionHandler implements ChangeListener {
-
+    class TabSelectionHandler implements ChangeListener 
+    {
         @Override
-        public void stateChanged(ChangeEvent e) 
+        public void stateChanged(ChangeEvent changeEvent) 
         {
             ViskitGraphComponentWrapper viskitGraphComponentWrapper = getCurrentVgraphComponentWrapper();
 
@@ -321,8 +333,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         }
     }
 
-    private void buildStateParamSplit(ViskitGraphComponentWrapper vgcw) {
-
+    private void buildStateParamSplit(ViskitGraphComponentWrapper graphComponentWrapper) 
+    {
         // State variables area:
         JPanel stateVariablesPanel = new JPanel();
         stateVariablesPanel.setLayout(new BoxLayout(stateVariablesPanel, BoxLayout.Y_AXIS));
@@ -339,21 +351,21 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
         stateVariablesPanel.add(eventGraphParametersSubpanel);
 
-        StateVariablesPanel vp = new StateVariablesPanel(300, 5);
-        stateVariablesPanel.add(vp);
+        StateVariablesPanel nextStateVariablesPanel = new StateVariablesPanel(300, 5);
+        stateVariablesPanel.add(nextStateVariablesPanel);
         stateVariablesPanel.add(Box.createVerticalStrut(5));
         stateVariablesPanel.setMinimumSize(new Dimension(20, 20));
 
         // Wire handlers for stateVariable adds, deletes and edits and tell it we'll be doing adds and deletes
-        vp.setEnableAddsAndDeletes(false);
-        vp.addPlusListener(ActionIntrospector.getAction(getController(), METHOD_newStateVariable));
+        nextStateVariablesPanel.setEnableAddsAndDeletes(false);
+        nextStateVariablesPanel.addPlusListener(ActionIntrospector.getAction(getController(), METHOD_newStateVariable));
 
         // Introspector can't handle a param to the method....?
-        vp.addMinusListener((ActionEvent event) -> {
+        nextStateVariablesPanel.addMinusListener((ActionEvent event) -> {
             ((EventGraphController) getController()).deleteStateVariable((ViskitStateVariable) event.getSource());
         });
 
-        vp.addDoubleClickedListener((ActionEvent event) -> {
+        nextStateVariablesPanel.addDoubleClickedListener((ActionEvent event) -> {
             ((EventGraphController) getController()).stateVariableEdit((ViskitStateVariable) event.getSource());
         });
 
@@ -368,12 +380,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         parametersPanel.add(descriptionLabel);
 //        parametersPanel.add(Box.createVerticalStrut(5));
         
-        JLabel instructions = new JLabel("Edit Properties or Ctrl-E to Edit");
-        instructions.setToolTipText(DESCRIPTION_HINT);
-        instructions.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        JLabel instructionsLabel = new JLabel("Edit Properties or Ctrl-E to Edit");
+        instructionsLabel.setToolTipText(DESCRIPTION_HINT);
+        instructionsLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         int bigSz = descriptionLabel.getFont().getSize();
-        instructions.setFont(descriptionLabel.getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
-        parametersPanel.add(instructions);
+        instructionsLabel.setFont(descriptionLabel.getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
+        parametersPanel.add(instructionsLabel);
 //        parametersPanel.add(Box.createVerticalStrut(5));
 
         JTextArea descriptionTA = new JTextArea();
@@ -384,13 +396,13 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         descriptionTA.setLineWrap(true);
         descriptionTA.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
 
-        JScrollPane descriptionSP = new JScrollPane(descriptionTA);
-        descriptionSP.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        descriptionSP.setMinimumSize(new Dimension(20, 20));
+        JScrollPane descriptionScrollPane = new JScrollPane(descriptionTA);
+        descriptionScrollPane.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        descriptionScrollPane.setMinimumSize(new Dimension(20, 20));
 
         // This works, you just have to have several lines of typed text to cause
         // the etched scrollbar to appear
-        parametersPanel.add(descriptionSP);
+        parametersPanel.add(descriptionScrollPane);
         parametersPanel.add(Box.createVerticalStrut(5));
         parametersPanel.setMinimumSize(new Dimension(20, 20));
 
@@ -405,57 +417,59 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphParametersSubpanel.add(Box.createHorizontalGlue());
         parametersPanel.add(eventGraphParametersSubpanel);
 
-        ParametersPanel pp = new ParametersPanel(300, 5);
-        pp.setMinimumSize(new Dimension(20, 20));
+        ParametersPanel nextParametersPanel = new ParametersPanel(300, 5);
+        nextParametersPanel.setMinimumSize(new Dimension(20, 20));
 
         // Wire handlers for parameter adds, deletes and edits and tell it we'll be doing adds and deletes
-        pp.setEnableAddsAndDeletes(false);
-        pp.addPlusListener(ActionIntrospector.getAction(getController(), METHOD_newSimulationParameter));
+        nextParametersPanel.setEnableAddsAndDeletes(false);
+        nextParametersPanel.addPlusListener(ActionIntrospector.getAction(getController(), METHOD_newSimulationParameter));
 
         // Introspector can't handle a param to the method....?
-        pp.addMinusListener((ActionEvent event) -> {
+        nextParametersPanel.addMinusListener((ActionEvent event) -> {
             ((EventGraphController) getController()).deleteSimParameter((ViskitParameter) event.getSource());
         });
-        pp.addDoubleClickedListener((ActionEvent event) -> {
+        nextParametersPanel.addDoubleClickedListener((ActionEvent event) -> {
             ((EventGraphController) getController()).simParameterEdit((ViskitParameter) event.getSource());
         });
 
-        parametersPanel.add(pp);
+        parametersPanel.add(nextParametersPanel);
         parametersPanel.add(Box.createVerticalStrut(5));
 
-        CodeBlockPanel codeblockPan = buildCodeBlockPanel();
+        CodeBlockPanel codeblockPanel = buildCodeBlockPanel();
 
-        JSplitPane stateCblockSplt = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+        JSplitPane stateCodeBlockSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 new JScrollPane(stateVariablesPanel),
-                new JScrollPane(buildCodeBlockComponent(codeblockPan)));
-        stateCblockSplt.setResizeWeight(0.75);
-        stateCblockSplt.setMinimumSize(new Dimension(20, 20));
+                new JScrollPane(buildCodeBlockComponent(codeblockPanel)));
+        stateCodeBlockSplitPane.setResizeWeight(0.75);
+        stateCodeBlockSplitPane.setMinimumSize(new Dimension(20, 20));
 
         // Split pane that has description, parameters, state variables and code block.
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 parametersPanel,
-                stateCblockSplt);
+                stateCodeBlockSplitPane);
         splitPane.setResizeWeight(0.75);
         splitPane.setMinimumSize(new Dimension(20, 20));
 
-        vgcw.stateParameterSplitPane = splitPane;
-        vgcw.paramPan = pp;
-        vgcw.varPan = vp;
-        vgcw.codeBlockPan = codeblockPan;
+        graphComponentWrapper.stateParameterSplitPane = splitPane;
+        graphComponentWrapper.paramPan = nextParametersPanel;
+        graphComponentWrapper.varPan = nextStateVariablesPanel;
+        graphComponentWrapper.codeBlockPan = codeblockPanel;
     }
 
-    private CodeBlockPanel buildCodeBlockPanel() {
-        CodeBlockPanel cbp = new CodeBlockPanel(this, true, "Event Graph Code Block");
-        cbp.addUpdateListener((ActionEvent e) -> {
+    private CodeBlockPanel buildCodeBlockPanel() 
+    {
+        CodeBlockPanel odeBlockPanel = new CodeBlockPanel(this, true, "Event Graph Code Block");
+        odeBlockPanel.addUpdateListener((ActionEvent e) -> {
             String s = (String) e.getSource();
             if (s != null) {
                 ((EventGraphController) getController()).codeBlockEdit(s);
             }
         });
-        return cbp;
+        return odeBlockPanel;
     }
 
-    private JComponent buildCodeBlockComponent(CodeBlockPanel codeBlockPanel) {
+    private JComponent buildCodeBlockComponent(CodeBlockPanel codeBlockPanel) 
+    {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         JLabel globalCodeBlockLabel = new JLabel("Global Code Block");
@@ -475,20 +489,23 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     @Override
     public void setSelectedEventGraphName(String newName) 
     {
-        boolean nullString = !(newName != null && newName.length() > 0); // TODO ! isBlank()
-        if  ((!nullString) && (tabbedPane != null))
-             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), newName);
+        boolean nullString = !(newName != null && newName.trim().length() > 0); // TODO ! isBlank()
+        if  ((!nullString) && (newName != null) && (tabbedPane != null))
+             tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), newName.trim());
     }
 
     @Override
-    public void setSelectedEventGraphDescription(String description) {
-        JSplitPane jsp = getCurrentVgraphComponentWrapper().stateParameterSplitPane;
-        JPanel jp = (JPanel) jsp.getTopComponent();
-        Component[] components = jp.getComponents();
-        for (Component c : components) {
-            if (c instanceof JScrollPane) {
-                c = ((JScrollPane) c).getViewport().getComponent(0);
-                ((JTextComponent) c).setText(description);
+    public void setSelectedEventGraphDescription(String description) 
+    {
+        JSplitPane splitPane = getCurrentVgraphComponentWrapper().stateParameterSplitPane;
+        JPanel panel = (JPanel) splitPane.getTopComponent();
+        Component[] componentArray = panel.getComponents();
+        for (Component component : componentArray) 
+        {
+            if (component instanceof JScrollPane) 
+            {
+                component = ((JScrollPane) component).getViewport().getComponent(0);
+                ((JTextComponent) component).setText(description);
             }
         }
     }
@@ -496,18 +513,19 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     int untitledCount = 0;
 
     @Override
-    public void addTab(Model mod) {
-        ViskitGraphModel vmod = new ViskitGraphModel();
-        ViskitGraphComponentWrapper graphPane = new ViskitGraphComponentWrapper(vmod, this);
-        vmod.setjGraph(graphPane);
-        graphPane.model = mod;
+    public void addTab(Model model) 
+    {
+        ViskitGraphModel graphModel = new ViskitGraphModel();
+        ViskitGraphComponentWrapper graphPane = new ViskitGraphComponentWrapper(graphModel, this);
+        graphModel.setjGraph(graphPane);
+        graphPane.model = model;
 
         buildStateParamSplit(graphPane);
 
         // Split pane with the canvas on the left and a split pane with state variables and parameters on the right.
-        JScrollPane jsp = new JScrollPane(graphPane);
+        JScrollPane scrollPane = new JScrollPane(graphPane);
 
-        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, jsp, graphPane.stateParameterSplitPane);
+        graphPane.drawingSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, graphPane.stateParameterSplitPane);
 
         // This is the key to getting the jgraph half to come up appropriately
         // wide by giving the left component (JGraph side) most of the usable
@@ -518,7 +536,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         graphPane.addMouseListener(new CursorHandler());
         try {
             graphPane.getDropTarget().addDropTargetListener(new EventGraphDropTargetAdapter());
-        } catch (TooManyListenersException tmle) {
+        } 
+        catch (TooManyListenersException tmle) {
             LOG.error(tmle);
         }
 
@@ -539,17 +558,17 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     @Override
-    public void deleteTab(Model mod)
+    public void deleteTab(Model model)
     {
-        JSplitPane jsplt;
-        JScrollPane jsp;
+        JSplitPane splitPane;
+        JScrollPane scrollPane;
         ViskitGraphComponentWrapper viskitGraphComponentWrapper;
         Runnable r;
         for (Component c : tabbedPane.getComponents()) {
-            jsplt = (JSplitPane) c;
-            jsp = (JScrollPane) jsplt.getLeftComponent();
-            viskitGraphComponentWrapper = (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
-            if (viskitGraphComponentWrapper.model == mod) {
+            splitPane = (JSplitPane) c;
+            scrollPane = (JScrollPane) splitPane.getLeftComponent();
+            viskitGraphComponentWrapper = (ViskitGraphComponentWrapper) scrollPane.getViewport().getComponent(0);
+            if (viskitGraphComponentWrapper.model == model) {
                 tabbedPane.remove(c);
                 viskitGraphComponentWrapper.isActive = false;
 
@@ -568,18 +587,20 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     @Override
     public Model[] getOpenModels() 
     {
-        JSplitPane jsplt;
-        JScrollPane jsp;
-        ViskitGraphComponentWrapper vgcw;
-        Component[] ca = tabbedPane.getComponents();
-        Model[] vm = new Model[ca.length];
-        for (int i = 0; i < vm.length; i++) {
-            jsplt = (JSplitPane) ca[i];
-            jsp = (JScrollPane) jsplt.getLeftComponent();
-            vgcw = (ViskitGraphComponentWrapper) jsp.getViewport().getComponent(0);
-            vm[i] = vgcw.model;
+        JSplitPane splitPane;
+        JScrollPane scrollPane;
+        ViskitGraphComponentWrapper graphComponentWrapper;
+        Component[] componentArray = tabbedPane.getComponents();
+        Model[] modelArray = new Model[componentArray.length];
+        
+        for (int i = 0; i < modelArray.length; i++) 
+        {
+            splitPane = (JSplitPane) componentArray[i];
+            scrollPane = (JScrollPane) splitPane.getLeftComponent();
+            graphComponentWrapper = (ViskitGraphComponentWrapper) scrollPane.getViewport().getComponent(0);
+            modelArray[i] = graphComponentWrapper.model;
         }
-        return vm;
+        return modelArray;
     }
 
     @Override
@@ -617,15 +638,15 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         @Override
         public void listChanged() 
         {
-            String nameOnly;
+            String fileName;
             Action currentAction;
-            JMenuItem mi;
+            JMenuItem menuItem;
             EventGraphController eventGraphController = (EventGraphController) getController();
-            Set<String> files = eventGraphController.getRecentEventGraphFileSet();
+            Set<String> filePathSet = eventGraphController.getRecentEventGraphFileSet();
             openRecentEventGraphMenu.removeAll(); // clear prior to rebuilding menu
             openRecentEventGraphMenu.setEnabled(false); // disable unless file is found
             File file;
-            for (String fullPath : files) 
+            for (String fullPath : filePathSet) 
             {
                 file = new File(fullPath);
                 if (!file.exists())
@@ -634,22 +655,22 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                     LOG.error("*** [EventGraphViewFrame listChanged] Event graph file not found: " + file.getPath());
                     continue; // actual file not found, skip to next file in files loop
                 }
-                nameOnly = file.getName();
-                currentAction = new ParameterizedAction(nameOnly);
+                fileName = file.getName();
+                currentAction = new ParameterizedAction(fileName);
                 currentAction.putValue(ViskitStatics.FULL_PATH, fullPath);
-                mi = new JMenuItem(currentAction);
-                mi.setToolTipText(file.getPath());
-                openRecentEventGraphMenu.add(mi);
+                menuItem = new JMenuItem(currentAction);
+                menuItem.setToolTipText(file.getPath());
+                openRecentEventGraphMenu.add(menuItem);
                 openRecentEventGraphMenu.setEnabled(true); // at least one is found
             }
-            if (!files.isEmpty()) 
+            if (!filePathSet.isEmpty()) 
             {
                 openRecentEventGraphMenu.add(new JSeparator());
                 currentAction = new ParameterizedAction("clear history");
                 currentAction.putValue(ViskitStatics.FULL_PATH, ViskitStatics.CLEAR_PATH_FLAG);  // flag
-                mi = new JMenuItem(currentAction);
-                mi.setToolTipText("Clear this list");
-                openRecentEventGraphMenu.add(mi);
+                menuItem = new JMenuItem(currentAction);
+                menuItem.setToolTipText("Clear this list");
+                openRecentEventGraphMenu.add(menuItem);
             }
             // TODO note that some items might remain loaded after "clear menu" and so wondering if that is ambiguous
         }
@@ -657,7 +678,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
     class ParameterizedAction extends javax.swing.AbstractAction 
     {
-        ParameterizedAction(String s) {
+        ParameterizedAction(String s) 
+        {
             super(s);
         }
 
@@ -674,9 +696,11 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             else
                 fullPath = (File) obj;
 
-            if (fullPath != null && fullPath.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) {
+            if (fullPath != null && fullPath.getPath().equals(ViskitStatics.CLEAR_PATH_FLAG)) 
+            {
                 eventGraphController.clearRecentEventGraphFileSet();
-            } else {
+            } 
+            else {
                 eventGraphController.openRecentEventGraph(fullPath);
             }
         }
@@ -696,7 +720,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         editMenu.add(buildMenuItem(eventGraphController, METHOD_redo, "Redo", KeyEvent.VK_Y,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Y, accelMod)));
 
-            ActionIntrospector.getAction(eventGraphController, METHOD_undo).setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, METHOD_undo).setEnabled(false);
         ActionIntrospector.getAction(eventGraphController, METHOD_redo).setEnabled(false);
         editMenu.addSeparator();
 
@@ -712,9 +736,9 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, accelMod)));
 
         // These start off being disabled, until something is selected
-        ActionIntrospector.getAction(eventGraphController, METHOD_cut).setEnabled(false);
-        ActionIntrospector.getAction(eventGraphController, METHOD_copy).setEnabled(false);
-        ActionIntrospector.getAction(eventGraphController, METHOD_paste).setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, METHOD_cut   ).setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, METHOD_copy  ).setEnabled(false);
+        ActionIntrospector.getAction(eventGraphController, METHOD_paste ).setEnabled(false);
         ActionIntrospector.getAction(eventGraphController, METHOD_remove).setEnabled(false);
         editMenu.addSeparator();
 
@@ -784,7 +808,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newSelfReferentialSchedulingEdge, "Add Self-Referential Scheduling Edge", KeyEvent.VK_A, null));
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_newSelfReferentialCancelingEdge, "Add Self-Refenential Canceling Edge", KeyEvent.VK_A, null));
 
-        // Thess start off being disabled, until something is selected
+        // These start off being disabled, until something is selected
         ActionIntrospector.getAction(eventGraphController, METHOD_newSelfReferentialSchedulingEdge).setEnabled(false);
         ActionIntrospector.getAction(eventGraphController, METHOD_newSelfReferentialCancelingEdge).setEnabled(false);
         
@@ -905,27 +929,32 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         return new JMenu(name);
     }
 
-    private JToggleButton makeJToggleButton(Action currentAction, String iconPath, String tooltipText) {
+    private JToggleButton makeJToggleButton(Action currentAction, String iconPath, String tooltipText)
+    {
         JToggleButton jToggleButton;
         if (currentAction != null) {
             jToggleButton = new JToggleButton(currentAction);
-        } else {
+        } 
+        else {
             jToggleButton = new JToggleButton();
         }
         return (JToggleButton) buttonCommon(jToggleButton, iconPath, tooltipText);
     }
 
-    private JButton makeButton(Action a, String iconPath, String tooltipText) {
-        JButton b;
-        if (a != null) {
-            b = new JButton(a);
-        } else {
-            b = new JButton();
+    private JButton makeButton(Action action, String iconPath, String tooltipText) 
+    {
+        JButton button;
+        if (action != null) {
+            button = new JButton(action);
+        } 
+        else {
+            button = new JButton();
         }
-        return (JButton) buttonCommon(b, iconPath, tooltipText);
+        return (JButton) buttonCommon(button, iconPath, tooltipText);
     }
 
-    private AbstractButton buttonCommon(AbstractButton button, String iconPath, String tooltipText) {
+    private AbstractButton buttonCommon(AbstractButton button, String iconPath, String tooltipText) 
+    {
         button.setIcon(new ImageIcon(getClass().getClassLoader().getResource(iconPath)));
         button.setToolTipText(tooltipText);
         button.setBorder(BorderFactory.createEtchedBorder());
@@ -933,113 +962,137 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         return button;
     }
 
-    private JLabel makeJLabel(String iconPath, String tooltipText) {
-        JLabel jlab = new JLabel(new ImageIcon(getClass().getClassLoader().getResource(iconPath)));
-        jlab.setToolTipText(tooltipText);
-        return jlab;
+    private JLabel makeJLabel(String iconPath, String tooltipText) 
+    {
+        JLabel label = new JLabel(new ImageIcon(getClass().getClassLoader().getResource(iconPath)));
+        label.setToolTipText(tooltipText);
+        return label;
     }
 
-    private void setupToolbar() {
+    private void setupToolbar() 
+    {
         ButtonGroup modeButtonGroup = new ButtonGroup();
         setToolBar(new JToolBar());
 
+        metadataLabel = new JLabel("Metadata: ");
+        metadataLabel.setToolTipText("Show event graph metadata");
+        
+        JButton metadataButton = makeButton(null, "viskit/images/Information24.gif",
+                "Show event graph metadata");
+        metadataButton.addActionListener((ActionEvent e) -> {
+            ((EventGraphController) getController()).editGraphMetadata();
+        });
+
         // Buttons for what mode we are in
 
-        addEvent = makeJLabel("viskit/images/eventNode.png",
+        addEventLabel = makeJLabel("viskit/images/eventNode.png",
                 "Drag onto canvas to add new events to the event graph");
-        addEvent.setBorder(BorderFactory.createCompoundBorder(
+        addEventLabel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
-        addEvent.setIcon(new EventNodeIcon());
+        addEventLabel.setIcon(new EventNodeIcon());
 
-        addSelfRef = makeJLabel("viskit/images/selfConnectingEdge.png",
+        addSelfReferentialEdgeLabel = makeJLabel("viskit/images/selfConnectingEdge.png",
                 "Drag onto an existing event node to add a self-referential scheduling edge");
-        addSelfRef.setBorder(BorderFactory.createCompoundBorder(
+        addSelfReferentialEdgeLabel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
-        addSelfCancelRef = makeJLabel("viskit/images/selfCancellingEdge.png",
+        addSelfCancellingEdgeLabel = makeJLabel("viskit/images/selfCancellingEdge.png",
                 "Drag onto an existing event node to add a self-referential canceling edge");
-        addSelfCancelRef.setBorder(BorderFactory.createCompoundBorder(
+        addSelfCancellingEdgeLabel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
-        selectMode = makeJToggleButton(null, "viskit/images/selectNode.png",
+        selectionModeButton = makeJToggleButton(null, "viskit/images/selectNode.png",
                 "Select an item on the graph");
 
-        arcMode = makeJToggleButton(null, "viskit/images/schedulingEdge.png",
-                "Connect nodes with a scheduling edge");
-        arcMode.setIcon(new SchedulingEdgeIcon());
+        schedulingEdgeModeButton = makeJToggleButton(null, "viskit/images/schedulingEdge.png",
+                "Connect centers of two nodes with a scheduling edge");
+        schedulingEdgeModeButton.setIcon(new SchedulingEdgeIcon());
 
-        cancellingEdgeMode = makeJToggleButton(null, "viskit/images/cancellingEdge.png",
-                "Connect nodes with a cancelling edge");
-        cancellingEdgeMode.setIcon(new CancellingEdgeIcon());
+        cancellingEdgeModeButton = makeJToggleButton(null, "viskit/images/cancellingEdge.png",
+                "Connect centers of two nodes nodes with a cancelling edge");
+        cancellingEdgeModeButton.setIcon(new CancellingEdgeIcon());
 
-        modeButtonGroup.add(selectMode);
-        modeButtonGroup.add(arcMode);
-        modeButtonGroup.add(cancellingEdgeMode);
+        modeButtonGroup.add(selectionModeButton);
+        modeButtonGroup.add(schedulingEdgeModeButton);
+        modeButtonGroup.add(cancellingEdgeModeButton);
 
-        JButton zoomIn = makeButton(null, "viskit/images/ZoomIn24.gif",
+        JButton zoomInButton = makeButton(null, "viskit/images/ZoomIn24.gif",
                 "Zoom in on the graph");
 
-        JButton zoomOut = makeButton(null, "viskit/images/ZoomOut24.gif",
+        JButton zoomOutButton = makeButton(null, "viskit/images/ZoomOut24.gif",
                 "Zoom out on the graph");
 
         // Make selection mode the default mode
-        selectMode.setSelected(true);
+        selectionModeButton.setSelected(true);
 
-        getToolBar().add(new JLabel("Add: "));
-        getToolBar().add(addEvent);
+        metadataLabel = new JLabel("Metadata: ");
+        metadataLabel.setToolTipText("Show event graph metadata");
+        getToolBar().add(metadataLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(addSelfRef);
+        getToolBar().add(metadataButton);
+        getToolBar().addSeparator(new Dimension(24, 24));
+
+        addLabel = new JLabel("Add: ");
+        addLabel.setToolTipText("Add an item");
+        getToolBar().add(addLabel);
+        getToolBar().add(addEventLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(addSelfCancelRef);
+        getToolBar().add(addSelfReferentialEdgeLabel);
+        getToolBar().addSeparator(new Dimension(5, 24));
+        getToolBar().add(addSelfCancellingEdgeLabel);
 
         getToolBar().addSeparator(new Dimension(24, 24));
 
-        getToolBar().add(new JLabel("Mode: "));
-        getToolBar().add(selectMode);
+        modeLabel = new JLabel("Mode: ");
+        modeLabel.setToolTipText("Select editing mode");
+        getToolBar().add(modeLabel);
+        getToolBar().add(selectionModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(arcMode);
+        getToolBar().add(schedulingEdgeModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(cancellingEdgeMode);
-
+        getToolBar().add(cancellingEdgeModeButton);
         getToolBar().addSeparator(new Dimension(24, 24));
-        getToolBar().add(new JLabel("Zoom: "));
-        getToolBar().add(zoomIn);
+
+        zoomLabel = new JLabel("Zoom: ");
+        zoomLabel.setToolTipText("Zoom in or out");
+        getToolBar().add(zoomLabel);
+        getToolBar().add(zoomInButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(zoomOut);
+        getToolBar().add(zoomOutButton);
 
         // Let the opening of Event Graphs make this visible
         getToolBar().setVisible(false);
 
-        zoomIn.addActionListener((ActionEvent e) -> {
+        zoomInButton.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setScale(getCurrentVgraphComponentWrapper().getScale() + 0.1d);
         });
-        zoomOut.addActionListener((ActionEvent e) -> {
+        zoomOutButton.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setScale(Math.max(getCurrentVgraphComponentWrapper().getScale() - 0.1d, 0.1d));
         });
 
         TransferHandler th = new TransferHandler("text");
         DragMouseAdapter dma = new DragMouseAdapter();
-        addEvent.setTransferHandler(th);
-        addEvent.addMouseListener(dma);
-        addSelfRef.setTransferHandler(th);
-        addSelfRef.addMouseListener(dma);
-        addSelfCancelRef.setTransferHandler(th);
-        addSelfCancelRef.addMouseListener(dma);
+        addEventLabel.setTransferHandler(th);
+        addEventLabel.addMouseListener(dma);
+        addSelfReferentialEdgeLabel.setTransferHandler(th);
+        addSelfReferentialEdgeLabel.addMouseListener(dma);
+        addSelfCancellingEdgeLabel.setTransferHandler(th);
+        addSelfCancellingEdgeLabel.addMouseListener(dma);
 
         // These buttons perform operations that are internal to our view class, and therefore their operations are
         // not under control of the application controller (EventGraphControllerImpl.java).  Small, simple anonymous inner classes
         // such as these have been certified by the Surgeon General to be only minimally detrimental to code health.
 
-        selectMode.addActionListener((ActionEvent e) -> {
+        selectionModeButton.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setPortsVisible(false);
         });
-        arcMode.addActionListener((ActionEvent e) -> {
+        schedulingEdgeModeButton.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setPortsVisible(true);
         });
-        cancellingEdgeMode.addActionListener((ActionEvent e) -> {
+        cancellingEdgeModeButton.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setPortsVisible(true);
         });
     }
@@ -1170,13 +1223,13 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         @Override
         public void mouseEntered(MouseEvent e) {
             switch (getCurrentMode()) {
-                case SELECT_MODE:
+                case SELECTION_MODE:
                     getCurrentVgraphComponentWrapper().setCursor(select);
                     break;
-                case ARC_MODE:
+                case SCHEDULING_EDGE_MODE:
                     getCurrentVgraphComponentWrapper().setCursor(arc);
                     break;
-                case CANCEL_ARC_MODE:
+                case CANCELLING_EDGE_MODE:
                     getCurrentVgraphComponentWrapper().setCursor(cancel);
                     break;
                 default:
@@ -1197,9 +1250,9 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         @Override
         public void mousePressed(MouseEvent e) {
             JComponent c = (JComponent) e.getSource();
-            if (c == EventGraphViewFrame.this.addSelfRef) {
+            if (c == EventGraphViewFrame.this.addSelfReferentialEdgeLabel) {
                 dragger = SELF_REF_DRAG;
-            } else if (c == EventGraphViewFrame.this.addSelfCancelRef) {
+            } else if (c == EventGraphViewFrame.this.addSelfCancellingEdgeLabel) {
                 dragger = SELF_REF_CANCEL_DRAG;
             } else {
                 dragger = NODE_DRAG;
@@ -1231,8 +1284,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             switch (dragger) {
                 case NODE_DRAG:
                     Point pp = new Point(
-                            p.x - addEvent.getWidth(),
-                            p.y - addEvent.getHeight());
+                            p.x - addEventLabel.getWidth(),
+                            p.y - addEventLabel.getHeight());
                     ((EventGraphController) getController()).buildNewEventNode(pp);
                     break;
                 case SELF_REF_CANCEL_DRAG:
@@ -1371,13 +1424,13 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
     @Override
     public boolean doEditNode(EventNode node) {
-        selectMode.doClick();     // always go back into select mode
+        selectionModeButton.doClick();     // always go back into select mode
         return EventNodeInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrame(), node); // blocks
     }
 
     @Override
     public boolean doEditEdge(Edge edge) {
-        selectMode.doClick();     // always go back into select mode
+        selectionModeButton.doClick();     // always go back into select mode
         return EdgeInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrame(), edge); // blocks
     }
 
