@@ -138,7 +138,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     static final Logger LOG = LogManager.getLogger();
 
     // Modes we can be in--selecting items, adding nodes to canvas, drawing arcs, etc.
-    public final static int SELECTION_MODE = 0;
+    public final static int SELECT_MODE = 0;
     public final static int ADD_NODE_MODE = 1;
     public final static int SCHEDULING_EDGE_MODE = 2;
     public final static int CANCELLING_EDGE_MODE = 3;
@@ -157,7 +157,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     private JLabel addSelfCancellingEdgeLabel;
     
     private JLabel modeLabel;
-    private JToggleButton selectionModeButton;
+    private JToggleButton selectModeButton;
     private JToggleButton schedulingEdgeModeButton;
     private JToggleButton cancellingEdgeModeButton;
     private JLabel zoomLabel;
@@ -200,8 +200,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     {
         // Use the button's selected status to figure out what mode we are in.
 
-        if (selectionModeButton.isSelected()) {
-            return SELECTION_MODE;
+        if (selectModeButton.isSelected()) {
+            return SELECT_MODE;
         }
         if (schedulingEdgeModeButton.isSelected()) {
             return SCHEDULING_EDGE_MODE;
@@ -1004,7 +1004,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
-        selectionModeButton = makeJToggleButton(null, "viskit/images/selectNode.png",
+        selectModeButton = makeJToggleButton(null, "viskit/images/selectNode.png",
                 "Select an item on the graph");
 
         schedulingEdgeModeButton = makeJToggleButton(null, "viskit/images/schedulingEdge.png",
@@ -1015,18 +1015,18 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 "Connect centers of two nodes nodes with a cancelling edge");
         cancellingEdgeModeButton.setIcon(new CancellingEdgeIcon());
 
-        modeButtonGroup.add(selectionModeButton);
+        modeButtonGroup.add(selectModeButton);
         modeButtonGroup.add(schedulingEdgeModeButton);
         modeButtonGroup.add(cancellingEdgeModeButton);
 
         JButton zoomInButton = makeButton(null, "viskit/images/ZoomIn24.gif",
-                "Zoom in on the graph");
+                "Zoom in towards the graph");
 
         JButton zoomOutButton = makeButton(null, "viskit/images/ZoomOut24.gif",
-                "Zoom out on the graph");
+                "Zoom out from the graph");
 
         // Make selection mode the default mode
-        selectionModeButton.setSelected(true);
+        selectModeButton.setSelected(true);
 
         metadataLabel = new JLabel("Metadata: ");
         metadataLabel.setToolTipText("Show event graph metadata");
@@ -1049,7 +1049,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         modeLabel = new JLabel("Mode: ");
         modeLabel.setToolTipText("Select editing mode");
         getToolBar().add(modeLabel);
-        getToolBar().add(selectionModeButton);
+        getToolBar().add(selectModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(schedulingEdgeModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
@@ -1086,7 +1086,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         // not under control of the application controller (EventGraphControllerImpl.java).  Small, simple anonymous inner classes
         // such as these have been certified by the Surgeon General to be only minimally detrimental to code health.
 
-        selectionModeButton.addActionListener((ActionEvent e) -> {
+        selectModeButton.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setPortsVisible(false);
         });
         schedulingEdgeModeButton.addActionListener((ActionEvent e) -> {
@@ -1223,7 +1223,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         @Override
         public void mouseEntered(MouseEvent e) {
             switch (getCurrentMode()) {
-                case SELECTION_MODE:
+                case SELECT_MODE:
                     getCurrentVgraphComponentWrapper().setCursor(select);
                     break;
                 case SCHEDULING_EDGE_MODE:
@@ -1424,13 +1424,13 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
     @Override
     public boolean doEditNode(EventNode node) {
-        selectionModeButton.doClick();     // always go back into select mode
+        selectModeButton.doClick();     // always go back into select mode
         return EventNodeInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrame(), node); // blocks
     }
 
     @Override
     public boolean doEditEdge(Edge edge) {
-        selectionModeButton.doClick();     // always go back into select mode
+        selectModeButton.doClick();     // always go back into select mode
         return EdgeInspectorDialog.showDialog(ViskitGlobals.instance().getMainFrame(), edge); // blocks
     }
 
