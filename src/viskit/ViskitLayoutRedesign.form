@@ -94,7 +94,7 @@
           <SubComponents>
             <Menu class="javax.swing.JMenu" name="editEventGraphSubMenu">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit selected Event Graph..."/>
+                <Property name="text" type="java.lang.String" value="Edit Event Graph..."/>
               </Properties>
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="undoEventEditMenuItem">
@@ -204,7 +204,7 @@
             </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="eventGraphMetadataPropertiesMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit selected Event Graph Metadata Properties"/>
+                <Property name="text" type="java.lang.String" value="Edit Event Graph Metadata"/>
                 <Property name="toolTipText" type="java.lang.String" value="graph metadata editor"/>
               </Properties>
               <Events>
@@ -279,7 +279,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="imageSaveDiagramEventGraphMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Image Save for Event Graph Diagram"/>
+                <Property name="text" type="java.lang.String" value="Graph Image Save"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="imageSaveDiagramEventGraphMIActionPerformed"/>
@@ -287,12 +287,15 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="javaSourceEventGraphMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Java Source Generation of saved Event Graph"/>
+                <Property name="text" type="java.lang.String" value="Java Source Generation"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="javaSourceEventGraphMIActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="xmlViewEventGraphMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="XML View of Saved Event Graph"/>
+                <Property name="text" type="java.lang.String" value="XML View"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="xmlViewEventGraphMIActionPerformed"/>
@@ -307,7 +310,7 @@
           <SubComponents>
             <Menu class="javax.swing.JMenu" name="editAssemblySubMenu">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit selected Assembly..."/>
+                <Property name="text" type="java.lang.String" value="Edit Assembly..."/>
               </Properties>
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="undoAssemblyEditMenuItem">
@@ -396,7 +399,7 @@
             </Menu>
             <MenuItem class="javax.swing.JMenuItem" name="assemblyMetadataPropertiesMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit selected Assembly Metadata Properties"/>
+                <Property name="text" type="java.lang.String" value="Edit Assembly Metadata"/>
                 <Property name="toolTipText" type="java.lang.String" value="graph metadata editor"/>
               </Properties>
               <Events>
@@ -471,7 +474,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="imageSaveDiagramAssemblyMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Image Save for Assembly Diagram"/>
+                <Property name="text" type="java.lang.String" value="Graph Image Save"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="imageSaveDiagramAssemblyMIActionPerformed"/>
@@ -487,7 +490,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="xmlViewAssemblyMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="XML View of Saved Assembly"/>
+                <Property name="text" type="java.lang.String" value="XML View"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
             </MenuItem>

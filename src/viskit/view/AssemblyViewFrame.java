@@ -499,7 +499,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.setMnemonic(KeyEvent.VK_A);
 
         // Set up edit submenu
-        JMenu editSubMenu = new JMenu("Edit selected Assembly");
+        JMenu editSubMenu = new JMenu("Edit Assembly...");
+        editSubMenu.setToolTipText("Edit functions for selected Asssembly");
         editSubMenu.setMnemonic(KeyEvent.VK_E);
         if (!ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus()) // combined menu integration
         {
@@ -534,8 +535,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         editSubMenu.add(buildMenuItem(assemblyController, METHOD_newPropertyChangeListenerNode, "Add a new Property Change Listener", KeyEvent.VK_L, null));
         
         assemblyMenu.add(editSubMenu);
-        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_editGraphMetadata, "Edit selected Assembly Metadata Properties", KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+        JMenuItem editMetadataPropertiesMenuItem = buildMenuItem(assemblyController, METHOD_editGraphMetadata, "Edit Assembly Metadata", KeyEvent.VK_E,
+                KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+        editMetadataPropertiesMenuItem.setToolTipText("Edit selected Assembly Metadata Properties");
+        assemblyMenu.add(editMetadataPropertiesMenuItem);
         assemblyMenu.addSeparator();
         }
 
@@ -581,11 +584,17 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.add(buildMenuItem(assemblyController, METHOD_saveAs, "Save Assembly as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         assemblyMenu.addSeparator();
-        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_captureWindow, "Image Save for Assembly Diagram", KeyEvent.VK_I,
-                KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_generateJavaSource, "Java Source Generation for Saved Assembly", KeyEvent.VK_J, // TODO confirm "saved"
-                KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_viewXML, "XML View of Saved Assembly", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+        JMenuItem assemblyGraphImageSave = buildMenuItem(assemblyController, METHOD_captureWindow, "Graph Image Save", KeyEvent.VK_I,
+                KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+        assemblyGraphImageSave.setToolTipText("Graph Image Save for Assembly Diagram");
+        assemblyMenu.add(assemblyGraphImageSave);
+        JMenuItem assemblyGenerateJavaSourceMenuItem = buildMenuItem(assemblyController, METHOD_generateJavaSource, "Java Source Generation", KeyEvent.VK_J, // TODO confirm "saved"
+                KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+        assemblyGenerateJavaSourceMenuItem.setToolTipText("Java Source Generation and Compilation for Saved Assembly");
+        assemblyMenu.add(assemblyGenerateJavaSourceMenuItem);
+        JMenuItem assemblyXmlViewMenuItem = buildMenuItem(assemblyController, METHOD_viewXML, "XML View", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+        assemblyXmlViewMenuItem.setToolTipText("XML View of Saved Assembly");
+        assemblyMenu.add(assemblyXmlViewMenuItem);
         
         
 /* TODO fix functionality before exposing
@@ -727,10 +736,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         setToolBar(new JToolBar());
 
         metadataLabel = new JLabel("Metadata: ");
-        metadataLabel.setToolTipText("Show assembly metadata");
+        metadataLabel.setToolTipText("Edit Assembly Metadata");
         
         JButton metadataButton = makeButton(null, "viskit/images/Information24.gif",
-                "Show assembly metadata");
+                "Edit Assembly Metadata");
         metadataButton.addActionListener((ActionEvent e) -> {
             ((AssemblyControllerImpl) getController()).editGraphMetadata();
         });

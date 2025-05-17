@@ -773,7 +773,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphMenu = new JMenu("Event Graph"); // Editor
         eventGraphMenu.setMnemonic(KeyEvent.VK_E);
 
-        editEventGraphSubMenu = new JMenu("Edit selected Event Graph..."); // submenu
+        editEventGraphSubMenu = new JMenu("Edit Event Graph..."); // submenu
+        editEventGraphSubMenu.setToolTipText("Edit functions for selected Event Graph");
         editEventGraphSubMenu.setMnemonic(KeyEvent.VK_E);
         editEventGraphSubMenu.add(buildMenuItem(eventGraphController, METHOD_undo, "Undo", KeyEvent.VK_Z,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, accelMod)));
@@ -814,8 +815,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         
         // TODO "disable" both of these if no Event Graph is active
         eventGraphMenu.add(editEventGraphSubMenu);
-        eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_editGraphMetadata, "Edit selected Event Graph Metadata Properties...", KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
+        JMenuItem editEventGraphMetadataMenuItem = buildMenuItem(eventGraphController, METHOD_editGraphMetadata, "Edit Event Graph Metadata", KeyEvent.VK_E,
+                KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod));
+        editEventGraphMetadataMenuItem.setToolTipText("Edit selected Event Graph Metadata Properties");
+        eventGraphMenu.add(editEventGraphMetadataMenuItem);
         eventGraphMenu.addSeparator();
 
         if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
@@ -852,11 +855,17 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_saveAs, "Save Event Graph as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, accelMod)));
         eventGraphMenu.addSeparator();
 
-        eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_captureWindow, "Image Save for Event Graph Diagram", KeyEvent.VK_I,
-                KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod)));
-        eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_generateJavaSource, "Java Source Generation for saved Event Graph", KeyEvent.VK_J,
-                KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod)));
-        eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_viewXML, "XML View of Saved Event Graph", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod)));
+        JMenuItem eventGraphGraphImageSave = buildMenuItem(eventGraphController, METHOD_captureWindow, "Graph Image Save", KeyEvent.VK_I,
+                KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod));
+        eventGraphGraphImageSave.setToolTipText("Graph Image Save for Event Graph Diagram");
+        eventGraphMenu.add(eventGraphGraphImageSave);
+        JMenuItem eventGraphGenerateJavaSourceMenuItem = buildMenuItem(eventGraphController, METHOD_generateJavaSource, "Java Source Generation", KeyEvent.VK_J,
+                KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod));
+        eventGraphGenerateJavaSourceMenuItem.setToolTipText("Java Source Generation and Compilation for saved Event Graph");
+        eventGraphMenu.add(eventGraphGenerateJavaSourceMenuItem);
+        JMenuItem eventGraphXmlViewMenuItem = buildMenuItem(eventGraphController, METHOD_viewXML, "XML View", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod));
+        eventGraphXmlViewMenuItem.setToolTipText("XML View of Saved Event Graph");
+        eventGraphMenu.add(eventGraphXmlViewMenuItem);
 
         if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
@@ -975,10 +984,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         setToolBar(new JToolBar());
 
         metadataLabel = new JLabel("Metadata: ");
-        metadataLabel.setToolTipText("Show event graph metadata");
+        metadataLabel.setToolTipText("Edit Event Graph Metadata");
         
         JButton metadataButton = makeButton(null, "viskit/images/Information24.gif",
-                "Show event graph metadata");
+                "Edit Event Graph Metadata");
         metadataButton.addActionListener((ActionEvent e) -> {
             ((EventGraphController) getController()).editGraphMetadata();
         });
@@ -1029,7 +1038,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         selectModeButton.setSelected(true);
 
         metadataLabel = new JLabel("Metadata: ");
-        metadataLabel.setToolTipText("Show event graph metadata");
+        metadataLabel.setToolTipText("Edit event graph metadata");
         getToolBar().add(metadataLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(metadataButton);
@@ -1105,7 +1114,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
      */
     public void toggleEventGraphStatusIndicators()
     {
-        int selectedTab = tabbedPane.getSelectedIndex();
+        int selectedTabIndex = tabbedPane.getSelectedIndex();
         for (Component currentSwingComponent : tabbedPane.getComponents()) 
         {
             // This will fire a call to stateChanged() which also sets the current model
@@ -1131,7 +1140,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             }
         }
         // Restore active tab and model by virtue of firing a call to stateChanged()
-        tabbedPane.setSelectedIndex(selectedTab);
+        tabbedPane.setSelectedIndex(selectedTabIndex);
     }
 
     /** Some private classes to implement Drag and Drop (DnD) and dynamic cursor update */
@@ -1503,6 +1512,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     /**
      * @return the recentEventGraphFileListener
      */
+    @SuppressWarnings("NonPublicExported")
     public RecentEventGraphFileListener getRecentEventGraphFileListener() {
         return recentEventGraphFileListener;
     }

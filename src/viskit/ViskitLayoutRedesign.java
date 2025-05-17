@@ -437,7 +437,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         eventGraphMenu.setText("Event Graph");
         eventGraphMenu.setActionCommand("Event Graph Editor");
 
-        editEventGraphSubMenu.setText("Edit selected Event Graph...");
+        editEventGraphSubMenu.setText("Edit Event Graph...");
 
         undoEventEditMenuItem.setMnemonic(KeyEvent.VK_U);
         undoEventEditMenuItem.setText("Undo");
@@ -502,7 +502,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         eventGraphMenu.add(editEventGraphSubMenu);
 
-        eventGraphMetadataPropertiesMI.setText("Edit selected Event Graph Metadata Properties");
+        eventGraphMetadataPropertiesMI.setText("Edit Event Graph Metadata");
         eventGraphMetadataPropertiesMI.setToolTipText("graph metadata editor");
         eventGraphMetadataPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -546,7 +546,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         eventGraphMenu.add(saveEventGraphAsMI);
         eventGraphMenu.add(jSeparator7);
 
-        imageSaveDiagramEventGraphMI.setText("Image Save for Event Graph Diagram");
+        imageSaveDiagramEventGraphMI.setText("Graph Image Save");
         imageSaveDiagramEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 imageSaveDiagramEventGraphMIActionPerformed(evt);
@@ -554,10 +554,15 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         });
         eventGraphMenu.add(imageSaveDiagramEventGraphMI);
 
-        javaSourceEventGraphMI.setText("Java Source Generation of saved Event Graph");
+        javaSourceEventGraphMI.setText("Java Source Generation");
+        javaSourceEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                javaSourceEventGraphMIActionPerformed(evt);
+            }
+        });
         eventGraphMenu.add(javaSourceEventGraphMI);
 
-        xmlViewEventGraphMI.setText("XML View of Saved Event Graph");
+        xmlViewEventGraphMI.setText("XML View");
         xmlViewEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 xmlViewEventGraphMIActionPerformed(evt);
@@ -569,7 +574,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         assemblyMenu.setText("Assembly           ");
 
-        editAssemblySubMenu.setText("Edit selected Assembly...");
+        editAssemblySubMenu.setText("Edit Assembly...");
 
         undoAssemblyEditMenuItem.setMnemonic(KeyEvent.VK_U);
         undoAssemblyEditMenuItem.setText("Undo");
@@ -625,7 +630,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
 
         assemblyMenu.add(editAssemblySubMenu);
 
-        assemblyMetadataPropertiesMI.setText("Edit selected Assembly Metadata Properties");
+        assemblyMetadataPropertiesMI.setText("Edit Assembly Metadata");
         assemblyMetadataPropertiesMI.setToolTipText("graph metadata editor");
         assemblyMetadataPropertiesMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -669,7 +674,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         assemblyMenu.add(saveAssemblyAsMI);
         assemblyMenu.add(jSeparator6);
 
-        imageSaveDiagramAssemblyMI.setText("Image Save for Assembly Diagram");
+        imageSaveDiagramAssemblyMI.setText("Graph Image Save");
         imageSaveDiagramAssemblyMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 imageSaveDiagramAssemblyMIActionPerformed(evt);
@@ -685,7 +690,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         });
         assemblyMenu.add(javaSourceAssemblyMI);
 
-        xmlViewAssemblyMI.setText("XML View of Saved Assembly");
+        xmlViewAssemblyMI.setText("XML View");
         xmlViewAssemblyMI.setToolTipText("");
         assemblyMenu.add(xmlViewAssemblyMI);
         assemblyMenu.add(jSeparator14);
@@ -871,6 +876,10 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private void imageSaveDiagramAssemblyMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imageSaveDiagramAssemblyMIActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_imageSaveDiagramAssemblyMIActionPerformed
+
+    private void javaSourceEventGraphMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_javaSourceEventGraphMIActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_javaSourceEventGraphMIActionPerformed
 
     /**
      * @param args the command line arguments
