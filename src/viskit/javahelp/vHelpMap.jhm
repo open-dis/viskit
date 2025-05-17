@@ -14,17 +14,17 @@
 
 <!-- Tutorial items -->
 
-  <mapID target="TutorialEventContents"       url="Pages/tutorialEvent.html#Contents"/>
-  <mapID target="TutorialEventIntro"          url="Pages/tutorialEvent.html#Intro"/>
-  <mapID target="TutorialEvent"               url="Pages/tutorialEvent.html#Event"/>
-  <mapID target="TutorialEventArrival"        url="Pages/tutorialEvent.html#EventArrival"/>
-  <mapID target="TutorialEventEvntParameters" url="Pages/tutorialEvent.html#EventEvntParameters"/>
-  <mapID target="TutorialEventStParmaeters"   url="Pages/tutorialEvent.html#EventStParameters"/>
-  <mapID target="TutorialEventNodes"          url="Pages/tutorialEvent.html#EventNodes"/>
-  <mapID target="TutorialEventSchedules"      url="Pages/tutorialEvent.html#EventSchedules"/>
-  <mapID target="TutorialAssembly"            url="Pages/tutorialEvent.html#Assembly"/>
+  <mapID target="TutorialEventContents"        url="Pages/tutorialEvent.html#Contents"/>
+  <mapID target="TutorialEventIntro"           url="Pages/tutorialEvent.html#Intro"/>
+  <mapID target="TutorialEvent"                url="Pages/tutorialEvent.html#Event"/>
+  <mapID target="TutorialEventArrival"         url="Pages/tutorialEvent.html#EventArrival"/>
+  <mapID target="TutorialEventParameters"      url="Pages/tutorialEvent.html#EventParameters"/>
+  <mapID target="TutorialEventStateParameters" url="Pages/tutorialEvent.html#EventStateParameters"/>
+  <mapID target="TutorialEventNodes"           url="Pages/tutorialEvent.html#EventNodes"/>
+  <mapID target="TutorialEventSchedules"       url="Pages/tutorialEvent.html#EventSchedules"/>
+  <mapID target="TutorialAssembly"             url="Pages/tutorialEvent.html#Assembly"/>
 
-  <mapID target="TutorialAssemblyContents"    url="Pages/tutorialAssembly.html#Contents"/>
+  <mapID target="TutorialAssemblyContents"     url="Pages/tutorialAssembly.html#Contents"/>
 
 <!-- Tab items -->
 
