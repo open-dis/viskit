@@ -820,6 +820,15 @@ their descpritions.
             <fileset dir="MyViskitProjects/DefaultProject/build">
                 <include name="**/*.class"/>
                 <include name="**/*.java"/>
+                <include name="**/*.png"/>
+            </fileset>
+        </delete>
+        <delete verbose="true">
+            <fileset dir="MyViskitProjects/DefaultProject/Assemblies">
+                <include name="**/*.png"/>
+            </fileset>
+            <fileset dir="MyViskitProjects/DefaultProject/EventGraphs">
+                <include name="**/*.png"/>
             </fileset>
         </delete>
     </target>
