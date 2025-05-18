@@ -201,6 +201,11 @@ public class ViskitGlobals
 
     /** The main app JavaHelp set */
     private Help help;
+
+    /* EventGraphViewFrame / EventGraphControllerImpl */
+
+    EventGraphViewFrame      eventGraphViewFrame;
+    EventGraphControllerImpl eventGraphController;
     
     /* Configuration constants and methods */
 
@@ -227,7 +232,7 @@ public class ViskitGlobals
      * Get a reference to the assembly editor view.
      * @return a reference to the assembly editor view or null if yet unbuilt.
      */
-    public AssemblyViewFrame getAssemblyViewFrame() {
+    public AssemblyViewFrame getAssemblyEditorViewFrame() {
         return (AssemblyViewFrame) assemblyViewFrame;
     }
 
@@ -286,22 +291,21 @@ public class ViskitGlobals
     };
     ActionListener assemblyQuitActionListener = defaultAssemblyQuitActionListener;
 
-    public void quitAssemblyEditor() {
-        if (assemblyQuitActionListener != null) {
-            assemblyQuitActionListener.actionPerformed(new ActionEvent(this, 0, "quit Assembly editor"));
+    public void quitAssemblyEditor() 
+    {
+        if (assemblyQuitActionListener != null) 
+        {
+            assemblyQuitActionListener.actionPerformed(new ActionEvent(this, 0, "quit Assembly Editor"));
         }
     }
 
-    public void setAssemblyQuitActionListener(ActionListener newActionListener) {
+    public void setAssemblyQuitActionListener(ActionListener newActionListener) 
+    {
         assemblyQuitActionListener = newActionListener;
     }
 
-    /* EventGraphViewFrame / EventGraphControllerImpl */
-
-    EventGraphViewFrame      eventGraphViewFrame;
-    EventGraphControllerImpl eventGraphController;
-
-    public EventGraphViewFrame getEventGraphViewFrame() {
+    public EventGraphViewFrame getEventGraphViewFrame() 
+    {
         return (EventGraphViewFrame) eventGraphViewFrame;
     }
 
@@ -1513,7 +1517,7 @@ public class ViskitGlobals
      */
     public void messageUser(int messageType, String messageTitle, String messageBody) // messageType is one of JOptionPane types
     {
-        if (ViskitGlobals.instance().getAssemblyViewFrame() != null)
+        if (ViskitGlobals.instance().getAssemblyEditorViewFrame() != null)
             ViskitGlobals.instance().getMainFrame().genericReport(messageType, messageTitle, messageBody);
     }
 

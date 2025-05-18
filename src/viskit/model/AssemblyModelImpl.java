@@ -13,7 +13,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlIDREF;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
@@ -82,12 +81,12 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
     @Override
     public boolean isDirty() {
-        return modelDirty;
+        return isModelDirty();
     }
 
     @Override
-    public void setDirty(boolean value) {
-        modelDirty = value;
+    public void setDirty(boolean newValue) {
+        setModelDirty(newValue);
     }
 
     @Override
@@ -101,9 +100,16 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void changeMetadata(GraphMetadata newGraphMetadata) {
+    public void changeMetadata(GraphMetadata newGraphMetadata)
+    {
         this.graphMetadata = newGraphMetadata;
         setDirty(true);
+    }
+
+    public void loadMetadata(GraphMetadata newGraphMetadata)
+    {
+        this.graphMetadata = newGraphMetadata;
+        // we are loading and not changing, and so dirty bit is not set
     }
 
     @Override
@@ -156,7 +162,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                     myGraphMetadata.verbose = schedule.getVerbose().equalsIgnoreCase("true");
                 }
 
-                changeMetadata(myGraphMetadata);
+                loadMetadata(myGraphMetadata); // no change to dirty status
                 buildEventGraphsFromJaxb(jaxbRoot.getSimEntity(), jaxbRoot.getOutput(), jaxbRoot.getVerbose());
                 buildPropertyChangeListenersFromJaxb(jaxbRoot.getPropertyChangeListener());
                 buildPropertyChangeListenerConnectionsFromJaxb(jaxbRoot.getPropertyChangeListenerConnection());
@@ -187,15 +193,15 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         }
         else title = "UnsavedAssemblyFile";
         
-        setDirty(false);
+        setDirty(false); // important to clear prior values from setup and intitialization
         return true;
     }
 
     @Override
-    public void saveModel(File savableAssemblyModel) 
+    public void saveModel(File savableAssemblyModelFile) 
     {
-        if (savableAssemblyModel == null) {
-            savableAssemblyModel = currentAssemblyModelFile;
+        if (savableAssemblyModelFile == null) {
+            savableAssemblyModelFile = currentAssemblyModelFile;
         }
 
         // Do the marshalling into a temporary file so as to avoid possible
@@ -218,7 +224,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             return;
         }
 
-        try {
+        try 
+        {
             fileWriter = new FileWriter(tempAssemblyMarshallFile);
             Marshaller assemblyMarshaller = jaxbContext.createMarshaller();
             assemblyMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -250,16 +257,16 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             assemblyMarshaller.marshal(jaxbRoot, fileWriter);
 
             // OK, made it through the marshal, overwrite the "real" file
-            Files.copy(tempAssemblyMarshallFile.toPath(), savableAssemblyModel.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(tempAssemblyMarshallFile.toPath(), savableAssemblyModelFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            modelDirty = false;
-            currentAssemblyModelFile = savableAssemblyModel;
+            setModelDirty(false);
+            currentAssemblyModelFile = savableAssemblyModelFile;
         }
         catch (JAXBException e) {
             ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE,
                     "XML I/O Error",
                     "Exception on JAXB marshalling" +
-                    "\n" + savableAssemblyModel +
+                    "\n" + savableAssemblyModelFile +
                     "\n" + e.getMessage() +
                     "\n(check for blank data fields)"
                     );
@@ -267,13 +274,15 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         catch (IOException ex) {
             ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE,
                     "File I/O Error",
-                    "Exception on writing " + savableAssemblyModel.getName() +
+                    "Exception on writing " + savableAssemblyModelFile.getName() +
                     "\n" + ex.getMessage());
-        } finally {
+        } 
+        finally {
             try {
                 if (fileWriter != null)
                     fileWriter.close();
-            } catch (IOException ioe) {}
+            } 
+            catch (IOException ioe) {}
         }
     }
 
@@ -379,7 +388,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbRoot.getSimEntity().add(jaxbEventGraph);
 
-        modelDirty = true;
+        setModelDirty(true);
         notifyChanged(new ModelEvent(node, ModelEvent.EVENT_GRAPH_ADDED, "Event graph added to assembly"));
     }
 
@@ -395,17 +404,18 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbRoot.getSimEntity().add(jaxbEventGraph);
 
-        modelDirty = true;
+        setModelDirty(true);
         notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_GRAPH, "Event Graph redone"));
     }
 
     @Override
-    public void deleteEventGraphNode(EventGraphNode eventGraphNode) {
+    public void deleteEventGraphNode(EventGraphNode eventGraphNode) 
+    {
         SimEntity jaxbEvent = (SimEntity) eventGraphNode.opaqueModelObject;
         getNodeCache().remove(jaxbEvent.getName());
         jaxbRoot.getSimEntity().remove(jaxbEvent);
 
-        modelDirty = true;
+        setModelDirty(true);
 
         if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.EVENT_GRAPH_DELETED, "Event Graph deleted"));
@@ -444,7 +454,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbRoot.getPropertyChangeListener().add(pcl);
 
-        modelDirty = true;
+        setModelDirty(true);
         notifyChanged(new ModelEvent(propertyChangeListenerNode, ModelEvent.PCL_ADDED, "Property Change Node added to assembly"));
     }
 
@@ -460,17 +470,18 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbRoot.getPropertyChangeListener().add(jaxbPCL);
 
-        modelDirty = true;
+        setModelDirty(true);
         notifyChanged(new ModelEvent(propertyChangeListenerNode, ModelEvent.REDO_PCL, "Property Change Node redone"));
     }
 
     @Override
-    public void deletePropertyChangeListener(PropertyChangeListenerNode pclNode) {
+    public void deletePropertyChangeListener(PropertyChangeListenerNode pclNode) 
+    {
         PropertyChangeListener jaxbPcNode = (PropertyChangeListener) pclNode.opaqueModelObject;
         getNodeCache().remove(pclNode.getName());
         jaxbRoot.getPropertyChangeListener().remove(jaxbPcNode);
 
-        modelDirty = true;
+        setModelDirty(true);
 
         if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(pclNode, ModelEvent.PCL_DELETED, "Property Change Listener deleted"));
@@ -498,7 +509,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbRoot.getAdapter().add(jaxbAdapter);
 
-        modelDirty = true;
+        setModelDirty(true);
 
         this.notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTER_EDGE_ADDED, "Adapter edge added"));
         return ae;
@@ -519,7 +530,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbRoot.getAdapter().add(jaxbAdapter);
 
-        modelDirty = true;
+        setModelDirty(true);
 
         this.notifyChanged(new ModelEvent(ae, ModelEvent.REDO_ADAPTER_EDGE, "Adapter edge added"));
     }
@@ -541,7 +552,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         pclc.setSource(src.getName());
 
         jaxbRoot.getPropertyChangeListenerConnection().add(pclc);
-        modelDirty = true;
+        setModelDirty(true);
 
         this.notifyChanged(new ModelEvent(pce, ModelEvent.PCL_EDGE_ADDED, "PCL edge added"));
         return pce;
@@ -561,7 +572,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         pclc.setSource(source.getName());
 
         jaxbRoot.getPropertyChangeListenerConnection().add(pclc);
-        modelDirty = true;
+        setModelDirty(true);
 
         this.notifyChanged(new ModelEvent(propertyChangeEdge, ModelEvent.REDO_PCL_EDGE, "PCL edge added"));
     }
@@ -584,7 +595,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbRoot.getSimEventListenerConnection().add(simEventListenerConnection);
 
-        modelDirty = true;
+        setModelDirty(true);
         notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIM_EVENT_LISTENER_EDGE_ADDED, "SimEventListener edge added"));
     }
 
@@ -602,7 +613,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbRoot.getSimEventListenerConnection().add(selc);
 
-        modelDirty = true;
+        setModelDirty(true);
         notifyChanged(new ModelEvent(sele, ModelEvent.REDO_SIM_EVENT_LISTENER_EDGE, "SimEventListener Edge redone"));
     }
 
@@ -612,7 +623,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbRoot.getPropertyChangeListenerConnection().remove(pclc);
 
-        modelDirty = true;
+        setModelDirty(true);
 
         if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(pce, ModelEvent.PCL_EDGE_DELETED, "PCL edge deleted"));
@@ -626,7 +637,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         jaxbRoot.getSimEventListenerConnection().remove(sel_c);
 
-        modelDirty = true;
+        setModelDirty(true);
 
         if (!assemblyController.isUndo())
             notifyChanged(new ModelEvent(sele, ModelEvent.SIM_EVENT_LISTENER_EDGE_DELETED, "SimEventListener edge deleted"));
@@ -635,16 +646,17 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deleteAdapterEdge(AdapterEdge ae) {
-        Adapter j_adp = (Adapter) ae.opaqueModelObject;
-        jaxbRoot.getAdapter().remove(j_adp);
+    public void deleteAdapterEdge(AdapterEdge adapterEdge) 
+    {
+        Adapter adapterToDelete = (Adapter) adapterEdge.opaqueModelObject;
+        jaxbRoot.getAdapter().remove(adapterToDelete);
 
-        modelDirty = true;
+        setModelDirty(true);
 
         if (!assemblyController.isUndo())
-            notifyChanged(new ModelEvent(ae, ModelEvent.ADAPTER_EDGE_DELETED, "Adapter edge deleted"));
+            notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_DELETED, "Adapter edge deleted"));
         else
-            notifyChanged(new ModelEvent(ae, ModelEvent.UNDO_ADAPTER_EDGE, "Adapter edge undone"));
+            notifyChanged(new ModelEvent(adapterEdge, ModelEvent.UNDO_ADAPTER_EDGE, "Adapter edge undone"));
     }
 
     @Override
@@ -654,7 +666,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         propertyChangeListenerConnection.setProperty(pclEdge.getProperty());
         propertyChangeListenerConnection.setDescription(pclEdge.getDescription());
 
-        modelDirty = true;
+        setModelDirty(true);
         notifyChanged(new ModelEvent(pclEdge, ModelEvent.PCL_EDGE_CHANGED, "PCL edge changed"));
     }
 
@@ -674,23 +686,23 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         jaxbAdapter.setName(adapterEdge.getName());
         jaxbAdapter.setDescription(adapterEdge.getDescription());
 
-        modelDirty = true;
+        setModelDirty(true);
         notifyChanged(new ModelEvent(adapterEdge, ModelEvent.ADAPTER_EDGE_CHANGED, "Adapter edge changed"));
     }
 
     @Override
-    public void changeSimEvEdge(SimEventListenerEdge simEventListenerEdge) 
+    public void changeSimEventListenerEdge(SimEventListenerEdge newSimEventListenerEdge) 
     {
-        EventGraphNode sourceEventGraphNode = (EventGraphNode) simEventListenerEdge.getFrom();
-        EventGraphNode targetEventGraphNode = (EventGraphNode) simEventListenerEdge.getTo();
-        SimEventListenerConnection simEventListenerConnection = (SimEventListenerConnection) simEventListenerEdge.opaqueModelObject;
+        EventGraphNode sourceEventGraphNode = (EventGraphNode) newSimEventListenerEdge.getFrom();
+        EventGraphNode targetEventGraphNode = (EventGraphNode) newSimEventListenerEdge.getTo();
+        SimEventListenerConnection simEventListenerConnection = (SimEventListenerConnection) newSimEventListenerEdge.opaqueModelObject;
 
         simEventListenerConnection.setListener(targetEventGraphNode.getName());
         simEventListenerConnection.setSource  (sourceEventGraphNode.getName());
-        simEventListenerConnection.setDescription(simEventListenerEdge.getDescription());
+        simEventListenerConnection.setDescription(newSimEventListenerEdge.getDescription());
 
-        modelDirty = true;
-        notifyChanged(new ModelEvent(simEventListenerEdge, ModelEvent.SIM_EVENT_LISTENER_EDGE_CHANGED, "SimEventListenerener edge changed"));
+        setModelDirty(true);
+        notifyChanged(new ModelEvent(newSimEventListenerEdge, ModelEvent.SIM_EVENT_LISTENER_EDGE_CHANGED, "SimEventListenerener edge changed"));
     }
 
     @Override
@@ -746,65 +758,66 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         for (Object o : mp.getParameters()) 
             objectList.add(o);
 
-        modelDirty = true;
+        setModelDirty(true);
         this.notifyChanged(new ModelEvent(propertyChangeListenerNode, ModelEvent.PCL_CHANGED, "Property Change Listener node changed"));
         return returnValue;
     }
 
     @Override
-    public boolean changeEvGraphNode(EventGraphNode evNode) {
-        boolean retcode = true;
+    public boolean changeEventGraphNode(EventGraphNode eventGraphNode) 
+    {
+        boolean returnValue = true;
         if (!nameCheck()) {
-            mangleName(evNode);
-            retcode = false;
+            mangleName(eventGraphNode);
+            returnValue = false;
         }
-        SimEntity jaxbSE = (SimEntity) evNode.opaqueModelObject;
+        SimEntity jaxbSimEntity = (SimEntity) eventGraphNode.opaqueModelObject;
 
-        jaxbSE.setName(evNode.getName());
-        jaxbSE.setType(evNode.getType());
-        jaxbSE.setDescription(evNode.getDescription());
+        jaxbSimEntity.setName(eventGraphNode.getName());
+        jaxbSimEntity.setType(eventGraphNode.getType());
+        jaxbSimEntity.setDescription(eventGraphNode.getDescription());
 
-        double x = evNode.getPosition().getX();
-        double y = evNode.getPosition().getY();
+        double x = eventGraphNode.getPosition().getX();
+        double y = eventGraphNode.getPosition().getY();
         Coordinate coor = jaxbAssemblyObjectFactory.createCoordinate();
         coor.setX("" + x);
         coor.setY("" + y);
-        evNode.getPosition().setLocation(x, y);
-        jaxbSE.setCoordinate(coor);
+        eventGraphNode.getPosition().setLocation(x, y);
+        jaxbSimEntity.setCoordinate(coor);
 
-        List<Object> lis = jaxbSE.getParameters();
-        lis.clear();
+        List<Object> parameterList = jaxbSimEntity.getParameters();
+        parameterList.clear();
 
-        ViskitModelInstantiator inst = evNode.getInstantiator();
+        ViskitModelInstantiator instantiator = eventGraphNode.getInstantiator();
 
         // this will be a list of one...a MultiParameter....get its list, but
         // throw away the object itself.  This is because the SimEntity object
         // serves as "its own" MultiParameter.
-        List<Object> jlistt = getJaxbParameterList(inst);
+        List<Object> jaxbParameterList = getJaxbParameterList(instantiator);
 
-        if (jlistt.size() != 1)
+        if (jaxbParameterList.size() != 1)
             throw new RuntimeException("Design error in AssemblyModel");
 
-        MultiParameter mp = (MultiParameter) jlistt.get(0);
+        MultiParameter multiParameter = (MultiParameter) jaxbParameterList.get(0);
 
-        for (Object o : mp.getParameters())
-            lis.add(o);
+        for (Object o : multiParameter.getParameters())
+            parameterList.add(o);
 
-        if (evNode.isOutputMarked()) {
-            addToOutputList(jaxbSE);
+        if (eventGraphNode.isOutputMarked()) {
+            addToOutputList(jaxbSimEntity);
         } else {
-            removeFromOutputList(jaxbSE);
+            removeFromOutputList(jaxbSimEntity);
         }
 
-        if (evNode.isVerboseMarked()) {
-            addToVerboseList(jaxbSE);
+        if (eventGraphNode.isVerboseMarked()) {
+            addToVerboseList(jaxbSimEntity);
         } else {
-            removeFromVerboseList(jaxbSE);
+            removeFromVerboseList(jaxbSimEntity);
         }
 
-        modelDirty = true;
-        this.notifyChanged(new ModelEvent(evNode, ModelEvent.EVENT_GRAPH_CHANGED, "Event changed"));
-        return retcode;
+        setModelDirty(true);
+        this.notifyChanged(new ModelEvent(eventGraphNode, ModelEvent.EVENT_GRAPH_CHANGED, "Event changed"));
+        return returnValue;
     }
 
     private void removeFromOutputList(SimEntity simEntity) {
@@ -1235,6 +1248,20 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
             LOG.error("getCurrentAssemblyModelName() found currentAssemblyModelFile is null, no name returned");
             return "";
         }
+    }
+
+    /**
+     * @return the modelDirty
+     */
+    public boolean isModelDirty() {
+        return modelDirty;
+    }
+
+    /**
+     * @param modelDirty the modelDirty to set
+     */
+    public void setModelDirty(boolean modelDirty) {
+        this.modelDirty = modelDirty;
     }
 
 } // end class AssemblyModelImpl

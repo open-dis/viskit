@@ -90,11 +90,12 @@ public interface AssemblyView {
 
     /** Saves the current Assembly "as" desired by the user
      *
-     * @param suggName the package and file name of the Assembly
-     * @param suggUniqueName show Assembly name only
+     * @param suggestedName the package and file name of the Assembly
+     * @param suggestUniqueName show Assembly name only
+     * @param title for chooser
      * @return a File object of the saved Assembly
      */
-    File saveFileAsk(String suggName, boolean suggUniqueName);
+    File saveFileAsk(String suggestedName, boolean suggestUniqueName, String title);
 
     /** Open an already existing Viskit Project */
     void openProject();

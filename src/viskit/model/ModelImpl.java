@@ -121,7 +121,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
-    public void changeMetadata(GraphMetadata newGraphMetadata) {
+    public void changeMetadata(GraphMetadata newGraphMetadata) 
+    {
         this.graphMetadata = newGraphMetadata;
         setDirty(true);
         notifyChanged(new ModelEvent(newGraphMetadata, ModelEvent.METADATA_CHANGED, "Metadata changed"));
@@ -486,14 +487,14 @@ public class ModelImpl extends MvcAbstractModel implements Model
         for (Object nextObject : objectList) 
         {
             if (nextObject instanceof Schedule) {
-                buildScheduleEdgeFromJaxb(sourceEventNode, (Schedule) nextObject);
+                buildSchedulingEdgeFromJaxb(sourceEventNode, (Schedule) nextObject);
             } else {
                 buildCancelingEdgeFromJaxb(sourceEventNode, (Cancel) nextObject);
             }
         }
     }
 
-    private void buildScheduleEdgeFromJaxb(EventNode sourceEventNode, Schedule schedule) 
+    private void buildSchedulingEdgeFromJaxb(EventNode sourceEventNode, Schedule schedule) 
     {
         SchedulingEdge schedulingEdge = new SchedulingEdge();
         String s;
@@ -508,7 +509,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
         schedulingEdge.setConditional(schedule.getCondition());
 
         // Attempt to avoid NumberFormatException thrown on Double.parseDouble(String s)
-        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, schedule.getPriority())) {
+        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, schedule.getPriority())) 
+        {
             s = schedule.getPriority();
 
             setNumericPriority(true);
@@ -530,8 +532,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
             } else {
                 s = "DEFAULT";
             }
-        } else {
-
+        } 
+        else {
             // We have an enumeration String
             s = schedule.getPriority();
         }
@@ -592,7 +594,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         edgeCache.put(cancel, cancelingEdge);
 
-        setDirty(true);
+//        setDirty(true); // likely erroneous, not expecting dirty if loading from file using JAXB
         notifyChanged(new ModelEvent(cancelingEdge, ModelEvent.CANCELING_EDGE_ADDED, "Canceling edge added"));
     }
 

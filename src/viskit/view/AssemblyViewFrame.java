@@ -80,7 +80,6 @@ import static viskit.control.AssemblyControllerImpl.METHOD_closeProject;
 import static viskit.control.AssemblyControllerImpl.METHOD_copy;
 import static viskit.control.AssemblyControllerImpl.METHOD_cut;
 import static viskit.control.AssemblyControllerImpl.METHOD_editGraphMetadata;
-import static viskit.control.AssemblyControllerImpl.METHOD_generateJavaSource;
 import static viskit.control.AssemblyControllerImpl.METHOD_newAssembly;
 import static viskit.control.AssemblyControllerImpl.METHOD_newEventGraphNode;
 import static viskit.control.AssemblyControllerImpl.METHOD_newProject;
@@ -122,6 +121,7 @@ import viskit.mvc.MvcController;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
 import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
+import static viskit.control.AssemblyControllerImpl.METHOD_generateJavaCode;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -182,6 +182,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     JMenu openRecentAssemblyMenu, openRecentProjectMenu;
 
     private final static String FRAME_DEFAULT_TITLE = "Assembly Editor";
+    private static final String LOOK_AND_FEEL = ViskitUserPreferencesDialog.getLookAndFeel();
 
     private final String CLEARPATHFLAG = ViskitStatics.CLEAR_PATH_FLAG;
     private final Color background = new Color(0xFB, 0xFB, 0xE5);
@@ -584,11 +585,11 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         assemblyMenu.add(buildMenuItem(assemblyController, METHOD_saveAs, "Save Assembly as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
 
         assemblyMenu.addSeparator();
-        JMenuItem assemblyGraphImageSave = buildMenuItem(assemblyController, METHOD_captureWindow, "Graph Image Save", KeyEvent.VK_I,
+        JMenuItem assemblyGraphImageSave = buildMenuItem(assemblyController, METHOD_captureWindow, "Image Save", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
-        assemblyGraphImageSave.setToolTipText("Graph Image Save for Assembly Diagram");
+        assemblyGraphImageSave.setToolTipText("Image Save for Assembly Diagram");
         assemblyMenu.add(assemblyGraphImageSave);
-        JMenuItem assemblyGenerateJavaSourceMenuItem = buildMenuItem(assemblyController, METHOD_generateJavaSource, "Java Source Generation", KeyEvent.VK_J, // TODO confirm "saved"
+        JMenuItem assemblyGenerateJavaSourceMenuItem = buildMenuItem(assemblyController, METHOD_generateJavaCode, "Java Source Generation", KeyEvent.VK_J, // TODO confirm "saved"
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
         assemblyGenerateJavaSourceMenuItem.setToolTipText("Java Source Generation and Compilation for Saved Assembly");
         assemblyMenu.add(assemblyGenerateJavaSourceMenuItem);
@@ -1161,12 +1162,54 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public void modelChanged(MvcModelEvent event) {
-        switch (event.getID()) {
+    public void modelChanged(MvcModelEvent modelEvent) 
+    {
+        switch (modelEvent.getID()) {
             default:
-                getCurrentViskitGraphAssemblyComponentWrapper().viskitModelChanged((ModelEvent) event);
+                getCurrentViskitGraphAssemblyComponentWrapper().viskitModelChanged((ModelEvent) modelEvent);
                 break;
         }
+
+        // Let model.isDirty() determine status color
+        toggleAssemblyStatusIndicators();
+    }
+
+    /** Changes the background/foreground color of Assembly tabs depending on
+     * model.isDirty() status giving the user an indication of a good/bad
+     * save and compile operation. Of note is that the default Look+Feel must be
+     * selected for WIN machines, else no colors will be visible. On Macs, the
+     * platform Look+Feel works best.
+     */
+    public void toggleAssemblyStatusIndicators()
+    {
+        int originalSelectedTabIndex = tabbedPane.getSelectedIndex();
+        for (Component currentSwingComponent : tabbedPane.getComponents()) 
+        {
+            // This will fire a call to stateChanged() which also sets the current model
+            tabbedPane.setSelectedComponent(currentSwingComponent);
+            // TODO tooltip text hints not appearing
+
+            if (((AssemblyModelImpl) getModel()).isDirty())
+            {
+                // background changes seem excessive
+//                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
+
+                if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
+                    tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.RED.darker());
+                tabbedPane.setToolTipText("Problem with event graph model validation and compilation");
+            } 
+            else 
+            {
+                // background changes seem excessive
+//                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.brighter());
+
+                if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
+                    tabbedPane.setForegroundAt(tabbedPane.getSelectedIndex(), Color.GREEN.darker());
+                tabbedPane.setToolTipText("Successful event graph model validation and compilation");
+            }
+        }
+        // Restore active tab and model by virtue of firing a call to stateChanged()
+        tabbedPane.setSelectedIndex(originalSelectedTabIndex);
     }
 
     @Override
@@ -1237,8 +1280,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
     // ViskitView-required methods:
     private JFileChooser openSaveChooser;
-    private JFileChooser buildOpenSaveChooser() {
-
+    
+    private JFileChooser buildOpenSaveChooser() 
+    {
         // Try to open in the current project directory for Assemblies
         if (ViskitGlobals.instance().getViskitProject() != null)
             return new JFileChooser(ViskitGlobals.instance().getViskitProject().getAssembliesDirectory());
@@ -1331,13 +1375,12 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         return uniqueFile;
     }
 
-    @Override
-    public File saveFileAsk(String suggestedPath, boolean showUniqueName)
+    public File saveFileAsk(String suggestedPath, boolean showUniqueName, String title)
     {
         if (openSaveChooser == null)
             openSaveChooser = buildOpenSaveChooser();
-
-        openSaveChooser.setDialogTitle("Save Assembly File");
+        openSaveChooser.setDialogTitle(title);
+        
         File suggestedFile = new File(ViskitGlobals.instance().getViskitProject().getAssembliesDirectory(), suggestedPath);
         if (!suggestedFile.getParentFile().isDirectory())
              suggestedFile.getParentFile().mkdirs();
@@ -1346,9 +1389,11 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         openSaveChooser.setSelectedFile(suggestedFile);
         int returnValue = openSaveChooser.showSaveDialog(this);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
+        if (returnValue == JFileChooser.APPROVE_OPTION) 
+        {
+            String message = "Confirm: overwrite " + openSaveChooser.getSelectedFile().getName() + "?";
             if (openSaveChooser.getSelectedFile().exists()) {
-                if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYesNo("File Exists",  "Overwrite? Confirm"))
+                if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYesNo("File Exists",  message))
                     return null;
             }
             try {
@@ -1372,10 +1417,14 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
      *
      * @param file to candidate Event Graph file
      */
-    public void deleteCanceledSave(File file) {
-        if (file.exists()) {
-            if (file.delete()) {
-                if (file.getParentFile().exists() && !file.getParentFile().equals(ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory()))
+    public void deleteCanceledSave(File file) 
+    {
+        if ((file != null) && file.exists() && !file.isDirectory())
+        {
+            if (file.delete())
+            {
+                if (file.getParentFile().exists() && 
+                   !file.getParentFile().equals(ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory()))
                     deleteCanceledSave(file.getParentFile());
             }
         }

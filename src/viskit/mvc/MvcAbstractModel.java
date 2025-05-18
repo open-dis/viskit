@@ -18,22 +18,22 @@ import java.util.List;
  */
 public abstract class MvcAbstractModel implements MvcModel {
 
-    private final List<MvcModelListener> listeners = new ArrayList<>(4);
+    private final List<MvcModelListener> modelListenerList = new ArrayList<>(4);
 
     @Override
     public void notifyChanged(MvcModelEvent event) {
-        for (MvcModelListener ml : listeners) {
-            ml.modelChanged(event);
+        for (MvcModelListener modelListener : modelListenerList) {
+             modelListener.modelChanged(event);
         }
     }
 
-    public void addModelListener(MvcModelListener l) {
-        if (!listeners.contains(l)) {
-            listeners.add(l);
+    public void addModelListener(MvcModelListener newModelListener) {
+        if (!modelListenerList.contains(newModelListener)) {
+             modelListenerList.add(newModelListener);
         }
     }
 
     public void removeModelListener(MvcModelListener l) {
-        listeners.remove(l);
+        modelListenerList.remove(l);
     }
 }

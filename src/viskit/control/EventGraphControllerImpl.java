@@ -7,6 +7,7 @@ import edu.nps.util.TempFileManager;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -184,33 +185,35 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private boolean askToSaveAndContinue()
     {
         ViskitGlobals.instance().selectEventGraphEditorTab();
-        int yn = (ViskitGlobals.instance().getMainFrame().genericAsk("Question", "Save modified graph?"));
+        int userResponse = (ViskitGlobals.instance().getMainFrame().genericAsk("Save event graph?", "Save modified event graph?"));
 
-        boolean retVal;
+        boolean returnValue;
 
-        switch (yn) {
+        switch (userResponse) 
+        {
             case JOptionPane.YES_OPTION:
                 save();
-                retVal = true;
+                returnValue = true;
                 break;
+                
             case JOptionPane.NO_OPTION:
-
                 // No need to recompile
                 if (((Model) getModel()).isDirty()) {
                     ((Model) getModel()).setDirty(false);
                 }
-                retVal = true;
+                returnValue = true;
                 break;
+                
             case JOptionPane.CANCEL_OPTION:
-                retVal = false;
+                returnValue = false;
                 break;
 
             // Something funny if we're here
             default:
-                retVal = false;
+                returnValue = false;
                 break;
         }
-        return retVal;
+        return returnValue;
     }
     
     /** method name for reflection use */
@@ -354,7 +357,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
     }
 
-    private void fileWatchClose(File file) {
+    private void fileWatchClose(File file)
+    {
         String fileName = file.getName();
         File ofile = new File(watchDirectoryFile, fileName);
         ofile.delete();
@@ -559,7 +563,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && hasDirtyEventGraph)
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
-            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "View Event Graph Editor", "First review Event Graphs before closing");
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "View Event Graph Editor", "First review Event Graph models before closing");
             return;
         }
         for (Model model : eventGraphModels) 
@@ -708,8 +712,11 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab())
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
-            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph before saving");
-            return;
+            if (ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded() > 1)
+            {
+                ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph before saving");
+                return;
+            }
         }
         ViskitGlobals.instance().selectEventGraphEditorTab();
         Model model = (Model) getModel();
@@ -720,20 +727,21 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
         // Allow the user to type specific package names
         String packageName = graphMetadata.packageName.replace(".", ViskitStatics.getFileSeparator());
-        File saveFile = eventGraphView.saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false,
+        File saveFile = ViskitGlobals.instance().getEventGraphViewFrame().saveFileAsk(packageName + ViskitStatics.getFileSeparator() + graphMetadata.name + ".xml", false,
                                          "Save Event Graph as...");
 
-        if (saveFile != null) {
+        if (saveFile != null) 
+        {
             File localLastFile = model.getLastFile();
             if (localLastFile != null) {
                 fileWatchClose(localLastFile);
             }
 
-            String n = saveFile.getName();
-            if (n.toLowerCase().endsWith(".xml")) {
-                n = n.substring(0, n.length() - 4);
+            String saveFileName = saveFile.getName();
+            if (saveFileName.toLowerCase().endsWith(".xml")) {
+                saveFileName = saveFileName.substring(0, saveFileName.length() - 4);
             }
-            graphMetadata.name = n;
+            graphMetadata.name = saveFileName;
             eventGraphView.setSelectedEventGraphName(graphMetadata.name);
             model.changeMetadata(graphMetadata); // might have renamed
 
@@ -754,7 +762,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         {
             // We don't need to recurse since we know this is a file, but make sure
             // it is re-compiled and re-validated. model.isDirty will be set from this call.
-            ViskitGlobals.instance().getAssemblyViewFrame().addEventGraphsToLegoTree(file, false);
+            ViskitGlobals.instance().getAssemblyEditorViewFrame().addEventGraphsToLegoTree(file, false);
         }
         // Don't watch an XML file whose source couldn't be compiled correctly
         if (!model.isDirty()) {
@@ -1084,7 +1092,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     /** Toggles the undo/redo Edit menu items on/off */
-    public void updateUndoRedoStatus() {
+    public void updateUndoRedoStatus() 
+    {
         EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
         ViskitGraphUndoManager graphUndoManager = (ViskitGraphUndoManager) eventGraphViewFrame.getCurrentVgraphComponentWrapper().getUndoManager();
 
@@ -1121,12 +1130,22 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
     
     /** method name for reflection use */
-    public static final String METHOD_generateJavaSource = "generateJavaSource";
+    public static final String METHOD_generateJavaCode = "generateJavaCode";
 
     @Override
-    public void generateJavaSource()
+    public void generateJavaCode()
     {
         ViskitGlobals.instance().selectEventGraphEditorTab();
+        
+        EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
+        if (eventGraphViewFrame.getNumberEventGraphsLoaded()== 0)
+        {
+            String message = "First load an Event Graph before generating Java code";
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.WARNING_MESSAGE,
+                "No Event Graph is loaded", message);
+            return;
+        }
+        
         Model model = (Model) getModel();
         if (model == null) {return;}
         File localLastFile = model.getLastFile();
@@ -1146,7 +1165,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         LOG.debug(sourceString);
         if (sourceString != null && sourceString.length() > 0) {
             String className = model.getMetadata().packageName + "." + model.getMetadata().name;
-            ViskitGlobals.instance().getAssemblyViewFrame().showAndSaveSource(className, sourceString, localLastFile.getName());
+            ViskitGlobals.instance().getAssemblyEditorViewFrame().showAndSaveSource(className, sourceString, localLastFile.getName());
         }
     }
     
@@ -1157,10 +1176,20 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void viewXML()
     {
         ViskitGlobals.instance().selectEventGraphEditorTab();
+        
+        EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
+        if (eventGraphViewFrame.getNumberEventGraphsLoaded()== 0)
+        {
+            String message = "First load an Event Graph before viewing XML source";
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.WARNING_MESSAGE,
+                "No Event Graph is loaded", message);
+            return;
+        }
+        
         if (!checkSave() || ((Model) getModel()).getLastFile() == null) {
             return;
         }
-        ViskitGlobals.instance().getAssemblyViewFrame().displayXML(((Model) getModel()).getLastFile());
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().displayXML(((Model) getModel()).getLastFile());
     }
 
     @Override
@@ -1311,11 +1340,20 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void captureWindow()
     {
         ViskitGlobals.instance().selectEventGraphEditorTab();
+        
+        EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
+        if (eventGraphViewFrame.getNumberEventGraphsLoaded()== 0)
+        {
+            String message = "First load an Event Graph before capturing an image";
+            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.WARNING_MESSAGE,
+                "No Event Graph is loaded", message);
+            return;
+        }
+        
         String fileName = "EventGraphScreenCapture";
 
         // create and save the image
-        EventGraphViewFrame eventGraphViewFrame = (EventGraphViewFrame) getView();
-
+        
         // Get only the jgraph part
         Component component = eventGraphViewFrame.getCurrentJgraphComponent();
         if (component == null) {return;}
@@ -1339,6 +1377,20 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         timer.start();
 
         imageSaveCountString = "" + (++imageSaveInt);
+        
+        try
+        {
+            if (eventGraphScreenCaptureFile.exists() && !eventGraphScreenCaptureFile.isDirectory())
+            {
+                Desktop.getDesktop().open(eventGraphScreenCaptureFile); // display image
+                // also open directory to facilitate copying, editing
+                Desktop.getDesktop().open(eventGraphScreenCaptureFile.getParentFile());
+            }
+        }
+        catch (IOException e)
+        {
+            LOG.error("captureWindow() unable to display ()", eventGraphScreenCaptureFile);
+        }
     }
 
     @Override

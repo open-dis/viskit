@@ -466,7 +466,7 @@ public class AnalystReportController extends MvcAbstractController
     public void viewXML() 
     {
         ViskitGlobals.instance().selectAnalystReportTab();
-        if ((getAnalystReportModel() == null) || (ViskitGlobals.instance().getAssemblyViewFrame() == null))
+        if ((getAnalystReportModel() == null) || (ViskitGlobals.instance().getAssemblyEditorViewFrame() == null))
         {
             ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Analyst Report not ready",
                     "<html><p align='center'>To view XML, first load an Analyst Report or else</p><br />" + 
@@ -474,7 +474,7 @@ public class AnalystReportController extends MvcAbstractController
             return;
         }
         // bravely ignoring error checking here...
-        ViskitGlobals.instance().getAssemblyViewFrame().displayXML(getAnalystReportModel().getAnalystReportXmlFile());
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().displayXML(getAnalystReportModel().getAnalystReportXmlFile());
     }
 
     /**

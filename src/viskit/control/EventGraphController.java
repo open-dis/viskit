@@ -195,7 +195,7 @@ public interface EventGraphController {
     /**
      * Generates Java source code from an Event Graph file
      */
-    void generateJavaSource();
+    void generateJavaCode();
 
     /**
      * Provides a single screenshot capture capability

@@ -256,7 +256,7 @@ public class ViskitGraphAssemblyComponent extends JGraph implements GraphModelLi
                     if (r != null) {
                         eventGraphNode = (EventGraphNode) assemblyCircleCell.getUserObject();
                         eventGraphNode.setPosition(new Point2D.Double(r.x, r.y));
-                        ((AssemblyModel) parentFrame.getModel()).changeEvGraphNode(eventGraphNode);
+                        ((AssemblyModel) parentFrame.getModel()).changeEventGraphNode(eventGraphNode);
                         attributeMap.put("bounds", attributeMap.createRect(eventGraphNode.getPosition().getX(), eventGraphNode.getPosition().getY(), r.width, r.height));
                     }
                 } else if (cellObject instanceof vAssemblyPropertyListCell) {

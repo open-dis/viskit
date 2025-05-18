@@ -279,7 +279,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="imageSaveDiagramEventGraphMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Graph Image Save"/>
+                <Property name="text" type="java.lang.String" value="Image Save"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="imageSaveDiagramEventGraphMIActionPerformed"/>
@@ -287,7 +287,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="javaSourceEventGraphMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Java Source Generation"/>
+                <Property name="text" type="java.lang.String" value="Java Code Generation"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="javaSourceEventGraphMIActionPerformed"/>
@@ -295,7 +295,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="xmlViewEventGraphMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="XML View"/>
+                <Property name="text" type="java.lang.String" value="XML Source View"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="xmlViewEventGraphMIActionPerformed"/>
@@ -474,7 +474,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="imageSaveDiagramAssemblyMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Graph Image Save"/>
+                <Property name="text" type="java.lang.String" value="Image Save"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="imageSaveDiagramAssemblyMIActionPerformed"/>
@@ -482,7 +482,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="javaSourceAssemblyMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Java Source Generation"/>
+                <Property name="text" type="java.lang.String" value="Java Code Generation"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="javaSourceAssemblyMIActionPerformed"/>
@@ -490,7 +490,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="xmlViewAssemblyMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="XML View"/>
+                <Property name="text" type="java.lang.String" value="XML Source View"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
             </MenuItem>

@@ -212,7 +212,7 @@ public interface AssemblyController {
      * Generates Java source code from an Assembly file and displays it from
      * a source window for inspection.
      */
-    void generateJavaSource();
+    void generateJavaCode();
 
     /** Prepare the Assembly for simulation run. This is called from 
      * the AssemblyView via reflection when the Prepare Assembly Run button 

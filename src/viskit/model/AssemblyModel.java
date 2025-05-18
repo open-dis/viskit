@@ -59,7 +59,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      */
     boolean isDirty();
 
-    void setDirty(boolean tf);  // to force save
+    void setDirty(boolean newValue);  // to force save
 
     /**
      * Messaged by controller when a new Model should be loaded.
@@ -100,13 +100,13 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
 
     boolean changePclNode(PropertyChangeListenerNode pclNode);
 
-    boolean changeEvGraphNode(EventGraphNode evNode);
+    boolean changeEventGraphNode(EventGraphNode evNode);
 
     void changePclEdge(PropertyChangeEdge pclEdge);
 
     void changeAdapterEdge(AdapterEdge aEdge);
 
-    void changeSimEvEdge(SimEventListenerEdge seEdge);
+    void changeSimEventListenerEdge(SimEventListenerEdge seEdge);
 
     void deleteEventGraphNode(EventGraphNode evNode);
 

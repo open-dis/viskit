@@ -546,7 +546,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         eventGraphMenu.add(saveEventGraphAsMI);
         eventGraphMenu.add(jSeparator7);
 
-        imageSaveDiagramEventGraphMI.setText("Graph Image Save");
+        imageSaveDiagramEventGraphMI.setText("Image Save");
         imageSaveDiagramEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 imageSaveDiagramEventGraphMIActionPerformed(evt);
@@ -554,7 +554,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         });
         eventGraphMenu.add(imageSaveDiagramEventGraphMI);
 
-        javaSourceEventGraphMI.setText("Java Source Generation");
+        javaSourceEventGraphMI.setText("Java Code Generation");
         javaSourceEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 javaSourceEventGraphMIActionPerformed(evt);
@@ -562,7 +562,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         });
         eventGraphMenu.add(javaSourceEventGraphMI);
 
-        xmlViewEventGraphMI.setText("XML View");
+        xmlViewEventGraphMI.setText("XML Source View");
         xmlViewEventGraphMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 xmlViewEventGraphMIActionPerformed(evt);
@@ -674,7 +674,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         assemblyMenu.add(saveAssemblyAsMI);
         assemblyMenu.add(jSeparator6);
 
-        imageSaveDiagramAssemblyMI.setText("Graph Image Save");
+        imageSaveDiagramAssemblyMI.setText("Image Save");
         imageSaveDiagramAssemblyMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 imageSaveDiagramAssemblyMIActionPerformed(evt);
@@ -682,7 +682,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         });
         assemblyMenu.add(imageSaveDiagramAssemblyMI);
 
-        javaSourceAssemblyMI.setText("Java Source Generation");
+        javaSourceAssemblyMI.setText("Java Code Generation");
         javaSourceAssemblyMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 javaSourceAssemblyMIActionPerformed(evt);
@@ -690,7 +690,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         });
         assemblyMenu.add(javaSourceAssemblyMI);
 
-        xmlViewAssemblyMI.setText("XML View");
+        xmlViewAssemblyMI.setText("XML Source View");
         xmlViewAssemblyMI.setToolTipText("");
         assemblyMenu.add(xmlViewAssemblyMI);
         assemblyMenu.add(jSeparator14);

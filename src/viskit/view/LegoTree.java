@@ -331,7 +331,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                         index = rootNode.getIndex(myNode);
                         defaultTreeModel.nodesWereInserted(rootNode, new int[] {index});
                     }
-                } else {
+                } 
+                else {
                     // NOTE: .class files come here if a directory is listed on
                     // the additional classpath element
                     LOG.warn("No classes of type {} found in {}", targetClassName, f.getName());
@@ -343,7 +344,8 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 // dirty won't get set b/c the graph model is null until the
                 // model tab is created and the Event Graph file is opened. First pass
                 // is only for inclusion in the LEGOs tree
-                if (ViskitGlobals.instance().getActiveEventGraphModel() != null) {
+                if (ViskitGlobals.instance().getActiveEventGraphModel() != null) 
+                {
                     ViskitGlobals.instance().getActiveEventGraphModel().setDirty(fileBasedAssemblyNode == null);
                     ViskitGlobals.instance().getEventGraphViewFrame().toggleEventGraphStatusIndicators();
                 }

@@ -74,7 +74,6 @@ import static viskit.control.EventGraphControllerImpl.METHOD_closeAll;
 import static viskit.control.EventGraphControllerImpl.METHOD_copy;
 import static viskit.control.EventGraphControllerImpl.METHOD_cut;
 import static viskit.control.EventGraphControllerImpl.METHOD_editGraphMetadata;
-import static viskit.control.EventGraphControllerImpl.METHOD_generateJavaSource;
 import static viskit.control.EventGraphControllerImpl.METHOD_newEventGraph;
 import static viskit.control.EventGraphControllerImpl.METHOD_newSelfReferentialCancelingEdge;
 import static viskit.control.EventGraphControllerImpl.METHOD_newSelfReferentialSchedulingEdge;
@@ -106,6 +105,7 @@ import viskit.view.dialog.ViskitUserPreferencesDialog;
 import viskit.mvc.MvcController;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
+import static viskit.control.EventGraphControllerImpl.METHOD_generateJavaCode;
 
 /**
  Main "view" of the Viskit app. This class controls a 3-paneled JFrame showing
@@ -451,9 +451,9 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         splitPane.setMinimumSize(new Dimension(20, 20));
 
         graphComponentWrapper.stateParameterSplitPane = splitPane;
-        graphComponentWrapper.paramPan = nextParametersPanel;
-        graphComponentWrapper.varPan = nextStateVariablesPanel;
-        graphComponentWrapper.codeBlockPan = codeblockPanel;
+        graphComponentWrapper.parametersPanel = nextParametersPanel;
+        graphComponentWrapper.stateVariablesPanel = nextStateVariablesPanel;
+        graphComponentWrapper.codeBlockPanel = codeblockPanel;
     }
 
     private CodeBlockPanel buildCodeBlockPanel() 
@@ -855,16 +855,16 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_saveAs, "Save Event Graph as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, accelMod)));
         eventGraphMenu.addSeparator();
 
-        JMenuItem eventGraphGraphImageSave = buildMenuItem(eventGraphController, METHOD_captureWindow, "Graph Image Save", KeyEvent.VK_I,
+        JMenuItem eventGraphGraphImageSave = buildMenuItem(eventGraphController, METHOD_captureWindow, "Image Save", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod));
-        eventGraphGraphImageSave.setToolTipText("Graph Image Save for Event Graph Diagram");
+        eventGraphGraphImageSave.setToolTipText("Image Save for Event Graph Diagram");
         eventGraphMenu.add(eventGraphGraphImageSave);
-        JMenuItem eventGraphGenerateJavaSourceMenuItem = buildMenuItem(eventGraphController, METHOD_generateJavaSource, "Java Source Generation", KeyEvent.VK_J,
+        JMenuItem eventGraphGenerateJavaSourceMenuItem = buildMenuItem(eventGraphController, METHOD_generateJavaCode, "Java Code Generation", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod));
-        eventGraphGenerateJavaSourceMenuItem.setToolTipText("Java Source Generation and Compilation for saved Event Graph");
+        eventGraphGenerateJavaSourceMenuItem.setToolTipText("Java Code Generation and Compilation for saved Event Graph");
         eventGraphMenu.add(eventGraphGenerateJavaSourceMenuItem);
-        JMenuItem eventGraphXmlViewMenuItem = buildMenuItem(eventGraphController, METHOD_viewXML, "XML View", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod));
-        eventGraphXmlViewMenuItem.setToolTipText("XML View of Saved Event Graph");
+        JMenuItem eventGraphXmlViewMenuItem = buildMenuItem(eventGraphController, METHOD_viewXML, "XML Source View", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod));
+        eventGraphXmlViewMenuItem.setToolTipText("XML Source View of Saved Event Graph");
         eventGraphMenu.add(eventGraphXmlViewMenuItem);
 
         if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
@@ -1114,7 +1114,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
      */
     public void toggleEventGraphStatusIndicators()
     {
-        int selectedTabIndex = tabbedPane.getSelectedIndex();
+        int originalSelectedTabIndex = tabbedPane.getSelectedIndex();
         for (Component currentSwingComponent : tabbedPane.getComponents()) 
         {
             // This will fire a call to stateChanged() which also sets the current model
@@ -1140,7 +1140,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             }
         }
         // Restore active tab and model by virtue of firing a call to stateChanged()
-        tabbedPane.setSelectedIndex(selectedTabIndex);
+        tabbedPane.setSelectedIndex(originalSelectedTabIndex);
     }
 
     /** Some private classes to implement Drag and Drop (DnD) and dynamic cursor update */
@@ -1347,7 +1347,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
      * the Actions library.
      */
     public void openProject() {
-        ViskitGlobals.instance().getAssemblyViewFrame().openProject();
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().openProject();
     }
 
     /**
@@ -1395,9 +1395,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         }
         openSaveChooser.setSelectedFile(suggestedFile);
         int retv = openSaveChooser.showSaveDialog(this);
-        if (retv == JFileChooser.APPROVE_OPTION) {
-            if (openSaveChooser.getSelectedFile().exists()) {
-                if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYesNo("File Exists",  "Overwrite? Confirm")) {
+        if (retv == JFileChooser.APPROVE_OPTION) 
+        {
+            if (openSaveChooser.getSelectedFile().exists())
+            {
+                String message = "Confirm: overwrite " + openSaveChooser.getSelectedFile().getName() + "?";
+                if (JOptionPane.YES_OPTION != ViskitGlobals.instance().getMainFrame().genericAskYesNo("File Exists",  message)) {
                     return null;
                 }
             }
@@ -1423,12 +1426,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
      * @param file to candidate Event Graph file
      */
     private void deleteCanceledSave(File file) {
-        ViskitGlobals.instance().getAssemblyViewFrame().deleteCanceledSave(file);
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().deleteCanceledSave(file);
     }
 
     @Override
     public File openRecentFilesAsk(Collection<String> lis) {
-        return ViskitGlobals.instance().getAssemblyViewFrame().openRecentFilesAsk(lis);
+        return ViskitGlobals.instance().getAssemblyEditorViewFrame().openRecentFilesAsk(lis);
     }
 
     @Override
@@ -1466,42 +1469,44 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     @Override
-    public void modelChanged(MvcModelEvent event) {
+    public void modelChanged(MvcModelEvent modelEvent) 
+    {
         ViskitGraphComponentWrapper vgcw = getCurrentVgraphComponentWrapper();
-        ParametersPanel pp = vgcw.paramPan;
-        StateVariablesPanel vp = vgcw.varPan;
-        switch (event.getID()) {
+        ParametersPanel parametersPanel = vgcw.parametersPanel;
+        StateVariablesPanel stateVariablesPanel = vgcw.stateVariablesPanel;
+        switch (modelEvent.getID()) 
+        {
             // Changes the two side panels need to know about
             case ModelEvent.SIM_PARAMETER_ADDED:
-                pp.addRow((ViskitElement) event.getSource());
+                parametersPanel.addRow((ViskitElement) modelEvent.getSource());
                 break;
             case ModelEvent.SIM_PARAMETER_DELETED:
-                pp.removeRow((ViskitElement) event.getSource());
+                parametersPanel.removeRow((ViskitElement) modelEvent.getSource());
                 break;
             case ModelEvent.SIM_PARAMETER_CHANGED:
-                pp.updateRow((ViskitElement) event.getSource());
+                parametersPanel.updateRow((ViskitElement) modelEvent.getSource());
                 break;
             case ModelEvent.STATE_VARIABLE_ADDED:
-                vp.addRow((ViskitElement) event.getSource());
+                stateVariablesPanel.addRow((ViskitElement) modelEvent.getSource());
                 break;
             case ModelEvent.STATE_VARIABLE_DELETED:
-                vp.removeRow((ViskitElement) event.getSource());
+                stateVariablesPanel.removeRow((ViskitElement) modelEvent.getSource());
                 break;
             case ModelEvent.STATE_VARIABLE_CHANGED:
-                vp.updateRow((ViskitElement) event.getSource());
+                stateVariablesPanel.updateRow((ViskitElement) modelEvent.getSource());
                 break;
             case ModelEvent.CODEBLOCK_CHANGED:
-                vgcw.codeBlockPan.setData((String) event.getSource());
+                vgcw.codeBlockPanel.setData((String) modelEvent.getSource());
                 break;
             case ModelEvent.NEW_MODEL:
-                vp.setData(null);
-                pp.setData(null);
+                stateVariablesPanel.setData(null);
+                parametersPanel.setData(null);
 
                 // Deliberate fallthrough here. See default note
 
             // Changes that jGraph needs to know about
             default:
-                vgcw.viskitModelChanged((ModelEvent) event);
+                vgcw.viskitModelChanged((ModelEvent) modelEvent);
                 break;
         }
 

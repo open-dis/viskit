@@ -459,12 +459,12 @@ public class MainFrame extends JFrame
             }
             
             // TODO rename menu methods consistently
-            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getProjectMenu());
+            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyEditorViewFrame().getProjectMenu());
             combinedMenuBar.add(ViskitGlobals.instance().getEventGraphViewFrame().getEventGraphMenu());
-            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getAssemblyMenu());
+            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyEditorViewFrame().getAssemblyMenu());
             combinedMenuBar.add(ViskitGlobals.instance().getInternalSimulationRunner().getMenus()); // TODO getSimulationRunMenu() ?
             combinedMenuBar.add(ViskitGlobals.instance().getAnalystReportViewFrame().getMenus());   // TODO getAnalystReportMenu() ?
-            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyViewFrame().getHelpMenu());
+            combinedMenuBar.add(ViskitGlobals.instance().getAssemblyEditorViewFrame().getHelpMenu());
             
             if  (hasOriginalModalMenus())
                  setJMenuBar(selectedMenuBar);
@@ -605,8 +605,8 @@ public class MainFrame extends JFrame
                 if (tabIndices[TAB_INDEX_ASSEMBLY_EDITOR] != -1) {
                     getAssemblyController().removeAssemblyFileListener(getAssemblyController().getAssemblyChangeListener());
                     getAssemblyController().removeAssemblyFileListener((OpenAssembly.AssemblyChangeListener) analystReportViewFrame);
-                    getAssemblyController().removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentAssemblyFileListener());
-                    getAssemblyController().removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyViewFrame().getRecentProjectFileSetListener());
+                    getAssemblyController().removeRecentAssemblyFileSetListener(ViskitGlobals.instance().getAssemblyEditorViewFrame().getRecentAssemblyFileListener());
+                    getAssemblyController().removeRecentProjectFileSetListener(ViskitGlobals.instance().getAssemblyEditorViewFrame().getRecentProjectFileSetListener());
 
                     // TODO: Need grid and doe listener removal (tdn) 9/13/24
 
@@ -817,7 +817,7 @@ public class MainFrame extends JFrame
 
         if ((ViskitGlobals.instance().hasViskitProject()) &&
             (ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded() == 0) &&
-            (ViskitGlobals.instance().getAssemblyViewFrame().getNumberAssembliesLoaded()    == 0))
+            (ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded()    == 0))
         {
             // provide initial guidance to new user who is facing an empty editor
             String message = "<html><body><p align='center'>Welcome to Viskit !</p><br />";
