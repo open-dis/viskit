@@ -840,7 +840,7 @@ public class MainFrame extends JFrame
             message +=       "<p align='center'>To get started, open or create an</p><br />";
             message +=       "<p align='center'><i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />"; 
         }
-        else return;
+        else return; // not expected, implies improper decision to invoke of method
         
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
             title, message);
