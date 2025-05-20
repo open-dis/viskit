@@ -967,14 +967,15 @@ public class ViskitGlobals
      * @return current viskitProject root directory path */
     public String getProjectRootDirectoryPath()
     {
-        return viskitProject.getProjectDirectoryPath();
+        return getViskitProject().getProjectDirectoryPath();
     }
 
+    // duplicative but tricky, watch out!
     /**
      * @return whether a viskitProject is currently loaded */
     public boolean hasViskitProject() {
         // TODO further checks?
-        return (viskitProject != null);
+        return (getViskitProject() != null);
     }
 
     /**
@@ -1042,8 +1043,8 @@ public class ViskitGlobals
             else LOG.info("createProjectWorkingDirectory() projectWorkingDirectory=\n      " + projectWorkingDirectory.getAbsolutePath());
         }
 
-        if (viskitProject == null)
-            viskitProject = new ViskitProject(projectWorkingDirectory);
+        if (getViskitProject() == null)
+            setViskitProject(new ViskitProject(projectWorkingDirectory));
         else
         {
 //            // (TODO, questionable) unexpected error condition; looping?
@@ -1051,15 +1052,15 @@ public class ViskitGlobals
 //            viskitProject.setProjectDirectory(new File(allProjectsBaseDirectory, ViskitProject.DEFAULT_PROJECT_NAME));
         }
 
-        if (viskitProject.initializeProject()) 
+        if (getViskitProject().initializeProject()) 
         {
-            ViskitUserPreferencesDialog.saveExtraClasspathEntries(viskitProject.getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
+            ViskitUserPreferencesDialog.saveExtraClasspathEntries(getViskitProject().getProjectAdditionalClasspaths()); // necessary to find and record extra classpaths
         } 
         else {
             LOG.error("Unable to create project directory for " + allProjectsBaseDirectory);
             return;
         }
-        setProjectClassesDirectory(viskitProject.getClassesDirectory());
+        setProjectClassesDirectory(getViskitProject().getClassesDirectory());
     }
 
     private ClassLoader viskitApplicationClassLoader;
@@ -1437,7 +1438,7 @@ public class ViskitGlobals
     
     public boolean isProjectOpen()
     {
-        if  (getViskitProject() == null)
+        if (getViskitProject() == null)
              return false;
         else return getViskitProject().isProjectOpen();
     }
@@ -1519,6 +1520,13 @@ public class ViskitGlobals
     {
         if (ViskitGlobals.instance().getAssemblyEditorViewFrame() != null)
             ViskitGlobals.instance().getMainFrame().genericReport(messageType, messageTitle, messageBody);
+    }
+
+    /**
+     * @param viskitProject the viskitProject to set
+     */
+    public void setViskitProject(ViskitProject viskitProject) {
+        this.viskitProject = viskitProject;
     }
 
 } // end class file ViskitGlobals.java

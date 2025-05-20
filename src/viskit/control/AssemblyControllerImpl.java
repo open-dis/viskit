@@ -69,6 +69,8 @@ import viskit.mvc.MvcRecentFileListener;
 import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
 import viskit.assembly.SimulationRunInterface;
 import viskit.control.InternalAssemblyRunner.SimulationState;
+import viskit.view.MainFrame;
+import static viskit.view.MainFrame.runLater;
 import viskit.view.SimulationRunPanel;
 
 /**
@@ -803,7 +805,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         boolean projectClosed;
         String title, message;
-        if (ViskitGlobals.instance().getViskitProject().isProjectOpen())
+        
+        if (ViskitGlobals.instance().getViskitProject() == null)
+            return true; // no project to close
+        
+        if (ViskitGlobals.instance().getViskitProject().isProjectOpen()) // TODO 
         {
             title = "Close Current Project?";
             message = "<html><p align='center'>Are you sure that you want to close</p><br/>";
@@ -816,6 +822,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             {
                 doProjectCleanup();
                 projectClosed = true;
+                // TODO duplicative
+                viskitProject = null;
+                ViskitGlobals.instance().setViskitProject(null);
             } 
             else {
                 projectClosed = false;
@@ -829,6 +838,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 //            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, title, message);
             projectClosed = true;
         }
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().enableProjectMenus();
+        
+        MainFrame.displayWelcomeGuidance(); // modal dialog; advise user to open or create a project
+        
+        // not working
+//        runLater(500L, () -> {
+//            MainFrame.displayWelcomeGuidance(); // modal dialog; advise user to open or create a project
+//        });
         return projectClosed;
     }
 
@@ -857,6 +874,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         adjustRecentProjectSet(ViskitGlobals.instance().getViskitProject().getProjectDirectory());
         
         ViskitGlobals.instance().setTitleProjectName(ViskitGlobals.instance().getProjectName());
+        
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().enableProjectMenus();
         
         runnerSimulationRunInterface.resetSimulationRunPanel();
     }

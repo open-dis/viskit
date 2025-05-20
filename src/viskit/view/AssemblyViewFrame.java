@@ -193,8 +193,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private JToggleButton selectModeToggleButton;
     private JToggleButton adapterModeToggleButton,  simEventListenerModeToggleButton,  propertyChangeListenerModeToggleButton;
     private LegoTree legoEventGraphsTree, propertyChangeListenerTree;
-    private JMenuBar myMenuBar;
+    private JMenuBar  myMenuBar;
     private JMenuItem quitMenuItem;
+    private JMenuItem closeProjectMenuItem;
+    private JMenuItem   zipProjectMenuItem;
     private RecentProjectFileSetListener recentProjectFileSetListener;
     private RecentAssemblyFileListener   recentAssemblyFileListener; // TODO public?
     private AssemblyControllerImpl assemblyController;
@@ -629,6 +631,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         // Help editor created by the EGVF for all of Viskit's UIs
         
     }
+    public void enableProjectMenus()
+    {
+        // TODO fix these flags
+        boolean isProjectLoaded = (ViskitGlobals.instance().hasViskitProject() || ViskitGlobals.instance().isProjectOpen());
+        closeProjectMenuItem.setEnabled(isProjectLoaded);
+          zipProjectMenuItem.setEnabled(isProjectLoaded);
+    }
 
     private void buildProjectMenu()
     {
@@ -636,11 +645,14 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         
         projectMenu = new JMenu("Project");
         projectMenu.setMnemonic(KeyEvent.VK_P);
+        projectMenu.addActionListener((ActionEvent e) -> {
+            enableProjectMenus();
+        });
 
         projectMenu.add(buildMenuItem(assemblyController, METHOD_newProject, "New Viskit Project", KeyEvent.VK_N,
                 null));
         
-        projectMenu.add(buildMenuItem(this, METHOD_openProject, "Open Project", KeyEvent.VK_O,
+        projectMenu.add(buildMenuItem(this, METHOD_openProject, "Open Viskit Project", KeyEvent.VK_O,
                 null));
         projectMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
         openRecentProjectMenu.setMnemonic('O');
@@ -651,11 +663,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getRecentProjectFileSetListener().addMenuItem(openRecentProjectMenu);
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         
-        projectMenu.add(        buildMenuItem(this, METHOD_closeProject,                            "Close Project", KeyEvent.VK_C,
-                null));
+        closeProjectMenuItem =     buildMenuItem(this, METHOD_closeProject,                            "Close Project", KeyEvent.VK_C,
+                null);
+        projectMenu.add(closeProjectMenuItem);
         
-        projectMenu.add(        buildMenuItem(assemblyController, METHOD_zipProject,                "Zip Viskit Project", KeyEvent.VK_Z,
-                null));
+        zipProjectMenuItem = buildMenuItem(assemblyController, METHOD_zipProject,                "Zip Viskit Project", KeyEvent.VK_Z,
+                null);
+        projectMenu.add(zipProjectMenuItem);
 
         projectMenu.addSeparator();
         projectMenu.add(        buildMenuItem(assemblyController, METHOD_showViskitUserPreferences, "Viskit User Preferences", KeyEvent.VK_V, null));
@@ -1375,6 +1389,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         return uniqueFile;
     }
 
+    @Override
     public File saveFileAsk(String suggestedPath, boolean showUniqueName, String title)
     {
         if (openSaveChooser == null)

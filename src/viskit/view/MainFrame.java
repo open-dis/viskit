@@ -57,6 +57,7 @@ import java.util.TimerTask;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import viskit.ViskitApplication;
+import static viskit.ViskitApplication.VISKIT_SHORT_APPLICATION_NAME;
 import viskit.assembly.SimulationRunInterface;
 import viskit.control.AnalystReportController;
 import viskit.control.EventGraphControllerImpl;
@@ -784,7 +785,7 @@ public class MainFrame extends JFrame
         }
         else if (newProjectName.isBlank())
         {
-            LOG.error ("MainFrame.setTitleApplicationProjectName() received a blank String, ignored");
+//            LOG.error ("MainFrame.setTitleApplicationProjectName() received a blank String, ignored");
         }
         if  (newProjectName.isBlank())
              newTitle = prefix;
@@ -815,24 +816,34 @@ public class MainFrame extends JFrame
     {
         // TODO check if author has entered profile information, offer to help if still needed
 
-        if ((ViskitGlobals.instance().hasViskitProject()) &&
-            (ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded() == 0) &&
-            (ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded()    == 0))
+        // provide initial guidance to new user who is facing an empty editor
+        String title = new String();
+        String message = "<html><body><p align='center'>Welcome to " + VISKIT_SHORT_APPLICATION_NAME + "!</p><br />";
+            
+            // TODO fix these flags
+        if (!ViskitGlobals.instance().hasViskitProject() && !ViskitGlobals.instance().isProjectOpen())
         {
-            // provide initial guidance to new user who is facing an empty editor
-            String message = "<html><body><p align='center'>Welcome to Viskit !</p><br />";
-            if (ViskitGlobals.instance().isProjectOpen())
-            {
-                message +=   "<p align='center'>";
-                if (!ViskitGlobals.instance().getProjectName().toLowerCase().contains("project"))
-                     message +=   "Project ";
-                message +=   "<i>" + ViskitGlobals.instance().getProjectName() + "</i> is the open project</p><br />";    
-            }
-            message +=       "<p align='center'>To get started, open or create an</p><br />";
-            message +=       "<p align='center'><i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />";
-            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
-                "Add Event Graph or Assembly", message);
+            title    =   "Begin with a Viskit Project";
+            message +=   "<p align='center'>";
+            message +=   "To begin, please open or create a Viskit Project</p><br />";
         }
+            // TODO fix these flags
+        else if ((ViskitGlobals.instance().hasViskitProject() || ViskitGlobals.instance().isProjectOpen()) ||
+            ((ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded()    == 0) &&
+             (ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded() == 0)))
+        {
+            title    =   "Add Event Graph or Assembly";
+            message +=   "<p align='center'>";
+            if (!ViskitGlobals.instance().getProjectName().toLowerCase().contains("project"))
+                 message +=   "Project ";
+            message +=   "<i>" + ViskitGlobals.instance().getProjectName() + "</i> is the open project</p><br />";   
+            message +=       "<p align='center'>To get started, open or create an</p><br />";
+            message +=       "<p align='center'><i>Event Graph</i> &nbsp;or <i>Assembly</i></p><br />"; 
+        }
+        else return;
+        
+        ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
+            title, message);
     }
     
     // user-interaction methods moved from AssemblyViewFrame to MainFrame, up higher in hierarchy

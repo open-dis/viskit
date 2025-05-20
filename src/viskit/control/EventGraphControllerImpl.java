@@ -80,7 +80,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void begin() {
         List<String> files = getOpenFileSetList(false);
 
-        if (!files.isEmpty()) {
+        if (!files.isEmpty())
+        {
             File file;
 
             // Open whatever Event Graphs were marked open on last closing
@@ -90,9 +91,9 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 if (file.exists())
                     _doOpenEventGraph(file);
             }
-
-        } else {
-
+        } 
+        else
+        {
             // For a brand new empty project open a default Event Graph
             File[] eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory().listFiles();
             if (eventGraphFiles.length == 0) {
@@ -721,7 +722,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         ViskitGlobals.instance().selectEventGraphEditorTab();
         Model model = (Model) getModel();
         EventGraphView eventGraphView = (EventGraphView) getView();
-        GraphMetadata graphMetadata = model.getMetadata();
+        graphMetadata = model.getMetadata();
         if ((graphMetadata.description == null) || graphMetadata.description.equals(DESCRIPTION_HINT))
             graphMetadata.description = "";
 
@@ -1288,7 +1289,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             LOG.error(METHOD_editGraphMetadata + "() unable to find eventGraphModel");
             return; // not expected
         }
-        GraphMetadata graphMetadata = eventGraphModel.getMetadata();
+        graphMetadata = eventGraphModel.getMetadata();
         boolean modified =
                 EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
         if (modified) {
