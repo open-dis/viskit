@@ -163,11 +163,19 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     private JLabel zoomLabel;
     
     private JTabbedPane tabbedPane;
-    private JMenuBar myMenuBar;
-    private JMenu editMenu;
-    private JMenu eventGraphMenu;
-    private JMenu editEventGraphSubMenu;
+    private JMenuBar  myMenuBar;
+    private JMenu     editMenu;
+    private JMenu     eventGraphMenu;
+    private JMenu     editEventGraphSubMenu;
     private JMenuItem quitMenuItem;
+    private JMenuItem editEventGraphMetadataMenuItem;
+    private JMenuItem closeEventGraphMenuItem;
+    private JMenuItem closeAllEventGraphsMenuItem;
+    private JMenuItem saveEventGraphMenuItem;
+    private JMenuItem saveAsEventGraphMenuItem;
+    private JMenuItem eventGraphGraphImageSave;
+    private JMenuItem eventGraphGenerateJavaSourceMenuItem;
+    private JMenuItem eventGraphXmlViewMenuItem;
     private RecentEventGraphFileListener recentEventGraphFileListener;
 
     private JMenu openRecentEventGraphMenu, openRecentProjectMenu;
@@ -178,7 +186,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
      */
     public EventGraphViewFrame(MvcController mvcController) {
         super(FRAME_DEFAULT_TITLE);
-        initializeMVC(mvcController);       // set up mvc linkages
+        initializeMVC(mvcController); // set up mvc linkages
         initializeUserInterface();    // build widgets
     }
 
@@ -229,7 +237,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     {
         // Layout menus
         buildEditMenu(); // must be first
-        buildMenus();
+        buildEventGraphMenuItems();
 
         // Layout of toolbar
         setupToolbar();
@@ -249,7 +257,9 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
     public int getNumberEventGraphsLoaded()
     {
-        return tabbedPane.getTabCount();
+        if  (tabbedPane == null)
+             return 0;
+        else return tabbedPane.getTabCount();
     }
     
     /** has one or more Event Graphs loaded
@@ -759,8 +769,23 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod)));
         }
     }
+    
+    public void enableEventGraphMenuItems()
+    {
+        boolean isEventGraphLoaded = (ViskitGlobals.instance().hasViskitProject() && ViskitGlobals.instance().isProjectOpen() &&
+                                      hasEventGraphsLoaded());
+        editEventGraphSubMenu.setEnabled(isEventGraphLoaded);
+        editEventGraphMetadataMenuItem.setEnabled(isEventGraphLoaded);
+        closeEventGraphMenuItem.setEnabled(isEventGraphLoaded);
+        closeAllEventGraphsMenuItem.setEnabled(isEventGraphLoaded);
+        saveEventGraphMenuItem.setEnabled(isEventGraphLoaded);
+        saveAsEventGraphMenuItem.setEnabled(isEventGraphLoaded);
+        eventGraphGraphImageSave.setEnabled(isEventGraphLoaded);
+        eventGraphGenerateJavaSourceMenuItem.setEnabled(isEventGraphLoaded);
+        eventGraphXmlViewMenuItem.setEnabled(isEventGraphLoaded);
+    }
 
-    private void buildMenus()
+    private void buildEventGraphMenuItems()
     {
         EventGraphController eventGraphController = (EventGraphController) getController();
         recentEventGraphFileListener = new RecentEventGraphFileListener();
@@ -772,7 +797,10 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 //      JMenu fileMenu = new JMenu("File");
         eventGraphMenu = new JMenu("Event Graph"); // Editor
         eventGraphMenu.setMnemonic(KeyEvent.VK_E);
-
+        eventGraphMenu.addActionListener((ActionEvent e) -> {
+            enableEventGraphMenuItems();
+        });
+        
         editEventGraphSubMenu = new JMenu("Edit Event Graph..."); // submenu
         editEventGraphSubMenu.setToolTipText("Edit functions for selected Event Graph");
         editEventGraphSubMenu.setMnemonic(KeyEvent.VK_E);
@@ -815,7 +843,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         
         // TODO "disable" both of these if no Event Graph is active
         eventGraphMenu.add(editEventGraphSubMenu);
-        JMenuItem editEventGraphMetadataMenuItem = buildMenuItem(eventGraphController, METHOD_editGraphMetadata, "Edit Event Graph Metadata", KeyEvent.VK_E,
+        
+        editEventGraphMetadataMenuItem = buildMenuItem(eventGraphController, METHOD_editGraphMetadata, "Edit Event Graph Metadata", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, accelMod));
         editEventGraphMetadataMenuItem.setToolTipText("Edit selected Event Graph Metadata Properties");
         eventGraphMenu.add(editEventGraphMetadataMenuItem);
@@ -847,23 +876,32 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         openRecentEventGraphMenu.setEnabled(false); // inactive until needed, reset by listener
         eventGraphMenu.addSeparator();
 
-        eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_close, "Close Event Graph", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod)));
-        eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_closeAll, "Close All Event Graphs", KeyEvent.VK_C, null));
-        eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_save, "Save Event Graph", KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod)));
-        eventGraphMenu.add(buildMenuItem(eventGraphController, METHOD_saveAs, "Save Event Graph as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, accelMod)));
+        closeEventGraphMenuItem = buildMenuItem(eventGraphController, METHOD_close, "Close Event Graph", KeyEvent.VK_C,
+                KeyStroke.getKeyStroke(KeyEvent.VK_W, accelMod));
+        eventGraphMenu.add(closeEventGraphMenuItem);
+        
+        closeAllEventGraphsMenuItem = buildMenuItem(eventGraphController, METHOD_closeAll, "Close All Event Graphs", KeyEvent.VK_C, null);
+        eventGraphMenu.add(closeAllEventGraphsMenuItem);
+        
+        saveEventGraphMenuItem = buildMenuItem(eventGraphController, METHOD_save, "Save Event Graph", KeyEvent.VK_S,
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, accelMod));
+        eventGraphMenu.add(saveEventGraphMenuItem);
+        
+        saveAsEventGraphMenuItem = buildMenuItem(eventGraphController, METHOD_saveAs, "Save Event Graph as...", KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_A, accelMod));
+        eventGraphMenu.add(saveAsEventGraphMenuItem);
         eventGraphMenu.addSeparator();
 
-        JMenuItem eventGraphGraphImageSave = buildMenuItem(eventGraphController, METHOD_captureWindow, "Image Save", KeyEvent.VK_I,
+        eventGraphGraphImageSave = buildMenuItem(eventGraphController, METHOD_captureWindow, "Image Save", KeyEvent.VK_I,
                 KeyStroke.getKeyStroke(KeyEvent.VK_I, accelMod));
         eventGraphGraphImageSave.setToolTipText("Image Save for Event Graph Diagram");
         eventGraphMenu.add(eventGraphGraphImageSave);
-        JMenuItem eventGraphGenerateJavaSourceMenuItem = buildMenuItem(eventGraphController, METHOD_generateJavaCode, "Java Code Generation", KeyEvent.VK_J,
+        
+        eventGraphGenerateJavaSourceMenuItem = buildMenuItem(eventGraphController, METHOD_generateJavaCode, "Java Code Generation", KeyEvent.VK_J,
                 KeyStroke.getKeyStroke(KeyEvent.VK_J, accelMod));
         eventGraphGenerateJavaSourceMenuItem.setToolTipText("Java Code Generation and Compilation for saved Event Graph");
         eventGraphMenu.add(eventGraphGenerateJavaSourceMenuItem);
-        JMenuItem eventGraphXmlViewMenuItem = buildMenuItem(eventGraphController, METHOD_viewXML, "XML Source View", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod));
+        
+        eventGraphXmlViewMenuItem = buildMenuItem(eventGraphController, METHOD_viewXML, "XML Source View", KeyEvent.VK_X, KeyStroke.getKeyStroke(KeyEvent.VK_X, accelMod));
         eventGraphXmlViewMenuItem.setToolTipText("XML Source View of Saved Event Graph");
         eventGraphMenu.add(eventGraphXmlViewMenuItem);
 
@@ -885,6 +923,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         myMenuBar = new JMenuBar();
         myMenuBar.add(eventGraphMenu);
         myMenuBar.add(editMenu);
+        
+        enableEventGraphMenuItems();
         
 // see AssemblyViewFrame
 //        Help help = new Help(ViskitGlobals.instance().getMainFrame());
@@ -1512,6 +1552,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
         // Let model.isDirty() determine status color
         toggleEventGraphStatusIndicators();
+        enableEventGraphMenuItems();
     }
 
     /**

@@ -608,7 +608,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public void deletePropChangeEdge(PropertyChangeEdge pce) {
+    public void deleteProperyChangeEdge(PropertyChangeEdge pce) {
         PropertyChangeListenerConnection pclc = (PropertyChangeListenerConnection) pce.opaqueModelObject;
 
         jaxbRoot.getPropertyChangeListenerConnection().remove(pclc);

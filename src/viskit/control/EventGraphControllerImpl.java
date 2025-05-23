@@ -287,8 +287,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         else {
             eventGraphView.deleteTab(modelImplementation); // Not a good open, tell view
         }
-
         resetRedoUndoStatus();
+        ViskitGlobals.instance().getEventGraphViewFrame().enableEventGraphMenuItems();
     }
 
     /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
@@ -572,6 +572,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             setModel((MvcModel) model); // TODO this is a little sloppy since an event graph might also be used by another open assembly
             close();
         }
+        ViskitGlobals.instance().getEventGraphViewFrame().enableEventGraphMenuItems();
     }
     
     /** method name for reflection use */
@@ -617,6 +618,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (preClose()) {
             postClose();
         }
+        ViskitGlobals.instance().getEventGraphViewFrame().enableEventGraphMenuItems();
     }
 
     @Override

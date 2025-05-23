@@ -304,7 +304,7 @@ public class ViskitGlobals
         assemblyQuitActionListener = newActionListener;
     }
 
-    public EventGraphViewFrame getEventGraphViewFrame() 
+    public EventGraphViewFrame getEventGraphViewFrame()
     {
         return (EventGraphViewFrame) eventGraphViewFrame;
     }

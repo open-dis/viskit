@@ -33,8 +33,6 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import edu.nps.util.Log4jUtilities;
-
 import java.awt.Desktop;
 import java.awt.Taskbar;
 import java.awt.desktop.QuitEvent;

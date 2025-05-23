@@ -156,6 +156,7 @@ public class MainFrame extends JFrame
         });
         ImageIcon icon = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/ViskitSplash2.png"));
         MainFrame.this.setIconImage(icon.getImage());
+        
         // MainFrame constructor complete
     }
 

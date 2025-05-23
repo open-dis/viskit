@@ -124,7 +124,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * Assembly nodes don't hold onto edges.
      * @param pce the edge to delete
      */
-    void deletePropChangeEdge(PropertyChangeEdge pce);
+    void deleteProperyChangeEdge(PropertyChangeEdge pce);
 
     /**
      * Supports redo of a PropertyChangeEdge

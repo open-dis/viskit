@@ -348,6 +348,7 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 {
                     ViskitGlobals.instance().getActiveEventGraphModel().setModelDirty(fileBasedAssemblyNode == null);
                     ViskitGlobals.instance().getEventGraphViewFrame().toggleEventGraphStatusIndicators();
+                    ViskitGlobals.instance().getEventGraphViewFrame().enableEventGraphMenuItems();
                 }
 
             } catch (Throwable t) {

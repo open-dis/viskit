@@ -70,8 +70,8 @@ import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
 import viskit.assembly.SimulationRunInterface;
 import viskit.control.InternalAssemblyRunner.SimulationState;
 import viskit.view.MainFrame;
-import static viskit.view.MainFrame.runLater;
 import viskit.view.SimulationRunPanel;
+import viskit.xsd.bindings.assembly.SimEntity;
 
 /**
  * AssemblyController full implementation.
@@ -311,6 +311,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         assemblyViewFrame.toggleAssemblyStatusIndicators();
         resetRedoUndoStatus();
+        assemblyViewFrame.enableAssemblyMenuItems();
     }
 
     /** Start w/ undo/redo disabled in the Edit Menu after opening a file */
@@ -396,13 +397,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 case CLOSE_ASSEMBLY:
                     // Close any currently open Event Graphs because we don't yet know which ones
                     // to keep open until iterating through each remaining vAMod
-
-                    ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).closeAll();
+                    ViskitGlobals.instance().getEventGraphController().closeAll();
 
                     markAssemblyConfigurationClosed(assemblyModel.getCurrentFile());
 
                     AssemblyView assemblyView = (AssemblyView) getView();
                     assemblyView.deleteTab(assemblyModel);
+                    assemblyModel = null;
 
                     // NOTE: This doesn't work quite right. If no Assembly is open,
                     // then any non-associated Event Graphs that were also open will
@@ -422,7 +423,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 default:
                     LOG.warn("Program error AssemblyController.assemblyChanged");
             }
-//            assemblyViewFrame.toggleAssemblyStatusIndicators(); // TODO watchout might cause infinite loop
+            assemblyViewFrame.toggleAssemblyStatusIndicators();
+            assemblyViewFrame.enableAssemblyMenuItems();
         }
 
         @Override
@@ -528,12 +530,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         if (assemblyModel.getCurrentFile() == null) {
             saveAs();
-            assemblyViewFrame.toggleAssemblyStatusIndicators();
         } 
         else {
             assemblyModel.saveModel(assemblyModel.getCurrentFile());
-            assemblyViewFrame.toggleAssemblyStatusIndicators();
         }
+            assemblyViewFrame.toggleAssemblyStatusIndicators();
+            assemblyViewFrame.enableAssemblyMenuItems();
     }
     
     /** method name for reflection use */
@@ -582,6 +584,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             adjustRecentAssemblySet(saveFile);
             markAssemblyFilesOpened();
             assemblyViewFrame.toggleAssemblyStatusIndicators();
+            assemblyViewFrame.enableAssemblyMenuItems();
         }
     }
     
@@ -838,7 +841,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 //            ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, title, message);
             projectClosed = true;
         }
-        ViskitGlobals.instance().getAssemblyEditorViewFrame().enableProjectMenus();
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().enableProjectMenuItems();
         
         MainFrame.displayWelcomeGuidance(); // modal dialog; advise user to open or create a project
         
@@ -875,7 +878,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         
         ViskitGlobals.instance().setTitleProjectName(ViskitGlobals.instance().getProjectName());
         
-        ViskitGlobals.instance().getAssemblyEditorViewFrame().enableProjectMenus();
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().enableProjectMenuItems();
         
         runnerSimulationRunInterface.resetSimulationRunPanel();
     }
@@ -900,7 +903,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             oldGraphMetadata = viskitAssemblyModel.getMetadata();
         }
 
-        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
+        assemblyModel = new AssemblyModelImpl(this);
         assemblyModel.initialize();
         assemblyModel.newAssemblyModel(null); // should create new assembly file
 
@@ -989,12 +992,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if  (numberOfAssemblies == 1)
             {
                 title   = "Inspect assembly before closing";
-                message = "First inspect open assembly in Assembly Editor before closing";
+                message = "First inspect open Assembly in Assembly Editor before closing";
             }
             else if (numberOfAssemblies > 1) // more that one
             {
                 title   = "Inspect assemblies before closing";
-                message = "First inspect open assemblies in Assembly Editor before closing them";
+                message = "First inspect open Assemblies in Assembly Editor before closing them";
             }
             ViskitGlobals.instance().selectAssemblyEditorTab();
             ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, 
@@ -1008,13 +1011,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             LOG.info("Closing all assemblies also closes corresponding event graphs");
         
         AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyEditorViewFrame().getOpenAssemblyModels();
-        for (AssemblyModel assemblyModel : assemblyModelArray) 
+        for (AssemblyModel nextAssemblyModel : assemblyModelArray) 
         {
-            setModel((MvcModel) assemblyModel);
+            setModel((MvcModel) nextAssemblyModel);
             setCloseAll(true);
             close(); // each one
         }
         setCloseAll(false);
+        assemblyViewFrame.enableAssemblyMenuItems();
     }
     
     /** method name for reflection use */
@@ -1068,6 +1072,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (preClose()) {
             postClose();
         }
+        assemblyViewFrame.enableAssemblyMenuItems();
     }
 
     @Override
@@ -1088,7 +1093,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void postClose() 
     {
-        LOG.debug("postClose() close assembly {}", OpenAssembly.instance().getName());
+        LOG.debug("postClose() close assembly {}", OpenAssembly.getName());
         OpenAssembly.instance().doFireActionCloseAssembly();
         ViskitGlobals.instance().selectAssemblyEditorTab();
     }
@@ -1202,7 +1207,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     {
         ViskitGlobals.instance().selectAssemblyEditorTab();
         String message = "Save modified ";
-        AssemblyModel assemblyModel = (AssemblyModel) getModel();
+        assemblyModel = (AssemblyModelImpl) getModel();
         if ((assemblyModel != null) && (assemblyModel.getMetadata() != null))
              message += assemblyModel.getMetadata().name + ".xml"; 
         if (!message.toLowerCase().contains("assembly"))
@@ -1536,39 +1541,53 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     /** Permanently delete, or undo selected nodes and attached edges from the cache */
     @SuppressWarnings("unchecked")
-    private void delete() {
-        Vector<Object> v = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
-        AssemblyNode en;
-        for (Object elem : v) {
-            if (elem instanceof AssemblyEdge) {
-                removeEdge((AssemblyEdge) elem);
-            } else if (elem instanceof EventGraphNode) {
-                en = (EventGraphNode) elem;
-                for (AssemblyEdge ed : en.getConnections()) {
-                    removeEdge(ed);
+    private void delete() 
+    {
+        Vector<Object> selectionVectorClone = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
+        AssemblyNode assemblyNode;
+        for (Object nextNode : selectionVectorClone) 
+        {
+            if (nextNode instanceof AssemblyEdge) 
+            {
+                removeEdge((AssemblyEdge) nextNode);
+            } 
+            else if (nextNode instanceof EventGraphNode) 
+            {
+                assemblyNode = (EventGraphNode) nextNode;
+                for (AssemblyEdge nextAssemblyEdge : assemblyNode.getConnections()) 
+                {
+                    removeEdge(nextAssemblyEdge);
                 }
-                ((AssemblyModel) getModel()).deleteEventGraphNode((EventGraphNode) en);
-            } else if (elem instanceof PropertyChangeListenerNode) {
-                en = (PropertyChangeListenerNode) elem;
-                for (AssemblyEdge ed : en.getConnections()) {
-                    removeEdge(ed);
+                ((AssemblyModel) getModel()).deleteEventGraphNode((EventGraphNode) assemblyNode);
+            } 
+            else if (nextNode instanceof PropertyChangeListenerNode)
+            {
+                assemblyNode = (PropertyChangeListenerNode) nextNode;
+                for (AssemblyEdge nextAssemblyEdge : assemblyNode.getConnections()) 
+                {
+                    removeEdge(nextAssemblyEdge);
                 }
-                ((AssemblyModel) getModel()).deletePropertyChangeListener((PropertyChangeListenerNode) en);
+                ((AssemblyModel) getModel()).deletePropertyChangeListener((PropertyChangeListenerNode) assemblyNode);
             }
         }
-
         // Clear the cache after a delete to prevent unnecessary buildup
         if (!selectionVector.isEmpty())
             selectionVector.clear();
     }
 
-    private void removeEdge(AssemblyEdge e) {
-        if (e instanceof AdapterEdge) {
-            ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) e);
-        } else if (e instanceof PropertyChangeEdge) {
-            ((AssemblyModel) getModel()).deletePropChangeEdge((PropertyChangeEdge) e);
-        } else if (e instanceof SimEventListenerEdge) {
-            ((AssemblyModel) getModel()).deleteSimEventListenerEdge((SimEventListenerEdge) e);
+    private void removeEdge(AssemblyEdge nextAssemblyEdge) 
+    {
+        if (nextAssemblyEdge instanceof AdapterEdge) 
+        {
+            ((AssemblyModel) getModel()).deleteAdapterEdge((AdapterEdge) nextAssemblyEdge);
+        } 
+        else if (nextAssemblyEdge instanceof PropertyChangeEdge) 
+        {
+            ((AssemblyModel) getModel()).deleteProperyChangeEdge((PropertyChangeEdge) nextAssemblyEdge);
+        } 
+        else if (nextAssemblyEdge instanceof SimEventListenerEdge) 
+        {
+            ((AssemblyModel) getModel()).deleteSimEventListenerEdge((SimEventListenerEdge) nextAssemblyEdge);
         }
     }
 
@@ -1646,33 +1665,40 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // Recreate the JAXB (XML) bindings since the paste function only does
         // nodes and not edges
-        if (redoGraphCell instanceof org.jgraph.graph.Edge) {
-
+        if (redoGraphCell instanceof org.jgraph.graph.Edge) 
+        {
             // Handles both arcs and self-referential arcs
-            if (redoGraphCell.getUserObject() instanceof AdapterEdge) {
-                AdapterEdge ed = (AdapterEdge) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoAdapterEdge(ed);
-            } else if (redoGraphCell.getUserObject() instanceof PropertyChangeEdge) {
-                PropertyChangeEdge ed = (PropertyChangeEdge) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoPropertyChangeEdge(ed);
-            } else {
-                SimEventListenerEdge ed = (SimEventListenerEdge) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoSimEvLisEdge(ed);
+            if (redoGraphCell.getUserObject() instanceof AdapterEdge) 
+            {
+                AdapterEdge nextAdapterEdge = (AdapterEdge) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoAdapterEdge(nextAdapterEdge);
+            } 
+            else if (redoGraphCell.getUserObject() instanceof PropertyChangeEdge) 
+            {
+                PropertyChangeEdge nextPropertyChangeEdge = (PropertyChangeEdge) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoPropertyChangeEdge(nextPropertyChangeEdge);
+            } 
+            else {
+                SimEventListenerEdge nextSimEventListenerEdge = (SimEventListenerEdge) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoSimEvLisEdge(nextSimEventListenerEdge);
             }
-        } else {
-
-            if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerNode) {
-                PropertyChangeListenerNode node = (PropertyChangeListenerNode) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoPropertyChangeListener(node);
-            } else {
-                EventGraphNode node = (EventGraphNode) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoEventGraph(node);
+        } 
+        else 
+        {
+            if (redoGraphCell.getUserObject() instanceof PropertyChangeListenerNode) 
+            {
+                PropertyChangeListenerNode pclNode = (PropertyChangeListenerNode) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoPropertyChangeListener(pclNode);
+            } 
+            else {
+                EventGraphNode nextEventGraphNode = (EventGraphNode) redoGraphCell.getUserObject();
+                ((AssemblyModel) getModel()).redoEventGraph(nextEventGraphNode);
             }
         }
 
-        ViskitGraphUndoManager undoMgr = (ViskitGraphUndoManager) assemblyViewFrame.getCurrentViskitGraphAssemblyComponentWrapper().getUndoManager();
+        ViskitGraphUndoManager undoManager = (ViskitGraphUndoManager) assemblyViewFrame.getCurrentViskitGraphAssemblyComponentWrapper().getUndoManager();
         try {
-            undoMgr.redo(assemblyViewFrame.getCurrentViskitGraphAssemblyComponentWrapper().getGraphLayoutCache());
+            undoManager.redo(assemblyViewFrame.getCurrentViskitGraphAssemblyComponentWrapper().getGraphLayoutCache());
         } 
         catch (CannotRedoException ex) {
             LOG.error(METHOD_redo + "() unable to redo: {}", ex);
@@ -1987,7 +2013,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             x2j.unmarshal();
 
             // SimEntity is a synonym for event graph, when running as part of an asssembly
-            boolean isEventGraph = x2j.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
+            boolean isEventGraph = x2j.getUnMarshalledObject() instanceof SimEntity;
             if (!isEventGraph) {
                 LOG.debug("Is an Assembly: {}", !isEventGraph);
                 return paf;
