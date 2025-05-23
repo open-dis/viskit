@@ -41,6 +41,6 @@ package viskit.mvc;
 public interface MvcRecentFileListener {
 
     /** Each of the view frames will handle recent file openings */
-    void listChanged();
+    void listenerChanged();
 
 } // end class file MvcRecentFileListener.java

@@ -80,16 +80,6 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     }
 
     @Override
-    public boolean isDirty() {
-        return isModelDirty();
-    }
-
-    @Override
-    public void setDirty(boolean newValue) {
-        setModelDirty(newValue);
-    }
-
-    @Override
     public SimkitAssembly getJaxbRoot() {
         return jaxbRoot;
     }
@@ -103,7 +93,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     public void changeMetadata(GraphMetadata newGraphMetadata)
     {
         this.graphMetadata = newGraphMetadata;
-        setDirty(true);
+        setModelDirty(true);
     }
 
     public void loadMetadata(GraphMetadata newGraphMetadata)
@@ -193,7 +183,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         }
         else title = "UnsavedAssemblyFile";
         
-        setDirty(false); // important to clear prior values from setup and intitialization
+        setModelDirty(false); // important to clear prior values from setup and intitialization
         return true;
     }
 

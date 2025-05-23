@@ -57,9 +57,9 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      *
      * @return true means changes have been made and it needs to be flushed.
      */
-    boolean isDirty();
+    boolean isModelDirty();
 
-    void setDirty(boolean newValue);  // to force save
+    void setModelDirty(boolean newValue);  // to force save
 
     /**
      * Messaged by controller when a new Model should be loaded.

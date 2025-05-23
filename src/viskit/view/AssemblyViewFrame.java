@@ -337,7 +337,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 //            AssemblyModelImpl assemblyModel = (AssemblyModelImpl) getModel(); // TODO not found in corresponding EventGraph method
 
             if (assemblyModel.getCurrentFile() != null)
-                ((AssemblyControllerImpl) getController()).initOpenAssemblyWatch(assemblyModel.getCurrentFile(), assemblyModel.getJaxbRoot());
+                ((AssemblyControllerImpl) getController()).initializeOpenAssemblyWatch(assemblyModel.getCurrentFile(), assemblyModel.getJaxbRoot());
 
             GraphMetadata graphMetadata = assemblyModel.getMetadata();
             if ((graphMetadata != null) && (graphMetadata.name != null))
@@ -350,7 +350,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     class RecentAssemblyFileListener implements MvcRecentFileListener
     {
         @Override
-        public void listChanged()
+        public void listenerChanged()
         {
             String fileName;
             Action currentAction;
@@ -1203,9 +1203,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             tabbedPane.setSelectedComponent(currentSwingComponent);
             // TODO tooltip text hints not appearing
 
-            if (((AssemblyModelImpl) getModel()).isDirty())
+            if (((AssemblyModelImpl) getModel()).isModelDirty())
             {
-                // background changes seem excessive
+                // background color changes look excessive
 //                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
 
                 if (LOOK_AND_FEEL != null && !LOOK_AND_FEEL.isEmpty() && LOOK_AND_FEEL.toLowerCase().equals("default"))
@@ -1223,7 +1223,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             }
         }
         // Restore active tab and model by virtue of firing a call to stateChanged()
-        tabbedPane.setSelectedIndex(originalSelectedTabIndex);
+        if (tabbedPane.getSelectedIndex() != originalSelectedTabIndex)
+            tabbedPane.setSelectedIndex(originalSelectedTabIndex);
     }
 
     @Override

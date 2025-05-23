@@ -557,7 +557,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     if (priorRunSimulationClassLoader == null) // restore while in thread
                         priorRunSimulationClassLoader = getRunSimulationClassLoader();
                     Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
-                    LOG.info("RunResumeListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
+                    LOG.debug("RunResumeListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     
                     Method resumeSimulationMethod = simulationRunAssemblyClass.getMethod(METHOD_setRunResumeSimulation);
                     resumeSimulationMethod.invoke(simulationRunAssemblyInstance);
@@ -605,7 +605,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                         priorRunSimulationClassLoader = getRunSimulationClassLoader();
                     
                     Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
-                    LOG.info("currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
+                    LOG.debug("currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     
                     Method setPauseSimulationRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setPauseSimulationRun, boolean.class);
                     setPauseSimulationRunMethod.invoke(simulationRunAssemblyInstance, true);
@@ -685,8 +685,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 if ((classLoader != null) && !classLoader.equals(priorWorkingClassLoaderNoReset))
                 {
                     Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
-                    LOG.info("StepListener actionPerformed(), rejoin regular thread");
-                    LOG.info("      currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
+                    LOG.debug("StepListener actionPerformed(), rejoin regular thread\n      currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
                 } // rejoin regular thread
 
                 // TODO should prior thread be removed?
@@ -724,7 +723,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                     if (priorRunSimulationClassLoader == null) // restore while in thread
                         priorRunSimulationClassLoader = getRunSimulationClassLoader();
                     Thread.currentThread().setContextClassLoader(priorRunSimulationClassLoader);
-                    LOG.info("StopListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
+                    LOG.debug("StopListener actionPerformed() currentThread contextClassLoader=" + priorRunSimulationClassLoader.getName());
                     
                     // TODO where was this original method? "setStopRun" is likely now METHOD_setStopSimulationRun
                     Method setStopRunMethod = simulationRunAssemblyClass.getMethod(METHOD_setStopSimulationRun, boolean.class);
@@ -743,8 +742,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 if ((classLoader != null) && !classLoader.equals(priorWorkingClassLoaderNoReset))
                 {
                     Thread.currentThread().setContextClassLoader(priorWorkingClassLoaderNoReset);
-                    LOG.info("StopListener actionPerformed(), rejoin regular thread");
-                    LOG.info("      currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
+                    LOG.debug("StopListener actionPerformed(), rejoin regular thread\n      currentThread contextClassLoader=" + priorWorkingClassLoaderNoReset.getName());
                 } // rejoin regular thread
                 else
                 {
@@ -1336,7 +1334,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                 // state set from the Viskit WorkingClassLoader
                 Thread.currentThread().setContextClassLoader(runSimulationClassLoader);
                 // TODO ensure no threading and singleton issues while inside ViskitGlobals?
-                LOG.info("getRunSimulationClassLoader() currentThread\n      " + 
+                LOG.debug("getRunSimulationClassLoader() currentThread\n      " + 
                          "contextClassLoader=" + runSimulationClassLoader.getName() + " and created new ClassLoader for\n      " +
                          ViskitGlobals.instance().getProjectRootDirectoryPath());
             }

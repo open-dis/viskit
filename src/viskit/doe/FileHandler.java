@@ -106,7 +106,7 @@ public class FileHandler
     public static DoeFileModel _openFileJaxb(SimkitAssembly simkitAssembly, File f) {
         DoeFileModel dfm = new DoeFileModel();
         dfm.userFile = f;
-        // todo dfm.jaxbRoot = assembly;
+        // todo dfm.jaxbRootSimkitAssembly = assembly;
         dfm.designParameters = simkitAssembly.getDesignParameters();
         dfm.setSimEntityList(simkitAssembly.getSimEntity());
         dfm.parameterTable = new ParameterTable(dfm.getSimEntityList(), dfm.designParameters);
@@ -140,7 +140,7 @@ public class FileHandler
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             marshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, SCHEMA_LOC);
-            marshaller.marshal(OpenAssembly.inst().jaxbRoot, fileWriter);
+            marshaller.marshal(OpenAssembly.instance().jaxbRootSimkitAssembly, fileWriter);
         }
     }
 

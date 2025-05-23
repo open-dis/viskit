@@ -166,12 +166,12 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             String title = "Confirm Run Event";
 
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
-            boolean dirty = false;
+            boolean modelDirty = false;
             if (returnValue == JOptionPane.YES_OPTION) {
                 EventGraphControllerImpl.this.buildNewEventNode(new Point(30, 60), "Run");
-                dirty = true;
+                modelDirty = true;
             }
-            ((Model) getModel()).setDirty(dirty);
+            ((Model) getModel()).setModelDirty(modelDirty);
         } 
         else {
            ((EventGraphView) getView()).deleteTab(newModelImpl);
@@ -199,8 +199,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 
             case JOptionPane.NO_OPTION:
                 // No need to recompile
-                if (((Model) getModel()).isDirty()) {
-                    ((Model) getModel()).setDirty(false);
+                if (((Model) getModel()).isModelDirty()) {
+                    ((Model) getModel()).setModelDirty(false);
                 }
                 returnValue = true;
                 break;
@@ -394,7 +394,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     private void notifyRecentFileListeners()
     {
       for(MvcRecentFileListener recentFileListener : recentFileListenerSet) {
-            recentFileListener.listChanged();
+            recentFileListener.listenerChanged();
         }
     }
 
@@ -555,7 +555,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         Model[] eventGraphModels = ((EventGraphView) getView()).getOpenModels();
         for (Model model : eventGraphModels) 
         {
-            if (model.isDirty())
+            if (model.isModelDirty())
             {
                 hasDirtyEventGraph = true;
                 break;
@@ -627,7 +627,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         {
             return false;
         }
-        if (eventGraphModel.isDirty())
+        if (eventGraphModel.isModelDirty())
         {
             return askToSaveAndContinue();
         }
@@ -762,11 +762,11 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (model.saveModel(file))
         {
             // We don't need to recurse since we know this is a file, but make sure
-            // it is re-compiled and re-validated. model.isDirty will be set from this call.
+            // it is re-compiled and re-validated. model.isModelDirty will be set from this call.
             ViskitGlobals.instance().getAssemblyEditorViewFrame().addEventGraphsToLegoTree(file, false);
         }
         // Don't watch an XML file whose source couldn't be compiled correctly
-        if (!model.isDirty()) {
+        if (!model.isModelDirty()) {
             fileWatchSave(file);
         }
     }
@@ -1118,7 +1118,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     {
         Model model = (Model) getModel();
         if (model == null) {return false;}
-        if (model.isDirty() || model.getLastFile() == null) {
+        if (model.isModelDirty() || model.getLastFile() == null) {
             String message = "The model will be saved.\nContinue?";
             String title = "Confirm";
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);

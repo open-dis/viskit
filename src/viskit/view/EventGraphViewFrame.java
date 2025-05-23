@@ -636,7 +636,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     class RecentEventGraphFileListener implements MvcRecentFileListener 
     {
         @Override
-        public void listChanged() 
+        public void listenerChanged() 
         {
             String fileName;
             Action currentAction;
@@ -1120,7 +1120,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             // This will fire a call to stateChanged() which also sets the current model
             tabbedPane.setSelectedComponent(currentSwingComponent);
             // TODO tooltip text hints not appearing
-            if (((Model) getModel()).isDirty())
+            if (((Model) getModel()).isModelDirty())
             {
                 // background changes seem excessive
 //                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());

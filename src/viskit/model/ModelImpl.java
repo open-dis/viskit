@@ -106,12 +106,12 @@ public class ModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
-    public boolean isDirty() {
+    public boolean isModelDirty() {
         return modelDirty;
     }
 
     @Override
-    public void setDirty(boolean newDirtyStatus) {
+    public void setModelDirty(boolean newDirtyStatus) {
         modelDirty = newDirtyStatus;
     }
 
@@ -124,7 +124,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     public void changeMetadata(GraphMetadata newGraphMetadata) 
     {
         this.graphMetadata = newGraphMetadata;
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(newGraphMetadata, ModelEvent.METADATA_CHANGED, "Metadata changed"));
     }
 
@@ -170,7 +170,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
                 buildEventsFromJaxb(jaxbRoot.getEvent());
 
                 // The above change metadata and build set the model dirty
-                setDirty(false);
+                setModelDirty(false);
                 // The following builds just notify
 
                 buildParametersFromJaxb(jaxbRoot.getParameter());
@@ -260,7 +260,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             // OK, made it through the marshal, overwrite the "real" file
             Files.copy(tempFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            setDirty(false);
+            setModelDirty(false);
             returnValue = true;
         }
         catch (JAXBException e) {
@@ -561,7 +561,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         edgeCache.put(schedule, schedulingEdge);
 
-        setDirty(true);
+        setModelDirty(true);
         this.notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Edge added"));
     }
 
@@ -594,7 +594,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         edgeCache.put(cancel, cancelingEdge);
 
-//        setDirty(true); // likely erroneous, not expecting dirty if loading from file using JAXB
+//        setModelDirty(true); // likely erroneous, not expecting dirty if loading from file using JAXB
         notifyChanged(new ModelEvent(cancelingEdge, ModelEvent.CANCELING_EDGE_ADDED, "Canceling edge added"));
     }
 
@@ -705,7 +705,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         jaxbRoot.getParameter().add(parameter);
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(viskitParameter, ModelEvent.SIM_PARAMETER_ADDED, "new simulation parameter"));
     }
 
@@ -721,14 +721,14 @@ public class ModelImpl extends MvcAbstractModel implements Model
         }
         simulationParameters.remove(vp);
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(vp, ModelEvent.SIM_PARAMETER_DELETED, "vParameter deleted"));
     }
 
     @Override
     public void changeCodeBlock(String s) {
         jaxbRoot.setCode(s);
-        setDirty(true);
+        setModelDirty(true);
     }
 
     @Override
@@ -750,7 +750,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //        parameter.getComment().add(newParameter.getDescription());
         parameter.setDescription(newParameter.getDescription());
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(newParameter, ModelEvent.SIM_PARAMETER_CHANGED, "vParameter changed"));
         return returnValue;
     }
@@ -775,7 +775,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         newStateVariable.opaqueModelObject = jaxbStateVariable;
         jaxbRoot.getStateVariable().add(jaxbStateVariable);
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(newStateVariable, ModelEvent.STATE_VARIABLE_ADDED, "State variable added"));
     }
 
@@ -791,7 +791,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         }
         stateVariables.remove(vsv);
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(vsv, ModelEvent.STATE_VARIABLE_DELETED, "State variable deleted"));
     }
 
@@ -811,7 +811,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //        stateVariable.getComment().add(vsv.getDescription());
         stateVariable.setDescription(ViskitStatics.emptyIfNull(newStateVariable.getDescription()));
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(newStateVariable, ModelEvent.STATE_VARIABLE_CHANGED, "State variable changed"));
         return returnValue;
     }
@@ -845,7 +845,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         node.opaqueModelObject = jaxbEvent;
         jaxbRoot.getEvent().add(jaxbEvent);
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(node, ModelEvent.EVENT_ADDED, "Event added"));
     }
 
@@ -860,7 +860,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         node.opaqueModelObject = jaxbEv;
         jaxbRoot.getEvent().add(jaxbEv);
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_NODE, "Event Node redone"));
     }
 
@@ -870,7 +870,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         eventNodeCache.remove(jaxbEv);
         jaxbRoot.getEvent().remove(jaxbEv);
 
-        setDirty(true);
+        setModelDirty(true);
         if (!eventGraphController.isUndo())
             notifyChanged(new ModelEvent(node, ModelEvent.EVENT_DELETED, "Event deleted"));
         else
@@ -1098,7 +1098,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         jaxbEvent.setCode(eventNode.getCodeBlockString());
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENT_CHANGED, "Event changed"));
         return returnValue;
     }
@@ -1138,7 +1138,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         edgeCache.put(schedule, schedulingEdge);
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Scheduling Edge added"));
     }
 
@@ -1158,7 +1158,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         sourceEvent.getScheduleOrCancel().add(schedule);
         edgeCache.put(schedule, edge);
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(edge, ModelEvent.REDO_SCHEDULING_EDGE, "Scheduling Edge redone"));
     }
 
@@ -1191,7 +1191,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         }
         edgeCache.put(cancel, cancelingEdge);
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(cancelingEdge, ModelEvent.CANCELING_EDGE_ADDED, "Canceling Edge added"));
     }
 
@@ -1212,7 +1212,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         sourceEveny.getScheduleOrCancel().add(cancel);
         edgeCache.put(cancel, edge);
 
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(edge, ModelEvent.REDO_CANCELING_EDGE, "Canceling Edge redone"));
     }
 
@@ -1249,7 +1249,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             edges.remove(jaxbEdge);
         }
         edgeCache.remove(edge);
-        setDirty(true);
+        setModelDirty(true);
     }
 
     @Override
@@ -1274,7 +1274,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             edgeParameter.setValue(ViskitStatics.nullIfEmpty(nextEdgeParameter.getValue()));
             schedule.getEdgeParameter().add(edgeParameter);
         }
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_CHANGED, "Edge changed"));
     }
 
@@ -1295,7 +1295,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             edgeParameter.setValue(ViskitStatics.nullIfEmpty(nextEdgeParameter.getValue()));
             cancel.getEdgeParameter().add(edgeParameter);
         }
-        setDirty(true);
+        setModelDirty(true);
         notifyChanged(new ModelEvent(newCancellingEdge, ModelEvent.CANCELING_EDGE_CHANGED, "Canceling edge changed"));
     }
 

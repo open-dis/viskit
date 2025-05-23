@@ -204,11 +204,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             assemblyModel = (AssemblyModelImpl) getModel();
         if (assemblyModel == null)
             assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
-        if (assemblyModel.isDirty()) 
+        if (assemblyModel.isModelDirty()) 
         {
             StringBuilder sb = new StringBuilder("<html><p align='center'>Execution parameters have been modified.<br>(");
 
-            for (Iterator<OpenAssembly.AssemblyChangeListener> itr = isLocalDirty.iterator(); itr.hasNext();) {
+            for (Iterator<OpenAssembly.AssemblyChangeListener> itr = isLocalDirtySet.iterator(); itr.hasNext();) {
                 sb.append(itr.next().getHandle());
                 sb.append(", ");
             }
@@ -229,7 +229,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         boolean returnValue = true;
         
-        if (assemblyModel.isDirty())
+        if (assemblyModel.isModelDirty())
         {
             return askToSaveAndContinue(); // blocks
         }
@@ -255,7 +255,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().selectAssemblyEditorTab();
         File[] filesArray = ViskitGlobals.instance().getAssemblyEditorViewFrame().openFilesAsk();
         if (filesArray == null)
-            return;
+            return; // no event graphs for this assembly to open
 
         for (File file : filesArray) {
             if (file != null)
@@ -302,7 +302,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             markAssemblyFilesOpened();
 
             // replaces old fileWatchOpen(file);
-            initOpenAssemblyWatch(file, assemblyModel.getJaxbRoot());
+            initializeOpenAssemblyWatch(file, assemblyModel.getJaxbRoot());
             openEventGraphs(file);
         } 
         else 
@@ -347,8 +347,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param f the XML Assembly file
      * @param jaxbroot the JAXB root of this XML file
      */
-    public void initOpenAssemblyWatch(File f, SimkitAssembly jaxbroot) {
-        OpenAssembly.inst().setFile(f, jaxbroot);
+    public void initializeOpenAssemblyWatch(File f, SimkitAssembly jaxbroot) {
+        OpenAssembly.instance().setFile(f, jaxbroot);
     }
 
     /** @return the listener for this AssemblyControllerImpl */
@@ -357,40 +357,40 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         return assemblyChangeListener;
     }
     
-    private Set<OpenAssembly.AssemblyChangeListener> isLocalDirty = new HashSet<>();
+    private Set<OpenAssembly.AssemblyChangeListener> isLocalDirtySet = new HashSet<>();
     
     OpenAssembly.AssemblyChangeListener assemblyChangeListener = new OpenAssembly.AssemblyChangeListener() 
     {
         @Override
-        public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object parameter) 
+        public void assemblyChanged(int assemblyChangeListenerAction, OpenAssembly.AssemblyChangeListener sourceAssemblyChangeListener, Object parameterObject) 
         {
             if (assemblyViewFrame == null)
                 assemblyViewFrame = ViskitGlobals.instance().getAssemblyEditorViewFrame();
             if (assemblyModel == null)
                 assemblyModel = (AssemblyModelImpl) getModel();
         
-            switch (action) 
+            switch (assemblyChangeListenerAction) 
             {    
                 case JAXB_CHANGED:
-                    isLocalDirty.remove(source);
-                    if (isLocalDirty.isEmpty())
+                    isLocalDirtySet.remove(sourceAssemblyChangeListener);
+                    if (isLocalDirtySet.isEmpty())
                     {
                         localDirty = false; // not expecting dirty if loaded from JAXB
                     }
-                   assemblyModel.setDirty(false);
+                    assemblyModel.setModelDirty(false);
                     break;
 
                 case NEW_ASSEMBLY:
-                    isLocalDirty.clear();
+                    isLocalDirtySet.clear();
                     localDirty = false;
-                    ((AssemblyModel) getModel()).setDirty(false);
+                    ((AssemblyModel) getModel()).setModelDirty(false); // TODO watchout might cause infinite loop
                     break;
 
                 case PARAMETER_LOCALLY_EDITED:
                     // This gets hit when you type something in the last three tabs
-                    isLocalDirty.add(source);
+                    isLocalDirtySet.add(sourceAssemblyChangeListener);
                     localDirty = true;
-                    assemblyModel.setDirty(true);
+                    assemblyModel.setModelDirty(true);
                     break;
 
                 case CLOSE_ASSEMBLY:
@@ -422,7 +422,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 default:
                     LOG.warn("Program error AssemblyController.assemblyChanged");
             }
-            assemblyViewFrame.toggleAssemblyStatusIndicators();
+//            assemblyViewFrame.toggleAssemblyStatusIndicators(); // TODO watchout might cause infinite loop
         }
 
         @Override
@@ -437,54 +437,54 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
 
     @Override
-    public void assemblyChanged(int action, OpenAssembly.AssemblyChangeListener source, Object param) {
-        assemblyChangeListener.assemblyChanged(action, source, param);
+    public void assemblyChanged(int assemblyChangeListenerAction, OpenAssembly.AssemblyChangeListener source, Object param) {
+        assemblyChangeListener.assemblyChanged(assemblyChangeListenerAction, source, param);
     }
 
     @Override
-    public void addAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis) {
-        OpenAssembly.inst().addListener(lis);
+    public void addAssemblyFileListener(OpenAssembly.AssemblyChangeListener assemblyChangeListener) {
+        OpenAssembly.instance().addListener(assemblyChangeListener);
     }
 
     @Override
-    public void removeAssemblyFileListener(OpenAssembly.AssemblyChangeListener lis) {
-        OpenAssembly.inst().removeListener(lis);
+    public void removeAssemblyFileListener(OpenAssembly.AssemblyChangeListener assemblyChangeListener) {
+        OpenAssembly.instance().removeListener(assemblyChangeListener);
     }
 
-    Set<MvcRecentFileListener> recentAssemblyListeners = new HashSet<>();
+    Set<MvcRecentFileListener> recentAssemblyListenerSet = new HashSet<>();
 
     @Override
-    public void addRecentAssemblyFileSetListener(MvcRecentFileListener lis) {
-        recentAssemblyListeners.add(lis);
+    public void addRecentAssemblyFileSetListener(MvcRecentFileListener mvcRecentFileListener) {
+        recentAssemblyListenerSet.add(mvcRecentFileListener);
     }
 
     @Override
-    public void removeRecentAssemblyFileSetListener(MvcRecentFileListener lis) {
-        recentAssemblyListeners.remove(lis);
+    public void removeRecentAssemblyFileSetListener(MvcRecentFileListener mvcRecentFileListener) {
+        recentAssemblyListenerSet.remove(mvcRecentFileListener);
     }
 
     /** Here we are informed of open Event Graphs */
 
     private void notifyRecentAssemblyFileListeners() {
-        for (MvcRecentFileListener lis : recentAssemblyListeners)
-            lis.listChanged();
+        for (MvcRecentFileListener mvcRecentFileListener : recentAssemblyListenerSet)
+            mvcRecentFileListener.listenerChanged();
     }
 
-    Set<MvcRecentFileListener> recentProjectListeners = new HashSet<>();
+    Set<MvcRecentFileListener> recentProjectListenerSet = new HashSet<>();
 
     @Override
-    public void addRecentProjectFileSetListener(MvcRecentFileListener lis) {
-        recentProjectListeners.add(lis);
+    public void addRecentProjectFileSetListener(MvcRecentFileListener mvcRecentFileListener) {
+        recentProjectListenerSet.add(mvcRecentFileListener);
     }
 
     @Override
-    public void removeRecentProjectFileSetListener(MvcRecentFileListener lis) {
-        recentProjectListeners.remove(lis);
+    public void removeRecentProjectFileSetListener(MvcRecentFileListener mvcRecentFileListener) {
+        recentProjectListenerSet.remove(mvcRecentFileListener);
     }
 
     private void notifyRecentProjectFileListeners() {
-        for (MvcRecentFileListener lis : recentProjectListeners) {
-            lis.listChanged();
+        for (MvcRecentFileListener mvcRecentFileListener : recentProjectListenerSet) {
+            mvcRecentFileListener.listenerChanged();
         }
     }
 
@@ -1078,7 +1078,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             return false;
         }
         LOG.debug("preClose() close assembly {}", assemblyModel.getCurrentAssemblyModelName());
-        if (assemblyModel.isDirty()) 
+        if (assemblyModel.isModelDirty()) 
         {
             return checkSaveIfDirty();
         }
@@ -1088,8 +1088,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void postClose() 
     {
-        LOG.debug("postClose() close assembly {}", OpenAssembly.inst().getName());
-        OpenAssembly.inst().doFireActionCloseAssembly();
+        LOG.debug("postClose() close assembly {}", OpenAssembly.instance().getName());
+        OpenAssembly.instance().doFireActionCloseAssembly();
         ViskitGlobals.instance().selectAssemblyEditorTab();
     }
 
@@ -1215,7 +1215,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             case JOptionPane.YES_OPTION:
                 save();
                 // TODO: Can't remember why this is here after a save?
-                if (((AssemblyModel) getModel()).isDirty()) {
+                if (((AssemblyModel) getModel()).isModelDirty()) {
                     return false;
                 } // we cancelled
                 return true;
@@ -1223,8 +1223,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             case JOptionPane.NO_OPTION:
 
                 // No need to recompile
-                if (((AssemblyModel) getModel()).isDirty()) {
-                    ((AssemblyModel) getModel()).setDirty(false);
+                if (((AssemblyModel) getModel()).isModelDirty()) {
+                    ((AssemblyModel) getModel()).setModelDirty(false);
                 }
                 return true;
                 
@@ -1735,7 +1735,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // Perhaps a cached file is no longer present in the path
         if (assemblyModel == null) {return false;}
-        if (assemblyModel.isDirty() || assemblyModel.getCurrentFile() == null) {
+        if (assemblyModel.isModelDirty() || assemblyModel.getCurrentFile() == null) {
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo("Confirm", "The model will be saved.\nContinue?");
             if (returnValue != JOptionPane.YES_OPTION) {
                 return false;

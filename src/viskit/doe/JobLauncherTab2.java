@@ -443,7 +443,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         @Override
         public void keyTyped(KeyEvent e) {
             //LOG.info("sending paramlocallyeditted from JobLauncherTab");
-            OpenAssembly.inst().doParamLocallyEdited(JobLauncherTab2.this);     // inform who is listening that we tweeked the params
+            OpenAssembly.instance().doParamLocallyEdited(JobLauncherTab2.this);     // inform who is listening that we tweeked the params
         }
     };
 
@@ -467,7 +467,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
                 replicationsTimeOut.setText(s);
             }
         } else {
-            exp = OpenAssembly.inst().jaxbAssemblyObjectFactory.createExperiment();
+            exp = OpenAssembly.instance().jaxbAssemblyObjectFactory.createExperiment();
 
             jaxbRoot.setExperiment(exp);
 
@@ -488,7 +488,7 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         public void actionPerformed(ActionEvent e) {
             // The user has hit the save button;
             saveParamsToJaxbNoNotify();
-            OpenAssembly.inst().doFireActionAssemblyJaxbChanged(JobLauncherTab2.this);
+            OpenAssembly.instance().doFireActionAssemblyJaxbChanged(JobLauncherTab2.this);
         }
     }
 
@@ -502,17 +502,17 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
     }
 
     private void saveParamsToJaxbNoNotify() {
-        // Put the params from the GUI into the jaxbRoot
+        // Put the params from the GUI into the jaxbRootSimkitAssembly
         int numDesignPts = jaxbRoot.getDesignParameters().size();
         numberDPsTF.setText("" + numDesignPts);
 
         Experiment exp = jaxbRoot.getExperiment();
         Schedule sch = jaxbRoot.getSchedule();
         if (exp == null) {
-            exp = OpenAssembly.inst().jaxbAssemblyObjectFactory.createExperiment();
+            exp = OpenAssembly.instance().jaxbAssemblyObjectFactory.createExperiment();
         }
         if (sch == null) {
-            sch = OpenAssembly.inst().jaxbAssemblyObjectFactory.createSchedule();
+            sch = OpenAssembly.instance().jaxbAssemblyObjectFactory.createSchedule();
         }
 
         String replications = numberReplicationsTF.getText().trim();

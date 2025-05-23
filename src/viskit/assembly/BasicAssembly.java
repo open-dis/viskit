@@ -1100,7 +1100,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         }
         else
         {
-            LOG.info("Begin running " + getName() + " simulation replications for {} planned replications total", getNumberReplicationsPlanned());
+            LOG.info("Begin running " + getName() + " simulation for {} planned replications total", getNumberReplicationsPlanned());
         }
         
         // here is the primary loop for each replication within the current simulation
@@ -1179,7 +1179,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                 seed = RandomVariateFactory.getDefaultRandomNumber().getSeed();
                 String seedString = String.valueOf(seed);
                 String indexSpacing = new String();
-                if (replicationNumber < 9)
+                if (replicationNumber <= 9)
                     indexSpacing = " ";
                 String spacing = new String();
                 if      (seedString.length() == 10)

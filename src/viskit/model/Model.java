@@ -48,7 +48,7 @@ public interface Model
      * Reports saved state of model.  Becomes "clean" after a save.
      * @return state of model
      */
-    boolean isDirty();
+    boolean isModelDirty();
 
     /**
      * This is messaged by the controller, typically after a newModel(f) message.
@@ -158,9 +158,9 @@ public interface Model
 
     /**
      * This is to allow the controller to stick in a Run event, but treat the graph as fresh.
-     * @param dirty, if true force to save
+     * @param newModelDirtyStatus, if true then prompt user to save
      */
-    void setDirty(boolean dirty);
+    void setModelDirty(boolean newModelDirtyStatus);
 
     String generateLocalVariableName();
 

@@ -1089,7 +1089,7 @@ public class ViskitGlobals
 
                 // TODO experimenting with context
                 Thread.currentThread().setContextClassLoader(viskitApplicationClassLoader);
-                LOG.info("getViskitApplicationClassLoader() currentThread\n      contextClassLoader='" + viskitApplicationClassLoader.getName() + "'" + "\n");
+                LOG.debug("getViskitApplicationClassLoader() currentThread\n      contextClassLoader='" + viskitApplicationClassLoader.getName() + "'" + "\n");
             }
         if (viskitApplicationClassLoader == null)
         {

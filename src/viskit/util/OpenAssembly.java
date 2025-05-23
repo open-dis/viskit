@@ -42,52 +42,55 @@ import org.apache.logging.log4j.Logger;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
 
-/**<p>
+/**
+ * This is a singleton class to coordinate opening of and modifications to
+ * Assembly files.
+ * <p>
  * MOVES Institute
  * Naval Postgraduate School, Monterey, CA
  * www.nps.edu</p>
  * @author Mike Bailey
  * @since Dec 1, 2005
- * @since 11:18:53 AM
- *
- * This is a singleton class to coordinate opening of and modifications to
- * Assembly files
  */
 public class OpenAssembly
 {
     static final Logger LOG = LogManager.getLogger();
 
-    private static OpenAssembly instance;
+    private static OpenAssembly openAssemblyInstance;
     private static final Object SYNCHER = new Object();
     private static String name = new String();
 
-    public static OpenAssembly inst() {
-        if (instance != null) {
-            return instance;
+    public static OpenAssembly instance() {
+        if (openAssemblyInstance != null) {
+            return openAssemblyInstance;
         }
 
         synchronized (SYNCHER) {
-            if (instance == null) {
-                instance = new OpenAssembly();
+            if (openAssemblyInstance == null) {
+                openAssemblyInstance = new OpenAssembly();
             }
-            return instance;
+            return openAssemblyInstance;
         }
     }
 
     public File file;
-    public SimkitAssembly jaxbRoot;
+    public SimkitAssembly jaxbRootSimkitAssembly;
     public ObjectFactory jaxbAssemblyObjectFactory;
 
-    /** Singleton class */
-    private OpenAssembly() {}
+    /** Singleton class constructor */
+    private OpenAssembly() 
+    {
+        // empty constructor
+    }
 
     /** @param newFile the Assembly XML file to announce to all the Assembly Listeners
-     * @param jaxb the JAXB root of this XML file
+     * @param jaxbSimkitAssembly the JAXB root of this XML file
      */
-    public void setFile(File newFile, SimkitAssembly jaxb) {
+    public void setFile(File newFile, SimkitAssembly jaxbSimkitAssembly) 
+    {
         if (newFile != null) {
             this.file = newFile;
-            jaxbRoot = jaxb;
+            jaxbRootSimkitAssembly = jaxbSimkitAssembly;
             jaxbAssemblyObjectFactory = new ObjectFactory();
 
             // This is crucial for Viskit being able to open associated Event Graphs for
@@ -101,44 +104,45 @@ public class OpenAssembly
                 name = name.substring(0, name.indexOf(".xml"));
         }
     }
-    private final Set<AssemblyChangeListener> listeners = new HashSet<>();
+    private final Set<AssemblyChangeListener> assemblyChangeListenerSet = new HashSet<>();
 
     /**
-     * @param listener assembly change listener
+     * @param assemblyChangeListener assembly change listener
      * @return true if was not already registered
      */
-    public boolean addListener(AssemblyChangeListener listener) {
-        return listeners.add(listener);
+    public boolean addListener(AssemblyChangeListener assemblyChangeListener) {
+        return assemblyChangeListenerSet.add(assemblyChangeListener);
     }
 
     /**
-     * @param listener assembly change listener
+     * @param assemblyChangeListener assembly change listener
      * @return true if it had been registered
      */
-    public boolean removeListener(AssemblyChangeListener listener) {
-        return listeners.remove(listener);
+    public boolean removeListener(AssemblyChangeListener assemblyChangeListener) {
+        return assemblyChangeListenerSet.remove(assemblyChangeListener);
     }
 
-    public void doParamLocallyEdited(AssemblyChangeListener source) {
-        fireAction(AssemblyChangeListener.PARAMETER_LOCALLY_EDITED, source, null);
+    public void doParamLocallyEdited(AssemblyChangeListener sourceAssemblyChangeListener) {
+        fireAction(AssemblyChangeListener.PARAMETER_LOCALLY_EDITED, sourceAssemblyChangeListener, null);
     }
 
-    public void doFireActionAssemblyJaxbChanged(AssemblyChangeListener source) {
-        fireAction(AssemblyChangeListener.JAXB_CHANGED, source, null);
+    public void doFireActionAssemblyJaxbChanged(AssemblyChangeListener sourceAssemblyChangeListener) {
+        fireAction(AssemblyChangeListener.JAXB_CHANGED, sourceAssemblyChangeListener, null);
     }
 
-    public void doFireActionNewAssembly(File f) {
-        fireAction(AssemblyChangeListener.NEW_ASSEMBLY, null, f);
+    public void doFireActionNewAssembly(File file) {
+        fireAction(AssemblyChangeListener.NEW_ASSEMBLY, null, file);
     }
 
     public void doFireActionCloseAssembly() {
         fireAction(AssemblyChangeListener.CLOSE_ASSEMBLY, null, null);
     }
 
-    private void fireAction(int action, AssemblyChangeListener source, Object param) {
-        for (AssemblyChangeListener listener : listeners) {
-            if (listener != source) {
-                listener.assemblyChanged(action, source, param);
+    private void fireAction(int assemblyChangeListenerAction, AssemblyChangeListener sourceAssemblyChangeListener, Object parameterObject) 
+    {
+        for (AssemblyChangeListener assemblyChangeListener : assemblyChangeListenerSet) {
+            if (assemblyChangeListener != sourceAssemblyChangeListener) {
+                assemblyChangeListener.assemblyChanged(assemblyChangeListenerAction, sourceAssemblyChangeListener, parameterObject);
             }
         }
     }
@@ -154,10 +158,10 @@ public class OpenAssembly
         /**
          * Notify the assembly listeners of a change
          * @param action the change taking place
-         * @param source the AssemblyChangeListener
-         * @param param the object that changes
+         * @param sourceAssemblyChangeListener the AssemblyChangeListener
+         * @param parameterObject the object that changes
          */
-        void assemblyChanged(int action, AssemblyChangeListener source, Object param);
+        void assemblyChanged(int action, AssemblyChangeListener sourceAssemblyChangeListener, Object parameterObject);
 
         /** @return the handle for this Assembly ChangeListener */
         String getHandle();
