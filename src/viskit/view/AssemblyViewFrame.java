@@ -192,10 +192,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private JToggleButton selectModeToggleButton;
     private JToggleButton adapterModeToggleButton,  simEventListenerModeToggleButton,  propertyChangeListenerModeToggleButton;
     private LegoTree legoEventGraphsTree, propertyChangeListenerTree;
-    private JMenuBar  myMenuBar;
-    private JMenuItem quitMenuItem;
+    private JMenuBar            myMenuBar;
+    private JMenuItem         quitMenuItem;
+    private JMenuItem   newProjectMenuItem;
+    private JMenuItem  openProjectMenuItem;
     private JMenuItem closeProjectMenuItem;
     private JMenuItem   zipProjectMenuItem;
+    private JMenuItem userPreferencesMenuItem;
     private RecentProjectFileSetListener recentProjectFileSetListener;
     private RecentAssemblyFileListener   recentAssemblyFileListener; // TODO public?
     private AssemblyControllerImpl assemblyController;
@@ -676,6 +679,14 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         boolean isProjectLoaded = (ViskitGlobals.instance().hasViskitProject() || ViskitGlobals.instance().isProjectOpen());
         closeProjectMenuItem.setEnabled(isProjectLoaded);
           zipProjectMenuItem.setEnabled(isProjectLoaded);
+          
+        if  (ViskitGlobals.instance().isProjectOpen())
+             openProjectMenuItem.setToolTipText("Open an existing Viskit project, closing current project");
+        else openProjectMenuItem.setToolTipText("Open an existing Viskit project");
+        
+        if  (ViskitGlobals.instance().isProjectOpen())
+             openRecentProjectMenu.setToolTipText("Select and open Recent Project, closing current project");
+        else openRecentProjectMenu.setToolTipText("Select and open Recent Project");
     }
 
     private void buildProjectMenu()
@@ -684,18 +695,30 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         
         projectMenu = new JMenu("Project");
         projectMenu.setMnemonic(KeyEvent.VK_P);
+        projectMenu.setToolTipText("Viskit Project operations");
         projectMenu.addActionListener((ActionEvent e) -> {
             enableProjectMenuItems();
         });
 
-        projectMenu.add(buildMenuItem(assemblyController, METHOD_newProject, "New Viskit Project", KeyEvent.VK_N,
-                null));
+        newProjectMenuItem = buildMenuItem(assemblyController, METHOD_newProject, "New Project", KeyEvent.VK_N,
+                null);
+        newProjectMenuItem.setToolTipText("Create a new Viskit project");
+        projectMenu.add(newProjectMenuItem);
         
-        projectMenu.add(buildMenuItem(this, METHOD_openProject, "Open Viskit Project", KeyEvent.VK_O,
-                null));
-        projectMenu.add(openRecentProjectMenu = buildMenu("Open Recent Project"));
+        openProjectMenuItem = buildMenuItem(this, METHOD_openProject, "Open Project", KeyEvent.VK_O,
+                null);
+        if  (ViskitGlobals.instance().isProjectOpen())
+             openProjectMenuItem.setToolTipText("Open an existing Viskit project, closing current project");
+        else openProjectMenuItem.setToolTipText("Open an existing Viskit project");
+        projectMenu.add(openProjectMenuItem);
+        
+        openRecentProjectMenu = buildMenu("Open Recent Project");
+        if  (ViskitGlobals.instance().isProjectOpen())
+             openRecentProjectMenu.setToolTipText("Select and open Recent Project, closing current project");
+        else openRecentProjectMenu.setToolTipText("Select and open Recent Project");
+        projectMenu.add(openRecentProjectMenu);
         openRecentProjectMenu.setMnemonic('O');
-        openRecentProjectMenu.setEnabled(false); // inactive until needed, reset by listener
+        openRecentProjectMenu.setEnabled(false); // inactive until needed, reset by project listener
 
         // The AssemblyViewFrame will get this listener for its menu item of the same name
         recentProjectFileSetListener = new RecentProjectFileSetListener();
@@ -704,17 +727,24 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         
         closeProjectMenuItem =     buildMenuItem(this, METHOD_closeProject,                            "Close Project", KeyEvent.VK_C,
                 null);
+        closeProjectMenuItem.setToolTipText("Close the current Viskit project");
         projectMenu.add(closeProjectMenuItem);
         
-        zipProjectMenuItem = buildMenuItem(assemblyController, METHOD_zipProject,                "Zip Viskit Project", KeyEvent.VK_Z,
+        zipProjectMenuItem = buildMenuItem(assemblyController, METHOD_zipProject,                "Zip Project", KeyEvent.VK_Z,
                 null);
+        zipProjectMenuItem.setToolTipText("Zip the current Viskit project");
         projectMenu.add(zipProjectMenuItem);
 
         projectMenu.addSeparator();
-        projectMenu.add(        buildMenuItem(assemblyController, METHOD_showViskitUserPreferences, "Viskit User Preferences", KeyEvent.VK_V, null));
+        
+        userPreferencesMenuItem = buildMenuItem(assemblyController, METHOD_showViskitUserPreferences, "Viskit User Preferences", KeyEvent.VK_V, null);
+        userPreferencesMenuItem.setToolTipText("Edit and save Viskit User Preference");
+        projectMenu.add(userPreferencesMenuItem);
 
-        projectMenu.add(quitMenuItem = buildMenuItem(assemblyController, METHOD_quit,                      "Quit", KeyEvent.VK_Q,
-                null));
+        quitMenuItem = buildMenuItem(assemblyController, METHOD_quit,                      "Quit", KeyEvent.VK_Q,
+                null);
+        quitMenuItem.setToolTipText("Exit and close Viskit");
+        projectMenu.add(quitMenuItem);
     }
     
     public void buildHelpMenu()
