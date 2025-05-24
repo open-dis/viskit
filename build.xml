@@ -781,7 +781,6 @@ their descpritions.
         </delete>
         <delete file="${dist.jar}" verbose="true"/>
         <delete file="viskit-editor.jar" verbose="true"/>
-
         <!-- This one is scary -->
         <delete dir=".">
             <include name="*.zip"/>
@@ -801,7 +800,7 @@ their descpritions.
     <target name="clean.DefaultProject">
         <!-- do not delete viskitProject.xml project file, it is required
         <delete verbose="true">
-            <fileset dir="MyViskitProjects/DefaultProject">
+            <fileset dir="f">
                 <include name="viskitProject.xml"/>
             </fileset>
         </delete>
@@ -814,6 +813,14 @@ their descpritions.
                 <exclude name="Viskit.ico"/>
                 <exclude name="ViskitSplash2.png"/>
                 <exclude name="archive/**/*"/>
+            </fileset>
+        </delete>
+        <delete verbose="true" includeEmptyDirs="true" description="incorrectly saved directories" failonerror="false">
+            <fileset dir="MyViskitProjects/DefaultProject/AnalystReports">
+                <include name="*_AnalystReport*"/>
+                <exclude name="archive"/>
+                <exclude name="images"/>
+                <exclude name="statistics"/>
             </fileset>
         </delete>
         <delete verbose="true">
