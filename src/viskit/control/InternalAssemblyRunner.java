@@ -65,19 +65,26 @@ import viskit.assembly.BasicAssembly;
 import static viskit.assembly.BasicAssembly.METHOD_addPropertyChangeListener;
 import static viskit.assembly.BasicAssembly.METHOD_getAnalystReport;
 import static viskit.assembly.BasicAssembly.METHOD_getStopTime;
-import static viskit.assembly.BasicAssembly.METHOD_isPrintReplicationReports;
-import static viskit.assembly.BasicAssembly.METHOD_isPrintSummaryReport;
 import static viskit.assembly.BasicAssembly.METHOD_isSaveReplicationData;
 import static viskit.assembly.BasicAssembly.METHOD_isVerbose;
 import static viskit.assembly.BasicAssembly.METHOD_setEnableAnalystReports;
 import static viskit.assembly.BasicAssembly.METHOD_setOutputStream;
 import static viskit.assembly.BasicAssembly.METHOD_setPclNodeCache;
-import static viskit.assembly.BasicAssembly.METHOD_setPrintReplicationReports;
-import static viskit.assembly.BasicAssembly.METHOD_setPrintSummaryReport;
 import static viskit.assembly.BasicAssembly.METHOD_setSaveReplicationData;
 import static viskit.assembly.BasicAssembly.METHOD_setStopSimulationRun;
 import static viskit.assembly.BasicAssembly.METHOD_setStopTime;
 import static viskit.assembly.BasicAssembly.METHOD_setVerbose;
+import static viskit.assembly.BasicAssembly.METHOD_setVerboseReplicationNumber;
+import static viskit.assembly.BasicAssembly.METHOD_setPauseSimulationRun;
+import static viskit.assembly.BasicAssembly.METHOD_setNumberReplicationsPlanned;
+import static viskit.assembly.BasicAssembly.METHOD_getNumberReplicationsPlanned;
+import static viskit.assembly.BasicAssembly.METHOD_setSingleStepSimulationRun;
+import static viskit.assembly.BasicAssembly.METHOD_setRunResumeSimulation;
+import static viskit.assembly.BasicAssembly.METHOD_setPrintSummaryReportToConsole;
+import static viskit.assembly.BasicAssembly.METHOD_isPrintSummaryReportToConsole;
+import static viskit.assembly.BasicAssembly.METHOD_setPrintReplicationReportsToConsole;
+import static viskit.assembly.BasicAssembly.METHOD_isPrintReplicationReportsToConsole;
+
 import viskit.doe.LocalBootLoader;
 import viskit.model.AnalystReportModel;
 import viskit.model.AssemblyModelImpl;
@@ -85,12 +92,6 @@ import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
 import static viskit.view.SimulationRunPanel.SIMULATION_RUN_PANEL_TITLE;
 import static viskit.view.SimulationRunPanel.VERBOSE_REPLICATION_NUMBER_DEFAULT_HINT;
 import viskit.view.dialog.ViskitUserPreferencesDialog;
-import static viskit.assembly.BasicAssembly.METHOD_setVerboseReplicationNumber;
-import static viskit.assembly.BasicAssembly.METHOD_setPauseSimulationRun;
-import static viskit.assembly.BasicAssembly.METHOD_setNumberReplicationsPlanned;
-import static viskit.assembly.BasicAssembly.METHOD_getNumberReplicationsPlanned;
-import static viskit.assembly.BasicAssembly.METHOD_setSingleStepSimulationRun;
-import static viskit.assembly.BasicAssembly.METHOD_setRunResumeSimulation;
 
 /** Controller for the Assembly RunSimulation panel, which
  * spawns the BasicAssembly thread
@@ -195,7 +196,13 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 //            LOG.info("VM argument is: {}", s);
 //        }
 
-        simulationRunAssemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
+        if (params.length >= AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME)
+            simulationRunAssemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
+        else
+        {
+            LOG.error("array access problem, params.length={}", params.length);
+            // TODO not sure what to do about this...
+        }
         doTitle(simulationRunAssemblyClassName);
 
         simulationRunPanel.vcrStartTimeTF.setText("0.0");
@@ -274,8 +281,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
         Method getNumberReplicationsMethod     = simulationRunAssemblyClass.getMethod(METHOD_getNumberReplicationsPlanned);
         Method isSaveReplicationData           = simulationRunAssemblyClass.getMethod(METHOD_isSaveReplicationData); // TODO hook this up
-        Method isPrintReplicationReportsMethod = simulationRunAssemblyClass.getMethod(METHOD_isPrintReplicationReports);
-        Method isPrintSummaryReportMethod      = simulationRunAssemblyClass.getMethod(METHOD_isPrintSummaryReport);
+        Method isPrintReplicationReportsMethod = simulationRunAssemblyClass.getMethod(METHOD_isPrintReplicationReportsToConsole);
+        Method isPrintSummaryReportMethod      = simulationRunAssemblyClass.getMethod(METHOD_isPrintSummaryReportToConsole);
         Method setVerboseMethod                = simulationRunAssemblyClass.getMethod(METHOD_setVerbose, boolean.class);
         Method isVerboseMethod                 = simulationRunAssemblyClass.getMethod(METHOD_isVerbose);
         Method setStopTimeMethod               = simulationRunAssemblyClass.getMethod(METHOD_setStopTime, double.class);
@@ -349,8 +356,8 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             Method setOutputStreamMethod             = simulationRunAssemblyClass.getMethod(METHOD_setOutputStream, OutputStream.class);
             if (setNumberReplicationsMethod == null)
                 setNumberReplicationsMethod          = simulationRunAssemblyClass.getMethod(METHOD_setNumberReplicationsPlanned, int.class);
-            Method setPrintReplicationReportsMethod  = simulationRunAssemblyClass.getMethod(METHOD_setPrintReplicationReports, boolean.class);
-            Method setPrintSummaryReportMethod       = simulationRunAssemblyClass.getMethod(METHOD_setPrintSummaryReport, boolean.class);
+            Method setPrintReplicationReportsMethod  = simulationRunAssemblyClass.getMethod(METHOD_setPrintReplicationReportsToConsole, boolean.class);
+            Method setPrintSummaryReportMethod       = simulationRunAssemblyClass.getMethod(METHOD_setPrintSummaryReportToConsole, boolean.class);
             Method setSaveReplicationDataMethod      = simulationRunAssemblyClass.getMethod(METHOD_setSaveReplicationData, boolean.class);
             Method setEnableAnalystReports           = simulationRunAssemblyClass.getMethod(METHOD_setEnableAnalystReports, boolean.class);
             Method setVerboseMethod                  = simulationRunAssemblyClass.getMethod(METHOD_setVerbose, boolean.class);

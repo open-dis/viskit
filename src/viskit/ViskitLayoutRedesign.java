@@ -377,7 +377,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         projectMenu.setText("Project");
 
         newViskitProjectMI.setMnemonic(KeyEvent.VK_N);
-        newViskitProjectMI.setText("New Viskit Project");
+        newViskitProjectMI.setText("New Project");
         projectMenu.add(newViskitProjectMI);
 
         openViskitProjectMI.setMnemonic(KeyEvent.VK_O);
@@ -409,7 +409,7 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         projectMenu.add(closeViskitProjectMI);
 
         zipMailViskitProjectMI.setMnemonic(KeyEvent.VK_Z);
-        zipMailViskitProjectMI.setText("Zip, Mail Viskit Project");
+        zipMailViskitProjectMI.setText("Zip Project");
         zipMailViskitProjectMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 zipMailViskitProjectMIActionPerformed(evt);

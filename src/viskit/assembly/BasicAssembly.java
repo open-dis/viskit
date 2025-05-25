@@ -117,8 +117,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
 
     private double  stopTime;
     private int     numberReplicationsPlanned;
-    private boolean printReplicationReports;
-    private boolean printSummaryReport;
+    private boolean printReplicationReportsToConsole;
+    private boolean printSummaryReportToConsole;
     private boolean saveReplicationData;
 
     /** Ordering is essential for this collection */
@@ -183,7 +183,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
      * Default constructor sets parameters of BasicAssembly to their
      * default values.These are:
      * <pre>
- printReplicationReports = true
+ printReplicationReportsToConsole = true
  printSummaryReport = true
  saveReplicationData = false
  numberReplicationsPlanned = 1
@@ -193,8 +193,11 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     {
         decimalFormat1 = new DecimalFormat("0.0; -0.0");
         decimalFormat4 = new DecimalFormat(" 0.0000;-0.0000");
-        setPrintReplicationReports(true); // TODO false
-        setPrintSummaryReport(true);
+        
+        // names also used by SimkitAssemblyXML2Java when generating source
+        setPrintReplicationReportsToConsole(true); // TODO false
+        setPrintSummaryReportToConsole(true);
+        
         replicationDataSavedStatisticsList = new LinkedHashMap<>();
         simEntityArray = new SimEntity[0];
         replicationStatisticsPropertyChangeListenerArray = new PropertyChangeListener[0];
@@ -569,31 +572,31 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     }
     
     /** method name for reflection use */
-    public static final String METHOD_setPrintReplicationReports = "setPrintReplicationReports";
+    public static final String METHOD_setPrintReplicationReportsToConsole = "setPrintReplicationReportsToConsole";
 
-    public final void setPrintReplicationReports(boolean newValue) {
-        printReplicationReports = newValue;
+    public final void setPrintReplicationReportsToConsole(boolean newValue) {
+        printReplicationReportsToConsole = newValue;
     }
     
     /** method name for reflection use */
-    public static final String METHOD_isPrintReplicationReports = "isPrintReplicationReports";
+    public static final String METHOD_isPrintReplicationReportsToConsole = "isPrintReplicationReportsToConsole";
 
-    public boolean isPrintReplicationReports() {
-        return printReplicationReports;
+    public boolean isPrintReplicationReportsToConsole() {
+        return printReplicationReportsToConsole;
     }
     
     /** method name for reflection use */
-    public static final String METHOD_setPrintSummaryReport = "setPrintSummaryReport";
+    public static final String METHOD_setPrintSummaryReportToConsole = "setPrintSummaryReportToConsole";
 
-    public final void setPrintSummaryReport(boolean newValue) {
-        printSummaryReport = newValue;
+    public final void setPrintSummaryReportToConsole(boolean newValue) {
+        printSummaryReportToConsole = newValue;
     }
     
     /** method name for reflection use */
-    public static final String METHOD_isPrintSummaryReport = "isPrintSummaryReport";
+    public static final String METHOD_isPrintSummaryReportToConsole = "isPrintSummaryReportToConsole";
 
-    public boolean isPrintSummaryReport() {
-        return printSummaryReport;
+    public boolean isPrintSummaryReportToConsole() {
+        return printSummaryReportToConsole;
     }
     
     /** method name for reflection use */
@@ -1263,7 +1266,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
                         }
                     }
                 } // end for
-                if (isPrintReplicationReports()) {
+                if (isPrintReplicationReportsToConsole()) {
                     printWriter.println(getReplicationReport(replicationNumber));
                     printWriter.flush();
                 }
@@ -1274,7 +1277,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         setSimulationState(SimulationState.DONE);
         LOG.info("All simulation replications now complete.");
 
-        if (isPrintSummaryReport()) 
+        if (isPrintSummaryReportToConsole()) 
         {
             printWriter.println(getSummaryReport());
             printWriter.flush();

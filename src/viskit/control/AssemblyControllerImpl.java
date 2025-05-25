@@ -208,15 +208,16 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         {
             StringBuilder sb = new StringBuilder("<html><p align='center'>Execution parameters have been modified.<br>(");
 
-            for (Iterator<OpenAssembly.AssemblyChangeListener> itr = isLocalDirtySet.iterator(); itr.hasNext();) {
-                sb.append(itr.next().getHandle());
+            for (Iterator<OpenAssembly.AssemblyChangeListener> openAssemblyChangeListenerIterator = isLocalDirtySet.iterator(); openAssemblyChangeListenerIterator.hasNext();) {
+                sb.append(openAssemblyChangeListenerIterator.next().getHandle());
                 sb.append(", ");
             }
             sb.setLength(sb.length() - 2); // last comma-space
             sb.append(")<br>Choose yes if you want to stop this operation, then manually select<br>the indicated tab(s) to ");
             sb.append("save the execution parameters.");
 
-            int userResponse = (ViskitGlobals.instance().getMainFrame().genericAsk2Buttons("Question", sb.toString(), "Stop and let me save",
+            int userResponse = (ViskitGlobals.instance().getMainFrame().genericAsk2Buttons("Question", sb.toString(),
+                    "Stop and let me save",
                     "Ignore execution parameter changes"));
             // n == -1 if dialog was just closed
             //   ==  0 for first option
@@ -233,7 +234,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         {
             return askToSaveAndContinue(); // blocks
         }
-        return returnValue;  // proceed
+        else return returnValue;  // proceed
     }
     
     /** method name for reflection use */
@@ -255,9 +256,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ViskitGlobals.instance().selectAssemblyEditorTab();
         File[] filesArray = ViskitGlobals.instance().getAssemblyEditorViewFrame().openFilesAsk();
         if (filesArray == null)
-            return; // no event graphs for this assembly to open
+            return; // no matching event graphs for this assembly to open
 
-        for (File file : filesArray) {
+        for (File file : filesArray)
+        {
             if (file != null)
                 _doOpen(file);
         }
@@ -903,7 +905,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             oldGraphMetadata = viskitAssemblyModel.getMetadata();
         }
 
-        assemblyModel = new AssemblyModelImpl(this);
+        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
         assemblyModel.initialize();
         assemblyModel.newAssemblyModel(null); // should create new assembly file
 
@@ -1813,8 +1815,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (assemblyModel.getCurrentFile().exists())
         {
             if  (assemblyModel.getMetadata() != null)
-                 LOG.info("Preparing assembly " + assemblyModel.getMetadata().name + " using Metadata file");
-            else LOG.error("produceJavaAssemblyClass() assemblyModel modelMetadata is null");
+                 LOG.info("Preparing assembly " + assemblyModel.getMetadata().name + " using contained Metadata");
+            else LOG.error("produceJavaAssemblyClass() assemblyModel model Metadata is null");
             return buildJavaAssemblySource(assemblyModel.getCurrentFile());
         }
         else
@@ -1828,37 +1830,37 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * Builds the actual source code from the Assembly XML after a successful
      * XML validation
      *
-     * @param f the Assembly file to produce source from
+     * @param xmlSourceFile the Assembly file to produce source from
      * @return a string of Assembly source code
      */
-    public String buildJavaAssemblySource(File f) 
+    public String buildJavaAssemblySource(File xmlSourceFile) 
     {
-        String assemblySource = null;
+        String assemblySourceText = null;
 
         // Must validate XML first and handle any errors before compiling
-        XMLValidationTool xmlValidationTool = new XMLValidationTool(f.getPath(), XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA);
+        XMLValidationTool xmlValidationTool = new XMLValidationTool(xmlSourceFile.getPath(), XMLValidationTool.LOCAL_ASSEMBLY_SCHEMA);
 
         if (!xmlValidationTool.isValidXML()) 
         {
             // TODO: implement a Dialog pointing to the validationErrors.LOG
-            LOG.error("buildJavaAssemblySource{} found invalid XML!\n      " + f.getAbsolutePath());
-            return assemblySource;
+            LOG.error("buildJavaAssemblySource{} found invalid XML!\n      " + xmlSourceFile.getAbsolutePath());
+            return assemblySourceText;
         } 
         else {
-            LOG.info("buildJavaAssemblySource{} found valid XML\n      " + f.getAbsolutePath());
+            LOG.info("buildJavaAssemblySource{} found valid XML\n      " + xmlSourceFile.getAbsolutePath());
         }
 
-        SimkitAssemblyXML2Java x2j;
+        SimkitAssemblyXML2Java xml2Java;
         try {
-            x2j = new SimkitAssemblyXML2Java(f);
-            x2j.unmarshal();
-            assemblySource = x2j.translateIntoJavaSource();
+            xml2Java = new SimkitAssemblyXML2Java(xmlSourceFile);
+            xml2Java.unmarshal();
+            assemblySourceText = xml2Java.translateIntoJavaSource();
         } 
         catch (FileNotFoundException e) {
             LOG.error(e);
-            assemblySource = "";
+            assemblySourceText = "";
         }
-        return assemblySource;
+        return assemblySourceText;
     }
 
     // NOTE: above are routines to operate on current assembly
@@ -1978,7 +1980,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             } 
             else
             {
-                LOG.error("compileJavaClassFromString(): " + diagnostic);
+                LOG.error("compileJavaClassFromString(): " + diagnostic + " !!!!!!!!!!");
                 if (!baosOutputStream.toString().isEmpty())
                     LOG.error("compileJavaClassFromString() " + baosOutputStream.toString());
             }
@@ -2067,35 +2069,40 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     // From menu
     @Override
-    public void export2grid() {
-        AssemblyModel model = (AssemblyModel) getModel();
+    public void export2grid() 
+    {
+        AssemblyModel copiedAssemblyModel = (AssemblyModel) getModel();
         File tempFile;
         try {
             tempFile = TempFileManager.createTempFile("ViskitAssembly", ".xml");
-        } catch (IOException e) {
-            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "File System Error", e.getMessage());
+        } 
+        catch (IOException e) {
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, 
+                                       "File system error creating tempfile", e.getMessage());
             return;
         }
-        model.saveModel(tempFile);
-    //todo switch to DOE
+        copiedAssemblyModel.saveModel(tempFile);
+        // todo switch to DOE
     }
     private String[] execStringArray;
 
     // Known modelPath for Assembly compilation
     @Override
-    public void prepareAssemblySimulationRun() 
+    public void prepareAssemblySimulationSource() 
     {
-        String src = produceJavaAssemblyClass(); // asks to save
+        String sourceString = produceJavaAssemblyClass(); // asks to save
 
-        PackageAndFile paf = compileJavaClassAndSetPackage(src);
-        if (paf != null) {
-            File f = paf.file;
-            String className = f.getName().substring(0, f.getName().indexOf('.'));
-            className = paf.packageName + "." + className;
+        PackageAndFile packageAndFile = compileJavaClassAndSetPackage(sourceString);
+        if (packageAndFile != null) 
+        {
+            File file = packageAndFile.file;
+            String className = file.getName().substring(0, file.getName().lastIndexOf('.'));
+            className = packageAndFile.packageName + "." + className;
 
             execStringArray = buildExecStringArray(className);
         } 
-        else {
+        else
+        {
             execStringArray = new String[0];
         }
     }
@@ -2112,11 +2119,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             return;
         }
 
-        // Prevent double clicking which will cause potential ClassLoader issues
+        // Disable button to prevent double clicking which can cause potential ClassLoader issues
         Runnable r = () -> {
             (ViskitGlobals.instance().getAssemblyEditorViewFrame()).prepareAssemblyForSimulationRunButton.setEnabled(false);
         };
-
         try {
             SwingUtilities.invokeLater(r);
         } 
@@ -2124,13 +2130,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             LOG.error(METHOD_prepareSimulationRunner + "() SwingUtilities.invokeLater(" + r.toString() + ") exception: " + e.getMessage());
         }
 
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>()
+        SwingWorker<Void, Void> prepareSimulationRunnerSwingWorker = new SwingWorker<Void, Void>()
         {
             @Override
             public Void doInBackground() // prepareSimulationRunner() activity
             {
                 // Compile and prepare the execStrings
-                prepareAssemblySimulationRun();
+                prepareAssemblySimulationSource();
 
                 if (execStringArray == null)
                 {
@@ -2218,9 +2224,11 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                     // Wait for the compile, save and Assembly preparations to finish
                     get();
                 } 
-                catch (InterruptedException | ExecutionException e) {
+                catch (InterruptedException | ExecutionException e) 
+                {
+                    // look for compilation errors  produced from compileJavaClassFromString()
                     LOG.error(e);
-//                    e.printStackTrace();
+                    e.printStackTrace();
                 }
                 finally {
                     (ViskitGlobals.instance().getAssemblyEditorViewFrame()).prepareAssemblyForSimulationRunButton.setEnabled(true);
@@ -2229,7 +2237,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 }
             }
         };
-        worker.execute();
+        prepareSimulationRunnerSwingWorker.execute();
     }
 
     private void announceReadyToCommenceSimulationRun(String newAssemblyName)

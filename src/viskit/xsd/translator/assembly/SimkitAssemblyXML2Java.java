@@ -262,6 +262,9 @@ public class SimkitAssemblyXML2Java
         String implementsName = this.simkitAssemblyRoot.getImplement();
         Schedule schedule;
 
+        pw.println("// created using SimkitAssemblyXML2Java");
+        pw.println();
+        
         pw.println("package " + packageName + sc);
         pw.println();
 
@@ -295,10 +298,10 @@ public class SimkitAssemblyXML2Java
             pw.print(sp8 + "setVerbose");
             pw.println(lp + schedule.getVerbose() + rp + sc);
 
-            pw.print(sp8 + "setPrintReplicationReports");
+            pw.print(sp8 + "setPrintReplicationReportsToConsole");
             pw.println(lp + schedule.getPrintReplicationReports() + rp + sc);
 
-            pw.print(sp8 + "setPrintSummaryReport");
+            pw.print(sp8 + "setPrintSummaryReportToConsole");
             pw.println(lp + schedule.getPrintSummaryReport() + rp + sc);
 
             pw.print(sp8 + "setSaveReplicationData");

@@ -221,7 +221,7 @@ public interface AssemblyController {
     void prepareSimulationRunner();
 
     /** Generating java source and compilation are taken care of here */
-    void prepareAssemblySimulationRun();
+    void prepareAssemblySimulationSource();
 
     void export2grid();
 
