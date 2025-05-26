@@ -1152,13 +1152,14 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         // Now load the simkit.jar and diskit.jar from where ever they happen to
         // be located on the classpath if present
         String[] classPath = ((LocalBootLoader) ViskitGlobals.instance().getViskitApplicationClassLoader()).getClassPath();
-        for (String path : classPath) {
-            if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) {
+        for (String path : classPath)
+        {
+            if (path.contains("simkit.jar") || (path.contains("diskit.jar"))) 
+            {
                             addEventGraphsToLegoTree(new File(path), false);
                 addPropertyChangeListenersToLegoTree(new File(path), false);
             }
         }
-
                LegosEventGraphsPanel       legosEventGraphsPanel = new LegosEventGraphsPanel(legoEventGraphsTree);
         PropertyChangeListenersPanel propertyChangeListenerPanel = new PropertyChangeListenersPanel(propertyChangeListenerTree);
 
@@ -1178,11 +1179,11 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         return treePanelsSplitPane;
     }
-    Transferable dragged;
+    Transferable draggedTransferable;
 
     @Override
-    public void startingDrag(Transferable trans) {
-        dragged = trans;
+    public void startingDrag(Transferable transferableInput) {
+        draggedTransferable = transferableInput;
     }
 
     /** Class to facilitate dragging new nodes onto the palette */
@@ -1198,12 +1199,12 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         @Override
         public void drop(DropTargetDropEvent dropTargetDropEvent) 
         {
-            if (dragged != null) 
+            if (draggedTransferable != null) 
             {
                 try {
                     Point p = dropTargetDropEvent.getLocation();
 
-                    String s = dragged.getTransferData(DataFlavor.stringFlavor).toString();
+                    String s = draggedTransferable.getTransferData(DataFlavor.stringFlavor).toString();
                     String[] sa = s.split("\t");
 
                     // Check for XML-based node
@@ -1230,7 +1231,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                                 break;
                         }
                     }
-                    dragged = null;
+                    draggedTransferable = null;
                 } 
                 catch (UnsupportedFlavorException | IOException e) {
                     LOG.error(e);
