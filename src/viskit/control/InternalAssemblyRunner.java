@@ -189,19 +189,24 @@ public class InternalAssemblyRunner implements PropertyChangeListener
     /**
      * Initialize this assembly runner prior to a simulation run
      * @param params arguments to initialize the Assembly runner
+     * @return whether successful
      */
-    public void preRunInitialization(String[] params) {
-
+    public boolean preRunInitialization(String[] params) 
+    {
 //        for (String s : params) {
 //            LOG.info("VM argument is: {}", s);
 //        }
 
-        if (params.length >= AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME)
+        if ((params != null) && params.length > AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME)
             simulationRunAssemblyClassName = params[AssemblyControllerImpl.EXEC_TARGET_CLASS_NAME];
         else
         {
-            LOG.error("array access problem, params.length={}", params.length);
-            // TODO not sure what to do about this...
+            if  (params != null)
+                 LOG.error("array access problem, params.length={}", params.length);
+            else LOG.error("array access problem, params == null");
+            // TODO not sure what to do about this problem, occurs after a compilation error...
+            // TODO need to have simulation run preparation fail
+            return false;
         }
         doTitle(simulationRunAssemblyClassName);
 
@@ -256,7 +261,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             vcrButtonPressSimulationStateDisplayUpdate(SimulationState.INACTIVE);
             simulationRunPanel.outputStreamTA.setText(INITIAL_SIMULATION_RUN_HINT); // duplicative since handling exception
 //            throwable.printStackTrace();
-            return;
+            return false;
         }
         // reset state machine
         vcrButtonPressSimulationStateDisplayUpdate(SimulationState.REWIND);
@@ -273,6 +278,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 //            LOG.error("preRunInitialization() console exception: " + ex.getMessage());
 //        }
 //       
+        return true;
     }
 
     private void fillSimulationRunButtonsFromAssemblyInitialization(boolean verbose, boolean saveReplicationDataToXml, double stopTime) throws Throwable 

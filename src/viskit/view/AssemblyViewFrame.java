@@ -1144,8 +1144,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         {
             if ((legoEventGraphsTree != null) && (legoEventGraphsTree.getRowCount() > 0))
             {
-                LOG.info("buildTreePanels() now checking project's prior event graphs...");
-            }
+                LOG.info("buildTreePanels() check existing event graph source files...");
+            }            
             addEventGraphsToLegoTree(viskitProject.getEventGraphsDirectory(), true);
         }
 
@@ -1342,9 +1342,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public void addEventGraphsToLegoTree(File f, boolean b) {
-        if ((f != null) && f.exists())
-            legoEventGraphsTree.addContentRoot(f, b);
+    public void addEventGraphsToLegoTree(File file, boolean recurse) 
+    {
+        if ((file != null) && file.exists())
+            legoEventGraphsTree.addContentRoot(file, recurse);
     }
 
     @Override
@@ -1517,12 +1518,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     @Override
-    public void showAndSaveSource(String className, String s, String fileName) {
-        final JFrame f = new SourceWindow(this, className, s);
-        f.setTitle("Generated Java source from: " + fileName);
+    public void showAndSaveSource(String className, String sourceText, String fileName) 
+    {
+        final JFrame newFrame = new SourceWindow(this, className, sourceText);
+        newFrame.setTitle(fileName + " generated Java source");
 
         Runnable r = () -> {
-            f.setVisible(true);
+            newFrame.setVisible(true);
         };
         SwingUtilities.invokeLater(r);
     }

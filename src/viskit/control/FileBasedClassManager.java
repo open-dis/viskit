@@ -33,7 +33,7 @@ import viskit.ViskitUserConfiguration;
 import viskit.ViskitStatics;
 
 import viskit.xsd.bindings.eventgraph.SimEntity;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 
 /** A custom class manager to support finding Event Graphs and PCLs in *.class form vice
  * XML.  Used to populate the LEGOs tree on the Assembly Editor.
@@ -92,118 +92,121 @@ public class FileBasedClassManager {
         removeFileClass(newFileBasedAssemblyNode.loadedClass);
     }
     FileBasedAssemblyNode fileBasedAssemblyNode = null;
-    Class<?> fclass = null;
-    JAXBContext jaxbContext = null;
+    Class<?> fileClass = null;
+    JAXBContext   jaxbContext = null;
     Unmarshaller unmarshaller = null;
-    PackageAndFile paf = null;
-    File fXml = null;
+    PackageAndFile packageAndFile = null;
+    File xmlFile = null;
     SimEntity simEntity = null;
 
     /** Known path for EventGraph Compilation
      *
-     * @param f an event graph to compile
+     * @param file an event graph to compile
      * @param implementsClass to test for extension of simkit.BasicSimEntity
      * @return a node tree for viewing in the Assembly Editor
      * @throws java.lang.Throwable for a problem finding a class
      */
-    public FileBasedAssemblyNode loadFile(File f, Class<?> implementsClass) throws Throwable {
+    public FileBasedAssemblyNode loadFile(File file, Class<?> implementsClass) throws Throwable {
 
         // if it is cached, cacheXML directory exists and will be loaded on start
-        if (f.getName().toLowerCase().endsWith(".xml"))
+        if (file.getName().toLowerCase().endsWith(".xml"))
         {
             if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
-                jaxbContext = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
+                jaxbContext = JAXBContext.newInstance(SimkitEventGraphXML2Java.EVENT_GRAPH_BINDINGS);
             unmarshaller = jaxbContext.createUnmarshaller();
 
             // Did we cacheXML the EventGraph XML and Class?
-            if (!isCached(f)) {
-
+            if (!isCached(file)) 
+            {
                 // Make sure it's not a Cached Miss
-                if (!isCacheMiss(f)) {
-
-                    // This will compile first time found Event Graphs
-                    paf = ((AssemblyControllerImpl) ViskitGlobals.instance().getActiveAssemblyController()).createTemporaryEventGraphClass(f);
+                if (!isCacheMiss(file)) 
+                {
+                    // This next step will compile first time found Event Graphs
+                    packageAndFile = ((AssemblyControllerImpl) ViskitGlobals.instance().getActiveAssemblyController()).createTemporaryEventGraphClass(file);
 
                     // Compile fail of an EventGraph, so just return here
-                    if (paf == null) {
+                    if (packageAndFile == null) {
                         return null;
                     }
 
                     // Reset this so that the correct FBAN gets created
-                    fXml = null;
-                    setFileBasedAssemblyNode(f);
+                    xmlFile = null;
+                    setFileBasedAssemblyNode(file);
 
                     // TODO: work situation where another build/classes gets added
                     // to the classpath as it won't readily be seen before the
                     // project's build/classes is. This causes ClassNotFoundExceptions
-                    addCache(f, fileBasedAssemblyNode.classFile);
+                    if (fileBasedAssemblyNode != null)
+                        addCache(file, fileBasedAssemblyNode.classFile);
+                    // else TODO
                 }
-
-            // It's cached
-            } else {
-                f = getCachedClass(f);
-                fXml = getCachedXML(f);
-                setFileBasedAssemblyNode(f);
+                // It's cached
+            } 
+            else {
+                file = getCachedClass(file);
+                xmlFile = getCachedXML(file);
+                setFileBasedAssemblyNode(file);
             }
-
         // Check, but don't cacheXML .class files
-        } else if (f.getName().toLowerCase().endsWith(".class")) {
-            fclass = FindClassesForInterface.classFromFile(f, implementsClass);   // Throwable from here possibly
-            if (fclass != null) {
-                String pkg = fclass.getName().substring(0, fclass.getName().lastIndexOf("."));
-                fileBasedAssemblyNode = new FileBasedAssemblyNode(f, fclass.getName(), pkg);
+        } 
+        else if (file.getName().toLowerCase().endsWith(".class")) {
+            fileClass = FindClassesForInterface.classFromFile(file, implementsClass);   // Throwable from here possibly
+            if (fileClass != null) 
+            {
+                String packageName = fileClass.getName().substring(0, fileClass.getName().lastIndexOf("."));
+                fileBasedAssemblyNode = new FileBasedAssemblyNode(file, fileClass.getName(), packageName);
 
                 // If we have an annotated ParameterMap, then cacheXML it. If not,
-                // then treat the fclass as something that belongs on the
+                // then treat the fileClass as something that belongs on the
                 // extra classpath
-                List<Object>[] pMap = ViskitStatics.resolveParameters(fclass);
-                if (pMap != null && pMap.length > 0)
-                    ViskitStatics.putParameterList(fclass.getName(), pMap);
+                List<Object>[] parameterMapListArray = ViskitStatics.resolveParameters(fileClass);
+                if (parameterMapListArray != null && parameterMapListArray.length > 0)
+                    ViskitStatics.putParameterList(fileClass.getName(), parameterMapListArray);
             }
-
-        // TODO: Check if this is really necessary and should be dealt with
-        // upstream
-        } else if (!f.getName().toLowerCase().endsWith(".java")) {
-            LOG.warn("Unsupported file type: {}", f);
+        // TODO: Check if this is really necessary and should be dealt with upstream
+        } 
+        else if (!file.getName().toLowerCase().endsWith(".java")) 
+        {
+            LOG.warn("Unsupported file type: {}", file);
             return null;
         }
-
-        if (fclass != null) {
-            addFileClass(fclass);
-        } else {
+        if (fileClass != null) 
+        {
+            addFileClass(fileClass);
+        } 
+        else {
             fileBasedAssemblyNode = null;
         }
         return fileBasedAssemblyNode;
     }
 
-    private void setFileBasedAssemblyNode(File f) {
-
-        // bug fix 1407
+    private void setFileBasedAssemblyNode(File file) 
+    {
         ClassLoader loader = ViskitGlobals.instance().getViskitApplicationClassLoader();
 
         // since we're here, cacheXML the parameter names
         try {
-            simEntity = (fXml == null) ? (SimEntity) unmarshaller.unmarshal(f) : (SimEntity) unmarshaller.unmarshal(fXml);
+            simEntity = (xmlFile == null) ? (SimEntity) unmarshaller.unmarshal(file) : (SimEntity) unmarshaller.unmarshal(xmlFile);
 
             // NOTE: If the project's build directory got nuked and we have
             // cached our Event Graphs and classes with MD5 hash, we'll throw a
             // ClassNotFoundException.
             // TODO: Check for this and recompile the Event Graphs before loading their classes
-            fclass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
+            fileClass = loader.loadClass(simEntity.getPackage() + "." + simEntity.getName());
 
-            fileBasedAssemblyNode =  (fXml == null) ?
-                new FileBasedAssemblyNode(paf.file, fclass.getName(), f, paf.packageName) :
-                new FileBasedAssemblyNode(f, fclass.getName(), fXml, simEntity.getPackage());
+            fileBasedAssemblyNode =  (xmlFile == null) ?
+                new FileBasedAssemblyNode(packageAndFile.file, fileClass.getName(), file, packageAndFile.packageName) :
+                new FileBasedAssemblyNode(file, fileClass.getName(), xmlFile, simEntity.getPackage());
 
-            List<Object>[] pa = GenericConversion.newListObjectTypeArray(List.class, 1);
-            pa[0].addAll(simEntity.getParameter());
-            ViskitStatics.putParameterList(fclass.getName(), pa);
+            List<Object>[] parameterArray = GenericConversion.newListObjectTypeArray(List.class, 1);
+            parameterArray[0].addAll(simEntity.getParameter());
+            ViskitStatics.putParameterList(fileClass.getName(), parameterArray);
 
-            LOG.debug("Put " + fclass.getName() + simEntity.getParameter());
-
-        } catch (JAXBException | ClassNotFoundException | NoClassDefFoundError | NullPointerException e) {
-            LOG.warn("File causing error: {}", f);
-            LOG.error(e);
+            LOG.debug("Put " + fileClass.getName() + simEntity.getParameter());
+        } 
+        catch (JAXBException | ClassNotFoundException | NoClassDefFoundError | NullPointerException e) {
+            LOG.error("setFileBasedAssemblyNode({}) error: \n{}", file, e);
+            e.printStackTrace();; // debug
         }
     }
 
@@ -212,7 +215,8 @@ public class FileBasedClassManager {
      * @param xmlEventGraphFile the Event Graph to cacheXML
      * @param classFile the compiled version of this Event Graph
      */
-    public void addCache(File xmlEventGraphFile, File classFile) {
+    public void addCache(File xmlEventGraphFile, File classFile) 
+    {
         // isCached ( itself checks isStale, if so update and return cached false ) if so don't bother adding the same cacheXML
         if (isCached(xmlEventGraphFile)) {
             return;
@@ -246,7 +250,8 @@ public class FileBasedClassManager {
             }
             // if used to miss, unmiss it
             removeCacheMiss(xmlEventGraphFile);
-        } catch (IOException ex) {
+        } 
+        catch (IOException ex) {
             LOG.error(ex);
             ex.printStackTrace(System.err);
         }

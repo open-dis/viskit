@@ -17,9 +17,9 @@ import viskit.control.AssemblyControllerImpl;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.xsd.bindings.assembly.*;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 
-/** A generator of source code from Assembly XML
+/** A generator to convert Assembly XML model into Java source
  *
  * @author  Rick Goldberg
  * @since April 1, 2004, 10:09 AM
@@ -34,7 +34,7 @@ public class SimkitAssemblyXML2Java
 
     /* convenience Strings for formatting */
     /** space character */
-    final private String sp  = SimkitXML2Java.SP;
+    final private String sp  = SimkitEventGraphXML2Java.SP;
     /** 4 space characters */
     final private String sp4 = sp+sp+sp+sp;
     /** 8 space characters */
@@ -42,25 +42,25 @@ public class SimkitAssemblyXML2Java
     /** 12 space characters */
     final private String sp12 = sp8+sp4;
     /** opening brace { */
-    final private String ob  = SimkitXML2Java.OB;
+    final private String ob  = SimkitEventGraphXML2Java.OB;
     /** closing brace } */
-    final private String cb  = SimkitXML2Java.CB;
+    final private String cb  = SimkitEventGraphXML2Java.CB;
     /** semicolon ; */
-    final private String sc  = SimkitXML2Java.SC;
+    final private String sc  = SimkitEventGraphXML2Java.SC;
     /** comma */
-    final private String cm  = SimkitXML2Java.CM;
+    final private String cm  = SimkitEventGraphXML2Java.CM;
     /** left parenthesis ( */
-    final private String lp  = SimkitXML2Java.LP;
+    final private String lp  = SimkitEventGraphXML2Java.LP;
     /** right parenthesis ) */
-    final private String rp  = SimkitXML2Java.RP;
+    final private String rp  = SimkitEventGraphXML2Java.RP;
     /** equal sign = */
-    final private String eq  = SimkitXML2Java.EQ;
+    final private String eq  = SimkitEventGraphXML2Java.EQ;
     /** period . */
-    final private String pd  = SimkitXML2Java.PD;
+    final private String pd  = SimkitEventGraphXML2Java.PD;
     /** period . */
-    final private String pl  = SimkitXML2Java.PL;
+    final private String pl  = SimkitEventGraphXML2Java.PL;
     /** quotation mark " */
-    final private String qu  = SimkitXML2Java.QU;
+    final private String qu  = SimkitEventGraphXML2Java.QU;
     /** "new" literal */
     final private String nw = "new";
 
@@ -256,14 +256,17 @@ public class SimkitAssemblyXML2Java
     void buildHead(StringWriter head) 
     {
         PrintWriter pw = new PrintWriter(head);
-        String name           = this.simkitAssemblyRoot.getName();
+        String className      = this.simkitAssemblyRoot.getName();
         String packageName    = this.simkitAssemblyRoot.getPackage();
         String extendsName    = this.simkitAssemblyRoot.getExtend();
         String implementsName = this.simkitAssemblyRoot.getImplement();
         Schedule schedule;
 
-        pw.println("// created using SimkitAssemblyXML2Java");
+        pw.println("// created using SimkitAssemblyXML2Java from " + packageName + "/" + className + ".xml");
         pw.println();
+        
+//        pw.println("   *** Intentional source error for testing ***"); // debug
+//        pw.println();
         
         pw.println("package " + packageName + sc);
         pw.println();
@@ -285,9 +288,9 @@ public class SimkitAssemblyXML2Java
             implementsName = "";
         }
 
-        pw.println("public class " + name + sp + extendsName + implementsName);
+        pw.println("public class " + className + sp + extendsName + implementsName);
         pw.println(ob);
-        pw.println(sp4 + "public" + sp + name + lp + rp);
+        pw.println(sp4 + "public" + sp + className + lp + rp);
         pw.println(sp4 + ob);
         pw.println(sp8 + "super" + lp + rp + sc);
         if ( (schedule = this.simkitAssemblyRoot.getSchedule()) != null ) 
@@ -308,7 +311,7 @@ public class SimkitAssemblyXML2Java
             pw.println(lp + schedule.getSaveReplicationData() + rp + sc);
 
             pw.println();
-            pw.println(sp8 + "// let controlling simulation manager determine number of replications planned");
+            pw.println(sp8 + "// controlling simulation manager usually determines number of replications planned");
             pw.print  (sp8 + "// setNumberReplicationsPlanned");
             pw.println(lp + schedule.getNumberReplications() + rp + sc);
         }

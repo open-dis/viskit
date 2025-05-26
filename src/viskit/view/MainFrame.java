@@ -86,9 +86,12 @@ public class MainFrame extends JFrame
     /**
      * @return the eventGraphController
      */
-    public EventGraphControllerImpl getEventGraphController() {
+    public EventGraphControllerImpl getEventGraphController() 
+    {
         return eventGraphController;
     }
+    static final Logger LOG = LogManager.getLogger();
+    
     public final String VISKIT_APPLICATION_TITLE = ViskitApplication.VISKIT_FULL_APPLICATION_NAME;
 
     /** modalMenus: true means choice from traditional modalMenuBarList, false means new combinedMenuBar */
@@ -125,9 +128,9 @@ public class MainFrame extends JFrame
     public static final int TAB1_CLUSTERUN_INDEX             = 5; // obsolete, requires refactoring someday
 
     private AssemblyControllerImpl     assemblyController;
-    private EventGraphControllerImpl eventGraphController;
+    EventGraphControllerImpl eventGraphController;
     
-    static final Logger LOG = LogManager.getLogger();
+    private  boolean preRunInitializationSuccess;
 
     public MainFrame(String initialAssemblyFile) 
     {
@@ -690,7 +693,7 @@ public class MainFrame extends JFrame
                 getSimulationRunTabbedPane().setSelectedIndex(TAB1_LOCALRUN_INDEX);
 
                 // initializes a RunSimulation class loader
-                internalAssemblyRunner.preRunInitialization(execStrings);
+                preRunInitializationSuccess = internalAssemblyRunner.preRunInitialization(execStrings);
             }
         }
 
@@ -761,6 +764,7 @@ public class MainFrame extends JFrame
     /** All done, any additional final cleanups can be performed here if needed. */
     public void quit()
     {
+        LOG.info("Viskit quit");
         System.exit(0);
     }
 
@@ -889,5 +893,12 @@ public class MainFrame extends JFrame
      * @return returns YES_NO_CANCEL_OPTION response; -1 if closed, 0 for first button, 1 for second button */
     public int genericAsk(String title, String message) {
         return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_CANCEL_OPTION);
+    }
+
+    /**
+     * @return the preRunInitializationSuccess
+     */
+    public boolean isPreRunInitializationSuccess() {
+        return preRunInitializationSuccess;
     }
 }

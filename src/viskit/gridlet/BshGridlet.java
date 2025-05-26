@@ -217,8 +217,8 @@ public class BshGridlet extends Thread
 
                 // generate java for the eventGraph and evaluate a loaded
                 // class
-                viskit.xsd.translator.eventgraph.SimkitXML2Java sx2j =
-                        new viskit.xsd.translator.eventgraph.SimkitXML2Java(bais);
+                viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java sx2j =
+                        new viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java(bais);
                 // first convert XML to java source
                 sx2j.unmarshal();
 

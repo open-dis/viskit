@@ -21,7 +21,8 @@ import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.doe.LocalBootLoader;
 
-/** Using the java compiler, now part of javax.tools, we no longer have to
+/** 
+ * Using the java compiler, now part of javax.tools, we no longer have to
  * ship tools.jar from the JDK install.
  * This class was originally based in {@link viskit.view.SourceWindow}.
  *
@@ -39,24 +40,24 @@ public class Compiler
     private static OutputStream baosOut;
 
     /** Compiler diagnostic object */
-    private static CompilerDiagnosticsListener diag;
+    private static CompilerDiagnosticsListener compilerDiagnosticsListener;
 
     /** Call the java compiler to test compile our event graph java source
      *
-     * @param pkg package containing java file
+     * @param packageName package containing java file
      * @param className name of the java file
-     * @param src a string containing the full source code
+     * @param sourceCodeText a string containing the full source code
      * @return diagnostic messages from the compiler
      */
-    public static String invoke(String pkg, String className, String src) {
+    public static String invoke(String packageName, String className, String sourceCodeText) {
 
         StringBuilder diagnosticMessages = new StringBuilder();
         StandardJavaFileManager sjfm = null;
         StringBuilder classPaths;
-        String cp;
+        String classPathsString;
 
-        if (pkg != null && !pkg.isEmpty()) {
-            pkg += ".";
+        if (packageName != null && !packageName.isEmpty()) {
+            packageName += ".";
         }
 
         try {
@@ -66,38 +67,38 @@ public class Compiler
             // JDK's java.exe.  If so, correct the Path in Computer ->
             // Properties -> Advanced system settings -> Environment variables
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            diag = new CompilerDiagnosticsListener(diagnosticMessages);
-            sjfm = compiler.getStandardFileManager(diag, null, null);
+            compilerDiagnosticsListener = new CompilerDiagnosticsListener(diagnosticMessages);
+            sjfm = compiler.getStandardFileManager(compilerDiagnosticsListener, null, null);
 
-            JavaObjectFromString jofs = new JavaObjectFromString(pkg + className, src);
+            JavaObjectFromString jofs = new JavaObjectFromString(packageName + className, sourceCodeText);
             Iterable<? extends JavaFileObject> fileObjects = Arrays.asList(jofs);
-            File workDir = ViskitGlobals.instance().getProjectWorkingDirectory();
-            String workDirPath = workDir.getCanonicalPath();
+            File workingDirectory = ViskitGlobals.instance().getProjectWorkingDirectory();
+            String workingDirectoryPath = workingDirectory.getCanonicalPath();
 
             // This is would be the first instance of obtaining a LBL if
             // beginning fresh, so, it is reset on the first instantiation
-            String[] workClassPath = ((LocalBootLoader) (ViskitGlobals.instance().getViskitApplicationClassLoader())).getClassPath();
-            int wkpLength = workClassPath.length;
-            classPaths = new StringBuilder(wkpLength);
+            String[] classPathArray = ((LocalBootLoader) (ViskitGlobals.instance().getViskitApplicationClassLoader())).getClassPath();
+            int classPathArrayLength = classPathArray.length;
+            classPaths = new StringBuilder(classPathArrayLength);
             
-            for (String cPath : workClassPath) {
-                classPaths.append(cPath);
+            for (String nextClassPath : classPathArray) {
+                classPaths.append(nextClassPath);
                 classPaths.append(File.pathSeparator);
             }
 
             // Get rid of the last ";" or ":" on the cp
             classPaths = classPaths.deleteCharAt(classPaths.lastIndexOf(File.pathSeparator));
-            cp = classPaths.toString();
-            LOG.debug("{} cp is: {}", className,cp);
+            classPathsString = classPaths.toString();
+            LOG.debug("{} classPath is: {}", className,classPathsString);
 
             String[] options = {
                 "-Xlint:unchecked",
                 "-Xlint:deprecation",
                 "-proc:none",
                 "-cp",
-                 cp,
+                 classPathsString,
                 "-d",
-                workDirPath
+                workingDirectoryPath
             };
             java.util.List<String> optionsList = Arrays.asList(options);
 
@@ -106,7 +107,7 @@ public class Compiler
 
             compiler.getTask(new BufferedWriter(new OutputStreamWriter(baosOut)),
                     sjfm,
-                    diag,
+                    compilerDiagnosticsListener,
                     optionsList,
                     null,
                     fileObjects).call();
@@ -115,10 +116,11 @@ public class Compiler
             if (diagnosticMessages.toString().isEmpty())
                 diagnosticMessages.append(COMPILE_SUCCESS_MESSAGE);
         } 
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             if (ex instanceof NullPointerException) {
 
-                String msg = "Your environment variable for Path likely has the JRE's "
+                String message = "Your environment variable for Path might have the JRE's "
                                 + "java.exe in front of the JDK's java.exe.\n"
                                 + "Please reset your Path to have the JDK's "
                                 + "java.exe as first entry in the Path";
@@ -127,13 +129,14 @@ public class Compiler
                 ViskitGlobals.instance().getMainFrame().genericReport(
                         JOptionPane.INFORMATION_MESSAGE,
                         "Incorrect Path", 
-                        msg
+                        message
                 );
-                LOG.error(msg);
+                LOG.error(message);
             }
-            LOG.error("JavaObjectFromString invoke " + pkg + "." + className + " exception: " + ex.getMessage());
+            LOG.error("JavaObjectFromString invoke " + packageName + "." + className + " exception: " + ex.getMessage());
 //            LOG.info("Classpath is {}: ", cp);
-        } finally {
+        } 
+        finally {
             if (sjfm != null) {
                 try {
                     sjfm.close();
@@ -156,7 +159,7 @@ public class Compiler
      * @return the compiler diagnostic tool
      */
     public static CompilerDiagnosticsListener getDiagnostic() {
-        return diag;
+        return compilerDiagnosticsListener;
     }
 
 } // end class file Compiler.java

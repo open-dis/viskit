@@ -23,7 +23,7 @@ import viskit.xsd.bindings.eventgraph.*;
  * @since March 23, 2004, 4:59 PM
  * @version $Id$
  */
-public class SimkitXML2Java
+public class SimkitEventGraphXML2Java
 {
     static final Logger LOG = LogManager.getLogger();
 
@@ -87,8 +87,10 @@ public class SimkitXML2Java
     private List<Parameter> rootParameterList;
     private List<StateVariable> stateVariableList;
 
-    /** Default to initialize the JAXBContext only */
-    private SimkitXML2Java()
+    /** 
+     * A generator to convert Event Graph XML model into Java source 
+     */
+    private SimkitEventGraphXML2Java()
     {
         try {
             if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
@@ -104,7 +106,7 @@ public class SimkitXML2Java
      *
      * @param stream the file stream to generate code from
      */
-    public SimkitXML2Java(InputStream stream) {
+    public SimkitEventGraphXML2Java(InputStream stream) {
         this();
         fileInputStream = stream;
     }
@@ -114,16 +116,15 @@ public class SimkitXML2Java
      * when used from another class.  Instance this
      * with a String for the className of the xmlFile
      *
-     * @param xmlFile the file to generate code from
+     * @param xmlFilePath the file to generate code from
      */
-    public SimkitXML2Java(String xmlFile) {
-        this(ViskitStatics.classForName(
-                SimkitXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFile));
-        setFileBaseName(new File(baseNameOf(xmlFile)).getName());
-        setEventGraphFile(new File(xmlFile));
+    public SimkitEventGraphXML2Java(String xmlFilePath) {
+        this(ViskitStatics.classForName(SimkitEventGraphXML2Java.class.getName()).getClassLoader().getResourceAsStream(xmlFilePath));
+        setFileBaseName(new File(baseNameOf(xmlFilePath)).getName());
+        setEventGraphFile(new File(xmlFilePath));
     }
 
-    public SimkitXML2Java(File f) throws FileNotFoundException {
+    public SimkitEventGraphXML2Java(File f) throws FileNotFoundException {
         this(new FileInputStream(f));
         setFileBaseName(baseNameOf(f.getName()));
         setEventGraphFile(f);
@@ -212,41 +213,50 @@ public class SimkitXML2Java
         return eventGraphFile;
     }
 
-    public final void setEventGraphFile(File f) {
-        eventGraphFile = f;
+    public final void setEventGraphFile(File xmlFile) {
+        eventGraphFile = xmlFile;
     }
 
-    void buildHead(StringWriter head) {
-
+    void buildHead(StringWriter head)
+    {
         PrintWriter pw = new PrintWriter(head);
 
-        className = root.getName();
-        packageName = root.getPackage();
-        extendz = root.getExtend();
+        className         = root.getName();
+        packageName       = root.getPackage();
+        extendz           = root.getExtend();
         String implementz = root.getImplement();
 
         // TBD: should be checking the class definitions
         // of the Interfaces and create a code block
         // if none exists with template methods, and
         // Events for any "do" methods if none exists.
-        if (implementz != null) {
+        if ((implementz != null) && !implementz.isBlank())
+        {
             extendz += SP + "implements" + SP + implementz;
         }
+
+        pw.println("// created using SimkitEventGraphXML2Java from " + packageName + "/" + className + ".xml");
+        pw.println();
+        
+//        pw.println("   *** Intentional source error for testing ***"); // debug
+//        pw.println();
 
         pw.println("package " + packageName + SC);
         pw.println();
         pw.println("// Standard library imports");
         pw.println("import java.util.*;");
+        // For debugging only
+//      pw.println("import org.apache.logging.log4j.LogManager;"); // TODO this needs to be supported in classpath
         pw.println();
         pw.println("// Application specific imports");
 
-        // For debugging only
-//        pw.println("import org.apache.logging.log4j.Logger;");
         pw.println("import simkit.*;");
         pw.println("import simkit.random.*;");
         pw.println();
         pw.println("public class " + className + SP + "extends" + SP + extendz + SP + OB);
         pw.println();
+//        pw.println("static final Logger LOG = LogManager.getLogger();" );
+//        pw.println();
     }
 
     void buildParameters(StringWriter vars, StringWriter accessorBlock) {
@@ -1324,7 +1334,7 @@ public class SimkitXML2Java
 
         try (InputStream is = new FileInputStream(xmlFile)) {
 
-            SimkitXML2Java sx2j = new SimkitXML2Java(is);
+            SimkitEventGraphXML2Java sx2j = new SimkitEventGraphXML2Java(is);
             File baseName = new File(sx2j.baseNameOf(xmlFile));
             sx2j.setFileBaseName(baseName.getName());
             sx2j.setEventGraphFile(new File(xmlFile));
@@ -1353,4 +1363,4 @@ public class SimkitXML2Java
         }
     }
     
-} // end class file SimkitXML2Java.java
+} // end class file SimkitEventGraphXML2Java.java

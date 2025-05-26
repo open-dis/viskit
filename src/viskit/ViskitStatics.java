@@ -576,74 +576,88 @@ public class ViskitStatics
 
         // Ben Cheng NPE fix
         Object testResult = parameterMap.get(type.getName());
-        List<Object>[] resolved = null;
-        if (testResult != null) {
-            resolved = (List<Object>[]) testResult;
+        List<Object>[] resolvedParametersList = null;
+        if (testResult != null) 
+        {
+            resolvedParametersList = (List<Object>[]) testResult;
             LOG.debug("parameter {} already resolved", type);
         }
-        if (resolved == null) {
-            Constructor<?>[] constr;
+        if (resolvedParametersList == null) 
+        {
+            Constructor<?>[] constructor;
             try {
-                constr = type.getConstructors();
-            } catch (NoClassDefFoundError er) {
-                LOG.error(er);
+                constructor = type.getConstructors();
+            } 
+            catch (NoClassDefFoundError error) {
+                LOG.error("resolveParameters({}) error: {}", type.getName(), error);
                 return null;
             }
-            List<Object>[] plist = GenericConversion.newListObjectTypeArray(List.class, constr.length);
+            List<Object>[] parameterList = GenericConversion.newListObjectTypeArray(List.class, constructor.length);
             Field field = null;
 
             try {
                 field = type.getField("parameterMap");
             }
-            catch (SecurityException ex) {
+            catch (SecurityException ex)
+            {
                 LOG.error(ex);
 //                ex.printStackTrace();
-            } catch (NoSuchFieldException ex) {}
+            } 
+            catch (NoSuchFieldException ex)
+            {
+                // avoid java.lang.NoSuchFieldException: parameterMap
+            }
 
             if (viskit.ViskitStatics.debug) {
                 LOG.info("adding " + type.getName());
-                LOG.info("\t # constructors: " + constr.length);
+                LOG.info("\t # constructors: " + constructor.length);
             }
 
-            Class<?>[] ptypes;
-            ParameterMap param;
-            String[] names, types;
+            Class<?>[] paramterTypesArray;
+            ParameterMap nextParameterMap;
+            String[] nameArray, typeArray;
             Parameter pt, p;
-            String[] params;
+            String[] parameterArray;
             String[][] pMap;
-            int numConstrs;
-            Annotation[] paramAnnots;
+            int numberConstructors;
+            Annotation[] paramameterAnnotationsArray;
             String ptype, pname, ptType;
-            for (int i = 0; i < constr.length; i++) {
-                ptypes = constr[i].getParameterTypes();
-                paramAnnots = constr[i].getDeclaredAnnotations();
-                plist[i] = new ArrayList<>();
+            for (int i = 0; i < constructor.length; i++) 
+            {
+                paramterTypesArray = constructor[i].getParameterTypes();
+                paramameterAnnotationsArray = constructor[i].getDeclaredAnnotations();
+                parameterList[i] = new ArrayList<>();
                 if (viskit.ViskitStatics.debug)
-                    LOG.debug("\t # params {} in constructor {}", ptypes.length, i);
+                    LOG.debug("\t # params {} in constructor {}", paramterTypesArray.length, i);
 
                 // possible that a class inherited a parameterMap, check if annotated first
-                if (paramAnnots != null && paramAnnots.length > 0) {
-                    if (paramAnnots.length > 1)
+                if (paramameterAnnotationsArray != null && paramameterAnnotationsArray.length > 0) 
+                {
+                    if (paramameterAnnotationsArray.length > 1)
                         throw new RuntimeException("Only one Annotation per constructor"); // TODO: harsh
 
-                    param = constr[i].getAnnotation(viskit.ParameterMap.class);
-                    if (param != null) {
-                        names = param.names();
-                        types = param.types();
-                        if (names.length != types.length)
+                    nextParameterMap = constructor[i].getAnnotation(viskit.ParameterMap.class);
+                    if (nextParameterMap != null) 
+                    {
+                        nameArray = nextParameterMap.names();
+                        typeArray = nextParameterMap.types();
+                        if (nameArray.length != typeArray.length)
                             throw new RuntimeException("ParameterMap names and types length mismatch"); // TODO: harsh
 
-                        for (int k = 0; k < names.length; k++) {
+                        for (int k = 0; k < nameArray.length; k++) 
+                        {
                             pt = jaxbEventGraphObjectFactory.createParameter();
-                            pt.setName(names[k]);
-                            pt.setType(types[k]);
+                            pt.setName(nameArray[k]);
+                            pt.setType(typeArray[k]);
 
-                            plist[i].add(pt);
+                            parameterList[i].add(pt);
                         }
                     }
 
-                } else if (field != null) {
-                    if (viskit.ViskitStatics.debug)
+                } 
+                else if (field != null) 
+                {
+                    if (ViskitStatics.debug)
                         LOG.debug("{} is a parameterMap", field);
 
                     try {
@@ -654,25 +668,28 @@ public class ViskitStatics
                         //  ...
                         // }
                         pMap = (String[][]) (field.get(new String[0][0]));
-                        numConstrs = pMap.length;
+                        numberConstructors = pMap.length;
 
-                        for (int n = 0; n < numConstrs; n++) { // tbd: check that numConstrs == constr.length
-                            params = pMap[n];
-                            if (params != null) {
-                                plist[n] = new ArrayList<>();
-                                for (int k = 0; k < params.length; k += 2) {
+                        for (int n = 0; n < numberConstructors; n++)  // tbd: check that numConstrs == constr.length
+                        { 
+                            // tbd: check that numConstrs == constr.length
+                            parameterArray = pMap[n];
+                            if (parameterArray != null) 
+                            {
+                                parameterList[n] = new ArrayList<>();
+                                for (int k = 0; k < parameterArray.length; k += 2) 
+                                {
                                     try {
                                         p = jaxbEventGraphObjectFactory.createParameter();
-                                        ptype = params[k];
-                                        pname = params[k + 1];
+                                        ptype = parameterArray[k];
+                                        pname = parameterArray[k + 1];
 
                                         p.setName(pname);
                                         p.setType(ptype);
 
-                                        plist[n].add(p);
+                                        parameterList[n].add(p);
                                         if (viskit.ViskitStatics.debug)
                                             LOG.debug("\tfrom compiled parameterMap {}", p.getName() + p.getType());
-
                                     }
                                     catch (Exception ex) {
                                         LOG.error("resolveParameters(" + type + ") initial-loop exception: " + ex.getMessage());
@@ -681,13 +698,16 @@ public class ViskitStatics
                             }
                         }
 //                        break; // fix this up, should index along with i not n
-                    } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    } 
+                    catch (IllegalArgumentException | IllegalAccessException ex) {
                         LOG.error(ex);
 //                        ex.printStackTrace();
                     }
-                } else { // unknown
+                }
+                else { // unknown
                     int k = 0;
-                    for (Class<?> ptyp : ptypes) {
+                    for (Class<?> ptyp : paramterTypesArray) 
+                    {
                         try {
                             p = jaxbEventGraphObjectFactory.createParameter();
                             ptType = ViskitStatics.convertClassName(ptyp.getName());
@@ -698,10 +718,9 @@ public class ViskitStatics
                             // Not sure what use a name like this is for PCLs
                             p.setName("p[" + k++ + "] : ");
                             p.setType(ptType);
-                            plist[i].add(p);
+                            parameterList[i].add(p);
                             if (viskit.ViskitStatics.debug)
                                 LOG.info("\t {}{}", p.getName(), p.getType());
-
                         }
                         catch (Exception ex) {
                             LOG.error("resolveParameters(" + type + ") secondary-loop exception: " + ex.getMessage());
@@ -709,10 +728,10 @@ public class ViskitStatics
                     }
                 }
             }
-            putParameterList(type.getName(), plist);
-            resolved = plist;
+            putParameterList(type.getName(), parameterList);
+            resolvedParametersList = parameterList;
         }
-        return resolved;
+        return resolvedParametersList;
     }
 
     /**
@@ -720,7 +739,8 @@ public class ViskitStatics
      * @param s the string to strip
      * @return a stripped string
      */
-    public static String stripOutJavaDotLang(String s) {
+    public static String stripOutJavaDotLang(String s)
+    {
         if (s.contains("java.lang.")) {
             s = s.replace("java.lang.", "");
         }

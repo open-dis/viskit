@@ -206,9 +206,10 @@ public class ViskitApplication
         final MainFrame mainFrame = (MainFrame) ViskitGlobals.instance().getMainFrame();
 
         // CMD Q for macOS
-        Desktop.getDesktop().setQuitHandler((QuitEvent e, QuitResponse response) -> {
+        Desktop.getDesktop().setQuitHandler((QuitEvent quitEvent, QuitResponse quitResponse) -> 
+        {
             mainFrame.getMyQuitAction().actionPerformed(null); // perform cleanups
-            response.performQuit();
+            quitResponse.performQuit();
         });
 
         ImageIcon aboutIcon = new ImageIcon(ViskitApplication.class.getResource("/viskit/images/ViskitLogo.gif"));

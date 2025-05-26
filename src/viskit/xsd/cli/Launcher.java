@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 
 public class Launcher extends Thread implements Runnable
 {
@@ -246,7 +246,7 @@ public class Launcher extends Thread implements Runnable
             ByteArrayInputStream bais = new ByteArrayInputStream(xml.toString().getBytes());
             Class<?> jclz = cloader.loadClass("javax.xml.bind.JAXBContext");
             Method m = jclz.getDeclaredMethod("newInstance", new Class<?>[]{String.class, ClassLoader.class});
-            Object jco = m.invoke(null, new Object[]{SimkitXML2Java.EVENT_GRAPH_BINDINGS, cloader});
+            Object jco = m.invoke(null, new Object[]{SimkitEventGraphXML2Java.EVENT_GRAPH_BINDINGS, cloader});
             m = jclz.getDeclaredMethod("createUnmarshaller", new Class<?>[]{});
             Object umo = m.invoke(jco, new Object[]{});
 
@@ -254,7 +254,7 @@ public class Launcher extends Thread implements Runnable
             m = jclz.getDeclaredMethod("unmarshal", new Class<?>[]{InputStream.class});
             Object eventGraphObject = m.invoke(umo, new Object[]{bais}); // TODO why isn't this a typed class?
 
-            jclz = cloader.loadClass(SimkitXML2Java.EVENT_GRAPH_BINDINGS + ".SimEntity");
+            jclz = cloader.loadClass(SimkitEventGraphXML2Java.EVENT_GRAPH_BINDINGS + ".SimEntity");
             m = jclz.getDeclaredMethod("getPackage", new Class<?>[]{});
             String eventGraphName = (String) m.invoke(eventGraphObject, new Object[]{});
             m = jclz.getDeclaredMethod("getName", new Class<?>[]{});
@@ -557,10 +557,10 @@ public class Launcher extends Thread implements Runnable
     String eventGraphName = (String) (e.nextElement());
     String eventGraph = (String)eventGraphs.get(eventGraphName);
     bais = new ByteArrayInputStream(eventGraph.getBytes());
-    Class clz = cloader.loadClass("viskit.xsd.translator.eventgraph.SimkitXML2Java");
+    Class clz = cloader.loadClass("viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java");
     Constructor cnstr = clz.getConstructor( new Class<?>[] { InputStream.class } );
-    //xml2j = new SimkitXML2Java(bais);
-    xml2j = (SimkitXML2Java)cnstr.newInstance( new Object[] { bais } );
+    //xml2j = new SimkitEventGraphXML2Java(bais);
+    xml2j = (SimkitEventGraphXML2Java)cnstr.newInstance( new Object[] { bais } );
     xml2j.unmarshal();
     bsh.eval(xml2j.translate());
     if (DEBUG) {

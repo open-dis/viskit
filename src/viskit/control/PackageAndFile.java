@@ -17,7 +17,8 @@ public class PackageAndFile { // TODO consider moving this small class into File
     public String packageName;
     public File file;
 
-    public PackageAndFile(String packageName, File file) {
+    public PackageAndFile(String packageName, File file) 
+    {
         this.packageName = packageName;
         this.file = file;
     }

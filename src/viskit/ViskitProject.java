@@ -229,6 +229,7 @@ public class ViskitProject
         if (!libDirectory.exists()) {
             getLibDirectory().mkdir();
         }
+        // TODO copy over logj4 jar
 
         // If we already have a project file, then load it.  If not, create it
         setProjectFile(new File(projectDirectory, PROJECT_FILE_NAME)); // sets projectFile

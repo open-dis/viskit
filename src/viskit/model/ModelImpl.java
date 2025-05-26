@@ -29,7 +29,7 @@ import viskit.mvc.MvcAbstractModel;
 import viskit.util.XMLValidationTool;
 import viskit.xsd.bindings.eventgraph.*;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 import viskit.mvc.MvcController;
 
 /**
@@ -93,7 +93,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     {
         try {
             if (jaxbContext == null) // avoid JAXBException (perhaps due to concurrency)
-                jaxbContext = JAXBContext.newInstance(SimkitXML2Java.EVENT_GRAPH_BINDINGS);
+                jaxbContext = JAXBContext.newInstance(SimkitEventGraphXML2Java.EVENT_GRAPH_BINDINGS);
             jaxbEventGraphObjectFactory = new viskit.xsd.bindings.eventgraph.ObjectFactory();
             jaxbRoot = jaxbEventGraphObjectFactory.createSimEntity(); // to start with empty graph
         } 

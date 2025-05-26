@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -63,7 +64,7 @@ import viskit.view.AssemblyView;
 import viskit.view.dialog.ViskitUserPreferencesDialog;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 import viskit.xsd.bindings.assembly.SimkitAssembly;
-import viskit.xsd.translator.eventgraph.SimkitXML2Java;
+import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
 import static viskit.view.MainFrame.TAB1_LOCALRUN_INDEX;
@@ -71,7 +72,6 @@ import viskit.assembly.SimulationRunInterface;
 import viskit.control.InternalAssemblyRunner.SimulationState;
 import viskit.view.MainFrame;
 import viskit.view.SimulationRunPanel;
-import viskit.xsd.bindings.assembly.SimEntity;
 
 /**
  * AssemblyController full implementation.
@@ -1872,7 +1872,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param simkitXML2Java the Event Graph initialized translator to produce source with
      * @return a string of Event Graph source code
      */
-    public String buildJavaEventGraphSource(SimkitXML2Java simkitXML2Java)
+    public String buildJavaEventGraphSource(SimkitEventGraphXML2Java simkitXML2Java)
     {
         String eventGraphSource = null;
 
@@ -1902,7 +1902,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     /** Create and test compile our EventGraphs and Assemblies from XML
      *
-     * @param sourceCode the translated source either from SimkitXML2Java, or SimkitAssemblyXML2Java
+     * @param sourceCode the translated source either from SimkitEventGraphXML2Java, or SimkitAssemblyXML2Java
      * @return a reference to a successfully compiled *.class file or null if
      * a compile failure occurred
      */
@@ -1912,12 +1912,13 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // Find the package subdirectory
         Pattern patttern = Pattern.compile("package.+;");
-        Matcher matcher = patttern.matcher(sourceCode);
-        boolean fnd = matcher.find();
+        Matcher matcher  = patttern.matcher(sourceCode);
+        boolean found    = matcher.find();
 
         String packagePath = "";
         String packageName = "";
-        if (fnd) {
+        if (found) 
+        {
             int startIndex = matcher.start();
             int   endIndex = matcher.end();
             String s = sourceCode.substring(startIndex, endIndex);
@@ -1947,49 +1948,86 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 viskitProject = ViskitGlobals.instance().getViskitProject(); // TODO breaks singleton pattern?
 
             // Create, or find the project's java source and package
-            File sourcePackagePath = new File(viskitProject.getSrcDirectory(), packagePath);
-            if (!sourcePackagePath.isDirectory())
-                 sourcePackagePath.mkdirs(); // include intermediate subdirectories
-            File javaSourceFile = new File(sourcePackagePath, baseName + ".java");
+            File sourcePackageDirectory = new File(viskitProject.getSrcDirectory(), packagePath);
+            if (!sourcePackageDirectory.isDirectory())
+                 sourcePackageDirectory.mkdirs(); // include intermediate subdirectories
+            File javaSourceFile = new File(sourcePackageDirectory, baseName + ".java");
             javaSourceFile.createNewFile();
 
             sourceCodeFileWriter = new FileWriter(javaSourceFile);
             sourceCodeFileWriter.write(sourceCode);
 
             // An error stream to write additional error info out to
-            OutputStream baosOutputStream = new ByteArrayOutputStream();
-            Compiler.setOutPutStream(baosOutputStream);
+            OutputStream errorsByteArrayOutputStream = new ByteArrayOutputStream();
+            Compiler.setOutPutStream(errorsByteArrayOutputStream);
 
             File classesDirectory = viskitProject.getClassesDirectory();
+            if (!classesDirectory.isDirectory())
+                 classesDirectory.mkdirs(); // include intermediate subdirectories
             
             String relativePathToCompiledClass = packagePath + baseName + ".class";
             File compiledClassFile = new File(classesDirectory.getAbsolutePath() + "/" + relativePathToCompiledClass);
-
-            LOG.info("compileJavaClassFromString() compiling file:\n      " + javaSourceFile.getAbsolutePath() + " to\n      " +
-                         compiledClassFile.getAbsolutePath());
+            if (!compiledClassFile.getParentFile().isDirectory())
+                 compiledClassFile.getParentFile().mkdirs(); // include intermediate subdirectories
+            
 
             // This will create a class/package to place the .class file
-            String diagnostic = Compiler.invoke(packageName, baseName, sourceCode);
-            compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);            
+            String diagnostic = Compiler.invoke(packageName, baseName, sourceCode); // diagnostics only
+            compileSuccess = diagnostic.equals(Compiler.COMPILE_SUCCESS_MESSAGE);
+            
+            // https://docs.oracle.com/javase/tutorial/essential/io/move.html
+            // https://docs.oracle.com/javase/8/docs/api/java/nio/file/Files.html#move-java.nio.file.Path-java.nio.file.Path-java.nio.file.CopyOption...-
+            // move compiler results
+            File compiledResultFile = new File(ViskitGlobals.instance().getProjectWorkingDirectory() + "/" + packageName, baseName + ".class");
+//          compiledResultFile.getAbsolutePath(); // debug
+            if  (compiledResultFile.exists())
+            {
+                // TODO moving files eludes the class loader later
+//                Files.move(compiledResultFile.toPath(), 
+//                        compiledClassFile.getParentFile().toPath().resolve(compiledResultFile.toPath().getFileName()), 
+//                        REPLACE_EXISTING);
+//                Files.delete(compiledResultFile.getParentFile().toPath()); // remove package directory
+            }
+            
+            LOG.info("compileJavaClassFromString() compiling file:\n      " + javaSourceFile.getAbsolutePath() + " to\n      " +
+                         compiledResultFile.getAbsolutePath());
+//                       compiledClassFile.getAbsolutePath());
 
-            LOG.debug("compileJavaClassFromString() compiledClassFile=\n      " + compiledClassFile.getAbsolutePath());
+            LOG.debug("compileJavaClassFromString() compiledClassFile=\n      " + compiledClassFile.getAbsolutePath() +
+                      "  exists=" + compiledClassFile.exists() + " length=" + compiledClassFile.length());
             if (compileSuccess) 
             {
-                LOG.info("compileJavaClassFromString(): " + diagnostic + "\n");
+                LOG.debug("compileJavaClassFromString(): " + 
+                         "autogenerated Java compilation result\n" +
+                         "=====================================\n" + 
+                         diagnostic + "n" +
+                         "=====================================\n");
                 return compiledClassFile;
             } 
             else
             {
-                LOG.error("compileJavaClassFromString(): " + diagnostic + " !!!!!!!!!!");
-                if (!baosOutputStream.toString().isEmpty())
-                    LOG.error("compileJavaClassFromString() " + baosOutputStream.toString());
+                String errorResults = 
+                         "autogenerated Java compilation error\n" +
+                         "====================================\n" + 
+                         diagnostic + "n" +
+                         "====================================\n";
+                if (!errorsByteArrayOutputStream.toString().isBlank())
+                    errorResults +=
+                         errorsByteArrayOutputStream.toString() +
+                         "====================================\n";
+                LOG.error("compileJavaClassFromString(): "  + errorResults);
+                // send error to simulation console for easiest user viewing
+                ViskitGlobals.instance().selectSimulationRunTab();
+                ViskitGlobals.instance().getSimulationRunPanel().outputStreamTA.append("\n\n" + errorResults);
+                return null;
             }
-
         } 
         catch (IOException ioe) {
             LOG.error("compileJavaClassFromString() exception" + ioe);
+            ioe.printStackTrace();
         } 
-        finally {
+        finally 
+        {
             try {
                 if (sourceCodeFileWriter != null)
                     sourceCodeFileWriter.close();
@@ -2008,37 +2046,43 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      * @param xmlFile the EventGraph to package up
      * @return a package and file pair
      */
-    public PackageAndFile createTemporaryEventGraphClass(File xmlFile) {
-        PackageAndFile paf = null;
+    public PackageAndFile createTemporaryEventGraphClass(File xmlFile) 
+    {
+        PackageAndFile packageAndFile = null;
         try {
-            SimkitXML2Java x2j = new SimkitXML2Java(xmlFile);
-            x2j.unmarshal();
+            SimkitEventGraphXML2Java simkitEventGraphXML2Java = new SimkitEventGraphXML2Java(xmlFile);
+            simkitEventGraphXML2Java.unmarshal();
 
-            // SimEntity is a synonym for event graph, when running as part of an asssembly
-            boolean isEventGraph = x2j.getUnMarshalledObject() instanceof SimEntity;
+            // SimEntity is a synonym for event graph, when running as part of an asssembly;
+            // be careful to use correct package tree
+//          Object unMarshalledObject = simkitEventGraphXML2Java.getUnMarshalledObject(); // debug
+            boolean isEventGraph = simkitEventGraphXML2Java.getUnMarshalledObject() instanceof viskit.xsd.bindings.eventgraph.SimEntity;
             if (!isEventGraph) {
-                LOG.debug("Is an Assembly: {}", !isEventGraph);
-                return paf;
+                LOG.error("Event graph {} is an Assembly: {}", xmlFile.getName(), !isEventGraph);
+                return packageAndFile;
             }
-
-            String sourceString = buildJavaEventGraphSource(x2j);
+            String sourceString = buildJavaEventGraphSource(simkitEventGraphXML2Java);
 
             /* We may have forgotten a parameter required for a super class */
-            if (sourceString == null) {
-                String message = xmlFile + " did not translate to source code.\n" +
-                        "Manually compile to determine cause";
+            if (sourceString == null) 
+            {
+                String message = xmlFile + "\n" + "did not translate correctly into source code.\n" +
+                        "Check console, inspect source to determine cause";
                 LOG.error(message);
                 ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Source code translation error", message);
                 return null;
             }
-
-            paf = compileJavaClassAndSetPackage(sourceString);
-
-        } catch (FileNotFoundException e) {
-            LOG.error("Error creating Java class file from {}: {}\n", xmlFile , e.getMessage());
-            FileBasedClassManager.instance().addCacheMiss(xmlFile);
+            packageAndFile = compileJavaClassAndSetPackage(sourceString);
         }
-        return paf;
+        catch (FileNotFoundException e)
+        {
+            String message = xmlFile + "\n" + "did not translate correctly into source code.\n" +
+                    "Check console, inspect source to determine cause";
+            LOG.error("Event graph compilation error creating Java class file from {}: {}\n", xmlFile , e.getMessage());
+            FileBasedClassManager.instance().addCacheMiss(xmlFile);
+            ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE, "Event graph compilation error", message);
+        }
+        return packageAndFile;
     }
 
     /** Path for Event Graph and Assembly compilation
@@ -2048,21 +2092,24 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      */
     private PackageAndFile compileJavaClassAndSetPackage(String source) 
     {
-        String pkg = null;
-        if (source != null && !source.isEmpty()) {
-            Pattern p = Pattern.compile("package.*;");
-            Matcher m = p.matcher(source);
-            if (m.find()) {
-                String nuts = m.group();
-                if (nuts.endsWith(";"))
-                    nuts = nuts.substring(0, nuts.length() - 1);
+        String newPackage = null;
+        if (source != null && !source.isEmpty()) 
+        {
+            Pattern pattern = Pattern.compile("package.*;");
+            Matcher matcher = pattern.matcher(source);
+            if (matcher.find()) 
+            {
+                String matchedString = matcher.group();
+                if (matchedString.endsWith(";"))
+                    matchedString = matchedString.substring(0, matchedString.length() - 1);
 
-                String[] sa = nuts.split("\\s");
-                pkg = sa[1];
+                String[] stringArray = matchedString.split("\\s");
+                newPackage = stringArray[1];
             }
-            File f = compileJavaClassFromString(source);
-            if (f != null)
-                return new PackageAndFile(pkg, f);
+            File newFile = compileJavaClassFromString(source);
+            // TODO check downstream, ensure file goes into correct subdirectory
+            if (newFile != null)
+                return new PackageAndFile(newPackage, newFile);
         }
         return null;
     }
@@ -2227,7 +2274,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 catch (InterruptedException | ExecutionException e) 
                 {
                     // look for compilation errors  produced from compileJavaClassFromString()
-                    LOG.error(e);
+                    LOG.error("Compilation error in autogenerated source: {}", e);
                     e.printStackTrace();
                 }
                 finally {
