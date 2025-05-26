@@ -1026,7 +1026,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         graphPane.drawingSplitPane.setOneTouchExpandable(true);
 
         try {
-            graphPane.getDropTarget().addDropTargetListener(new vDropTargetAdapter());
+            graphPane.getDropTarget().addDropTargetListener(new ViskitDropTargetAdapter());
         } catch (TooManyListenersException tmle) {
             LOG.error(tmle);
         }
@@ -1185,38 +1185,41 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         dragged = trans;
     }
 
-    /** Class to facilitate dragging new nodes onto the pallette */
-    class vDropTargetAdapter extends DropTargetAdapter {
-
+    /** Class to facilitate dragging new nodes onto the palette */
+    class ViskitDropTargetAdapter extends DropTargetAdapter 
+    {
         @Override
-        public void dragOver(DropTargetDragEvent e) {
-
-            // NOTE: this action is very critical in getting JGraph 5.14 to
-            // signal the drop method
-            e.acceptDrag(e.getDropAction());
+        public void dragOver(DropTargetDragEvent dropTargetDragEvent) 
+        {
+            // NOTE: this action is very critical in getting JGraph 5.14 to signal the drop method
+            dropTargetDragEvent.acceptDrag(dropTargetDragEvent.getDropAction());
         }
 
         @Override
-        public void drop(DropTargetDropEvent dtde) {
-            if (dragged != null) {
+        public void drop(DropTargetDropEvent dropTargetDropEvent) 
+        {
+            if (dragged != null) 
+            {
                 try {
-                    Point p = dtde.getLocation();
+                    Point p = dropTargetDropEvent.getLocation();
 
                     String s = dragged.getTransferData(DataFlavor.stringFlavor).toString();
                     String[] sa = s.split("\t");
 
                     // Check for XML-based node
-                    FileBasedAssemblyNode xn = isFileBasedAssemblyNode(sa[1]);
-                    if (xn != null) {
+                    FileBasedAssemblyNode xmlFileBasedAssemblyNode = isFileBasedAssemblyNode(sa[1]);
+                    if (xmlFileBasedAssemblyNode != null) 
+                    {
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
-                                ((AssemblyControllerImpl) getController()).newFileBasedEventGraphNode(xn, p);
+                                ((AssemblyControllerImpl) getController()).newFileBasedEventGraphNode(xmlFileBasedAssemblyNode, p);
                                 break;
                             case "java.beans.PropertyChangeListener":
-                                ((AssemblyControllerImpl) getController()).newFileBasedPropertyChangeListenerNode(xn, p);
+                                ((AssemblyControllerImpl) getController()).newFileBasedPropertyChangeListenerNode(xmlFileBasedAssemblyNode, p);
                                 break;
                         }
-                    } else {
+                    } 
+                    else {
                         // Else class-based node
                         switch (sa[0]) {
                             case "simkit.BasicSimEntity":
@@ -1227,19 +1230,21 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                                 break;
                         }
                     }
-
                     dragged = null;
-                } catch (UnsupportedFlavorException | IOException e) {
+                } 
+                catch (UnsupportedFlavorException | IOException e) {
                     LOG.error(e);
                 }
             }
         }
     }
 
-    private FileBasedAssemblyNode isFileBasedAssemblyNode(String s) {
+    private FileBasedAssemblyNode isFileBasedAssemblyNode(String nodeName) 
+    {
         try {
-            return FileBasedAssemblyNode.fromString(s);
-        } catch (FileBasedAssemblyNode.exception e) {
+            return FileBasedAssemblyNode.fromString(nodeName);
+        } 
+        catch (FileBasedAssemblyNode.exception e) {
             return null;
         }
     }
@@ -1252,7 +1257,6 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 getCurrentViskitGraphAssemblyComponentWrapper().viskitModelChanged((ModelEvent) modelEvent);
                 break;
         }
-
         // Let model.isDirty() determine status color
         toggleAssemblyStatusIndicators();
         enableAssemblyMenuItems();
