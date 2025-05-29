@@ -33,11 +33,12 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 package viskit;
 
-import edu.nps.util.Log4jUtilities;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -65,7 +66,14 @@ public class Help
     static final Logger LOG = LogManager.getLogger();
     
     public static final Version VERSION = new Version("version.txt");
-    public static final String VERSION_STRING = VERSION.getVersionString();
+    public static final String  VERSION_STRING = VERSION.getVersionString();
+    
+    public static final String SIMKIT_DES_MODELING_MANUAL            = "documents/references/SimkitDiscreteEventSimulationModelingManual.pdf";
+    public static final String MV3302_SIMKIT_JAVA_PROGRAMMING_VIDEOS = "https://www.youtube.com/playlist?list=PL25IAuhExzo5UPi5TnUyq23N9jXhApFPi";
+    public static final String SIMKIT_GITHUB_URL                     = "https://github.com/ahbuss/simkit";
+    public static final String VISKIT_GITHUB_URL                     = "https://github.com/open-dis/viskit";
+    
+            
     public static final String CR = "<br>";
     public static final String ABOUT_EVENTGRAPH_STRING =
             "Viskit Event Graph and Assembly Editor" + CR + "   version " + VERSION_STRING +
@@ -235,7 +243,61 @@ public class Help
             linkString = "<a href = " + url + ">" + url + "</a>";
         } catch (MalformedURLException | URISyntaxException ex) {}
         return linkString;
+    }
+    
+    /** method name for reflection use */
+    public static final String METHOD_launchSimkitDesModelingManual = "launchSimkitDesModelingManual";
 
+    public void launchSimkitDesModelingManual() 
+    {
+        try {
+            Desktop.getDesktop().open(new File(SIMKIT_DES_MODELING_MANUAL));
+        } 
+        catch (IOException ex) {
+            LOG.error("launchSimkitDesModelingManual() problem: {}", ex);
+        }
+    }
+    
+    /** method name for reflection use */
+    public static final String METHOD_launchMV3302SimkitJavaProgrammingVideos = "launchMV3302SimkitJavaProgrammingVideos";
+
+    public void launchMV3302SimkitJavaProgrammingVideos() 
+    {
+        try {
+            Desktop.getDesktop().browse(new URI(MV3302_SIMKIT_JAVA_PROGRAMMING_VIDEOS));
+        }
+        catch (IOException | URISyntaxException ex) {
+            
+            LOG.error("launchMV3302JavaProgrammingVideos() problem: {}", ex);
+        }
+    }
+    
+    /** method name for reflection use */
+    public static final String METHOD_launchGithubSimkit = "launchGithubSimkit";
+
+    public void launchGithubSimkit() 
+    {
+        try {
+            Desktop.getDesktop().browse(new URI(SIMKIT_GITHUB_URL));
+        }
+        catch (IOException | URISyntaxException ex) {
+            
+            LOG.error("launchGithubSimkit() problem: {}", ex);
+        }
+    }
+    
+    /** method name for reflection use */
+    public static final String METHOD_launchGithubViskit = "launchGithubViskit";
+
+    public void launchGithubViskit() 
+    {
+        try {
+            Desktop.getDesktop().browse(new URI(VISKIT_GITHUB_URL));
+        }
+        catch (IOException | URISyntaxException ex) {
+            
+            LOG.error("launchGithubSimkit() problem: {}", ex);
+        }
     }
 
     public static void main(String[] args) {

@@ -219,9 +219,10 @@ public class InternalAssemblyRunner implements PropertyChangeListener
 
         try {
             simulationRunAssemblyClass = ViskitStatics.classForName(simulationRunAssemblyClassName);
-            if (simulationRunAssemblyClass == null) {
+            if (simulationRunAssemblyClass == null) 
+            {
                 LOG.error("fillSimulationRunButtonsFromAssemblyInitialization() found (simulationRunAssemblyClass == null)");
-                throw new ClassNotFoundException();
+                throw new ClassNotFoundException("simulationRunAssemblyClass");
             }
 
 //            LOG.info("attempting fillSimulationRunButtonsFromAssemblyInitialization() simulationRunAssemblyClass.getDeclaredConstructor(parameterTypes)");

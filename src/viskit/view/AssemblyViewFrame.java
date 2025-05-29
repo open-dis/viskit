@@ -64,6 +64,10 @@ import static viskit.Help.METHOD_aboutViskit;
 import static viskit.Help.METHOD_doContents;
 import static viskit.Help.METHOD_doSearch;
 import static viskit.Help.METHOD_doTutorial;
+import static viskit.Help.METHOD_launchGithubSimkit;
+import static viskit.Help.METHOD_launchGithubViskit;
+import static viskit.Help.METHOD_launchMV3302SimkitJavaProgrammingVideos;
+import static viskit.Help.METHOD_launchSimkitDesModelingManual;
 
 import viskit.control.AssemblyControllerImpl;
 import viskit.util.FileBasedAssemblyNode;
@@ -206,6 +210,12 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private JMenu assemblyMenu;
     private JMenu editMenu;
     private JMenu helpMenu;
+    
+    private JMenu helpResourcesMenu;
+    private JMenuItem simkitDesModelingManualMenuItem;
+    private JMenuItem simkitJavaProgrammingVideosMenuItem;
+    private JMenuItem simkitGithubMenuItem;
+    private JMenuItem viskitGithubMenuItem;
     
     private JLabel metadataLabel;
     private JLabel modeLabel;
@@ -763,6 +773,19 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getHelpMenu().add(buildMenuItem(help, METHOD_doTutorial,  "Tutorial",     KeyEvent.VK_T, null));
         
         getHelpMenu().addSeparator();
+        helpResourcesMenu = new JMenu("Resources");
+        
+        simkitDesModelingManualMenuItem = buildMenuItem(help, METHOD_launchSimkitDesModelingManual, "Simkit DES Modeling Manual", KeyEvent.VK_M, null);
+        simkitJavaProgrammingVideosMenuItem = buildMenuItem(help, METHOD_launchMV3302SimkitJavaProgrammingVideos, "Simkit Java Programming Videos", KeyEvent.VK_V, null);
+        simkitGithubMenuItem = buildMenuItem(help, METHOD_launchGithubSimkit, "Github Simkit Repository", KeyEvent.VK_G, null);
+        viskitGithubMenuItem = buildMenuItem(help, METHOD_launchGithubViskit, "Github Viskit Repository", KeyEvent.VK_G, null);
+                
+        helpResourcesMenu.add(simkitDesModelingManualMenuItem);
+        helpResourcesMenu.add(simkitJavaProgrammingVideosMenuItem);
+        helpResourcesMenu.add(simkitGithubMenuItem);
+        helpResourcesMenu.add(viskitGithubMenuItem);
+        helpMenu.add(helpResourcesMenu);
+        
         getHelpMenu().add(buildMenuItem(help, METHOD_aboutViskit, "About Viskit", KeyEvent.VK_A, null));
     }
 
