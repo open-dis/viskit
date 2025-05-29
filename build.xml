@@ -823,7 +823,7 @@ their descpritions.
                 <exclude name="statistics"/>
             </fileset>
         </delete>
-        <delete verbose="true">
+        <delete verbose="true" failonerror="false">
             <fileset dir="MyViskitProjects/DefaultProject/build">
                 <include name="**/*.class"/>
                 <include name="**/*.java"/>
