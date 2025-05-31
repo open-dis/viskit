@@ -117,7 +117,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public static final String METHOD_zipAndMailProject = "zipAndMailProject";
 
     @Override
-    public void zipAndMailProject() {
+    public void zipProject() {
         ((AssemblyControllerImpl)ViskitGlobals.instance().getActiveAssemblyController()).zipProject();
     }
     
@@ -1327,7 +1327,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void cancellingEdgeEdit(Edge edge) {
+    public void cancelingEdgeEdit(Edge edge) {
         boolean modified = ((EventGraphView) getView()).doEditCancelEdge(edge);
         if (modified) {
             ((viskit.model.Model) getModel()).changeCancelingEdge(edge);

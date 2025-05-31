@@ -49,20 +49,21 @@ public class ViskitGraphUI extends BasicGraphUI {
      *
      * @param cell the cell to edit
      */
-    private void createEditDialog(Object cell) {
-
-        EventGraphController cntl = (EventGraphController) ViskitGlobals.instance().getEventGraphController();
+    private void createEditDialog(Object cell) 
+    {
+        EventGraphController eventGraphController = (EventGraphController) ViskitGlobals.instance().getEventGraphController();
         if (cell instanceof vEdgeCell) {
-            Edge e = (Edge) ((DefaultMutableTreeNode) cell).getUserObject();
+            Edge edge = (Edge) ((DefaultMutableTreeNode) cell).getUserObject();
             
-            if (e instanceof SchedulingEdge)
-                cntl.schedulingEdgeEdit(e);
+            if (edge instanceof SchedulingEdge)
+                eventGraphController.schedulingEdgeEdit(edge);
             else
-                cntl.cancellingEdgeEdit(e);
+                eventGraphController.cancelingEdgeEdit(edge);
             
-        } else if (cell instanceof vCircleCell) {
-            EventNode en = (EventNode) ((DefaultMutableTreeNode) cell).getUserObject();
-            cntl.nodeEdit(en);
+        } 
+        else if (cell instanceof vCircleCell) {
+            EventNode eventNode = (EventNode) ((DefaultMutableTreeNode) cell).getUserObject();
+            eventGraphController.nodeEdit(eventNode);
         }
     }
 }

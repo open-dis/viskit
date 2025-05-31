@@ -80,9 +80,9 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         addSimulationParameterMenuItem = new javax.swing.JMenuItem();
         addStateVariableMenuItem = new javax.swing.JMenuItem();
         addSchedulingEdgeMenuItem = new javax.swing.JMenuItem();
-        addCancellingEdgeMenuItem = new javax.swing.JMenuItem();
+        addCancelingEdgeMenuItem = new javax.swing.JMenuItem();
         addSelfReferencingSchedulingEdgeMenuItem = new javax.swing.JMenuItem();
-        addSelfReferencingCancellingEdgeMenuItem = new javax.swing.JMenuItem();
+        addSelfReferencingCancelingEdgeMenuItem = new javax.swing.JMenuItem();
         eventGraphMetadataPropertiesMI = new javax.swing.JMenuItem();
         jSeparator9 = new javax.swing.JPopupMenu.Separator();
         newEventGraphMI = new javax.swing.JMenuItem();
@@ -488,17 +488,17 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
         addSchedulingEdgeMenuItem.setToolTipText("");
         editEventGraphSubMenu.add(addSchedulingEdgeMenuItem);
 
-        addCancellingEdgeMenuItem.setText("Add Cancelling Edge");
-        addCancellingEdgeMenuItem.setToolTipText("");
-        editEventGraphSubMenu.add(addCancellingEdgeMenuItem);
+        addCancelingEdgeMenuItem.setText("Add Canceling Edge");
+        addCancelingEdgeMenuItem.setToolTipText("");
+        editEventGraphSubMenu.add(addCancelingEdgeMenuItem);
 
         addSelfReferencingSchedulingEdgeMenuItem.setText("Add Self-Referencing Scheduling Edge");
         addSelfReferencingSchedulingEdgeMenuItem.setToolTipText("");
         editEventGraphSubMenu.add(addSelfReferencingSchedulingEdgeMenuItem);
 
-        addSelfReferencingCancellingEdgeMenuItem.setText("Add Self-Referencing Cancelling Edge");
-        addSelfReferencingCancellingEdgeMenuItem.setToolTipText("");
-        editEventGraphSubMenu.add(addSelfReferencingCancellingEdgeMenuItem);
+        addSelfReferencingCancelingEdgeMenuItem.setText("Add Self-Referencing Canceling Edge");
+        addSelfReferencingCancelingEdgeMenuItem.setToolTipText("");
+        editEventGraphSubMenu.add(addSelfReferencingCancelingEdgeMenuItem);
 
         eventGraphMenu.add(editEventGraphSubMenu);
 
@@ -957,12 +957,12 @@ public class ViskitLayoutRedesign extends javax.swing.JFrame {
     private javax.swing.JPanel _7_StatisticalResultsPanel;
     private javax.swing.JPanel _8_ConclusionsRecommendationsPanel;
     private javax.swing.JMenuItem aboutMI;
-    private javax.swing.JMenuItem addCancellingEdgeMenuItem;
+    private javax.swing.JMenuItem addCancelingEdgeMenuItem;
     private javax.swing.JMenuItem addEventGraphMI;
     private javax.swing.JMenuItem addEventNodeMenuItem;
     private javax.swing.JMenuItem addPropertyChangeListenerMI;
     private javax.swing.JMenuItem addSchedulingEdgeMenuItem;
-    private javax.swing.JMenuItem addSelfReferencingCancellingEdgeMenuItem;
+    private javax.swing.JMenuItem addSelfReferencingCancelingEdgeMenuItem;
     private javax.swing.JMenuItem addSelfReferencingSchedulingEdgeMenuItem;
     private javax.swing.JMenuItem addSimulationParameterMenuItem;
     private javax.swing.JMenuItem addStateVariableMenuItem;

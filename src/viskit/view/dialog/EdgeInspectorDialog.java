@@ -50,11 +50,11 @@ public class EdgeInspectorDialog extends JDialog
     private static boolean modified = false;
     private static boolean allGood;
     private Edge edge;
-    private boolean schedulingType = true; // true = scheduling, false = cancelling
+    private boolean schedulingType = true; // true = scheduling, false = canceling
     private final JButton cancelButton;
-    private final JButton okButton;
+    private final JButton applyChangesButton;
     private final JLabel sourceEvent;
-    private final JLabel targEetvent;
+    private final JLabel targetEvent;
     private EdgeParametersPanel edgeParametersPanel;
     private final ConditionalExpressionPanel conditionalExpressionPanel;
     private final JPanel timeDelayPanel;
@@ -69,11 +69,12 @@ public class EdgeInspectorDialog extends JDialog
     private Vector<String> priorityNames;
     private int priorityDefaultIndex = 3;      // set properly below
     private final JLabel schedulingLabel;
-    private final JLabel cancellingLabel;
+    private final JLabel cancelingLabel;
+    private final JPanel addButtonPanel;
     private final JButton addConditionalButton;
     private final JButton addDescriptionButton;
-    private JTextArea descriptionTextArea;
-    private final JScrollPane descriptionJsp;
+    private       JTextArea   descriptionTextArea;
+    private final JScrollPane descriptionScrollPane;
     private final JLabel dotLabel;
 
     /**
@@ -102,15 +103,18 @@ public class EdgeInspectorDialog extends JDialog
         return modified;
     }
 
-    private EdgeInspectorDialog(JFrame parent, Edge edge) {
-        super(parent, "Edge Inspector", true);
+    private ChangeListener changeListener;
+    
+    private EdgeInspectorDialog(JFrame parent, Edge edge)
+    {
+        super(parent, "Event Node Edge Inspector", true);
         this.edge = edge;
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new CloseListener());
 
-        Container cont = getContentPane();
-        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
+        Container edgeInspectorContainer = getContentPane();
+        edgeInspectorContainer.setLayout(new BoxLayout(edgeInspectorContainer, BoxLayout.Y_AXIS));
 
         JPanel edgeInspectorPanel = new JPanel();
         edgeInspectorPanel.setLayout(new BoxLayout(edgeInspectorPanel, BoxLayout.Y_AXIS));
@@ -121,16 +125,16 @@ public class EdgeInspectorDialog extends JDialog
         JPanel typePanel = new JPanel();
         typePanel.setLayout(new BoxLayout(typePanel, BoxLayout.X_AXIS));
         typePanel.add(Box.createHorizontalGlue());
-        JLabel typeLabel = new JLabel("Type: ");
+        JLabel typeLabel = new JLabel("edge type:");
         BoxLayoutUtils.clampWidth(typeLabel);
         typePanel.add(typeLabel);
-        typePanel.add(Box.createHorizontalStrut(15));
-        schedulingLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "Scheduling" + OneLinePanel.CLOSE_LABEL_BOLD);
+        typePanel.add(Box.createHorizontalStrut(10));
+        schedulingLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "Scheduling Edge" + OneLinePanel.CLOSE_LABEL_BOLD);
         BoxLayoutUtils.clampWidth(schedulingLabel);
-        cancellingLabel = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "Canceling" + OneLinePanel.CLOSE_LABEL_BOLD);
-        BoxLayoutUtils.clampWidth(cancellingLabel);
+        cancelingLabel  = new JLabel(OneLinePanel.OPEN_LABEL_BOLD + "Canceling Edge" + OneLinePanel.CLOSE_LABEL_BOLD);
+        BoxLayoutUtils.clampWidth(cancelingLabel);
         typePanel.add(schedulingLabel);
-        typePanel.add(cancellingLabel);
+        typePanel.add(cancelingLabel);
         typePanel.add(Box.createHorizontalGlue());
 
         BoxLayoutUtils.clampHeight(typePanel);
@@ -142,10 +146,10 @@ public class EdgeInspectorDialog extends JDialog
         sourceTargetPanel.add(Box.createHorizontalGlue());
         JPanel sourceTargetNamesPanel = new JPanel();
         sourceTargetNamesPanel.setLayout(new BoxLayout(sourceTargetNamesPanel, BoxLayout.Y_AXIS));
-        JLabel sourceEventLabel = new JLabel("Source event:");
+        JLabel sourceEventLabel = new JLabel("source event node:");
         sourceEventLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
         sourceTargetNamesPanel.add(sourceEventLabel);
-        JLabel targetEventLabel = new JLabel("Target event:");
+        JLabel targetEventLabel = new JLabel("target event node:");
         targetEventLabel.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
         sourceTargetNamesPanel.add(targetEventLabel);
         sourceTargetPanel.add(sourceTargetNamesPanel);
@@ -155,12 +159,12 @@ public class EdgeInspectorDialog extends JDialog
         sourceEvent = new JLabel("srcEvent");
         sourceEvent.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         sourceTargetValuesPanel.add(sourceEvent);
-        targEetvent = new JLabel("targEvent");
-        targEetvent.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-        sourceTargetValuesPanel.add(targEetvent);
+        targetEvent = new JLabel("targEvent");
+        targetEvent.setAlignmentX(JLabel.LEFT_ALIGNMENT);
+        sourceTargetValuesPanel.add(targetEvent);
         sourceTargetValuesPanel.setBorder(BorderFactory.createTitledBorder(""));
         sourceTargetValuesPanel.setAlignmentX(JLabel.LEFT_ALIGNMENT);
-        keepSameSize(sourceEvent, targEetvent);
+        keepSameSize(sourceEvent, targetEvent);
         sourceTargetPanel.add(sourceTargetValuesPanel);
         sourceTargetPanel.add(Box.createHorizontalGlue());
         BoxLayoutUtils.clampHeight(sourceTargetPanel);
@@ -170,16 +174,18 @@ public class EdgeInspectorDialog extends JDialog
 
         descriptionTextArea = new JTextArea(2, 25);
         descriptionTextArea.setText("");
+        descriptionTextArea.setLineWrap(true);
+        descriptionTextArea.setWrapStyleWord(true);
         descriptionTextArea.setToolTipText(DESCRIPTION_HINT);
-        descriptionJsp = new JScrollPane(descriptionTextArea);
-        descriptionJsp.setToolTipText(DESCRIPTION_HINT);
-        descriptionJsp.setBorder(new CompoundBorder(
+        descriptionScrollPane = new JScrollPane(descriptionTextArea);
+        descriptionScrollPane.setToolTipText(DESCRIPTION_HINT);
+        descriptionScrollPane.setBorder(new CompoundBorder(
                 new EmptyBorder(0, 0, 5, 0),
                 BorderFactory.createTitledBorder("description")));
-        edgeInspectorPanel.add(descriptionJsp);
+        edgeInspectorPanel.add(descriptionScrollPane);
 
-        Dimension descriptionJspDimension = descriptionJsp.getPreferredSize();
-        descriptionJsp.setMinimumSize(descriptionJspDimension);
+        Dimension descriptionScrollPaneDimension = descriptionScrollPane.getPreferredSize();
+        descriptionScrollPane.setMinimumSize(descriptionScrollPaneDimension);
 
         descriptionTextArea.addCaretListener((CaretEvent e) -> {
             if (changeListener != null) {
@@ -253,12 +259,12 @@ public class EdgeInspectorDialog extends JDialog
         JPanel twoRowButtonPanel = new JPanel();
         twoRowButtonPanel.setLayout(new BoxLayout(twoRowButtonPanel, BoxLayout.Y_AXIS));
 
-        JPanel addButtonPanel = new JPanel();
+        addButtonPanel = new JPanel();
         addButtonPanel.setLayout(new BoxLayout(addButtonPanel, BoxLayout.X_AXIS));
-        addButtonPanel.setBorder(new TitledBorder("add"));
+        addButtonPanel.setBorder(new TitledBorder("add to display"));
         addDescriptionButton = new JButton("description");
         addDescriptionButton.setToolTipText(DESCRIPTION_HINT);        
-        addConditionalButton = new JButton("conditional");
+        addConditionalButton = new JButton("conditional expression");
 
         addButtonPanel.add(Box.createHorizontalGlue());
         addButtonPanel.add(addDescriptionButton);
@@ -267,39 +273,39 @@ public class EdgeInspectorDialog extends JDialog
         twoRowButtonPanel.add(addButtonPanel);
         twoRowButtonPanel.add(Box.createVerticalStrut(5));
 
-        JPanel buttPan = new JPanel();
-        buttPan.setLayout(new BoxLayout(buttPan, BoxLayout.X_AXIS));
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         cancelButton = new JButton("Cancel");
-        okButton = new JButton("Apply changes");
-        buttPan.add(Box.createHorizontalGlue());
-        buttPan.add(okButton);
-        buttPan.add(cancelButton);
-        twoRowButtonPanel.add(buttPan);
+        applyChangesButton = new JButton("Apply changes");
+        buttonPanel.add(Box.createHorizontalGlue());
+        buttonPanel.add(applyChangesButton);
+        buttonPanel.add(cancelButton);
+        twoRowButtonPanel.add(buttonPanel);
 
         edgeInspectorPanel.add(twoRowButtonPanel);
-        cont.add(edgeInspectorPanel);
+        edgeInspectorContainer.add(edgeInspectorPanel);
 
         // attach listeners
         cancelButton.addActionListener(new CancelButtonListener());
-        okButton.addActionListener(new ApplyButtonListener());
+        applyChangesButton.addActionListener(new ApplyButtonListener());
 
-        final EdgeInspectorDialogChangeListener chlis = new EdgeInspectorDialogChangeListener();
-        descriptionTextArea.addKeyListener(chlis);
-        conditionalExpressionPanel.addChangeListener(chlis);
-        priorityCB.addActionListener(chlis);
-        timeDelayVarsCB.addActionListener(chlis);
+        final EdgeInspectorDialogChangeListener edgeInspectorDialogChangeListener = new EdgeInspectorDialogChangeListener();
+        descriptionTextArea.addKeyListener(edgeInspectorDialogChangeListener);
+        conditionalExpressionPanel.addChangeListener(edgeInspectorDialogChangeListener);
+        priorityCB.addActionListener(edgeInspectorDialogChangeListener);
+        timeDelayVarsCB.addActionListener(edgeInspectorDialogChangeListener);
 
         if (timeDelayMethodsCB != null) {
-            timeDelayMethodsCB.addActionListener(chlis);
-            timeDelayMethodsCB.getEditor().getEditorComponent().addKeyListener(chlis);
+            timeDelayMethodsCB.addActionListener(edgeInspectorDialogChangeListener);
+            timeDelayMethodsCB.getEditor().getEditorComponent().addKeyListener(edgeInspectorDialogChangeListener);
         }
 
-        priorityCB.getEditor().getEditorComponent().addKeyListener(chlis);
-        timeDelayVarsCB.getEditor().getEditorComponent().addKeyListener(chlis);
+        priorityCB.getEditor().getEditorComponent().addKeyListener(edgeInspectorDialogChangeListener);
+        timeDelayVarsCB.getEditor().getEditorComponent().addKeyListener(edgeInspectorDialogChangeListener);
 
-        AddHideButtonListener hideList = new AddHideButtonListener();
-        addConditionalButton.addActionListener(hideList);
-        addDescriptionButton.addActionListener(hideList);
+        AddHideButtonListener addHideButtonListener = new AddHideButtonListener();
+        addConditionalButton.addActionListener(addHideButtonListener);
+        addDescriptionButton.addActionListener(addHideButtonListener);
 
         edgeParametersPanel.addDoubleClickedListener((ActionEvent event) -> {
             ViskitEdgeParameter ep = (ViskitEdgeParameter) event.getSource();
@@ -307,7 +313,7 @@ public class EdgeInspectorDialog extends JDialog
             boolean wasModified = EdgeParameterDialog.showDialog(EdgeInspectorDialog.this, ep);
             if (wasModified) {
                 edgeParametersPanel.updateRow(ep);
-                chlis.actionPerformed(event);
+                edgeInspectorDialogChangeListener.actionPerformed(event);
             }
         });
 
@@ -324,7 +330,7 @@ public class EdgeInspectorDialog extends JDialog
         if (!allGood) {return;}
 
         modified = false;
-        okButton.setEnabled(false);
+        applyChangesButton.setEnabled(false);
 
         getRootPane().setDefaultButton(cancelButton);
         pack();
@@ -513,38 +519,39 @@ public class EdgeInspectorDialog extends JDialog
         }
     }
 
-    private void fillWidgets() {
-
+    private void fillWidgets() 
+    {
         sourceEvent.setText(edge.getFrom().getName());
-        targEetvent.setText(edge.getTo().getName());
+        targetEvent.setText(edge.getTo().getName());
 
-        if (edge.getTo().getArguments() != null || !edge.getTo().getArguments().isEmpty()) {
+        if (edge.getTo().getArguments() != null || !edge.getTo().getArguments().isEmpty()) 
+        {
             edgeParametersPanel.setArgumentList(edge.getTo().getArguments());
             edgeParametersPanel.setData(edge.getParameters());
             parameterPanel.setBorder(new CompoundBorder(
                     new EmptyBorder(0, 0, 5, 0),
-                    BorderFactory.createTitledBorder("Edge Parameters passed to " + targEetvent.getText())));
+                    BorderFactory.createTitledBorder("Edge Parameters passed to " + targetEvent.getText())));
         }
 
-        if (edge instanceof SchedulingEdge) {
+        if (edge instanceof SchedulingEdge) 
+        {
             parameterPanel.setVisible(true);
 
             // Prepare default selections
             timeDelayVarsCB.setEnabled(timeDelayVarsCB.getItemCount() > 0);
             setTimeDelayVarsCBValue("");
 
-            // A zero delay will be the default
+            // A zero time delay is the default
             setTimeDelayMethodsCBValue("0.0");
 
-            // We always want this enabled to be able to enter manual delay
-            // values
+            // We always want this enabled so that user is able to enter delay values
             if (timeDelayMethodsCB != null)
                 timeDelayMethodsCB.setEnabled(true);
             else
                 allGood = false;
 
-            if (edge.getDelay() != null && !edge.getDelay().isBlank()) {
-
+            if (edge.getDelay() != null && !edge.getDelay().isBlank())
+            {
                 String[] s = edge.getDelay().split("\\.");
                 if (s.length == 1) {
                     setTimeDelayMethodsCBValue(s[0]);
@@ -557,13 +564,11 @@ public class EdgeInspectorDialog extends JDialog
                     }
                 }
             }
-
             timeDelayPanel.setBorder(delayPanelBorder);
-
             setPriorityCBValue(((SchedulingEdge) edge).priority);
-
-        } else {
-
+        }
+        else
+        {
             parameterPanel.setVisible(false);
 
             timeDelayVarsCB.setEnabled(false);
@@ -577,74 +582,87 @@ public class EdgeInspectorDialog extends JDialog
             timeDelayPanel.setBorder(delayPanelDisabledBorder);
         }
 
-        if (edge.getConditional() == null || edge.getConditional().isBlank()) {
+        if (edge.getConditional() == null || edge.getConditional().isBlank())
+        {
             conditionalExpressionPanel.setText("");
-            hideShowConditionals(false);
-        } else {
+            setConditionalExpressionVisible(false);
+        } 
+        else 
+        {
             conditionalExpressionPanel.setText(edge.getConditional());
-            hideShowConditionals(true);
+            setConditionalExpressionVisible(true);
         }
 
-        if (edge.getDescription() != null && !edge.getDescription().isBlank()) {
+        if (edge.getDescription() != null && !edge.getDescription().isBlank()) 
+        {
             setDescription(edge.getDescription());
-            showHideDescription(false);
+            setDescriptionVisible(false);
         } 
-        else {
+        else 
+        {
             setDescription("");
-            showHideDescription(true);
+            setDescriptionVisible(true);
         }
-        showHideDescription(true); // always show
+        setDescriptionVisible(true); // always show
 
         setSchedulingType(edge instanceof SchedulingEdge);
     }
 
-    private void unloadWidgets() {
-        if (edge instanceof SchedulingEdge) {
-            int idx = priorityCB.getSelectedIndex();
-            String s;
-            if (idx < 0) {
-                s = (String) priorityCB.getSelectedItem();
-                if (s.isEmpty()) {
-
+    private void unloadWidgets() 
+    {
+        edge.setDescription(getDescription());
+        
+        if (edge instanceof SchedulingEdge) 
+        {
+            int index = priorityCB.getSelectedIndex();
+            String priorityString;
+            if (index < 0) 
+            {
+                priorityString = (String) priorityCB.getSelectedItem();
+                if (priorityString.isEmpty()) 
+                {
                     // Force default in this case (no information provided in Event Graph)
-                    s = "DEFAULT";
-                } else {
-                    if (s.contains("-3")) {
-                        s = "LOWEST";
-                    } else if (s.contains("-2")) {
-                        s = "LOWER";
-                    } else if (s.contains("-1")) {
-                        s = "LOW";
-                    } else if (s.contains("1")) {
-                        s = "HIGH";
-                    } else if (s.contains("2")) {
-                        s = "HIGHER";
-                    } else if (s.contains("3")) {
-                        s = "HIGHEST";
+                    priorityString = "DEFAULT";
+                } 
+                else 
+                {
+                    if (priorityString.contains("-3")) {
+                        priorityString = "LOWEST";
+                    } else if (priorityString.contains("-2")) {
+                        priorityString = "LOWER";
+                    } else if (priorityString.contains("-1")) {
+                        priorityString = "LOW";
+                    } else if (priorityString.contains("1")) {
+                        priorityString = "HIGH";
+                    } else if (priorityString.contains("2")) {
+                        priorityString = "HIGHER";
+                    } else if (priorityString.contains("3")) {
+                        priorityString = "HIGHEST";
                     } else {
-                        s = "DEFAULT";
+                        priorityString = "DEFAULT";
                     }
                 }
-            } else {
-               Priority p = priorityList.get(idx);
+            } 
+            else 
+            {
+               Priority priority = priorityList.get(index);
 
                 // Get the name of the Priority in this manner
-                s = p.toString().split("[\\ \\[]") [1];
+                priorityString = priority.toString().split("[\\ \\[]") [1];
             }
-
-            ((SchedulingEdge) edge).priority = s;
+            ((SchedulingEdge) edge).priority = priorityString;
         }
 
-        String delaySt = ((ViskitElement) timeDelayVarsCB.getSelectedItem()).getName();
-        if (delaySt == null || delaySt.isBlank())
-            delaySt = (String) timeDelayMethodsCB.getSelectedItem();
+        String timeDelayString = ((ViskitElement) timeDelayVarsCB.getSelectedItem()).getName();
+        if (timeDelayString == null || timeDelayString.isBlank())
+            timeDelayString = (String) timeDelayMethodsCB.getSelectedItem();
         else
-            delaySt += ("." + timeDelayMethodsCB.getSelectedItem());
+            timeDelayString += ("." + timeDelayMethodsCB.getSelectedItem());
 
-        edge.setDelay(delaySt);
+        edge.setDelay(timeDelayString);
 
-        String condSt = conditionalExpressionPanel.getText();
-        edge.setConditional((condSt == null || condSt.isBlank()) ? null : conditionalExpressionPanel.getText());
+        String conditionalString = conditionalExpressionPanel.getText();
+        edge.setConditional((conditionalString == null || conditionalString.isBlank()) ? null : conditionalExpressionPanel.getText());
 
         edge.setConditionalDescription(getDescription());
         if (!edge.getParameters().isEmpty()) {
@@ -654,28 +672,36 @@ public class EdgeInspectorDialog extends JDialog
         // Key on the EdgeNode's list of potential arguments
         // TODO: How do we do this automatically from the EventNodeInspectorDialog
         // when we remove an argument?
-        if (!edge.getTo().getArguments().isEmpty()) {
-
+        if (!edge.getTo().getArguments().isEmpty()) 
+        {
             // Bug 1373: This is how applying changes to a scheduling edge
             // causes the correct Event Graph XML representation when removing event
             // parameters from a proceeding node.  This loop adds vEdgeParameters
             for (ViskitElement element : edgeParametersPanel.getData()) {
                 edge.getParameters().add(element);
             }
-        } else {
+        } 
+        else {
             edgeParametersPanel.setData(edge.getParameters());
         }
     }
 
-    private void hideShowConditionals(boolean show) {
-        conditionalExpressionPanel.showConditions(show);
-        addConditionalButton.setVisible(!show);
+    private void setConditionalExpressionVisible(boolean displayVisible) 
+    {
+        conditionalExpressionPanel.setPanelVisible(displayVisible);
+        addConditionalButton.setVisible(!displayVisible);
+        if (conditionalExpressionPanel.isPanelVisible() &&
+            isDescriptionPanelVisible())
+            addButtonPanel.setVisible(false); // once buttons are hidden, not repeatable
         pack();
     }
 
-    private void showHideDescription(boolean showDescription) {
-        showDescription(showDescription);
+    private void setDescriptionVisible(boolean showDescription) {
+        setDescriptionScrollPaneVisible(showDescription);
         addDescriptionButton.setVisible(!showDescription);
+        if (conditionalExpressionPanel.isPanelVisible() &&
+            isDescriptionPanelVisible())
+            addButtonPanel.setVisible(false); // once buttons are hidden, not repeatable
         pack();
     }
 
@@ -684,9 +710,10 @@ public class EdgeInspectorDialog extends JDialog
         @Override
         public void actionPerformed(final ActionEvent e) {
             if (e.getSource().equals(addConditionalButton)) {
-                hideShowConditionals(true);
-            } else if (e.getSource().equals(addDescriptionButton)) {
-                showHideDescription(true);
+                setConditionalExpressionVisible(true);
+            } 
+            if (e.getSource().equals(addDescriptionButton)) {
+                setDescriptionVisible(true);
             }
         }
     }
@@ -716,8 +743,8 @@ public class EdgeInspectorDialog extends JDialog
         @Override
         public void stateChanged(ChangeEvent event) {
             modified = true;
-            okButton.setEnabled(true);
-            getRootPane().setDefaultButton(okButton);
+            applyChangesButton.setEnabled(true);
+            getRootPane().setDefaultButton(applyChangesButton);
             dotLabel.setVisible(!((ViskitElement) timeDelayVarsCB.getSelectedItem()).getName().isEmpty());
 
             // Set the ComboBox width to accomodate the string length
@@ -750,15 +777,15 @@ public class EdgeInspectorDialog extends JDialog
         priorityPanel.setVisible(wh);
         timeDelayPanel.setVisible(wh);
         schedulingLabel.setVisible(wh);
-        cancellingLabel.setVisible(!wh);
+        cancelingLabel.setVisible(!wh);
     }
 
-    private void showDescription(boolean visible) {
-        descriptionJsp.setVisible(visible);
+    private void setDescriptionScrollPaneVisible(boolean visible) {
+        descriptionScrollPane.setVisible(visible);
     }
 
-    public boolean isDescriptionVisible() {
-        return descriptionJsp.isVisible();
+    public boolean isDescriptionPanelVisible() {
+        return descriptionScrollPane.isVisible();
     }
 
     public void setDescription(String newDescription) 
@@ -766,13 +793,12 @@ public class EdgeInspectorDialog extends JDialog
         newDescription = ViskitStatics.emptyIfNull(newDescription);
         descriptionTextArea.setText(newDescription);
         modified = true;
-        okButton.setEnabled(true);
+        applyChangesButton.setEnabled(true);
     }
 
     public String getDescription() {
         return descriptionTextArea.getText().trim();
     }
-    private ChangeListener changeListener;
 
     class CloseListener extends WindowAdapter {
 
@@ -782,7 +808,7 @@ public class EdgeInspectorDialog extends JDialog
                 int ret = JOptionPane.showConfirmDialog(EdgeInspectorDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    okButton.doClick();
+                    applyChangesButton.doClick();
                 } else {
                     cancelButton.doClick();
                 }

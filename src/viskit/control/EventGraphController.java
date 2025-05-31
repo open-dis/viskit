@@ -87,7 +87,7 @@ public interface EventGraphController {
      * Creates a zip of the current project directory and initiates an email
      * client form to open for mailing to the viskit mailing list
      */
-    void zipAndMailProject();
+    void zipProject();
 
     /** Show the XML form of an event graph */
     void viewXML();
@@ -106,9 +106,9 @@ public interface EventGraphController {
 
     /**
      * Edit a canceling edge
-     * @param cancellingEdge the edge to edit
+     * @param cancelingEdge the edge to edit
      */
-    void cancellingEdgeEdit(Edge cancellingEdge);
+    void cancelingEdgeEdit(Edge cancelingEdge);
 
     void simParameterEdit(ViskitParameter simParameter);
 

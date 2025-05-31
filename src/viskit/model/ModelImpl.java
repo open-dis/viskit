@@ -1279,24 +1279,24 @@ public class ModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
-    public void changeCancelingEdge(Edge newCancellingEdge )
+    public void changeCancelingEdge(Edge newCancelingEdge )
     {
-        Cancel cancel = (Cancel) newCancellingEdge.opaqueModelObject;
-        cancel.setCondition(newCancellingEdge.getConditional());
-        cancel.setEvent(newCancellingEdge.getTo().opaqueModelObject);
+        Cancel cancel = (Cancel) newCancelingEdge.opaqueModelObject;
+        cancel.setCondition(newCancelingEdge.getConditional());
+        cancel.setEvent(newCancelingEdge.getTo().opaqueModelObject);
 //        cancel.getComment().clear();
 //        cancel.getComment().add(newCancellingEdge.conditionalDescription);
-        cancel.setDescription(newCancellingEdge.getConditionalDescription());
+        cancel.setDescription(newCancelingEdge.getConditionalDescription());
 
         cancel.getEdgeParameter().clear();
         EdgeParameter edgeParameter;
-        for (ViskitElement nextEdgeParameter : newCancellingEdge.getParameters()) {
+        for (ViskitElement nextEdgeParameter : newCancelingEdge.getParameters()) {
             edgeParameter = jaxbEventGraphObjectFactory.createEdgeParameter();
             edgeParameter.setValue(ViskitStatics.nullIfEmpty(nextEdgeParameter.getValue()));
             cancel.getEdgeParameter().add(edgeParameter);
         }
         setModelDirty(true);
-        notifyChanged(new ModelEvent(newCancellingEdge, ModelEvent.CANCELING_EDGE_CHANGED, "Canceling edge changed"));
+        notifyChanged(new ModelEvent(newCancelingEdge, ModelEvent.CANCELING_EDGE_CHANGED, "Canceling edge changed"));
     }
 
 } // end class file ModelImpl.java

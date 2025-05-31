@@ -578,7 +578,7 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
         Object[] objectArray = new Object[]{sourceGraphCell, targetGraphCell};
         EventGraphController eventGraphController = (EventGraphController) parent.getController();
         
-        if (parent.getCurrentMode() == EventGraphViewFrame.CANCELLING_EDGE_MODE) {
+        if (parent.getCurrentMode() == EventGraphViewFrame.CANCELING_EDGE_MODE) {
             eventGraphController.buildNewCancelingEdge(objectArray);
         } 
         else {

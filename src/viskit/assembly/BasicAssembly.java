@@ -284,7 +284,8 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
     }
 
     /** Call all the hookup methods */
-    protected void performHookups() {
+    protected void performHookups() 
+    {
         hookupSimEventListeners();
         hookupReplicationListeners();
 

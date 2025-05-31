@@ -88,7 +88,7 @@ import static viskit.control.EventGraphControllerImpl.METHOD_saveAs;
 import static viskit.control.EventGraphControllerImpl.METHOD_undo;
 import static viskit.control.EventGraphControllerImpl.METHOD_viewXML;
 import static viskit.control.EventGraphControllerImpl.METHOD_zipAndMailProject;
-import viskit.images.CancellingEdgeIcon;
+import viskit.images.CancelingEdgeIcon;
 import viskit.images.EventNodeIcon;
 import viskit.images.SchedulingEdgeIcon;
 import viskit.jgraph.ViskitGraphComponentWrapper;
@@ -141,7 +141,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     public final static int SELECT_MODE = 0;
     public final static int ADD_NODE_MODE = 1;
     public final static int SCHEDULING_EDGE_MODE = 2;
-    public final static int CANCELLING_EDGE_MODE = 3;
+    public final static int CANCELING_EDGE_MODE = 3;
     public final static int SELF_REF_MODE = 4;
     public final static int SELF_REF_CANCEL_MODE = 5;
 
@@ -154,12 +154,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     private JLabel addLabel;
     private JLabel addEventLabel;
     private JLabel addSelfReferentialEdgeLabel;
-    private JLabel addSelfCancellingEdgeLabel;
+    private JLabel addSelfCancelingEdgeLabel;
     
     private JLabel modeLabel;
     private JToggleButton selectModeButton;
     private JToggleButton schedulingEdgeModeButton;
-    private JToggleButton cancellingEdgeModeButton;
+    private JToggleButton cancelingEdgeModeButton;
     private JLabel zoomLabel;
     
     private JTabbedPane tabbedPane;
@@ -214,8 +214,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         if (schedulingEdgeModeButton.isSelected()) {
             return SCHEDULING_EDGE_MODE;
         }
-        if (cancellingEdgeModeButton.isSelected()) {
-            return CANCELLING_EDGE_MODE;
+        if (cancelingEdgeModeButton.isSelected()) {
+            return CANCELING_EDGE_MODE;
         }
 
         LOG.error("assert false : \"getCurrentMode()\""); // TODO ??
@@ -1035,21 +1035,21 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         // Buttons for what mode we are in
 
         addEventLabel = makeJLabel("viskit/images/eventNode.png",
-                "Drag onto canvas to add new events to the event graph");
+                "Add a new Event Node to event graph by dragging onto canvas");
         addEventLabel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
         addEventLabel.setIcon(new EventNodeIcon());
 
         addSelfReferentialEdgeLabel = makeJLabel("viskit/images/selfConnectingEdge.png",
-                "Drag onto an existing event node to add a self-referential scheduling edge");
+                "Add a self-referential scheduling edge by dragging onto an existing Event Node");
         addSelfReferentialEdgeLabel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
-        addSelfCancellingEdgeLabel = makeJLabel("viskit/images/selfCancellingEdge.png",
-                "Drag onto an existing event node to add a self-referential canceling edge");
-        addSelfCancellingEdgeLabel.setBorder(BorderFactory.createCompoundBorder(
+        addSelfCancelingEdgeLabel = makeJLabel("viskit/images/selfCancelingEdge.png",
+                "Add a self-referential canceling edge by dragging onto an existing Event Node");
+        addSelfCancelingEdgeLabel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEtchedBorder(),
                 BorderFactory.createEmptyBorder(4, 4, 4, 4)));
 
@@ -1057,16 +1057,16 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 "Select an item on the graph");
 
         schedulingEdgeModeButton = makeJToggleButton(null, "viskit/images/schedulingEdge.png",
-                "Connect centers of two nodes with a scheduling edge");
+                "Add a scheduling edge by connecting centers of two Event Nodes");
         schedulingEdgeModeButton.setIcon(new SchedulingEdgeIcon());
 
-        cancellingEdgeModeButton = makeJToggleButton(null, "viskit/images/cancellingEdge.png",
-                "Connect centers of two nodes nodes with a cancelling edge");
-        cancellingEdgeModeButton.setIcon(new CancellingEdgeIcon());
+        cancelingEdgeModeButton = makeJToggleButton(null, "viskit/images/cancelingEdge.png",
+                "Add a canceling edge by connecting centers of two Event Nodese");
+        cancelingEdgeModeButton.setIcon(new CancelingEdgeIcon());
 
         modeButtonGroup.add(selectModeButton);
         modeButtonGroup.add(schedulingEdgeModeButton);
-        modeButtonGroup.add(cancellingEdgeModeButton);
+        modeButtonGroup.add(cancelingEdgeModeButton);
 
         JButton zoomInButton = makeButton(null, "viskit/images/ZoomIn24.gif",
                 "Zoom in towards the graph");
@@ -1091,7 +1091,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(addSelfReferentialEdgeLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(addSelfCancellingEdgeLabel);
+        getToolBar().add(addSelfCancelingEdgeLabel);
 
         getToolBar().addSeparator(new Dimension(24, 24));
 
@@ -1102,7 +1102,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(schedulingEdgeModeButton);
         getToolBar().addSeparator(new Dimension(5, 24));
-        getToolBar().add(cancellingEdgeModeButton);
+        getToolBar().add(cancelingEdgeModeButton);
         getToolBar().addSeparator(new Dimension(24, 24));
 
         zoomLabel = new JLabel("Zoom: ");
@@ -1128,8 +1128,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         addEventLabel.addMouseListener(dma);
         addSelfReferentialEdgeLabel.setTransferHandler(th);
         addSelfReferentialEdgeLabel.addMouseListener(dma);
-        addSelfCancellingEdgeLabel.setTransferHandler(th);
-        addSelfCancellingEdgeLabel.addMouseListener(dma);
+        addSelfCancelingEdgeLabel.setTransferHandler(th);
+        addSelfCancelingEdgeLabel.addMouseListener(dma);
 
         // These buttons perform operations that are internal to our view class, and therefore their operations are
         // not under control of the application controller (EventGraphControllerImpl.java).  Small, simple anonymous inner classes
@@ -1141,7 +1141,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         schedulingEdgeModeButton.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setPortsVisible(true);
         });
-        cancellingEdgeModeButton.addActionListener((ActionEvent e) -> {
+        cancelingEdgeModeButton.addActionListener((ActionEvent e) -> {
             getCurrentVgraphComponentWrapper().setPortsVisible(true);
         });
     }
@@ -1190,11 +1190,12 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         Cursor arc;
         Cursor cancel;
 
-        CursorHandler() {
+        CursorHandler() // constructor
+        {
             super();
             select = Cursor.getDefaultCursor();
             arc = new Cursor(Cursor.CROSSHAIR_CURSOR);
-            Image img = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/cancellingEdgeCursor.png")).getImage();
+            Image img = new ImageIcon(getClass().getClassLoader().getResource("viskit/images/cancelingEdgeCursor.png")).getImage();
 
             // Check if we should size the cursor
             Dimension d = Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);
@@ -1278,7 +1279,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 case SCHEDULING_EDGE_MODE:
                     getCurrentVgraphComponentWrapper().setCursor(arc);
                     break;
-                case CANCELLING_EDGE_MODE:
+                case CANCELING_EDGE_MODE:
                     getCurrentVgraphComponentWrapper().setCursor(cancel);
                     break;
                 default:
@@ -1301,7 +1302,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             JComponent c = (JComponent) e.getSource();
             if (c == EventGraphViewFrame.this.addSelfReferentialEdgeLabel) {
                 dragger = SELF_REF_DRAG;
-            } else if (c == EventGraphViewFrame.this.addSelfCancellingEdgeLabel) {
+            } else if (c == EventGraphViewFrame.this.addSelfCancelingEdgeLabel) {
                 dragger = SELF_REF_CANCEL_DRAG;
             } else {
                 dragger = NODE_DRAG;

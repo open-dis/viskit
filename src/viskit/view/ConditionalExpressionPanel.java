@@ -21,45 +21,50 @@ import java.awt.*;
  * @since 11:53:36 AM
  * @version $Id$
  */
-public class ConditionalExpressionPanel extends JPanel {
+public class ConditionalExpressionPanel extends JPanel 
+{
+               JTextArea conditionalExpressionTA;
+    private final JPanel conditionalExpressionPanel;
+    private final JPanel ifConditionalExpressionTextPanel;
+    private final String CONDITIONAL_EXPRESSION_HINT = "boolean expression, which can include dstate variables from source event node";
 
-    JTextArea conditionalTA;
-    private final JPanel conditionalPanel;
-    private final JPanel ifTextPan;
-
-    public ConditionalExpressionPanel(Edge edge, boolean schedulingType) {
+    public ConditionalExpressionPanel(Edge edge, boolean schedulingType)
+    {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setAlignmentX(JComponent.CENTER_ALIGNMENT);
 
-        conditionalPanel = new JPanel();
-        conditionalPanel.setLayout(new BoxLayout(conditionalPanel, BoxLayout.Y_AXIS));
-        conditionalPanel.setBorder(new CompoundBorder(
+        conditionalExpressionPanel = new JPanel();
+        conditionalExpressionPanel.setLayout(new BoxLayout(conditionalExpressionPanel, BoxLayout.Y_AXIS));
+        conditionalExpressionPanel.setBorder(new CompoundBorder(
                 new EmptyBorder(0, 0, 5, 0),
                 BorderFactory.createTitledBorder("Conditional Expression")));
+        conditionalExpressionPanel.setToolTipText("Conditional expression is optional");
 
-        ifTextPan = new JPanel();
-        ifTextPan.setLayout(new BoxLayout(ifTextPan, BoxLayout.X_AXIS));
-        ifTextPan.add(Box.createHorizontalStrut(5));
-        JLabel leftParen = new JLabel("if (");
-        leftParen.setFont(leftParen.getFont().deriveFont(Font.ITALIC | Font.BOLD));
-        leftParen.setAlignmentX(Box.LEFT_ALIGNMENT);
-        ifTextPan.add(leftParen);
-        ifTextPan.add(Box.createHorizontalGlue());
-        BoxLayoutUtils.clampHeight(ifTextPan);
-        conditionalPanel.add(ifTextPan);
+        ifConditionalExpressionTextPanel = new JPanel();
+        ifConditionalExpressionTextPanel.setLayout(new BoxLayout(ifConditionalExpressionTextPanel, BoxLayout.X_AXIS));
+        ifConditionalExpressionTextPanel.add(Box.createHorizontalStrut(5));
+        JLabel leftParenLabel = new JLabel("if (");
+        leftParenLabel.setFont(leftParenLabel.getFont().deriveFont(Font.ITALIC | Font.BOLD));
+        leftParenLabel.setAlignmentX(Box.LEFT_ALIGNMENT);
+        ifConditionalExpressionTextPanel.add(leftParenLabel);
+        ifConditionalExpressionTextPanel.setToolTipText(CONDITIONAL_EXPRESSION_HINT);
+        ifConditionalExpressionTextPanel.add(Box.createHorizontalGlue());
+        BoxLayoutUtils.clampHeight(ifConditionalExpressionTextPanel);
+        conditionalExpressionPanel.add(ifConditionalExpressionTextPanel);
 
-        conditionalTA = new JTextArea(3, 25);
-        conditionalTA.setText(edge.getConditional());
-        conditionalTA.setEditable(true);
-        JScrollPane conditionalJsp = new JScrollPane(conditionalTA);
-        conditionalPanel.add(conditionalJsp);
+        conditionalExpressionTA = new JTextArea(3, 25);
+        conditionalExpressionTA.setText(edge.getConditional());
+        conditionalExpressionTA.setEditable(true);
+        conditionalExpressionTA.setToolTipText(CONDITIONAL_EXPRESSION_HINT);
+        JScrollPane conditionalScrollPane = new JScrollPane(conditionalExpressionTA);
+        conditionalExpressionPanel.add(conditionalScrollPane);
 
-        Dimension conditionalJspDimension = conditionalJsp.getPreferredSize();
-        conditionalJsp.setMinimumSize(conditionalJspDimension);
+        Dimension conditionalJspDimension = conditionalScrollPane.getPreferredSize();
+        conditionalScrollPane.setMinimumSize(conditionalJspDimension);
 
-        JPanel thenTextPan = new JPanel();
-        thenTextPan.setLayout(new BoxLayout(thenTextPan, BoxLayout.X_AXIS));
-        thenTextPan.add(Box.createHorizontalStrut(10));
+        JPanel thenTextPanel = new JPanel();
+        thenTextPanel.setLayout(new BoxLayout(thenTextPanel, BoxLayout.X_AXIS));
+        thenTextPanel.add(Box.createHorizontalStrut(10));
         JLabel rightParen;
 
         if (schedulingType) {
@@ -67,36 +72,37 @@ public class ConditionalExpressionPanel extends JPanel {
         } else {
             rightParen = new JLabel(") then cancel target event");
         }
-        rightParen.setFont(leftParen.getFont().deriveFont(Font.ITALIC | Font.BOLD));
+        rightParen.setFont(leftParenLabel.getFont().deriveFont(Font.ITALIC | Font.BOLD));
         rightParen.setAlignmentX(Box.LEFT_ALIGNMENT);
-        thenTextPan.add(rightParen);
-        thenTextPan.add(Box.createHorizontalGlue());
-        BoxLayoutUtils.clampHeight(thenTextPan);
-        conditionalPanel.add(thenTextPan);
+        rightParen.setToolTipText("conditional expression must be met prior to sending this event");
+        thenTextPanel.add(rightParen);
+        thenTextPanel.add(Box.createHorizontalGlue());
+        BoxLayoutUtils.clampHeight(thenTextPanel);
+        conditionalExpressionPanel.add(thenTextPanel);
 
-        add(conditionalPanel);
+        add(conditionalExpressionPanel);
 
-        conditionalTA.addCaretListener((CaretEvent e) -> {
+        conditionalExpressionTA.addCaretListener((CaretEvent e) -> {
             if (changeListener != null) {
-                changeListener.stateChanged(new ChangeEvent(conditionalTA));
+                changeListener.stateChanged(new ChangeEvent(conditionalExpressionTA));
             }
         });
     }
 
-    public void showConditions(boolean wh) {
-        conditionalPanel.setVisible(wh);
+    public void setPanelVisible(boolean displayVisible) {
+        conditionalExpressionPanel.setVisible(displayVisible);
     }
 
-    public boolean isConditionsVisible() {
-        return conditionalPanel.isVisible();
+    public boolean isPanelVisible() {
+        return conditionalExpressionPanel.isVisible();
     }
 
-    public void setText(String s) {
-        conditionalTA.setText(s);
+    public void setText(String conditionalExpressionSourceText) {
+        conditionalExpressionTA.setText(conditionalExpressionSourceText);
     }
 
     public String getText() {
-        return conditionalTA.getText();
+        return conditionalExpressionTA.getText();
     }
     private ChangeListener changeListener;
 

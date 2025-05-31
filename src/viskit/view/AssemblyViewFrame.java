@@ -818,7 +818,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     }
 
     /**
-     * @return the current mode--select, add, schedulingEdge, cancellingEdge
+     * @return the current mode--select, add, schedulingEdge, cancelingEdge
      */
     public int getCurrentMode() 
     {

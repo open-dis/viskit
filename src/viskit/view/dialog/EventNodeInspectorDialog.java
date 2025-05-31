@@ -9,6 +9,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.CaretEvent;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.logging.log4j.LogManager;
@@ -39,8 +40,10 @@ public class EventNodeInspectorDialog extends JDialog
     private EventNode eventNode;
     private static boolean modified = false;
     private final JTextField eventNameTF;
-    private final JTextField descriptionTF;
-    private final JPanel descriptionPanel;
+//    private final JTextField descriptionTF;
+//    private final JPanel descriptionPanel;
+    private final JTextArea   descriptionTextArea;
+    private final JScrollPane descriptionScrollPane;
     private TransitionsPanel stateTransitionsPanel;
     private ArgumentsPanel arguments;
     private LocalVariablesPanel localVariablesPanel;
@@ -81,6 +84,7 @@ public class EventNodeInspectorDialog extends JDialog
         // above call blocks
         return modified;
     }
+    private ChangeListener changeListener;
 
     private EventNodeInspectorDialog(final JFrame frame, EventNode node) 
     {
@@ -90,16 +94,16 @@ public class EventNodeInspectorDialog extends JDialog
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new CloseListener());
 
-        JPanel panel = new JPanel();
-        setContentPane(panel);
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 10, 10, 10));
+        JPanel eventNodeInspectorPanel = new JPanel();
+        setContentPane(eventNodeInspectorPanel);
+        eventNodeInspectorPanel.setLayout(new BoxLayout(eventNodeInspectorPanel, BoxLayout.Y_AXIS));
+        eventNodeInspectorPanel.setBorder(BorderFactory.createEmptyBorder(15, 10, 10, 10));
 
         // name
         JPanel eventNamePanel = new JPanel();
         eventNamePanel.setLayout(new BoxLayout(eventNamePanel, BoxLayout.X_AXIS));
         eventNamePanel.setOpaque(false);
-        eventNamePanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event name")));
+        eventNamePanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event Node name")));
         eventNameTF = new JTextField(30); // This sets the "preferred width" when this dialog is packed
         eventNameTF.setOpaque(true);
         eventNameTF.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
@@ -108,54 +112,80 @@ public class EventNodeInspectorDialog extends JDialog
         Dimension d = eventNamePanel.getPreferredSize();
         d.width = Integer.MAX_VALUE;
         eventNamePanel.setMaximumSize(new Dimension(d));
-        panel.add(eventNamePanel);
+        eventNodeInspectorPanel.add(eventNamePanel);
 
-        descriptionPanel = new JPanel();
-        descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.X_AXIS));
-        descriptionPanel.setOpaque(false);
-        descriptionPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("description")));
-        descriptionPanel.setToolTipText(DESCRIPTION_HINT);
-        descriptionTF = new JTextField("");
-        descriptionTF.setToolTipText(DESCRIPTION_HINT);
-        descriptionTF.setOpaque(true);
-        descriptionTF.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        descriptionPanel.add(descriptionTF);
-        d = descriptionPanel.getPreferredSize();
-        d.width = Integer.MAX_VALUE;
-        descriptionPanel.setMaximumSize(new Dimension(d));
+//        descriptionPanel = new JPanel();
+//        descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.X_AXIS));
+//        descriptionPanel.setOpaque(false);
+//        descriptionPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("description")));
+//        descriptionPanel.setToolTipText(DESCRIPTION_HINT);
+        
+//        descriptionTF = new JTextField("");
+//        descriptionTF.setToolTipText(DESCRIPTION_HINT);
+//        descriptionTF.setOpaque(true);
+//        descriptionTF.setLineWrap(true);
+//        descriptionTF.setWrapStyleWord(true);
+//        descriptionTF.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        
+        // TODO not scrolling :(
+        descriptionTextArea = new JTextArea(2, 25);
+        descriptionTextArea.setText("");
+        descriptionTextArea.setLineWrap(true);
+        descriptionTextArea.setWrapStyleWord(true);
+        descriptionTextArea.setToolTipText(DESCRIPTION_HINT);
+        descriptionScrollPane = new JScrollPane(descriptionTextArea);
+        descriptionScrollPane.setToolTipText(DESCRIPTION_HINT);
+        descriptionScrollPane.setBorder(new CompoundBorder(
+                new EmptyBorder(0, 0, 5, 0),
+                BorderFactory.createTitledBorder("description")));
+        eventNodeInspectorPanel.add(descriptionScrollPane);
+        
+        Dimension descriptionScrollPaneDimension = descriptionScrollPane.getPreferredSize();
+        descriptionScrollPane.setMinimumSize(descriptionScrollPaneDimension);
 
-        JButton editDescriptionButton = new JButton(" ... ");
-        editDescriptionButton.setToolTipText(DESCRIPTION_HINT);
-        editDescriptionButton.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-        editDescriptionButton.setToolTipText("Select to edit a long description");
-        Dimension dd = editDescriptionButton.getPreferredSize();
-        dd.height = d.height;
-        editDescriptionButton.setMaximumSize(new Dimension(dd));
-        descriptionPanel.add(editDescriptionButton);
-        panel.add(descriptionPanel);
+        descriptionTextArea.addCaretListener((CaretEvent e) -> {
+            if (changeListener != null) {
+                changeListener.stateChanged(new ChangeEvent(descriptionTextArea));
+            }
+        });
+        
+//        descriptionPanel.add(descriptionScrollPane);
+//        d = descriptionPanel.getPreferredSize();
+//        d.width = Integer.MAX_VALUE;
+//        descriptionPanel.setMaximumSize(new Dimension(d));
+
+//        JButton editDescriptionButton = new JButton(" ... ");
+//        editDescriptionButton.setToolTipText(DESCRIPTION_HINT);
+//        editDescriptionButton.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+//        editDescriptionButton.setToolTipText("Select to edit a long description");
+//        Dimension dd = editDescriptionButton.getPreferredSize();
+//        dd.height = d.height;
+//        editDescriptionButton.setMaximumSize(new Dimension(dd));
+//        descriptionPanel.add(editDescriptionButton);
+
 
         // Event node arguments
         arguments = new ArgumentsPanel(300, 2);
-        arguments.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event node arguments")));
-        panel.add(arguments);
+        arguments.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Event Node arguments")));
+        eventNodeInspectorPanel.add(arguments);
 
         // local variables
         localVariablesPanel = new LocalVariablesPanel(300, 2);
         localVariablesPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Local variables")));
         localVariablesPanel.setToolTipText("variables with local scope, not globally visible outside of this event node");
-        panel.add(localVariablesPanel);
+        eventNodeInspectorPanel.add(localVariablesPanel);
 
         // code block
         localCodeBlockPanel = new CodeBlockPanel(this, true, "Event Code Block");
         localCodeBlockPanel.setToolTipText("Use of this code block will cause code to run first" +
                 " at the top of the Event's \"do\" method");
         localCodeBlockPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("Local code block")));
-        panel.add(localCodeBlockPanel);
+        eventNodeInspectorPanel.add(localCodeBlockPanel);
 
         // state transitions
         stateTransitionsPanel = new TransitionsPanel();
         stateTransitionsPanel.setBorder(new CompoundBorder(new EmptyBorder(0, 0, 5, 0), BorderFactory.createTitledBorder("State transitions")));
-        panel.add(stateTransitionsPanel);
+        eventNodeInspectorPanel.add(stateTransitionsPanel);
 
         // buttons
         JPanel twoRowButtonPanel = new JPanel();
@@ -202,7 +232,7 @@ public class EventNodeInspectorDialog extends JDialog
         buttonPanel.add(cancelButton);
         twoRowButtonPanel.add(buttonPanel);
 
-        panel.add(twoRowButtonPanel);
+        eventNodeInspectorPanel.add(twoRowButtonPanel);
 
         // attach listeners
         cancelButton.addActionListener(new CancelButtonListener());
@@ -219,8 +249,9 @@ public class EventNodeInspectorDialog extends JDialog
         //name.addActionListener(chlis);
         KeyListener keyListener = new KeyListener();
         eventNameTF.addKeyListener(keyListener);
-        descriptionTF.addKeyListener(keyListener);
-        editDescriptionButton.addActionListener(new DescriptionListener());
+//        descriptionTF.addKeyListener(keyListener);
+        descriptionTextArea.addKeyListener(keyListener);
+//        editDescriptionButton.addActionListener(new DescriptionListener());
 
         arguments.addPlusListener(myChangeListener);
         arguments.addMinusListener(myChangeListener);
@@ -305,12 +336,12 @@ public class EventNodeInspectorDialog extends JDialog
         setTitle("Event Node Inspector: " + nodeName);
         eventNameTF.setText(nodeName);
 
-        Dimension d = descriptionTF.getPreferredSize();
+        Dimension d = descriptionTextArea.getPreferredSize();
 //        String s = fillString(eventNode.getDescription());
         String s = eventNode.getDescription();
-        descriptionTF.setText(s);
-        descriptionTF.setCaretPosition(0);
-        descriptionTF.setPreferredSize(d);
+        descriptionTextArea.setText(s);
+        descriptionTextArea.setCaretPosition(0);
+        descriptionTextArea.setPreferredSize(d);
 
 //      hideShowDescription(s != null && !s.isEmpty());
         hideShowDescription(true); // always show
@@ -383,7 +414,7 @@ public class EventNodeInspectorDialog extends JDialog
             eventNode.setLocalVariables(localVariablesPanel.getData());
 //            eventNode.getComments().clear();
 //            eventNode.getComments().add(descriptionTF.getText().trim());
-            eventNode.setDescription(descriptionTF.getText().trim());
+            eventNode.setDescription(descriptionTextArea.getText().trim());
             eventNode.setCodeBlockString(localCodeBlockPanel.getData());
         }
     }
@@ -470,7 +501,7 @@ public class EventNodeInspectorDialog extends JDialog
     /** hide or show description text field
      */
     private void hideShowDescription(boolean show) {
-        descriptionPanel.setVisible(show);
+        descriptionScrollPane.setVisible(show);
         addDescriptionButton.setVisible(!show);
         pack();
     }
@@ -563,12 +594,12 @@ public class EventNodeInspectorDialog extends JDialog
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            StringBuffer sb = new StringBuffer(EventNodeInspectorDialog.this.descriptionTF.getText().trim());
+            StringBuffer sb = new StringBuffer(EventNodeInspectorDialog.this.descriptionTextArea.getText().trim());
             boolean modded = TextAreaDialog.showTitledDialog("Event Description",
                     EventNodeInspectorDialog.this, sb);
             if (modded) {
-                EventNodeInspectorDialog.this.descriptionTF.setText(sb.toString().trim());
-                EventNodeInspectorDialog.this.descriptionTF.setCaretPosition(0);
+                EventNodeInspectorDialog.this.descriptionTextArea.setText(sb.toString().trim());
+                EventNodeInspectorDialog.this.descriptionTextArea.setCaretPosition(0);
                 setModified(true);
             }
         }

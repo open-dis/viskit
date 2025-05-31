@@ -182,9 +182,9 @@
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </MenuItem>
-                <MenuItem class="javax.swing.JMenuItem" name="addCancellingEdgeMenuItem">
+                <MenuItem class="javax.swing.JMenuItem" name="addCancelingEdgeMenuItem">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Add Cancelling Edge"/>
+                    <Property name="text" type="java.lang.String" value="Add Canceling Edge"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </MenuItem>
@@ -194,9 +194,9 @@
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </MenuItem>
-                <MenuItem class="javax.swing.JMenuItem" name="addSelfReferencingCancellingEdgeMenuItem">
+                <MenuItem class="javax.swing.JMenuItem" name="addSelfReferencingCancelingEdgeMenuItem">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Add Self-Referencing Cancelling Edge"/>
+                    <Property name="text" type="java.lang.String" value="Add Self-Referencing Canceling Edge"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
                 </MenuItem>
