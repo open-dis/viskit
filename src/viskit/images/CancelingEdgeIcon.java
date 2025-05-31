@@ -13,7 +13,7 @@ import java.awt.*;
  * Time: 9:18:11 PM
  */
 
-public class CancellingEdgeIcon implements Icon
+public class CancelingEdgeIcon implements Icon
 {
   @Override
   public int getIconHeight()
