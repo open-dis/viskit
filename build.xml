@@ -807,11 +807,14 @@ their descpritions.
         -->
         <delete verbose="true">
             <fileset dir="MyViskitProjects/DefaultProject/AnalystReports">
+                <include name="**/*.ico"/>
                 <include name="**/*.png"/>
                 <include name="**/*.html"/>
                 <include name="**/*.xml"/>
-                <exclude name="Viskit.ico"/>
+                <!-- copied every time
+                <exclude name="ViskitIcon.ico"/>
                 <exclude name="ViskitSplash2.png"/>
+                -->
                 <exclude name="archive/**/*"/>
             </fileset>
         </delete>
