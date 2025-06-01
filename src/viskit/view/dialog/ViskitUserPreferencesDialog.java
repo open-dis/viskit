@@ -894,7 +894,7 @@ public class ViskitUserPreferencesDialog extends JDialog
                             tabbedPane.setSelectedIndex(ANALYST_TAB_INDEX);
                             String message = "Please confirm your analyst entries";
                             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
-                                    "Metadata initialization", message);
+                                    "Viskit User Preferences initialization", message);
                         }
                     });
                 }

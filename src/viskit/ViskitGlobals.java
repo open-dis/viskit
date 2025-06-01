@@ -708,6 +708,7 @@ public class ViskitGlobals
                     // TODO untested
                     newProjectFile = new File (projectDirectory, ViskitProject.PROJECT_FILE_NAME);
                     setProjectFile(newProjectFile);
+                    getViskitProject().initializeProject();
                 }
             
 ////            // no project open, popup special dialog

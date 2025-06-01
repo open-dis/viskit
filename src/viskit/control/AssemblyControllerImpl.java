@@ -2319,8 +2319,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             message += " simulation";
         message +=
                 " is ready to run!</p><br />" +
-                "<p align='center'>Check the Replication Settings at left, then press Run button to begin.</p><br />" +
-                "<p align='center'>Multiple simulation replications provide data for a draft Analyst Report.</p><br /></body></html>";
+                "<p align='center'>Check replication settings at left, then press Run button to begin.</p><br />" +
+                "<p align='center'>Multiple simulation replications provide data for your draft Analyst Report.</p><br /></body></html>";
                 
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 "Ready to Commence Simulation Run", message);

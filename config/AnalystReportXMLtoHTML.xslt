@@ -37,7 +37,7 @@
                 <title>Viskit Simulation Analysis Report</title>
                 <meta http-equiv="Content-Language" content="en-us"/>
                 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"/>
-                <link rel="shortcut icon" href="Viskit.ico" type="image/x-icon"/>
+                <link rel="shortcut icon" href="ViskitIcon.ico" type="image/x-icon"/>
                 <!--
                 <style type="text/css">
                 </style>-->

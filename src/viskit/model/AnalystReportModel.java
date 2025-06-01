@@ -813,7 +813,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         String[][] emptyResult = new String[0][0];
         if (simulationConfigurationElement == null)
         {
-            LOG.error("AnalystReportModel unMakeEntityTable() simulationConfigurationElement is null");
+            LOG.error("unMakeEntityTable() simulationConfigurationElement is null");
             return emptyResult;
         }
         if (!simulationConfigurationElement.getChildren().isEmpty())
@@ -821,7 +821,7 @@ public final class AnalystReportModel extends MvcAbstractModel
             Element element = simulationConfigurationElement.getChild(ENTITY_TABLE);
             if (element == null)
             {
-                LOG.error("AnalystReportModel unMakeEntityTable() simulationConfigurationElement EntityTable is null");
+                LOG.error("unMakeEntityTable() simulationConfigurationElement EntityTable is null");
                 return emptyResult;
             }
             List<Element> elementsList = element.getChildren(SIM_ENTITY);

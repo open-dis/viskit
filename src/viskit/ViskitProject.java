@@ -37,6 +37,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.nio.file.Files;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -87,7 +88,7 @@ public class ViskitProject
     public static final String SOURCE_DIRECTORY_NAME  = "src";
 
     public static final String VISKIT_CONFIG_DIRECTORY = "config"; // this must match viskit.jar and many other places
-    public static final String VISKIT_ICON_FILE_NAME   = "Viskit.ico";
+    public static final String VISKIT_ICON_FILE_NAME   = "ViskitIcon.ico"; // also ViskitIcon.gif
     public static final String VISKIT_SPLASH_FILE_NAME = "ViskitSplash2.png";
     public static final String VISKIT_ICON_SOURCE      = "src/viskit" + "/" + IMAGES_DIRECTORY_NAME + "/" + VISKIT_ICON_FILE_NAME;
     public static final String VISKIT_SPLASH_SOURCE    = "src/viskit" + "/" + IMAGES_DIRECTORY_NAME + "/" + VISKIT_SPLASH_FILE_NAME;
@@ -163,16 +164,15 @@ public class ViskitProject
         if (!analystReportsDirectory.exists())
         {
             getAnalystReportsDirectory().mkdirs();
-            try {
-                // copy icon and splash files to AnalystsReport directory to support html report
-                Files.copy(new File(VISKIT_ICON_SOURCE).toPath(),   new File(getAnalystReportsDirectory(), VISKIT_ICON_FILE_NAME).toPath());
-                Files.copy(new File(VISKIT_SPLASH_SOURCE).toPath(), new File(getAnalystReportsDirectory(), VISKIT_SPLASH_FILE_NAME).toPath());
-            }
-            catch (IOException ex) {
-                LOG.error("initializeProject() exception when setting up analystReportsDirectory {}", ex);
-            }
         }
-
+        try {
+            // copy icon and splash files to AnalystsReport directory to support html report
+            Files.copy(new File(VISKIT_ICON_SOURCE).toPath(),   new File(getAnalystReportsDirectory(), VISKIT_ICON_FILE_NAME).toPath(),REPLACE_EXISTING);
+            Files.copy(new File(VISKIT_SPLASH_SOURCE).toPath(), new File(getAnalystReportsDirectory(), VISKIT_SPLASH_FILE_NAME).toPath(),REPLACE_EXISTING);
+        }
+        catch (IOException ex) {
+            LOG.error("initializeProject() exception when setting up analystReportsDirectory {}", ex);
+        }
         setAnalystReportImagesDirectory(new File(getAnalystReportsDirectory(), ANALYST_REPORT_IMAGES_DIRECTORY_NAME));
 
         setAnalystReportAssemblyImagesDirectory(new File(getAnalystReportImagesDirectory(), ANALYST_REPORT_ASSEMBLY_IMAGES_DIRECTORY_NAME));

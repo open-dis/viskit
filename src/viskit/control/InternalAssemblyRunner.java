@@ -1054,7 +1054,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         else
                  simkitState = "(unknown)  simTime=" + Schedule.getSimTime();
         
-        LOG.info("logSimulationRunState()" +
+        LOG.info("logSimulationRunState()" + "\n      " +
                    " play=" + isOnOff(simulationRunPanel.vcrRunResumeButton.isEnabled()) +
                    " step=" + isOnOff(simulationRunPanel.vcrPauseStepButton.isEnabled()) +
                    " stop=" + isOnOff(simulationRunPanel.vcrStopButton.isEnabled()) +
