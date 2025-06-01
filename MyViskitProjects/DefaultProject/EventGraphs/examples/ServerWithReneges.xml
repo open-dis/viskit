@@ -28,10 +28,10 @@
         <StateTransition state="queue">
             <Operation method="add(customer)"/>
         </StateTransition>
-        <Schedule delay="renegeTime.generate()" event="Renege" priority="DEFAULT">
+        <Schedule delay="renegeTime.generate()" event="Renege" priority="DEFAULT" description="designate a probabilistic subset of customers who decide to renege">
             <EdgeParameter value="customer"/>
         </Schedule>
-        <Schedule delay="0.0" event="StartService" condition="getNumberAvailableServers() &gt; 0" priority="DEFAULT" description=""/>
+        <Schedule delay="0.0" event="StartService" condition="getNumberAvailableServers() &gt; 0" priority="DEFAULT" description="activate the next server to handle this customer arrival"/>
         <Code></Code>
         <Coordinate x="70.0" y="170.0"/>
     </Event>
@@ -43,10 +43,10 @@
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers - 1"/>
         </StateTransition>
-        <Cancel event="Renege">
+        <Cancel event="Renege" description="cancel service for this customer">
             <EdgeParameter value="customer"/>
         </Cancel>
-        <Schedule delay="serviceTime.generate()" event="EndService" priority="DEFAULT">
+        <Schedule delay="serviceTime.generate()" event="EndService" priority="DEFAULT" description="schedule completion of this customer following a probabilistic serviceTime interval">
             <EdgeParameter value="customer"/>
         </Schedule>
         <Coordinate x="210.0" y="160.0"/>
@@ -59,7 +59,8 @@
         <StateTransition state="numberServed">
             <Assignment value="numberServed+1"/>
         </StateTransition>
-        <Schedule event="StartService" condition="queue.size() &gt; 0" priority="HIGH"/>
+        <Schedule delay="0.0" event="StartService" condition="queue.size() &gt; 0" priority="HIGH" description="now that customer has been served, announce availability of this server for next customer"/>
+        <Code></Code>
         <Coordinate x="340.0" y="160.0"/>
     </Event>
     <Event name="Renege">
