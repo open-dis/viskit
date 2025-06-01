@@ -844,6 +844,8 @@ public class ViskitUserPreferencesDialog extends JDialog
         }
         boolean isEnabled;
         try {
+            if (appXMLConfiguration == null) // not yet initialized
+                return false;
             isEnabled = appXMLConfiguration.getBoolean(property);
             return isEnabled;
         }

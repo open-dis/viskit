@@ -68,6 +68,9 @@ public class ViskitUserConfiguration
     public static final File C_GUI_FILE               = new File(VISKIT_CONFIGURATION_DIR, "c_gui.xml");
     public static final File VISKIT_LOGS_DIR          = new File("logs");
     public static final File VISKIT_ERROR_LOG         = new File(VISKIT_LOGS_DIR, "error.0.log");
+    
+    public static final String SYSTEM_USER_DIR  = System.getProperty("user.dir");
+    public static final String SYSTEM_USER_HOME = System.getProperty("user.home");
 
     public static final String GUI_BEANSHELL_ERROR_DIALOG_KEY                 = "gui.beanshellerrordialog";
     public static final String BEANSHELL_WARNING_KEY                          = "app.beanshell.warning";
@@ -142,7 +145,7 @@ public class ViskitUserConfiguration
     {
         if (!initalized)
         {     
-            LOG.info("initializing ViskitUserConfiguration by reading files in .viskit directory");        
+            LOG.info("initializing with user's .viskit configuration files");        
             initialize(); // this should only occur once
         }
         // LOG.info("created ViskitUserConfiguration singleton (if this message occurs again, it is a problem)");   
@@ -246,7 +249,12 @@ public class ViskitUserConfiguration
 
     public String getValue(String key) 
     {
-        String returnString = sessionHashMap.get(key);
+        if ((sessionHashMap == null) || (projectCombinedConfiguration == null))
+        {
+            LOG.info("not yet initialized");
+            return new String();
+        }
+        String returnString = sessionHashMap.get(key);                
         if (returnString != null && returnString.length() > 0) 
         {
             return returnString;

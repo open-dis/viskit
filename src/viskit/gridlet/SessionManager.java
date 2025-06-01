@@ -19,7 +19,6 @@
  */
 package viskit.gridlet;
 
-import edu.nps.util.Log4jUtilities;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -46,6 +45,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import static viskit.ViskitUserConfiguration.SYSTEM_USER_HOME;
 import viskit.xsd.bindings.assembly.ObjectFactory;
 import viskit.xsd.bindings.assembly.PasswordFile;
 import viskit.xsd.bindings.assembly.User;
@@ -62,7 +62,7 @@ public class SessionManager /* compliments DoeSessionDriver*/ {
 
     static final Logger LOG = LogManager.getLogger();
 
-    private static final String PASSWD = System.getProperty("user.home") + "/.viskit/passwd.xml";
+    private static final String PASSWD = SYSTEM_USER_HOME + "/.viskit/passwd.xml";
     private static final String SALT = "gridkit!";
 
     public static String LOGIN_ERROR = "LOGIN-ERROR";

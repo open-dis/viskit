@@ -650,12 +650,15 @@ public class ViskitGlobals
 
 //////        viskitProject.setProjectRootDirectory( new File(projectHome));
 
-        LOG.info("initializeProjectHome() projectHome=\n      " + projectHome);
         if (  projectHome.isEmpty() || 
+              projectHome.equals("/") || projectHome.equals("///") || projectHome.equals("\\\\") ||
             !(new File(projectHome).exists()) ||
              (hasViskitProject() && !isProjectOpen()))
         {
+            if (!projectHome.isEmpty())
+                 LOG.info("initializeProjectHome() projectHome=\n      " + projectHome);
             LOG.info("initializeProjectHome() did not find a previously existing project");
+            
             if (ViskitGlobals.instance().hasMainFrameInitialized())
             {
                 String popupTitle = "New Project or Open Project?";
@@ -663,8 +666,13 @@ public class ViskitGlobals
                         "<html><body>" +
                         "<p align='center'>Create a new Viskit project, or</p><br />" +
                         "<p align='center'>Open an existing Viskit project?</p><br />";
-                int returnValue = getMainFrame().genericAsk2Buttons(popupTitle, message, 
-                        "New Project", "Open Project");
+                
+//                int returnValue = getMainFrame().genericAsk2Buttons(popupTitle, message, 
+//                        "New Project", "Open Project");
+                
+                String buttonLabel1 = "New Project";
+                String buttonLabel2 = "Open Project";
+                int returnValue = JOptionPane.showOptionDialog(new JFrame(), message, popupTitle, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]{buttonLabel1, buttonLabel2}, buttonLabel1);
         
                 if  (returnValue == 0) // new project
                 {    
@@ -691,9 +699,15 @@ public class ViskitGlobals
                 }
                 else // open project
                 {
-                    File projectDirectory = ViskitProject.openProjectDirectory(getEventGraphViewFrame().getRootPane(),".");
+                    // might occur during initial startup before appliaction frame is initialized
+                    JComponent floatingComponent;
+                    if (getEventGraphViewFrame() != null)
+                         floatingComponent = getEventGraphViewFrame().getRootPane(); //
+                    else floatingComponent = new JPanel();
+                    File projectDirectory = ViskitProject.openProjectDirectory(floatingComponent,".");
                     // TODO untested
                     newProjectFile = new File (projectDirectory, ViskitProject.PROJECT_FILE_NAME);
+                    setProjectFile(newProjectFile);
                 }
             
 ////            // no project open, popup special dialog
@@ -702,19 +716,20 @@ public class ViskitGlobals
 ////                viskitProjectSelectionPanel = new ViskitProjectSelectionPanel(); // should only occur once
 ////            }
 ////            viskitProjectSelectionPanel.showDialog(); // blocks
+
+///////            }
+////            else
+////            {
+////                ViskitProject.VISKIT_PROJECTS_DIRECTORY = projectHome;
+////                // TODO untested
+////////                newProjectFile = new File (projectHome + "/" + ViskitProject.PROJECT_FILE_NAME);
+////            setProjectFile(newProjectFile);
+////            LOG.info("initializeProjectHome() newProjectFile=\n      " + newProjectFile.getAbsolutePath());
             }
-            else // previously existing project found
-            {
-                ViskitProject.VISKIT_PROJECTS_DIRECTORY = projectHome;
-                // TODO untested
-                newProjectFile = new File (projectHome + "/" + ViskitProject.PROJECT_FILE_NAME);
-            }
-            setProjectFile(newProjectFile);
-            LOG.info("initializeProjectHome() newProjectFile=\n      " + newProjectFile.getAbsolutePath());
         }
         else 
         {
-            LOG.info("initializeProjectHome() found a previously existing project."); // Now createProjectWorkingDirectory()..."); // debug
+            LOG.info("initializeProjectHome() found a previously existing project:\n      {}", projectHome); // Now createProjectWorkingDirectory()..."); // debug
             createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
         }
     }

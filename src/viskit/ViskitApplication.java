@@ -162,7 +162,7 @@ public class ViskitApplication
             // these ViskitGlobal calls need to occur afterMainFrame initialization so that diagnostic popups are possible,
             // but are needed beforehand for MainFrame to find globals, ouch... 
             // resolution: use ViskitGlobals.instance().hasMainFrameInitialized() to avoid exceptions
-            ViskitGlobals.instance().initializeProjectHome();  // needed for first time, but not if repeating... 
+            ViskitGlobals.instance().initializeProjectHome();  // needed for first time, or if no project found
 
             MainFrame mainFrame = new MainFrame(initialAssemblyFile);
             if (isMac) {
@@ -170,7 +170,7 @@ public class ViskitApplication
             }
             mainFrame.setVisible(true);
 
-            MainFrame.runLater(1000L, () -> {
+            MainFrame.runLater(500L, () -> {
                 // wait a second, give file loading a chance to finish before checking no models loaded...
                 MainFrame.displayWelcomeGuidance(); // if no event graph or assembly is open
             });

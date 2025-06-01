@@ -1170,6 +1170,10 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 LOG.info("buildTreePanels() check existing event graph source files...");
             }            
             addEventGraphsToLegoTree(viskitProject.getEventGraphsDirectory(), true);
+            if ((legoEventGraphsTree != null) && (legoEventGraphsTree.getRowCount() > 0))
+            {
+                LOG.info("buildTreePanels() check existing event graph source files complete");
+            }            
         }
 
         // Now load the simkit.jar and diskit.jar from where ever they happen to

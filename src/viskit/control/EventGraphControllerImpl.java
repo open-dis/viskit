@@ -129,9 +129,12 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     {
         ViskitGlobals.instance().selectEventGraphEditorTab();
 
-        // Don't allow a new event graph to be created if a current project is
-        // not open
-        if (!ViskitGlobals.instance().getViskitProject().isProjectOpen()) {return;}
+        // Don't allow a new event graph to be created if a current project is not open
+        if (!ViskitGlobals.instance().hasViskitProject() ||
+            !ViskitGlobals.instance().getViskitProject().isProjectOpen()) 
+        {
+            return;
+        }
 
         GraphMetadata oldGraphMetadata = null;
         Model viskitModel = (Model) getModel();

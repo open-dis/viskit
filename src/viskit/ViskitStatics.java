@@ -65,6 +65,8 @@ import javax.swing.event.HyperlinkEvent;
 import org.apache.logging.log4j.LogManager;
 
 import org.apache.logging.log4j.Logger;
+import static viskit.ViskitUserConfiguration.SYSTEM_USER_DIR;
+import static viskit.ViskitUserConfiguration.SYSTEM_USER_HOME;
 
 import viskit.control.FileBasedClassManager;
 import viskit.doe.LocalBootLoader;
@@ -465,8 +467,6 @@ public class ViskitStatics
      */
     static Class<?> tryUnqualifiedName(String name) 
     {
-        String systemUserDir  = System.getProperty("user.dir");
-        String systemUserHome = System.getProperty("user.home");
         String workingDirectory = ViskitGlobals.instance().getProjectWorkingDirectory().getPath();
 
         FindFile finder;
@@ -496,10 +496,10 @@ public class ViskitStatics
                     clazz = finder.getPath().toString();
 
                     // Strip out unwanted prepaths
-                    if (clazz.contains(systemUserHome))
-                        clazz = clazz.substring(systemUserHome.length() + 1, clazz.length());
-                    else if (clazz.contains(systemUserDir))
-                        clazz = clazz.substring(systemUserDir.length() + 1, clazz.length());
+                    if (clazz.contains(SYSTEM_USER_HOME))
+                        clazz = clazz.substring(SYSTEM_USER_HOME.length() + 1, clazz.length());
+                    else if (clazz.contains(SYSTEM_USER_DIR))
+                        clazz = clazz.substring(SYSTEM_USER_DIR.length() + 1, clazz.length());
                     else if (clazz.contains(workingDirectory))
                         clazz = clazz.substring(workingDirectory.length() + 1, clazz.length());
 

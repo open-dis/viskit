@@ -1,6 +1,5 @@
 package viskit.view;
 
-import edu.nps.util.Log4jUtilities;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -25,6 +24,8 @@ import viskit.control.FileBasedClassManager;
 import viskit.util.FindClassesForInterface;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
+import static viskit.ViskitUserConfiguration.SYSTEM_USER_DIR;
+import static viskit.ViskitUserConfiguration.SYSTEM_USER_HOME;
 
 /**
  * Class to support creating a Listener Event Graph Object (LEGO) tree on the
@@ -67,9 +68,9 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
 
     private String genericTableToolTip = "Drag onto canvas";
 
-    String userDir = System.getProperty("user.dir");
+    String userDir  = SYSTEM_USER_DIR;
 
-    String userHome = System.getProperty("user.home");
+    String userHome = SYSTEM_USER_HOME;
 
     String projectPath = new String();
 

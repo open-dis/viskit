@@ -12,6 +12,7 @@ import javax.swing.WindowConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import viskit.ViskitProject;
+import static viskit.ViskitUserConfiguration.SYSTEM_USER_HOME;
 
 /** Dialog to assist in generating a new viskit project directory space
  *
@@ -24,7 +25,8 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
     public static String projectPath = "";
     private static JDialog dialog;
 
-    public static void showDialog() {
+    public static void showDialog() 
+    {
         ViskitProjectGenerationDialog3 panel = new ViskitProjectGenerationDialog3();
         dialog = new JDialog((Dialog) null, true);  // modal
         dialog.setTitle("Viskit Project Creation");
@@ -37,18 +39,19 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
     }
 
     /** Creates new form ViskitProjectGenerationDialog3 */
-    public ViskitProjectGenerationDialog3() {
+    public ViskitProjectGenerationDialog3() 
+    {
         initComponents();
 
-        DocumentListener lis = new myDocListener();
-        nameTF.getDocument().addDocumentListener(lis);
-        locationTF.getDocument().addDocumentListener(lis);
+        DocumentListener myDocumentListener = new MyDocumentListener();
+        nameTF.getDocument().addDocumentListener(myDocumentListener);
+        locationTF.getDocument().addDocumentListener(myDocumentListener);
 
         nameTF.setText(ViskitProject.NEW_PROJECT_NAME);
-        locationTF.setText(ViskitProject.DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH);
+        locationTF.setText(ViskitProject.USER_DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH);
     }
 
-    class myDocListener implements DocumentListener {
+    class MyDocumentListener implements DocumentListener {
 
         @Override
         public void changedUpdate(DocumentEvent e) {
@@ -66,7 +69,8 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         }
         StringBuffer sb = new StringBuffer();
 
-        private void common() {
+        private void common() 
+        {
             sb.setLength(0);
 
             sb.append(locationTF.getText().trim());
@@ -109,6 +113,8 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
 
         projectNameLabel.setText("Project Name:");
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -118,7 +124,7 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         nameTF.setColumns(30);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 0.5;
@@ -129,7 +135,7 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         projectLocationLabel.setText("Project Location:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -137,7 +143,7 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         add(projectLocationLabel, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 2.0;
@@ -153,7 +159,7 @@ public class ViskitProjectGenerationDialog3 extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 2, 5, 5);
         add(browseButton, gridBagConstraints);
@@ -231,7 +237,7 @@ private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
 
-    File file = ViskitProject.newProjectPath(this, System.getProperty("user.home"));
+    File file = ViskitProject.newProjectPath(this, SYSTEM_USER_HOME);
 
     if (file != null)
         locationTF.setText(file.getAbsolutePath().replaceAll("\\\\", "/"));

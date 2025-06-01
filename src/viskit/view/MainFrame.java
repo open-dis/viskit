@@ -830,7 +830,7 @@ public class MainFrame extends JFrame
         {
             title    =   "Begin with a Viskit Project";
             message +=   "<p align='center'>";
-            message +=   "To begin, please open or create a Viskit Project</p><br />";
+            message +=   "To begin, open or create a Viskit Project</p><br />";
         }
             // TODO fix these flags
         else if ((ViskitGlobals.instance().hasViskitProject() || ViskitGlobals.instance().isProjectOpen()) ||

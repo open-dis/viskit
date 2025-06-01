@@ -658,7 +658,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         return shortName(typeName, "adapter_", adapterNodeCountField); // use same counter
     }
 
-    private String shortName(String typeName, String prefix, Field intField) {
+    private String shortName(String typeName, String prefix, Field intField) 
+    {
         String shortname = prefix;
         if (typeName.lastIndexOf('.') != -1) {
             shortname = typeName.substring(typeName.lastIndexOf('.') + 1) + "_";
@@ -669,19 +670,21 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         ca[0] = Character.toLowerCase(ca[0]);
         shortname = new String(ca);
 
-        String retn = shortname;
+        String returnValue = shortname;
         try {
             int count = intField.getInt(this);
             // Find a unique name
             AssemblyModel model = (AssemblyModel) getModel();
             do {
-                retn = shortname + count++;
-            } while (model.nameExists(retn));   // don't force the vAMod to mangle the name
+                returnValue = shortname + count++;
+            } 
+            while (model.nameExists(returnValue));   // don't force the vAMod to mangle the name
+            
             intField.setInt(this, count);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             LOG.error(ex);
         }
-        return retn;
+        return returnValue;
     }
     
     /** method name for reflection use */
@@ -690,15 +693,21 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void newProject() 
     {
-        if (closeProject()) 
+        if (ViskitGlobals.instance().isProjectOpen()) 
         {
-            ViskitGlobals.instance().createProjectWorkingDirectory();
+            closeProject();
+        }
+        // TODO ask for project name?
+//        ViskitGlobals.instance().createProjectWorkingDirectory();
+        
+        ViskitGlobals.instance().initializeProjectHome();
 
-            // For a brand new empty project open a default Event Graph
-            File[] eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory().listFiles();
-            if (eventGraphFiles.length == 0) {
-                ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
-            }
+        // For a brand new empty project open a default Event Graph
+        File[] eventGraphFiles = new File[0];
+        if (ViskitGlobals.instance().hasViskitProject())
+            eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory().listFiles();
+        if (eventGraphFiles.length == 0) {
+            ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
         }
     }
     
@@ -986,8 +995,17 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public void closeAll()
     {
+        if (assemblyViewFrame == null)
+            assemblyViewFrame = ViskitGlobals.instance().getAssemblyEditorViewFrame();
+        
         int numberOfAssemblies = ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded();
-        if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab() && (numberOfAssemblies != 0))
+        boolean hasDirtyAssembly = false;
+        for (int index = 0; index < numberOfAssemblies; index++)
+        {
+            hasDirtyAssembly = hasDirtyAssembly || 
+                               ViskitGlobals.instance().getAssemblyEditorViewFrame().getOpenAssemblyModels()[index].isModelDirty();
+        }
+        if (hasDirtyAssembly && !ViskitGlobals.instance().isSelectedAssemblyEditorTab() && (numberOfAssemblies != 0))
         {
             ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
             String title = new String(), message = new String();

@@ -119,7 +119,7 @@ public class Help
     private final ActionListener TUTORIAL_LISTENER_LAUNCHER;
 
     private Component parent;
-    private final Icon icon;
+    private final Icon viskitImage;
     private final JEditorPane aboutViskitEditorPane;
 
     /** Creates a new instance of Help
@@ -148,7 +148,7 @@ public class Help
 
         CSH.setHelpIDString(TUTORIAL_COMPONENT, "hTutorial");
 
-        icon = new ImageIcon(
+        viskitImage = new ImageIcon(
                 getClass().getClassLoader().getResource(
                 "viskit/images/ViskitLogo.png")
         );
@@ -179,7 +179,7 @@ public class Help
                 aboutViskitEditorPane,
                 "About Viskit",
                 JOptionPane.OK_OPTION,
-                icon
+                viskitImage
         );
     }
     

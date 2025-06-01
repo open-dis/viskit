@@ -52,6 +52,8 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import static viskit.ViskitUserConfiguration.SYSTEM_USER_DIR;
+import static viskit.ViskitUserConfiguration.SYSTEM_USER_HOME;
 
 import viskit.doe.FileHandler;
 import viskit.view.dialog.ViskitUserPreferencesDialog;
@@ -69,12 +71,13 @@ public class ViskitProject
     
     public static final String VISKIT_VERSION                         = "2.0 beta";
     public static final String DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME = "MyViskitProjects";
-    public static final String DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH =
+    public static final String DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH =          "." + "/" + DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME;
+    public static final String USER_DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH =
             System.getProperty("user.home").replaceAll("\\\\", "/") + "/" + DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME;
-    public static final String PROJECT_FILE_NAME           = "viskitProject.xml";
-    public static final String VISKIT_PROJECT_ROOT_ELEMENT_NAME       = "ViskitProject";
-    public static final String ASSEMBLIES_DIRECTORY_NAME   = "Assemblies";
-    public static final String EVENT_GRAPHS_DIRECTORY_NAME = "EventGraphs";
+    public static final String PROJECT_FILE_NAME                = "viskitProject.xml";
+    public static final String VISKIT_PROJECT_ROOT_ELEMENT_NAME = "ViskitProject";
+    public static final String ASSEMBLIES_DIRECTORY_NAME        = "Assemblies";
+    public static final String EVENT_GRAPHS_DIRECTORY_NAME      = "EventGraphs";
 
     public static final String BUILD_DIRECTORY_NAME   = "build";
     public static final String CLASSES_DIRECTORY_NAME = "classes";
@@ -86,8 +89,8 @@ public class ViskitProject
     public static final String VISKIT_CONFIG_DIRECTORY = "config"; // this must match viskit.jar and many other places
     public static final String VISKIT_ICON_FILE_NAME   = "Viskit.ico";
     public static final String VISKIT_SPLASH_FILE_NAME = "ViskitSplash2.png";
-    public static final String VISKIT_ICON_SOURCE      = VISKIT_CONFIG_DIRECTORY + "/" + IMAGES_DIRECTORY_NAME + "/" + VISKIT_ICON_FILE_NAME;
-    public static final String VISKIT_SPLASH_SOURCE    = VISKIT_CONFIG_DIRECTORY + "/" + IMAGES_DIRECTORY_NAME + "/" + VISKIT_SPLASH_FILE_NAME;
+    public static final String VISKIT_ICON_SOURCE      = "src/viskit" + "/" + IMAGES_DIRECTORY_NAME + "/" + VISKIT_ICON_FILE_NAME;
+    public static final String VISKIT_SPLASH_SOURCE    = "src/viskit" + "/" + IMAGES_DIRECTORY_NAME + "/" + VISKIT_SPLASH_FILE_NAME;
     public static final String ANALYST_REPORTS_DIRECTORY_NAME = "AnalystReports";
     public static final String ANALYST_REPORT_IMAGES_DIRECTORY_NAME = "images";
     public static final String ANALYST_REPORT_CHARTS_DIRECTORY_PATH = ANALYST_REPORT_IMAGES_DIRECTORY_NAME + "/" + "charts";
@@ -98,7 +101,7 @@ public class ViskitProject
     static final Logger LOG = LogManager.getLogger();
 
     /** This static variable will get updated at launch if user's home directory doesn't exist */
-    public static String VISKIT_PROJECTS_DIRECTORY = DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH;
+    public static String VISKIT_PROJECTS_DIRECTORY = USER_DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH;
 
     /** TODO FIX: This static variable will be set by the user upon first Viskit startup
      * to determine a project location space on the user's machine. A default
@@ -668,8 +671,10 @@ public class ViskitProject
         }
     };
 
-    private static void initializeProjectChooser(String startPath) {
-        if (projectChooser == null) {
+    private static void initializeProjectChooser(String startPath) 
+    {
+        if (projectChooser == null) 
+        {
             projectChooser = new JFileChooser(startPath);
 
             projectChooser.addPropertyChangeListener(myChangeListener);
@@ -690,15 +695,16 @@ public class ViskitProject
     /** Used to aid in new project path creation
      *
      * @param parent the component to center the FileChooser against
-     * @param startingDirPath a path to start looking
+     * @param initialDirectoryPath a path to start looking
      * @return a selected file
      */
-    public static File newProjectPath(JComponent parent, String startingDirPath) {
-        initializeProjectChooser(startingDirPath);
+    public static File newProjectPath(JComponent parent, String initialDirectoryPath)
+    {
+        initializeProjectChooser(initialDirectoryPath);
 
         projectChooser.setDialogTitle("New Viskit Project Directory");
-        int ret = projectChooser.showSaveDialog(parent);
-        if (ret == JFileChooser.CANCEL_OPTION) {
+        int returnValue = projectChooser.showSaveDialog(parent);
+        if (returnValue == JFileChooser.CANCEL_OPTION) {
             return null;
         }
         return projectChooser.getSelectedFile();
@@ -706,20 +712,30 @@ public class ViskitProject
 
     /** Utility method to aid in Viskit specific project directory selection
      *
-     * @param parent the component parent for JOptionPane orientation
+     * @param parentComponent the component parent for JOptionPane orientation
      * @param defaultDirectoryPath a path to start looking from in the chooser
      * @return a path to a valid project directory
      */
-    public static File openProjectDirectory(JComponent parent, String defaultDirectoryPath)
+    public static File openProjectDirectory(JComponent parentComponent, String defaultDirectoryPath)
     {
         String initialDirectoryPath = defaultDirectoryPath;
+        if (defaultDirectoryPath.equals("."))
+            initialDirectoryPath = USER_DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH;
         File projectDirectory = new File (initialDirectoryPath);
         
         // if no user preference directory exists, fall back to MyViskitProjects/DefaultProject
-        if (!projectDirectory.exists())
+        if (!projectDirectory.exists() || 
+             projectDirectory.getAbsolutePath().equals(SYSTEM_USER_HOME) ||
+             projectDirectory.getAbsolutePath().equals(SYSTEM_USER_DIR) )
         {
-            // likely user has not created their own projects yet, fall back to Viskit's embedded MyViskitProjects
-            initialDirectoryPath = DEFAULT_VISKIT_PROJECTS_DIRECTORY_NAME + "/"; // allow user to choose DefaultProject or whatever else is there
+            initialDirectoryPath = USER_DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH + "/"; // allow user to choose whatever is there
+            projectDirectory = new File (initialDirectoryPath); // test
+        }
+        // likely user has not created their own projects yet, if so then fall back to Viskit's embedded MyViskitProjects
+        if (projectDirectory.isDirectory() && projectDirectory.exists() && (projectDirectory.list().length == 0))
+        {
+            initialDirectoryPath = DEFAULT_VISKIT_PROJECTS_DIRECTORY_PATH + "/";
+            projectDirectory = new File (initialDirectoryPath); // reset
         }
         initializeProjectChooser(initialDirectoryPath);
 
@@ -727,7 +743,7 @@ public class ViskitProject
         boolean isProjectDirectory;
 
         do {
-            int returnValue = projectChooser.showOpenDialog(parent);
+            int returnValue = projectChooser.showOpenDialog(parentComponent);
             // User may have exited the chooser, if so then no file was chosen
             if (returnValue == JFileChooser.CANCEL_OPTION) {
                 return null;
@@ -739,7 +755,7 @@ public class ViskitProject
             if (!isProjectDirectory) 
             {
                 Object[] options = {"Select project", "Cancel"};
-                returnValue = JOptionPane.showOptionDialog(parent, "Your selection is not a valid Viskit project.", "Please try another selection",
+                returnValue = JOptionPane.showOptionDialog(parentComponent, "Your selection is not a valid Viskit project.", "Please try another selection",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
                 if (returnValue != 0) {
@@ -790,14 +806,14 @@ public class ViskitProject
          * @param fileDirectory the project directory to test
          * @return true when a viskitProject.xml file is found
          */
-        public boolean isViskitProject(File fileDirectory) {
-
+        public boolean isViskitProject(File fileDirectory)
+        {
             if ((fileDirectory == null) || !fileDirectory.exists() || !fileDirectory.isDirectory()) {
                 return false;
             }
             
             // http://www.avajava.com/tutorials/lessons/how-do-i-use-a-filenamefilter-to-display-a-subset-of-files-in-a-directory.html
-            File[] files = fileDirectory.listFiles((File directory, String name) -> {
+            File[] fileArray = fileDirectory.listFiles((File directory, String name) -> {
                 // config/ contains the template viskitProject.xml file
                 // so, don't show this directory as a potential Viskit project
                 if (directory.getName().equals(VISKIT_CONFIG_DIRECTORY)) {
@@ -824,10 +840,11 @@ public class ViskitProject
         }
     }
 
-    private static class ProjectFilter extends javax.swing.filechooser.FileFilter {
-
+    private static class ProjectFilter extends javax.swing.filechooser.FileFilter
+    {
         @Override
-        public boolean accept(File pathname) {
+        public boolean accept(File pathname) 
+        {
             return !pathname.getName().contains("svn");
         }
 
