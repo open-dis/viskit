@@ -101,7 +101,7 @@ public interface EventGraphView {
 
     void deleteTab(Model mod); // When a tab is removed
 
-    Model[] getOpenModels();
+    Model[] getOpenEventGraphModels();
 
     // The following 2 may be implemented by the view in some other way than an
     // official GUI Dialog

@@ -114,8 +114,8 @@ public class ViskitGlobals
     {
         // This should only occur once
         // Other initialization checks moved out of this constructor to avoid breaking singleton pattern
-        // TODO does LOG interfere with singleton pattern?
-        LOG.info("created ViskitGlobals singleton (if this message occurs again, it is a problem)"); // TODO threading issue?
+        // LOG does not appear to interfere with singleton pattern
+        LOG.info("creating singleton instance (report error if message occurs again)"); // TODO threading issue likely
     }
     
     public static ViskitGlobals instance()
@@ -304,7 +304,7 @@ public class ViskitGlobals
         assemblyQuitActionListener = newActionListener;
     }
 
-    public EventGraphViewFrame getEventGraphViewFrame()
+    public EventGraphViewFrame getEventGraphEditorViewFrame()
     {
         return (EventGraphViewFrame) eventGraphViewFrame;
     }
@@ -688,21 +688,21 @@ public class ViskitGlobals
                     String newProjectPath = ViskitProjectGenerationDialog3.projectPath;
                     newProjectFile = new File(newProjectPath);
                     if (newProjectFile.exists() && (newProjectFile.isFile() || newProjectFile.list().length > 0))
-                        JOptionPane.showMessageDialog(getEventGraphViewFrame().getRootPane(), 
+                        JOptionPane.showMessageDialog(getEventGraphEditorViewFrame().getRootPane(), 
                                 "Chosen project name already exists, please create a new project name.");
                     else
                         break; // out of do-while
 
                 } while (true); // loop until break
 
-//                File projectDirectory = ViskitProject.openProjectDirectory(ViskitGlobals.instance().getEventGraphViewFrame().getRootPane(),".");
+//                File projectDirectory = ViskitProject.openProjectDirectory(ViskitGlobals.instance().getEventGraphEditorViewFrame().getRootPane(),".");
                 }
                 else // open project
                 {
                     // might occur during initial startup before appliaction frame is initialized
                     JComponent floatingComponent;
-                    if (getEventGraphViewFrame() != null)
-                         floatingComponent = getEventGraphViewFrame().getRootPane(); //
+                    if (getEventGraphEditorViewFrame() != null)
+                         floatingComponent = getEventGraphEditorViewFrame().getRootPane(); //
                     else floatingComponent = new JPanel();
                     File projectDirectory = ViskitProject.openProjectDirectory(floatingComponent,".");
                     // TODO untested
@@ -728,7 +728,7 @@ public class ViskitGlobals
 ////            LOG.info("initializeProjectHome() newProjectFile=\n      " + newProjectFile.getAbsolutePath());
             }
         }
-        else 
+        else
         {
             LOG.info("initializeProjectHome() found a previously existing project:\n      {}", projectHome); // Now createProjectWorkingDirectory()..."); // debug
             createProjectWorkingDirectory(); // TODO needed? maybe yes for first time, but not if repeating...
@@ -1543,6 +1543,44 @@ public class ViskitGlobals
      */
     public void setViskitProject(ViskitProject viskitProject) {
         this.viskitProject = viskitProject;
+    }
+    
+    /** Return whether one or more open Assembly models are dirty and possibly need to be saved.
+     * @return whether dirty Assembly is loaded
+     */
+    public boolean hasDirtyAssembly()
+    {
+        int numberOfAssemblies = getAssemblyEditorViewFrame().getNumberAssembliesLoaded();
+        if (numberOfAssemblies == 0)
+            return false;
+        
+        boolean hasDirtyAssembly = false;
+            
+        for (int index = 0; index < numberOfAssemblies; index++)
+        {
+            hasDirtyAssembly = hasDirtyAssembly || 
+                               ViskitGlobals.instance().getAssemblyEditorViewFrame().getOpenAssemblyModels()[index].isModelDirty();
+        }
+        return hasDirtyAssembly;
+    }
+    
+    /** Return whether one or more open Even Graph models are dirty and possibly need to be saved.
+     * @return whether dirty Event Graph is loaded
+     */
+    public boolean hasDirtyEventGraph()
+    {
+        int numberOfEventGraphs = getEventGraphEditorViewFrame().getNumberEventGraphsLoaded();
+        if (numberOfEventGraphs == 0)
+            return false;
+        
+        boolean hasDirtyEventGraph = false;
+            
+        for (int index = 0; index < numberOfEventGraphs; index++)
+        {
+            hasDirtyEventGraph = hasDirtyEventGraph || 
+                                 ViskitGlobals.instance().getEventGraphEditorViewFrame().getOpenEventGraphModels()[index].isModelDirty();
+        }
+        return hasDirtyEventGraph;
     }
 
 } // end class file ViskitGlobals.java

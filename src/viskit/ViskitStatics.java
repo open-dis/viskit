@@ -959,8 +959,9 @@ public class ViskitStatics
      * @param inputString the string to evaluate for nullity
      * @return the passed string if non-zero length, else null
      */
-    public static String emptyIfNull(String inputString) {
-        if (inputString == null) 
+    public static String emptyIfNull(String inputString) 
+    {
+        if ((inputString == null) || (inputString.equals("null")))
         {
             inputString = new String();
         }

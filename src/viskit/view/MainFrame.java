@@ -422,7 +422,7 @@ public class MainFrame extends JFrame
             if (topTabbedPane == null)
                 return; // nothing to do, yet
 
-            Model[] modelArray = ViskitGlobals.instance().getEventGraphViewFrame().getOpenModels();
+            Model[] modelArray = ViskitGlobals.instance().getEventGraphEditorViewFrame().getOpenEventGraphModels();
             Model dirtyModel = null;
 
             // Make sure we save modified SimulationState Graphs if we wander off to the Assembly tab
@@ -465,7 +465,7 @@ public class MainFrame extends JFrame
             
             // TODO rename menu methods consistently
             combinedMenuBar.add(ViskitGlobals.instance().getAssemblyEditorViewFrame().getProjectMenu());
-            combinedMenuBar.add(ViskitGlobals.instance().getEventGraphViewFrame().getEventGraphMenu());
+            combinedMenuBar.add(ViskitGlobals.instance().getEventGraphEditorViewFrame().getEventGraphMenu());
             combinedMenuBar.add(ViskitGlobals.instance().getAssemblyEditorViewFrame().getAssemblyMenu());
             combinedMenuBar.add(ViskitGlobals.instance().getInternalSimulationRunner().getMenus()); // TODO getSimulationRunMenu() ?
             combinedMenuBar.add(ViskitGlobals.instance().getAnalystReportViewFrame().getMenus());   // TODO getAnalystReportMenu() ?
@@ -601,7 +601,7 @@ public class MainFrame extends JFrame
 
                 if (tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR] != -1) {
                     getEventGraphController().removeEventGraphFileListener(getAssemblyController().getOpenEventGraphListener());
-                    getEventGraphController().removeRecentEventGraphFileListener(ViskitGlobals.instance().getEventGraphViewFrame().getRecentEventGraphFileListener());
+                    getEventGraphController().removeRecentEventGraphFileListener(ViskitGlobals.instance().getEventGraphEditorViewFrame().getRecentEventGraphFileListener());
 
                     // TODO: Need doe listener removal (tdn) 9/13/24
 
@@ -834,7 +834,7 @@ public class MainFrame extends JFrame
         }
             // TODO fix these flags
         else if ((ViskitGlobals.instance().hasViskitProject() || ViskitGlobals.instance().isProjectOpen()) ||
-            ((ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded()    == 0) &&
+            ((ViskitGlobals.instance().getEventGraphEditorViewFrame().getNumberEventGraphsLoaded()    == 0) &&
              (ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded() == 0)))
         {
             title    =   "Add Event Graph or Assembly";

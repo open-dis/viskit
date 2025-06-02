@@ -1243,6 +1243,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     /**
      * @return the modelDirty
      */
+    @Override
     public boolean isModelDirty() {
         return modelDirty;
     }
@@ -1250,8 +1251,12 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     /**
      * @param modelDirty the modelDirty to set
      */
-    public void setModelDirty(boolean modelDirty) {
+    @Override
+    public void setModelDirty(boolean modelDirty)
+    {
         this.modelDirty = modelDirty;
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().enableAssemblyMenuItems();
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().enableProjectMenuItems(); // enable/disable Save All Models menu item
     }
 
 } // end class AssemblyModelImpl

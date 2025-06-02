@@ -125,6 +125,7 @@ import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
 import static viskit.view.SimulationRunPanel.INITIAL_SIMULATION_RUN_HINT;
 import static viskit.control.AssemblyControllerImpl.METHOD_generateJavaCode;
+import static viskit.control.AssemblyControllerImpl.METHOD_saveAll;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -202,6 +203,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private JMenuItem  openProjectMenuItem;
     private JMenuItem closeProjectMenuItem;
     private JMenuItem   zipProjectMenuItem;
+    private JMenuItem      saveAllMenuItem;
     private JMenuItem userPreferencesMenuItem;
     private RecentProjectFileSetListener recentProjectFileSetListener;
     private RecentAssemblyFileListener   recentAssemblyFileListener; // TODO public?
@@ -689,6 +691,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         boolean isProjectLoaded = (ViskitGlobals.instance().hasViskitProject() || ViskitGlobals.instance().isProjectOpen());
         closeProjectMenuItem.setEnabled(isProjectLoaded);
           zipProjectMenuItem.setEnabled(isProjectLoaded);
+             saveAllMenuItem.setEnabled(isProjectLoaded && 
+                     (ViskitGlobals.instance().hasDirtyAssembly() ||
+                      ViskitGlobals.instance().hasDirtyEventGraph()));
           
         if  (ViskitGlobals.instance().isProjectOpen())
              openProjectMenuItem.setToolTipText("Open an existing Viskit project, closing current project");
@@ -746,6 +751,11 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         projectMenu.add(zipProjectMenuItem);
 
         projectMenu.addSeparator();
+        
+        saveAllMenuItem = buildMenuItem(assemblyController, METHOD_saveAll,                "Save All Modified Models", KeyEvent.VK_Z,
+                null);
+        saveAllMenuItem.setToolTipText("Save all modified Event Graph and Assembly Models in this project");
+        projectMenu.add(saveAllMenuItem);
         
         userPreferencesMenuItem = buildMenuItem(assemblyController, METHOD_showViskitUserPreferences, "Viskit User Preferences", KeyEvent.VK_V, null);
         userPreferencesMenuItem.setToolTipText("Edit and save Viskit User Preference");
@@ -1167,12 +1177,9 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         {
             if ((legoEventGraphsTree != null) && (legoEventGraphsTree.getRowCount() > 0))
             {
-                LOG.info("buildTreePanels() check existing event graph source files...");
-            }            
-            addEventGraphsToLegoTree(viskitProject.getEventGraphsDirectory(), true);
-            if ((legoEventGraphsTree != null) && (legoEventGraphsTree.getRowCount() > 0))
-            {
-                LOG.info("buildTreePanels() check existing event graph source files complete");
+                LOG.info("buildTreePanels() check previous event graphs compiled...");
+                addEventGraphsToLegoTree(viskitProject.getEventGraphsDirectory(), true);
+                LOG.info("buildTreePanels() check previous event graphs complete");
             }            
         }
 

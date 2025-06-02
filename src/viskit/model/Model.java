@@ -34,6 +34,12 @@ public interface Model
     boolean newModel(File f);
 
     /**
+     * Save existing model.
+     * @return indication of success or failure
+     */
+    boolean save();
+
+    /**
      * Save existing model to specified file.  If null, save to last file.  If no last file, error.
      *
      * @param f File to save to.

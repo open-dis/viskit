@@ -207,7 +207,7 @@ public interface EventGraphController {
     void removeEventGraphFileListener(DirectoryWatch.DirectoryChangeListener eventGraphFileListener);
 
     void addRecentEventGraphFileListener(MvcRecentFileListener recentEventGraphFileListener);
-
+    
     void removeRecentEventGraphFileListener(MvcRecentFileListener recentEventGraphFileListener);
 
     Set<String> getRecentEventGraphFileSet();

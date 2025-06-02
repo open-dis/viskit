@@ -57,21 +57,23 @@ public class ModelImpl extends MvcAbstractModel implements Model
     ObjectFactory jaxbEventGraphObjectFactory;
     SimEntity jaxbRoot;
     File currentFile;
-    Map<Event, EventNode> eventNodeCache = new HashMap<>();
-    Map<Object, Edge> edgeCache = new HashMap<>();
-    Vector<ViskitElement> stateVariables = new Vector<>();
+    Map<Event, EventNode> eventNodeCacheMap = new HashMap<>();
+    Map<Object, Edge>     edgeCacheMap      = new HashMap<>();
+    Vector<ViskitElement> stateVariables    = new Vector<>();
     Vector<ViskitElement> simulationParameters  = new Vector<>();
 
     private final String schemaLocation = XMLValidationTool.EVENT_GRAPH_SCHEMA;
     private final String privateIndexVariablePrefix = "_index_variable_";
     private final String privateLocalVariablePrefix = "local_variable_";
     private final String stateVariablePrefix = "state_variable_";
+    private final String DEFAULT_RUN_EVENT_DESCRIPTION = "The Run node initializes state variables and events when simulation execution begins.";
     private final EventGraphControllerImpl eventGraphController;
 
     private GraphMetadata graphMetadata;
     private boolean modelDirty = false;
     private boolean numericPriority;
 
+    /** Constructor */
     public ModelImpl(MvcController newEventGraphController) 
     {
         eventGraphController = (EventGraphControllerImpl) newEventGraphController;
@@ -111,8 +113,11 @@ public class ModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
-    public void setModelDirty(boolean newDirtyStatus) {
+    public void setModelDirty(boolean newDirtyStatus) 
+    {
         modelDirty = newDirtyStatus;
+        ViskitGlobals.instance().getEventGraphEditorViewFrame().enableEventGraphMenuItems();
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().enableProjectMenuItems(); // enable/disable Save All Models menu item
     }
 
     @Override
@@ -133,8 +138,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
     {
         stateVariables.removeAllElements();
         simulationParameters.removeAllElements();
-        eventNodeCache.clear();
-        edgeCache.clear();
+        eventNodeCacheMap.clear();
+        edgeCacheMap.clear();
 
         if (modelFile == null) {
             jaxbRoot = jaxbEventGraphObjectFactory.createSimEntity(); // to start with empty graph
@@ -208,13 +213,19 @@ public class ModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
+    public boolean save() 
+    {
+        return saveModel(currentFile);
+    }
+
+    @Override
     public boolean saveModel(File modelFile) 
     {
         boolean returnValue;
         if (modelFile == null) {
-            modelFile = currentFile;
+            modelFile = currentFile; // keep original
         }
-        currentFile = modelFile;
+        else currentFile = modelFile;
 
         // Do the marshalling into a temporary file, so as to avoid possible
         // deletion of existing file on a marshal error.
@@ -307,7 +318,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     }
 
     private EventNode buildNodeFromJaxbEvent(Event ev) {
-        EventNode en = eventNodeCache.get(ev);
+        EventNode en = eventNodeCacheMap.get(ev);
         if (en != null) {
             return en;
         }
@@ -315,10 +326,10 @@ public class ModelImpl extends MvcAbstractModel implements Model
         jaxbEventToNode(ev, en);
         en.opaqueModelObject = ev;
 
-        eventNodeCache.put(ev, en);   // key = ev
+        eventNodeCacheMap.put(ev, en);   // key = ev
 
         // Ensure a unique Event name for XML IDREFs
-        if (!nameCheck()) {
+        if (!noDuplicateNamesCheck()) {
             mangleName(en);
         }
         
@@ -337,19 +348,26 @@ public class ModelImpl extends MvcAbstractModel implements Model
         return sb.toString().trim();
     }
 
+    /** changes node name to unique value */
     private void mangleName(ViskitElement node) {
         do {
             node.setName(AssemblyModelImpl.mangleName(node.getName()));
-        } while (!nameCheck());
+        } while (!noDuplicateNamesCheck());
     }
 
-    private boolean nameCheck() {
-        Set<String> hs = new HashSet<>(10);
-        for (EventNode en : eventNodeCache.values()) {
-            if (!hs.add(en.getName())) {
+    /** Check for duplicate names
+     * @return true if no duplicate name found, false otherwise
+     */
+    private boolean noDuplicateNamesCheck() 
+    {
+        Set<String> nameHashSet = new HashSet<>(10);
+        for (EventNode eventNode : eventNodeCacheMap.values()) 
+        {
+            if (!nameHashSet.add(eventNode.getName())) 
+            {
                 ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE,
                         "Duplicate Event Name",
-                        "Duplicate event name detected: " + en.getName() +
+                        "Duplicate event node name detected: " + eventNode.getName() +
                         "\nUnique name will be substituted.");
                 return false;
             }
@@ -559,7 +577,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         schedulingEdge.setDelay(schedule.getDelay());
         schedulingEdge.setParameters(buildEdgeParametersFromJaxb(schedule.getEdgeParameter()));
 
-        edgeCache.put(schedule, schedulingEdge);
+        edgeCacheMap.put(schedule, schedulingEdge);
 
         setModelDirty(true);
         this.notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Edge added"));
@@ -592,7 +610,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         sourceEventNode.getConnections().add(cancelingEdge);
         targetEventNode.getConnections().add(cancelingEdge);
 
-        edgeCache.put(cancel, cancelingEdge);
+        edgeCacheMap.put(cancel, cancelingEdge);
 
 //        setModelDirty(true); // likely erroneous, not expecting dirty if loading from file using JAXB
         notifyChanged(new ModelEvent(cancelingEdge, ModelEvent.CANCELING_EDGE_ADDED, "Canceling edge added"));
@@ -669,7 +687,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
     @Override
     public Vector<ViskitElement> getAllNodes() {
-        return new Vector<>(eventNodeCache.values());
+        return new Vector<>(eventNodeCacheMap.values());
     }
 
     @Override
@@ -822,25 +840,28 @@ public class ModelImpl extends MvcAbstractModel implements Model
     @Override
     public void newEventNode(String nodeName, Point2D p) 
     {
+        nodeName = ViskitStatics.emptyIfNull(nodeName);
         EventNode node = new EventNode(nodeName);
         if (p == null) {
             p = new Point2D.Double(30, 60);
         }
         node.setPosition(p);
-        Event jaxbEvent = jaxbEventGraphObjectFactory.createEvent();
-
-        eventNodeCache.put(jaxbEvent, node);   // key = ev
 
         // Ensure a unique Event name
-        if (!nameCheck()) {
+        if (!noDuplicateNamesCheck()) 
+        {
             mangleName(node);
         }
+        Event jaxbEvent = jaxbEventGraphObjectFactory.createEvent();
 
-        jaxbEvent.setName(ViskitStatics.nullIfEmpty(nodeName));
+        eventNodeCacheMap.put(jaxbEvent, node);   // key = ev
 
-        if ("Run".equals(ViskitStatics.nullIfEmpty(nodeName)))
+        jaxbEvent.setName(nodeName);
+
+        if (nodeName.equals("Run"))
         {
-            jaxbEvent.setDescription("The Run event is fired first in order to initialize all state variables");
+                 node.setDescription(DEFAULT_RUN_EVENT_DESCRIPTION);
+            jaxbEvent.setDescription(DEFAULT_RUN_EVENT_DESCRIPTION);
         }
         node.opaqueModelObject = jaxbEvent;
         jaxbRoot.getEvent().add(jaxbEvent);
@@ -851,11 +872,11 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
     @Override
     public void redoEvent(EventNode node) {
-        if (eventNodeCache.containsValue(node))
+        if (eventNodeCacheMap.containsValue(node))
             return;
 
         Event jaxbEv = jaxbEventGraphObjectFactory.createEvent();
-        eventNodeCache.put(jaxbEv, node);   // key = evnode.opaqueModelObject = jaxbEv;
+        eventNodeCacheMap.put(jaxbEv, node);   // key = evnode.opaqueModelObject = jaxbEv;
         jaxbEv.setName(node.getName());
         node.opaqueModelObject = jaxbEv;
         jaxbRoot.getEvent().add(jaxbEv);
@@ -867,7 +888,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     @Override
     public void deleteEvent(EventNode node) {
         Event jaxbEv = (Event) node.opaqueModelObject;
-        eventNodeCache.remove(jaxbEv);
+        eventNodeCacheMap.remove(jaxbEv);
         jaxbRoot.getEvent().remove(jaxbEv);
 
         setModelDirty(true);
@@ -919,7 +940,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
     private boolean isUniqueLVorIdxVname(String nm) {
         String ie;
-        for (EventNode event : eventNodeCache.values()) {
+        for (EventNode event : eventNodeCacheMap.values()) {
             for (ViskitElement lv : event.getLocalVariables()) {
                 if (lv.getName().equals(nm)) {
                     return false;
@@ -1074,7 +1095,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         boolean returnValue = true;
 
         // Ensure a unique Event name
-        if (!nameCheck()) {
+        if (!noDuplicateNamesCheck()) {
             mangleName(eventNode);
             returnValue = false;
         }
@@ -1136,7 +1157,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         }
         schedulingEdge.priority = "DEFAULT";  // set default priority
 
-        edgeCache.put(schedule, schedulingEdge);
+        edgeCacheMap.put(schedule, schedulingEdge);
 
         setModelDirty(true);
         notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Scheduling Edge added"));
@@ -1144,7 +1165,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
     @Override
     public void redoSchedulingEdge(Edge edge) {
-        if (edgeCache.containsValue(edge))
+        if (edgeCacheMap.containsValue(edge))
             return;
 
         EventNode sourceEventNode, targetEventNode;
@@ -1156,7 +1177,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         schedule.setEvent(targetEvent);
         Event sourceEvent = (Event) sourceEventNode.opaqueModelObject;
         sourceEvent.getScheduleOrCancel().add(schedule);
-        edgeCache.put(schedule, edge);
+        edgeCacheMap.put(schedule, edge);
 
         setModelDirty(true);
         notifyChanged(new ModelEvent(edge, ModelEvent.REDO_SCHEDULING_EDGE, "Scheduling Edge redone"));
@@ -1189,7 +1210,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             }
             cancelingEdge.setParameters(edgeParameters);
         }
-        edgeCache.put(cancel, cancelingEdge);
+        edgeCacheMap.put(cancel, cancelingEdge);
 
         setModelDirty(true);
         notifyChanged(new ModelEvent(cancelingEdge, ModelEvent.CANCELING_EDGE_ADDED, "Canceling Edge added"));
@@ -1198,7 +1219,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
     @Override
     public void redoCancelingEdge(Edge edge) 
     {
-        if (edgeCache.containsValue(edge))
+        if (edgeCacheMap.containsValue(edge))
             return;
 
         EventNode sourceEventNode, targetEventNode;
@@ -1210,7 +1231,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
         cancel.setEvent(targetEvent);
         Event sourceEveny = (Event) sourceEventNode.opaqueModelObject;
         sourceEveny.getScheduleOrCancel().add(cancel);
-        edgeCache.put(cancel, edge);
+        edgeCacheMap.put(cancel, edge);
 
         setModelDirty(true);
         notifyChanged(new ModelEvent(edge, ModelEvent.REDO_CANCELING_EDGE, "Canceling Edge redone"));
@@ -1248,7 +1269,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
             edges = nextEvent.getScheduleOrCancel();
             edges.remove(jaxbEdge);
         }
-        edgeCache.remove(edge);
+        edgeCacheMap.remove(edge);
         setModelDirty(true);
     }
 

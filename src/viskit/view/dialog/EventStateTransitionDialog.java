@@ -238,7 +238,7 @@ public class EventStateTransitionDialog extends JDialog
             pack();
         });
         newStateVariableButton.addActionListener((ActionEvent e) -> {
-            String stateVarjableName = ViskitGlobals.instance().getEventGraphViewFrame().addStateVariableDialog();
+            String stateVarjableName = ViskitGlobals.instance().getEventGraphEditorViewFrame().addStateVariableDialog();
             if (stateVarjableName != null) {
                 stateVariablesCB.setModel(ViskitGlobals.instance().getStateVariablesComboBoxModel());
                 for (int i = 0; i < stateVariablesCB.getItemCount(); i++) {

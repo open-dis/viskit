@@ -193,7 +193,7 @@ public class StateVariableDialog extends ViskitSmallDialog
             isArray = ViskitGlobals.instance().isArray(stateVariable.getType());
         } 
         else {
-            stateVariableNameField.setText(((Model) ViskitGlobals.instance().getEventGraphViewFrame().getModel()).generateStateVariableName()); //"state_"+count++);
+            stateVariableNameField.setText(((Model) ViskitGlobals.instance().getEventGraphEditorViewFrame().getModel()).generateStateVariableName()); //"state_"+count++);
             type = (String) stateVariableTypeCombo.getSelectedItem();
             isArray = ViskitGlobals.instance().isArray(type);
             descriptionField.setText("");

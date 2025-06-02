@@ -59,7 +59,7 @@ public class GraphMetadata
         }
         else
         {
-            name = "NewEventGraphName";
+            name = "NewEventGraph"; // default name
             viskit.xsd.bindings.eventgraph.ObjectFactory jaxbEventGraphObjectFactory =
                     new viskit.xsd.bindings.eventgraph.ObjectFactory();
             SimEntity tempSimEntity = jaxbEventGraphObjectFactory.createSimEntity();

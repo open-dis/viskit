@@ -831,7 +831,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             if (saveChooser == null) {
                 saveChooser = new JFileChooser(ViskitGlobals.instance().getViskitProject().getProjectDirectory());
             }
-            File consoleFile = ViskitGlobals.instance().getEventGraphViewFrame().getUniqueName("SimulationRunOutput.txt", saveChooser.getCurrentDirectory());
+            File consoleFile = ViskitGlobals.instance().getEventGraphEditorViewFrame().getUniqueName("SimulationRunOutput.txt", saveChooser.getCurrentDirectory());
             saveChooser.setSelectedFile(consoleFile);
             saveChooser.setDialogTitle("Save Console Output");
 
@@ -1055,6 +1055,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
                  simkitState = "(unknown)  simTime=" + Schedule.getSimTime();
         
         LOG.info("logSimulationRunState()" + "\n      " +
+                   "VCR buttons" +
                    " play=" + isOnOff(simulationRunPanel.vcrRunResumeButton.isEnabled()) +
                    " step=" + isOnOff(simulationRunPanel.vcrPauseStepButton.isEnabled()) +
                    " stop=" + isOnOff(simulationRunPanel.vcrStopButton.isEnabled()) +

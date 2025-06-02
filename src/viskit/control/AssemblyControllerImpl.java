@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -541,6 +540,38 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     }
     
     /** method name for reflection use */
+    public static final String METHOD_saveAll= "saveAll";
+
+    public void saveAll()
+    {
+        if (ViskitGlobals.instance().hasDirtyAssembly())
+        {
+            int numberOfAssemblies = ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded();
+            if (ViskitGlobals.instance().hasDirtyAssembly())
+            {                
+                for (int index = 0; index < numberOfAssemblies; index++)
+                {
+                    AssemblyModel nextAssemblyModel = ViskitGlobals.instance().getAssemblyEditorViewFrame().getOpenAssemblyModels()[index];
+                    if (nextAssemblyModel.isModelDirty())
+                    {
+                        ((AssemblyModelImpl) nextAssemblyModel).saveModel(nextAssemblyModel.getCurrentFile());
+                    }
+                }
+            }
+        }
+        if (ViskitGlobals.instance().hasDirtyEventGraph())
+        {
+            int numberOfEventGraphs = ViskitGlobals.instance().getEventGraphEditorViewFrame().getNumberEventGraphsLoaded();
+            for (int index = 0; index < numberOfEventGraphs; index++)
+            {
+                Model nextEventGraphModel = ViskitGlobals.instance().getEventGraphEditorViewFrame().getOpenEventGraphModels()[index];
+                if (nextEventGraphModel.isModelDirty())
+                    nextEventGraphModel.save();
+            }
+        }
+    }
+    
+    /** method name for reflection use */
     public static final String METHOD_saveAs = "saveAs";
 
     @Override
@@ -999,13 +1030,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             assemblyViewFrame = ViskitGlobals.instance().getAssemblyEditorViewFrame();
         
         int numberOfAssemblies = ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded();
-        boolean hasDirtyAssembly = false;
-        for (int index = 0; index < numberOfAssemblies; index++)
-        {
-            hasDirtyAssembly = hasDirtyAssembly || 
-                               ViskitGlobals.instance().getAssemblyEditorViewFrame().getOpenAssemblyModels()[index].isModelDirty();
-        }
-        if (hasDirtyAssembly && !ViskitGlobals.instance().isSelectedAssemblyEditorTab() && (numberOfAssemblies != 0))
+        
+        if ( ViskitGlobals.instance().hasDirtyAssembly() && 
+            !ViskitGlobals.instance().isSelectedAssemblyEditorTab() && (numberOfAssemblies != 0))
         {
             ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
             String title = new String(), message = new String();
@@ -1026,7 +1053,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
         
-        int numberOfEventGraphs = ViskitGlobals.instance().getEventGraphViewFrame().getNumberEventGraphsLoaded();
+        int numberOfEventGraphs = ViskitGlobals.instance().getEventGraphEditorViewFrame().getNumberEventGraphsLoaded();
         if (numberOfEventGraphs > 1)
             LOG.info("Closing all assemblies also closes corresponding event graphs");
         
@@ -1074,7 +1101,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         
 //        boolean hasDirtyEventGraph = false; // TODO if needed
 //        
-//        Model[] eventGraphModels = ((EventGraphView) getView()).getOpenModels();
+//        Model[] eventGraphModels = ((EventGraphView) getView()).getOpenEventGraphModels();
 //        for (Model model : eventGraphModels) 
 //        {
 //            if (model.isDirty())
@@ -2319,7 +2346,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             message += " simulation";
         message +=
                 " is ready to run!</p><br />" +
-                "<p align='center'>Check replication settings at left, then press Run button to begin.</p><br />" +
+                "<p align='center'>Check replication settings at left, then press <b>Run button</b> to begin.</p><br />" +
                 "<p align='center'>Multiple simulation replications provide data for your draft Analyst Report.</p><br /></body></html>";
                 
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,

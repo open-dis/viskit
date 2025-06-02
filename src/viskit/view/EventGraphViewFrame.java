@@ -595,7 +595,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     @Override
-    public Model[] getOpenModels() 
+    public Model[] getOpenEventGraphModels() 
     {
         JSplitPane splitPane;
         JScrollPane scrollPane;
@@ -648,32 +648,36 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         @Override
         public void listenerChanged() 
         {
-            String fileName;
+            File   recentFile;
+            String recentFileName;
             Action currentAction;
             JMenuItem menuItem;
             EventGraphController eventGraphController = (EventGraphController) getController();
-            Set<String> filePathSet = eventGraphController.getRecentEventGraphFileSet();
+            Set<String> recentFilePathSet = eventGraphController.getRecentEventGraphFileSet();
             openRecentEventGraphMenu.removeAll(); // clear prior to rebuilding menu
             openRecentEventGraphMenu.setEnabled(false); // disable unless file is found
-            File file;
-            for (String fullPath : filePathSet) 
+            for (String recentFileFullPath : recentFilePathSet) 
             {
-                file = new File(fullPath);
-                if (!file.exists())
+                recentFile = new File(recentFileFullPath);
+                if (!recentFile.exists())
                 {
                     // file not found as expected, something happened externally and so report it
-                    LOG.error("*** [EventGraphViewFrame listChanged] Event graph file not found: " + file.getPath());
+                    LOG.error("*** [EventGraphViewFrame listChanged] Event graph file not found, removed from list:\n      " + 
+                              recentFile.getPath());
+                    recentFilePathSet.remove(recentFileFullPath); // avoids reporting this problem more than once
+                    // TODO needed?
+                    // eventGraphController.removeRecentEventGraphFileListener(TODO find corresponding file listener);
                     continue; // actual file not found, skip to next file in files loop
                 }
-                fileName = file.getName();
-                currentAction = new ParameterizedAction(fileName);
-                currentAction.putValue(ViskitStatics.FULL_PATH, fullPath);
+                recentFileName = recentFile.getName();
+                currentAction = new ParameterizedAction(recentFileName);
+                currentAction.putValue(ViskitStatics.FULL_PATH, recentFileFullPath);
                 menuItem = new JMenuItem(currentAction);
-                menuItem.setToolTipText(file.getPath());
+                menuItem.setToolTipText(recentFile.getPath());
                 openRecentEventGraphMenu.add(menuItem);
                 openRecentEventGraphMenu.setEnabled(true); // at least one is found
             }
-            if (!filePathSet.isEmpty()) 
+            if (!recentFilePathSet.isEmpty()) 
             {
                 openRecentEventGraphMenu.add(new JSeparator());
                 currentAction = new ParameterizedAction("clear history");
