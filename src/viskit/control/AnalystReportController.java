@@ -371,6 +371,9 @@ public class AnalystReportController extends MvcAbstractController
 
     private void buildAnalystReport(File targetFile)
     {
+        if (currentAssemblyFile == null)
+            currentAssemblyFile = ViskitGlobals.instance().getActiveAssemblyModel().getCurrentFile();
+        
         LOG.debug("buildAnalystReport() targetFile is:\n      {}", targetFile);
         AnalystReportModel analystReportModelLocal;
         try {

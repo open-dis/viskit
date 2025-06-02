@@ -166,7 +166,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     private Map<String, AssemblyNode> pclNodeCache;
 
     /** 
-     * Build an AnalystReport object from an existing statisticsReport
+     * Constructor to build an AnalystReport object from an existing statisticsReport
      * document.This is done from viskit.BasicAssembly via reflection.
      * @param assemblyName the assembly name
      * @param statisticsReportPath the path to the statistics generated report
@@ -209,7 +209,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     {
         this(xmlFile); // also sets assemblyName
         
-        // TODO: This doesn't seem to be doing anything correctly
+        // TODO: progressBar doesn't seem to be doing anything correctly
         progressBar = new JProgressBar();
         analystReportFrame.add(progressBar);
         analystReportFrame.validate();
@@ -1239,7 +1239,7 @@ public final class AnalystReportModel extends MvcAbstractModel
     private void captureAssemblyImage() 
     {
         String assemblyFilePath = assemblyFile.getPath();
-        assemblyFilePath = assemblyFilePath.substring(assemblyFilePath.indexOf("Assemblies"), assemblyFilePath.length());
+        assemblyFilePath = assemblyFilePath.substring(assemblyFilePath.indexOf(ASSEMBLIES_DIRECTORY_NAME), assemblyFilePath.length());
         if      (assemblyFilePath.contains("\\"))
                  assemblyFilePath = assemblyFilePath.substring(assemblyFilePath.lastIndexOf("\\") + 1);
         else if (assemblyFilePath.contains("/"))

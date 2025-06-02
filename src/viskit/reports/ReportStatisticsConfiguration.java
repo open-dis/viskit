@@ -258,7 +258,8 @@ public class ReportStatisticsConfiguration {
             }
             return null;
         }
-        LOG.info("saveData(" + reportDocument.getRootElement().getName() + ") analystReportStatisticsDirectoryFile at\n      " + analystReportStatisticsDirectoryFile.getAbsolutePath());
+        LOG.info("saveData(" + reportDocument.getRootElement().getName() + ") to\n      " + 
+                analystReportStatisticsDirectoryFile.getAbsolutePath()); // analystReportStatisticsDirectoryFile at
 
         return analystReportStatisticsDirectoryFile.getAbsolutePath();
     }
