@@ -14,7 +14,8 @@
             <Assignment value="totalNumberRepairPeople"/>
         </StateTransition>
         <Schedule delay="0.0" event="StartMachine" priority="DEFAULT"/>
-        <Coordinate x="0.0" y="0.0"/>
+        <Code></Code>
+        <Coordinate x="0.0" y="20.0"/>
     </Event>
     <Event name="StartMachine">
         <StateTransition state="numberFailedMachines">
@@ -22,21 +23,21 @@
         </StateTransition>
         <Schedule delay="timeToFailure.generate()" event="Failure" priority="DEFAULT"/>
         <Schedule delay="0.0" event="StartMachine" condition="numberFailedMachines &gt; 0" priority="DEFAULT"/>
-        <Coordinate x="80.0" y="0.0"/>
+        <Coordinate x="80.0" y="20.0"/>
     </Event>
     <Event name="Failure">
         <StateTransition state="numberFailedMachines">
             <Assignment value="numberFailedMachines + 1"/>
         </StateTransition>
         <Schedule delay="0.0" event="StartRepair" condition="numberAvailableRepairPeople &gt; 0" priority="DEFAULT"/>
-        <Coordinate x="80.0" y="160.0"/>
+        <Coordinate x="80.0" y="180.0"/>
     </Event>
     <Event name="StartRepair">
         <StateTransition state="numberAvailableRepairPeople">
             <Assignment value="numberAvailableRepairPeople - 1"/>
         </StateTransition>
         <Schedule delay="repairTime.generate()" event="EndRepair" priority="DEFAULT"/>
-        <Coordinate x="280.0" y="160.0"/>
+        <Coordinate x="280.0" y="180.0"/>
     </Event>
     <Event name="EndRepair">
         <StateTransition state="numberAvailableRepairPeople">
@@ -47,6 +48,6 @@
         </StateTransition>
         <Schedule delay="0.0" event="StartRepair" condition="numberFailedMachines &gt;= totalNumberRepairPeople" priority="HIGH"/>
         <Schedule delay="timeToFailure.generate()" event="Failure" priority="DEFAULT"/>
-        <Coordinate x="280.0" y="10.0"/>
+        <Coordinate x="280.0" y="30.0"/>
     </Event>
 </SimEntity>
