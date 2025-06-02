@@ -172,8 +172,8 @@ public class ViskitApplication
 
             MainFrame.runLater(500L, () -> {
                 // wait a second, give file loading a chance to finish before checking no models loaded...
-                MainFrame.displayWelcomeGuidance(); // if no event graph or assembly is open
                 LOG.info("ViskitApplication launched successfuly");
+                MainFrame.displayWelcomeGuidance(); // if no event graph or assembly is open; blocks and awaits user acknowledgement
             });
         }
         catch (ExceptionInInitializerError exception)
