@@ -49,6 +49,7 @@
         <Schedule delay="serviceTime.generate()" event="EndService" priority="DEFAULT" description="schedule completion of this customer following a probabilistic serviceTime interval">
             <EdgeParameter value="customer"/>
         </Schedule>
+        <Code></Code>
         <Coordinate x="210.0" y="160.0"/>
     </Event>
     <Event name="EndService">

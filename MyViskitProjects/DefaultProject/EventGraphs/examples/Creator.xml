@@ -5,14 +5,14 @@
         <StateTransition state="nextID">
             <Assignment value="nextID+1"/>
         </StateTransition>
-        <Schedule delay="0.0" event="CustomerArrival" condition="true" priority="DEFAULT" description="Each arriving customer produces an event">
+        <Schedule delay="0.0" event="CustomerArrival" priority="DEFAULT" description="Each arriving customer produces an event">
             <EdgeParameter value="nextID"/>
         </Schedule>
         <Code></Code>
         <Coordinate x="30.0" y="120.0"/>
     </Event>
     <Event name="CustomerArrival">
-        <Argument name="customer" type="Integer"/>
+        <Argument name="customer" type="Integer" description=""/>
         <Code></Code>
         <Coordinate x="190.0" y="120.0"/>
     </Event>

@@ -18,6 +18,7 @@
         </StateTransition>
         <Schedule delay="timeBetweenReviews" event="Review" priority="DEFAULT"/>
         <Schedule delay="timeBetweenDemands.generate()" event="Demand" priority="DEFAULT"/>
+        <Code></Code>
         <Coordinate x="10.0" y="20.0"/>
     </Event>
     <Event name="Demand">
@@ -35,7 +36,7 @@
         <Coordinate x="80.0" y="140.0"/>
     </Event>
     <Event name="PlaceOrder">
-        <Argument name="newOrderAmount" type="double"/>
+        <Argument name="newOrderAmount" type="double" description=""/>
         <StateTransition state="amountOnOrder">
             <Assignment value="amountOnOrder + newOrderAmount"/>
         </StateTransition>
@@ -45,7 +46,7 @@
         <Coordinate x="190.0" y="150.0"/>
     </Event>
     <Event name="ReceiveOrder">
-        <Argument name="receivedOrderAmount" type="double"/>
+        <Argument name="receivedOrderAmount" type="double" description=""/>
         <StateTransition state="amountOnOrder">
             <Assignment value="amountOnOrder - receivedOrderAmount"/>
         </StateTransition>
