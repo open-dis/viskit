@@ -7,7 +7,7 @@
         </FactoryParameter>
         <Coordinate x="40.0" y="140.0"/>
     </SimEntity>
-    <SimEntity name="creator" type="examples.Creator" description="Creator process creates customer entites">
+    <SimEntity name="creator" type="examples.Creator" description="Creator process generates customer entities">
         <Coordinate x="190.0" y="140.0"/>
     </SimEntity>
     <SimEntity name="serverWithReneges" type="examples.ServerWithReneges" description="Event graph for server handling customers, either for service or for reneges">
