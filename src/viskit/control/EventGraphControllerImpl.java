@@ -1404,6 +1404,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
     }
 
+    /** Capture images using already-completed JGraph images.  
+     * TODO crop excess for smaller margin, probably by keeping track of dimensions when creating. */
     @Override
     public void captureEventGraphImages(List<File> eventGraphs, List<File> eventGraphImages) 
     {
@@ -1422,7 +1424,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
          * Assembly, then all of the screen shots would be of the last Event Graph
          * that was opened either manually, or automatically by the below process.
          */
-        closeAll();
+        closeAll(); // TODO seems wrong
 
         // Each Event Graph needs to be opened first
         for (File eventGraph : eventGraphs) 

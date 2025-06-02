@@ -389,9 +389,9 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
     private void centerMe() {
         Rectangle meR = getBounds();
         if (mom != null) {
-            Rectangle r = mom.getBounds();
-            meR.x = r.x + r.width / 2 - meR.width / 2;
-            meR.y = r.y + r.height / 2 - meR.height / 2;
+            Rectangle rectangle = mom.getBounds();
+            meR.x = rectangle.x + rectangle.width / 2 - meR.width / 2;
+            meR.y = rectangle.y + rectangle.height / 2 - meR.height / 2;
         }
         setBounds(meR);
     }
@@ -700,13 +700,13 @@ public class JobLauncher extends JFrame implements Runnable, DirectoryWatch.Dire
         clusterStatusFrame.pack();
         Rectangle frR = clusterStatusFrame.getBounds();
 
-        Rectangle r = this.getBounds();
+        Rectangle rectangle = this.getBounds();
         /*
         frR.x = r.x + r.width / 2 - frR.width / 2;
         frR.y = r.y + r.height / 2 - frR.height / 2;
          */
-        frR.x = r.x + r.width;
-        frR.y = r.y; //chartter.getLocation().y + chartter.getSize().height;
+        frR.x = rectangle.x + rectangle.width;
+        frR.y = rectangle.y; //chartter.getLocation().y + chartter.getSize().height;
         clusterStatusFrame.setBounds(frR);
 
         Runnable rn = () -> {

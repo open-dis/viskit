@@ -1126,13 +1126,13 @@ public class JobLauncherTab2 extends JPanel implements Runnable, OpenAssembly.As
         clusterStatusFrame.pack();
         Rectangle frR = clusterStatusFrame.getBounds();
 
-        Rectangle r = this.getBounds();
+        Rectangle rectangle = this.getBounds();
         /*
         frR.x = r.x + r.width / 2 - frR.width / 2;
         frR.y = r.y + r.height / 2 - frR.height / 2;
          */
-        frR.x = r.x + r.width;
-        frR.y = r.y; //chartter.getLocation().y + chartter.getSize().height;
+        frR.x = rectangle.x + rectangle.width;
+        frR.y = rectangle.y; //chartter.getLocation().y + chartter.getSize().height;
         clusterStatusFrame.setBounds(frR);
 
         Runnable rn = () -> {

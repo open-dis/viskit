@@ -247,7 +247,7 @@ public class ViskitGraphVertexRenderer
     // jmb
     @Override
     protected void paintComponent(Graphics g) {
-        Rectangle2D r = view.getBounds();
+        Rectangle2D rectangle2D = view.getBounds();
         Graphics2D g2 = (Graphics2D) g;
         
         if (view instanceof ViskitAssemblyCircleView) // EGN
@@ -261,22 +261,22 @@ public class ViskitGraphVertexRenderer
         int myoff = 2;
         
         if (view instanceof ViskitAssemblyCircleView) // EGN
-            g2.fillRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
+            g2.fillRoundRect(myoff, myoff, rectangle2D.getBounds().width - 2 * myoff, rectangle2D.getBounds().height - 2 * myoff, 20, 20);
         if (view instanceof ViskitAssemblyPropListView) // PCL
-            g2.fillRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
+            g2.fillRect(myoff, myoff, rectangle2D.getBounds().width - 2 * myoff, rectangle2D.getBounds().height - 2 * myoff);
         if (view instanceof VertexCircleView) // EN
-            g2.fillOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff); // size of rect is 54,54
+            g2.fillOval(myoff, myoff, rectangle2D.getBounds().width - 2 * myoff, rectangle2D.getBounds().height - 2 * myoff); // size of rect is 54,54
             
         g2.setColor(Color.darkGray);
         
         if (view instanceof ViskitAssemblyCircleView) // EGN
-            g2.drawRoundRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff, 20, 20);
+            g2.drawRoundRect(myoff, myoff, rectangle2D.getBounds().width - 2 * myoff, rectangle2D.getBounds().height - 2 * myoff, 20, 20);
         if (view instanceof ViskitAssemblyPropListView) { // PCL
             g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 10.0f, new float[]{2.0f, 2.0f}, 0.0f));
-            g2.drawRect(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
+            g2.drawRect(myoff, myoff, rectangle2D.getBounds().width - 2 * myoff, rectangle2D.getBounds().height - 2 * myoff);
         }
         if (view instanceof VertexCircleView) // EN
-            g2.drawOval(myoff, myoff, r.getBounds().width - 2 * myoff, r.getBounds().height - 2 * myoff);
+            g2.drawOval(myoff, myoff, rectangle2D.getBounds().width - 2 * myoff, rectangle2D.getBounds().height - 2 * myoff);
 
         // Draw the text in the circle
         g2.setFont(myfont);         // uses component's font if not specified
@@ -474,7 +474,7 @@ public class ViskitGraphVertexRenderer
      * href="#override">Implementation Note </a> for more information.
      */
     @Override
-    public void repaint(Rectangle r) {
+    public void repaint(Rectangle rectangle) {
     }
 
     /**

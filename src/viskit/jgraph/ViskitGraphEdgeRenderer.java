@@ -98,7 +98,7 @@ public class ViskitGraphEdgeRenderer extends EdgeRenderer
     }
     
     @Override
-    public boolean intersects(JGraph graph, CellView value, Rectangle rect) {
+    public boolean intersects(JGraph graph, CellView value, Rectangle rectangle) {
         if (value instanceof EdgeView && graph != null) {
             setView(value);
 
@@ -109,14 +109,16 @@ public class ViskitGraphEdgeRenderer extends EdgeRenderer
             if (g2 == null || view.getPointCount() == 2) {
                 Point2D p0 = view.getPoint(0);
                 Point2D p1 = view.getPoint(1);
-                if (rect.intersectsLine(p0.getX(), p0.getY(), p1.getX(), p1.getY()))
+                if (rectangle.intersectsLine(p0.getX(), p0.getY(), p1.getX(), p1.getY()))
                     return true;
                 
-            } else if (view.getShape().intersects(rect)) // <- This finally fixes the edge/listener selection on MBP displays 8/8/24 tdn
+            } 
+            else if (view.getShape().intersects(rectangle)) // <- This finally fixes the edge/listener selection on MBP displays 8/8/24 tdn
                 return true;                               // Fixes Issue #1
             
-            Rectangle2D r = getLabelBounds(graph, view);
-            if (r != null && r.intersects(rect) && g2 != null) {
+            Rectangle2D rectangle2D = getLabelBounds(graph, view);
+            if (rectangle2D != null && rectangle2D.intersects(rectangle) && g2 != null)
+            {
                 boolean hits = true;
 
                 // Performs exact hit detection on rotated labels
@@ -143,7 +145,7 @@ public class ViskitGraphEdgeRenderer extends EdgeRenderer
                             g2.rotate(angle, cx, cy);
                         }
 
-                        hits = g2.hit(rect, tmp, false);
+                        hits = g2.hit(rectangle, tmp, false);
                     } finally {
                         g2.setTransform(tx);
                     }
@@ -156,8 +158,8 @@ public class ViskitGraphEdgeRenderer extends EdgeRenderer
             Object[] labels = GraphConstants.getExtraLabels(view.getAllAttributes());
             if (labels != null) {
                 for (int i = 0; i < labels.length; i++) {
-                    r = getExtraLabelBounds(graph, view, i);
-                    if (r != null && r.intersects(rect))
+                    rectangle2D = getExtraLabelBounds(graph, view, i);
+                    if (rectangle2D != null && rectangle2D.intersects(rectangle))
                         return true;                
                 }
             }

@@ -144,11 +144,9 @@ public class AnalystReportController extends MvcAbstractController
             LOG.info("setReportXML() creating analystReportModel");
             analystReportModel =  new AnalystReportModel(analystReportXmlFile);
         }
-
         if (analystReportViewFrame == null) {
             analystReportViewFrame = ViskitGlobals.instance().getAnalystReportViewFrame();
         }
-
         buildAnalystReport(analystReportXmlFile);
     }
 
@@ -380,7 +378,7 @@ public class AnalystReportController extends MvcAbstractController
             analystReportModelLocal = new AnalystReportModel(analystReportViewFrame, targetFile, currentAssemblyFile);
         } 
         catch (Exception e) {
-            LOG.error("Error parsing Analyst Report: {}", e);
+            LOG.error("Error creating new AnalystReportModel: {}", e);
 //            e.printStackTrace();
             return;
         }

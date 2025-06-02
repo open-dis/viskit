@@ -2494,8 +2494,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             if (component instanceof JScrollPane) {
                 component = ((JScrollPane) component).getViewport().getView();
             }
-            Rectangle rec = component.getBounds();
-            Image image = new BufferedImage(rec.width, rec.height, BufferedImage.TYPE_3BYTE_BGR);
+            Rectangle rectangle = component.getBounds();
+            Image image = new BufferedImage(rectangle.width, rectangle.height, BufferedImage.TYPE_3BYTE_BGR);
             // TODO how to crop empty space?  perhaps alternative is to save image when constructed?
 
             // Tell the jgraph component to draw into memory

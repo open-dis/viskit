@@ -294,14 +294,14 @@ public class ViskitGraphMarqueeHandler extends BasicMarqueeHandler {
             // If Not Floating Port...
             boolean o = (GraphConstants.getOffset(port.getAllAttributes()) != null);
             // ...Then use Parent's Bounds
-            Rectangle2D r = (o) ? port.getBounds() : port.getParentView().getBounds();
+            Rectangle2D rectangle2D = (o) ? port.getBounds() : port.getParentView().getBounds();
             // Scale from Model to Screen
-            r = graph.toScreen((Rectangle2D) r.clone());
+            rectangle2D = graph.toScreen((Rectangle2D) rectangle2D.clone());
             // Add Space For the Highlight Border
-            r.setFrame(r.getX() - 3, r.getY() - 3, r.getWidth() + 6, r
+            rectangle2D.setFrame(rectangle2D.getX() - 3, rectangle2D.getY() - 3, rectangle2D.getWidth() + 6, rectangle2D
                     .getHeight() + 6);
             // Paint Port in Preview (=Highlight) Mode
-            graph.getUI().paintCell(g, port, r, true);
+            graph.getUI().paintCell(g, port, rectangle2D, true);
         }
     }
 
@@ -337,14 +337,14 @@ public class ViskitGraphMarqueeHandler extends BasicMarqueeHandler {
      */
     protected Rectangle getHighlightBounds(JGraph graph, CellView cellView) {
         boolean offset = (GraphConstants.getOffset(cellView.getAllAttributes()) != null);
-        Rectangle2D r = (offset) ? cellView.getBounds() : cellView.getParentView().getBounds();
-        r = graph.toScreen((Rectangle2D) r.clone());
+        Rectangle2D rectangle2D = (offset) ? cellView.getBounds() : cellView.getParentView().getBounds();
+        rectangle2D = graph.toScreen((Rectangle2D) rectangle2D.clone());
         int s = 3;
 
-        return new Rectangle((int) (r.getX() - s), 
-                (int) (r.getY() - s),
-                (int) (r.getWidth() + 2 * s), 
-                (int) (r.getHeight() + 2 * s));
+        return new Rectangle((int) (rectangle2D.getX() - s), 
+                (int) (rectangle2D.getY() - s),
+                (int) (rectangle2D.getWidth() + 2 * s), 
+                (int) (rectangle2D.getHeight() + 2 * s));
     }
 
 } // end class ViskitGraphMarqueeHandler
