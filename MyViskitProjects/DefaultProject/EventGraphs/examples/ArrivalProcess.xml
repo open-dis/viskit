@@ -7,6 +7,7 @@
             <Assignment value="0"/>
         </StateTransition>
         <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT" description="initiate arrival process upon startup"/>
+        <Code></Code>
         <Coordinate x="40.0" y="70.0"/>
     </Event>
     <Event name="Arrival">

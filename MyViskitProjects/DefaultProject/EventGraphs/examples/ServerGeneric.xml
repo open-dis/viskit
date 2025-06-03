@@ -6,7 +6,7 @@
     <StateVariable name="queue" type="java.util.LinkedList&lt;simkit.Entity&gt;" description="the queue holds customers who are waiting in line"/>
     <StateVariable name="delayInQueue" type="double" description="any fixed waiting time that all customers encounter"/>
     <StateVariable name="timeInSystem" type="double" description="how much time did the current customer need"/>
-    <Event name="Run" description="">
+    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
         <StateTransition state="numberAvailableServers">
             <Assignment value="totalNumberServers"/>
         </StateTransition>

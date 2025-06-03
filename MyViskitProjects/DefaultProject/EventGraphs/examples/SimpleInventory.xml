@@ -9,7 +9,7 @@
     <Parameter name="orderUpTo" type="double"/>
     <StateVariable name="inventoryPosition" type="double"/>
     <StateVariable name="amountOnOrder" type="double"/>
-    <Event name="Run">
+    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
         <StateTransition state="inventoryPosition">
             <Assignment value="initialInventory"/>
         </StateTransition>

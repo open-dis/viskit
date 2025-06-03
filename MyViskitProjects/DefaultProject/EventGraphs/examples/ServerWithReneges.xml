@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="ServerWithReneges" package="examples" version="2.0" extend="SimEntityBase" description="Event graph for server handling customers and reneges" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter name="numberServers" type="int"/>
-    <Parameter name="serviceTime" type="simkit.random.RandomVariate"/>
-    <Parameter name="renegeTime" type="simkit.random.RandomVariate"/>
-    <StateVariable name="numberAvailableServers" type="int"/>
-    <StateVariable name="queue" type="java.util.LinkedList&lt;Integer&gt;"/>
-    <StateVariable name="numberServed" type="int"/>
+    <Parameter name="numberServers" type="int" description="total number of servers"/>
+    <Parameter name="serviceTime" type="simkit.random.RandomVariate" description="probablilistic time duration to service a customer"/>
+    <Parameter name="renegeTime" type="simkit.random.RandomVariate" description="likely wait time before a customer decides to reneqe and get out of the service line"/>
+    <StateVariable name="numberAvailableServers" type="int" description="current number of available servers"/>
+    <StateVariable name="queue" type="java.util.LinkedList&lt;Integer&gt;" description="ordered list of waiting customers, FIFO"/>
+    <StateVariable name="numberServed" type="int" description="how many customers have been successfully served"/>
     <StateVariable name="numberReneges" type="int" description="this state variable stores the number of reneges as a Java int."/>
-    <Event name="Run">
+    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
         <StateTransition state="numberAvailableServers">
             <Assignment value="getNumberServers()"/>
         </StateTransition>

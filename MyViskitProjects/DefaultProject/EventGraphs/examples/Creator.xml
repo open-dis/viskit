@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="Creator" package="examples" version="2.0" author="Arnie Buss" extend="SimEntityBase" description="Creator process creates customer entites" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <StateVariable name="nextID" type="int"/>
+    <StateVariable name="nextID" type="int" description="identifying number of next customer"/>
     <Event name="Arrival" description="Each customer is sequentially numbered">
         <StateTransition state="nextID">
             <Assignment value="nextID+1"/>
@@ -16,7 +16,7 @@
         <Code></Code>
         <Coordinate x="190.0" y="120.0"/>
     </Event>
-    <Event name="Run">
+    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
         <StateTransition state="nextID">
             <Assignment value="0"/>
         </StateTransition>

@@ -6,7 +6,7 @@
     <Parameter name="repairTime" type="simkit.random.RandomVariate"/>
     <StateVariable name="numberFailedMachines" type="int"/>
     <StateVariable name="numberAvailableRepairPeople" type="int"/>
-    <Event name="Run">
+    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
         <StateTransition state="numberFailedMachines">
             <Assignment value="totalNumberMachines"/>
         </StateTransition>
