@@ -115,7 +115,7 @@ public class ViskitGlobals
         // This should only occur once
         // Other initialization checks moved out of this constructor to avoid breaking singleton pattern
         // LOG does not appear to interfere with singleton pattern
-        LOG.info("creating singleton instance (report error if message occurs again)"); // TODO threading issue likely
+        LOG.info("creating singleton instance (report threading error if this message occurs again)"); // TODO threading issue likely
     }
     
     public static ViskitGlobals instance()

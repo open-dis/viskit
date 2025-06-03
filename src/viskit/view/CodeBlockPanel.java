@@ -127,7 +127,8 @@ public class CodeBlockPanel extends JPanel {
         updateListener = lis;
     }
 
-    public String getData() {
+    public String getData() 
+    {
         String s = jtc.getText();
         return (s == null) ? "" : s;
     }

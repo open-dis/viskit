@@ -772,7 +772,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (model.saveModel(file))
         {
             // We don't need to recurse since we know this is a file, but make sure
-            // it is re-compiled and re-validated. model.isModelDirty will be set from this call.
+            // it is re-compiled and re-validated later. model.isModelDirty will be set from this call.
             ViskitGlobals.instance().getAssemblyEditorViewFrame().addEventGraphsToLegoTree(file, false);
         }
         // Don't watch an XML file whose source couldn't be compiled correctly

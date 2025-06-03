@@ -172,7 +172,7 @@ public class ViskitApplication
 
             MainFrame.runLater(500L, () -> {
                 // wait a second, give file loading a chance to finish before checking no models loaded...
-                LOG.info("ViskitApplication launched successfuly");
+                LOG.info("ViskitApplication launched successfully"); // updating log first facilitates debugging
                 MainFrame.displayWelcomeGuidance(); // if no event graph or assembly is open; blocks and awaits user acknowledgement
             });
         }

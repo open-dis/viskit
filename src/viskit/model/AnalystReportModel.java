@@ -1289,7 +1289,7 @@ public final class AnalystReportModel extends MvcAbstractModel
         ViskitGlobals.instance().selectSimulationRunTab();
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE,
                 popupTitle, message);
-        // user: OK
+        // user response: OK
         
         ViskitGlobals.instance().selectAnalystReportTab();
         popupTitle = "Ready to Edit and Generate HTML Analyst Report";
@@ -1307,6 +1307,7 @@ public final class AnalystReportModel extends MvcAbstractModel
 
         message += "<p align='center'>in Analyst Report menu to view results.</p><br /></body></html>";
         ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.INFORMATION_MESSAGE, popupTitle, message);
+        // user response: OK
         
         /* better not to present another decision, had thread-completion issues anyway
         message =

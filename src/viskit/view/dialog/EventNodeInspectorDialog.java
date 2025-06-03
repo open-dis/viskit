@@ -367,7 +367,8 @@ public class EventNodeInspectorDialog extends JDialog
 
     private void unloadWidgets(EventNode eventNode)
     {
-        if (modified) {
+        if (modified) 
+        {
             eventNode.setName(eventNameTF.getText().trim().replace(' ', '_'));
 
             eventNode.setStateTransitions(stateTransitionsPanel.getTransitions());
@@ -488,7 +489,7 @@ public class EventNodeInspectorDialog extends JDialog
 
                 unloadWidgets(eventNode);
             }
-            dispose();
+            dispose(); // releases window assets; perhaps this is premature>  contained information not being saved...
         }
 
 //        private void addPotentialLocalIndexVariable(EventNode n, String lvName) {
