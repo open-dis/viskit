@@ -73,7 +73,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
     private boolean modelDirty = false;
     private boolean numericPriority;
 
-    /** Constructor */
+    /** Constructor
+     * @param newEventGraphController provide corresponding controller */
     public ModelImpl(MvcController newEventGraphController) 
     {
         eventGraphController = (EventGraphControllerImpl) newEventGraphController;
@@ -245,6 +246,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
         FileWriter fileWriter = null;
         try {
+            // save metadata
             fileWriter = new FileWriter(tempFile);
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -257,6 +259,9 @@ public class ModelImpl extends MvcAbstractModel implements Model
             jaxbRoot.setPackage    (ViskitStatics.nullIfEmpty(graphMetadata.packageName));
             jaxbRoot.setExtend     (ViskitStatics.nullIfEmpty(graphMetadata.extendsPackageName));
             jaxbRoot.setImplement  (ViskitStatics.nullIfEmpty(graphMetadata.implementsPackageName));
+            
+            // TODO do we need to update StateVariables, Parameters, Events?  isn't this handled in subclass?
+//          List<StateVariable> stateVariableList = jaxbRoot.getStateVariable(); // TODO confirm not needed
             
             // obsolete
 //            List<String> clis = jaxbRoot.getComment();
@@ -292,15 +297,19 @@ public class ModelImpl extends MvcAbstractModel implements Model
                     );
             returnValue = false;
         } 
-        finally {
-            try {
+        finally 
+        {
+            try 
+            {
                 if (fileWriter != null)
                     fileWriter.close();
             } 
             catch (IOException ioe) {
-                LOG.error("{} saveModel() error closing FileWriter\n      {}\n{}", this.getClass().getSimpleName(), currentFile.toPath(), ioe);
+                LOG.error("{} saveModel() error closing FileWriter\n      {}\n{}", 
+                        this.getClass().getSimpleName(), currentFile.toPath(), ioe);
             }
         }
+        LOG.info("saveModel({}) result: {}", modelFile.getName(), returnValue);
         return returnValue;
     }
 
@@ -399,7 +408,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
         return true;
     }
 
-    private void jaxbEventToNode(Event event, EventNode eventNode) {
+    private void jaxbEventToNode(Event event, EventNode eventNode) 
+    {
         eventNode.setName(event.getName());
 
 //        eventNode.getComments().clear();
@@ -445,7 +455,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
         StateVariable stateVariable;
         String index;
         LocalVariableInvocation localVariableInvocation;
-        List<String> commentList;
+//      List<String> commentList;
+        
         for (StateTransition stateTransition : event.getStateTransition()) 
         {
             eventStateTransition = new EventStateTransition();
@@ -460,11 +471,17 @@ public class ModelImpl extends MvcAbstractModel implements Model
             eventStateTransition.setName(stateVariable.getName());
             eventStateTransition.setType(stateVariable.getType());
 
-            // bug fix 1183
             if (ViskitGlobals.instance().isArray(stateVariable.getType())) {
                 index = stateTransition.getIndex();
                 eventStateTransition.setIndexingExpression(index);
             }
+            
+            // obsolete
+//            commentList = new ArrayList<>(); // from XML
+//            commentList.addAll(stateVariable.getComment());
+////            eventStateTransition.setComments(comment);
+//            eventStateTransition.setDescription(concatStrings(commentList));
+            eventStateTransition.setDescription(stateVariable.getDescription());
 
             eventStateTransition.setOperation(stateTransition.getOperation() != null);
             if (eventStateTransition.isOperation()) 
@@ -479,23 +496,16 @@ public class ModelImpl extends MvcAbstractModel implements Model
             if (localVariableInvocation != null && localVariableInvocation.getMethod() != null && !localVariableInvocation.getMethod().isEmpty())
                 eventStateTransition.setLocalVariableInvocation(stateTransition.getLocalVariableInvocation().getMethod());
 
-            // obsolete
-//            commentList = new ArrayList<>(); // from XML
-//            commentList.addAll(stateVariable.getComment());
-////            eventStateTransition.setComments(comment);
-//            eventStateTransition.setDescription(concatStrings(commentList));
-            eventStateTransition.setDescription(stateVariable.getDescription());
-
             eventStateTransition.opaqueModelObject = stateTransition;
             eventNode.getStateTransitions().add(eventStateTransition);
         }
 
-        Coordinate coor = event.getCoordinate();
-        if (coor != null) //todo lose this after all xmls updated
+        Coordinate coordinate = event.getCoordinate();
+        if (coordinate != null) //todo lose this after all xmls updated
         {
             eventNode.setPosition(new Point2D.Double(
-                    Double.parseDouble(coor.getX()),
-                    Double.parseDouble(coor.getY())));
+                    Double.parseDouble(coordinate.getX()),
+                    Double.parseDouble(coordinate.getY())));
         }
     }
 
@@ -978,70 +988,80 @@ public class ModelImpl extends MvcAbstractModel implements Model
     /**
      * Here we convert local state transition expressions into JAXB bindings
      *
-     * @param targ List of StateTransitions to populate
-     * @param local List of StateTransitions to transfer to the target
+     * @param targetStateTransitionList List of StateTransitions to populate
+     * @param localStateTransitionList List of StateTransitions to transfer to the target
      */
-    private void cloneTransitions(List<StateTransition> targ, List<ViskitElement> local) {
-        targ.clear();
-        StateTransition st;
-        String localV, assign, localI, invoke;
-        LocalVariableAssignment l;
-        StateVariable sv;
-        Operation o;
-        Assignment a;
-        LocalVariableInvocation lvi;
-        for (ViskitElement transition : local) {
-            st = jaxbEventGraphObjectFactory.createStateTransition();
+    private void cloneTransitions(List<StateTransition> targetStateTransitionList, List<ViskitElement> localStateTransitionList) 
+    {
+        targetStateTransitionList.clear();
+        StateTransition stateTransition;
+        String localVariableAssignmentString, assignmentString, localVariableInvocationString, invocationString;
+        LocalVariableAssignment localVariableAssignment;
+        StateVariable stateVariable;
+        Operation operation;
+        Assignment assignment;
+        LocalVariableInvocation localVariableInvocation;
+        
+        for (ViskitElement stateTransitionElement : localStateTransitionList)
+        {
+            stateTransition = jaxbEventGraphObjectFactory.createStateTransition();
 
             // Various locally declared variable ops
-            localV = ((EventStateTransition)transition).getLocalVariableAssignment();
-            if (localV != null && !localV.isEmpty()) {
+            localVariableAssignmentString = ((EventStateTransition)stateTransitionElement).getLocalVariableAssignment();
+            if (localVariableAssignmentString != null && !localVariableAssignmentString.isEmpty()) {
 
-                assign = ((EventStateTransition)transition).getLocalVariableAssignment();
-                if (assign != null && !assign.isEmpty()) {
-                    l = jaxbEventGraphObjectFactory.createLocalVariableAssignment();
-                    l.setValue(assign);
-                    st.setLocalVariableAssignment(l);
+                assignmentString = ((EventStateTransition)stateTransitionElement).getLocalVariableAssignment();
+                if (assignmentString != null && !assignmentString.isEmpty()) {
+                    localVariableAssignment = jaxbEventGraphObjectFactory.createLocalVariableAssignment();
+                    localVariableAssignment.setValue(assignmentString);
+                    stateTransition.setLocalVariableAssignment(localVariableAssignment);
                 }
             }
+            stateVariable = findStateVariable(stateTransitionElement.getName());
 
-            sv = findStateVariable(transition.getName());
+            if (stateVariable == null) {continue;}
 
-            if (sv == null) {continue;}
+            stateTransition.setState(stateVariable);
 
-            st.setState(sv);
-
-            if (sv.getType() != null && ViskitGlobals.instance().isArray(sv.getType())) {
-
+            if (stateVariable.getType() != null && ViskitGlobals.instance().isArray(stateVariable.getType()))
+            {
                 // Match the state transition's index to the given index
-                st.setIndex(transition.getIndexingExpression());
+                stateTransition.setIndex(stateTransitionElement.getIndexingExpression());
             }
 
-            if (transition.isOperation()) {
-                o = jaxbEventGraphObjectFactory.createOperation();
-                o.setMethod(transition.getOperationOrAssignment());
-                st.setOperation(o);
-            } else {
-                a = jaxbEventGraphObjectFactory.createAssignment();
-                a.setValue(transition.getOperationOrAssignment());
-                st.setAssignment(a);
+            // Not needed.  Duplicative, gives StateTransition same description as StateVariable
+//            if  (stateTransition.getDescription() != null)
+//            {
+//                 stateTransition.setDescription(stateTransitionElement.getDescription());
+//            }
+//            else stateTransition.setDescription("");
+
+            if (stateTransitionElement.isOperation()) 
+            {
+                operation = jaxbEventGraphObjectFactory.createOperation();
+                operation.setMethod(stateTransitionElement.getOperationOrAssignment());
+                stateTransition.setOperation(operation);
+            } 
+            else {
+                assignment = jaxbEventGraphObjectFactory.createAssignment();
+                assignment.setValue(stateTransitionElement.getOperationOrAssignment());
+                stateTransition.setAssignment(assignment);
             }
 
             // If we have any void return type, zero parameter methods to
             // call on local vars, or args, do it now
-            localI = ((EventStateTransition)transition).getLocalVariableInvocation();
-            if (localI != null && !localI.isEmpty()) {
-
-                invoke = ((EventStateTransition) transition).getLocalVariableInvocation();
-                if (invoke != null && !invoke.isEmpty()) {
-                    lvi = jaxbEventGraphObjectFactory.createLocalVariableInvocation();
-                    lvi.setMethod(invoke);
-                    st.setLocalVariableInvocation(lvi);
+            localVariableInvocationString = ((EventStateTransition)stateTransitionElement).getLocalVariableInvocation();
+            if (localVariableInvocationString != null && !localVariableInvocationString.isEmpty())
+            {
+                invocationString = ((EventStateTransition) stateTransitionElement).getLocalVariableInvocation();
+                if (invocationString != null && !invocationString.isEmpty()) {
+                    localVariableInvocation = jaxbEventGraphObjectFactory.createLocalVariableInvocation();
+                    localVariableInvocation.setMethod(invocationString);
+                    stateTransition.setLocalVariableInvocation(localVariableInvocation);
                 }
             }
-
-            transition.opaqueModelObject = st; //replace
-            targ.add(st);
+            stateTransitionElement.opaqueModelObject = stateTransition; //replace
+            targetStateTransitionList.add(stateTransition);
         }
     }
 
