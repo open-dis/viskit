@@ -23,7 +23,6 @@ import simkit.Priority;
 import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import static viskit.ViskitStatics.DESCRIPTION_HINT;
-import viskit.control.EventGraphController;
 import viskit.model.Edge;
 import viskit.model.EventLocalVariable;
 import viskit.model.SchedulingEdge;
@@ -337,7 +336,8 @@ public class EdgeInspectorDialog extends JDialog
         setLocationRelativeTo(c);
     }
 
-    private void keepSameSize(JComponent a, JComponent b) {
+    private void keepSameSize(JComponent a, JComponent b) 
+    {
         Dimension ad = a.getPreferredSize();
         Dimension bd = b.getPreferredSize();
         Dimension d = new Dimension(Math.max(ad.width, bd.width), Math.max(ad.height, bd.height));
@@ -772,12 +772,12 @@ public class EdgeInspectorDialog extends JDialog
         }
     }
 
-    private void setSchedulingType(boolean wh) {
-        schedulingType = wh;
-        priorityPanel.setVisible(wh);
-        timeDelayPanel.setVisible(wh);
-        schedulingLabel.setVisible(wh);
-        cancelingLabel.setVisible(!wh);
+    private void setSchedulingType(boolean whichType) {
+        schedulingType = whichType;
+        priorityPanel.setVisible(whichType);
+        timeDelayPanel.setVisible(whichType);
+        schedulingLabel.setVisible(whichType);
+        cancelingLabel.setVisible(!whichType);
     }
 
     private void setDescriptionScrollPaneVisible(boolean visible) {
@@ -800,8 +800,8 @@ public class EdgeInspectorDialog extends JDialog
         return descriptionTextArea.getText().trim();
     }
 
-    class CloseListener extends WindowAdapter {
-
+    class CloseListener extends WindowAdapter 
+    {
         @Override
         public void windowClosing(WindowEvent e) {
             if (modified) {
