@@ -44,13 +44,13 @@
         <TerminalParameter name="p[0] : " value="numberArrivals" type="java.lang.String"/>
         <Coordinate x="40.0" y="260.0"/>
     </PropertyChangeListener>
-    <SimEventListenerConnection listener="creator" source="arrivalProcess"/>
-    <PropertyChangeListenerConnection property="queue" listener="numberInQueueStat" source="serverWithReneges"/>
-    <PropertyChangeListenerConnection property="numberAvailableServers" listener="numberAvailableServersStat" source="serverWithReneges"/>
-    <PropertyChangeListenerConnection property="numberServed" listener="numberServedStat" source="serverWithReneges"/>
-    <PropertyChangeListenerConnection property="numberReneges" listener="numberRenegesStat" source="serverWithReneges"/>
+    <SimEventListenerConnection listener="creator" source="arrivalProcess" description="delivers arrivals to creator for customer preparation"/>
+    <PropertyChangeListenerConnection property="queue" listener="numberInQueueStat" source="serverWithReneges" description="count the number of customers in queue"/>
+    <PropertyChangeListenerConnection property="numberAvailableServers" listener="numberAvailableServersStat" source="serverWithReneges" description="count the number of available servers to help determine if system has good capacity"/>
+    <PropertyChangeListenerConnection property="numberServed" listener="numberServedStat" source="serverWithReneges" description="count the number of served customers"/>
+    <PropertyChangeListenerConnection property="numberReneges" listener="numberRenegesStat" source="serverWithReneges" description="count the number of reneging customers"/>
     <PropertyChangeListenerConnection property="numberArrivals" listener="numberArrivalsStat" source="arrivalProcess"/>
-    <Adapter name="arrivalAdapter" eventHeard="CustomerArrival" eventSent="Arrival" from="creator" to="serverWithReneges"/>
+    <Adapter name="arrivalAdapter" eventHeard="CustomerArrival" eventSent="Arrival" from="creator" to="serverWithReneges" description="celivers arrivals from customerArrival to serverWithReneges arrivals"/>
     <Output entity="creator"/>
     <Output entity="arrivalProcess"/>
     <Output entity="serverWithReneges"/>
