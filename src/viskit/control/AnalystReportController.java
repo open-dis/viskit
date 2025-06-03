@@ -266,16 +266,16 @@ public class AnalystReportController extends MvcAbstractController
     {
         if (analystReportViewFrame == null)
         {
+            ViskitGlobals.instance().selectAnalystReportTab();
             String message1 = "Analyst Report results must first be available in order to generateHtmlReport()";
             String message2 = "<html><p align='center'>Analyst Report results must first be available</p><br />" +
                                     "<p align='center'>in order to generate the HTML Analyst Report.</p><br />" +
-                                    "<p align='center'>Please load a prior Analyst Report or else perform a simulation run first.</p><br />";
+                                    "<p align='center'>Please perform a Simulation Run first, or else load a prior Analyst Report.</p><br />";
             LOG.error(message1);
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.WARNING_MESSAGE,
-                "Unable to show Analyst Report", message2);
+                "Unable to display Analyst Report", message2);
             return;
         }
-        ViskitGlobals.instance().selectAnalystReportTab();
         if (!ViskitGlobals.instance().getSimulationRunPanel().analystReportCB.isSelected()) {
             ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.WARNING_MESSAGE,
                     "Enable Analyst Reports not selected",

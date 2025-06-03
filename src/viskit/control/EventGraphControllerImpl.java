@@ -1424,7 +1424,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
          * Assembly, then all of the screen shots would be of the last Event Graph
          * that was opened either manually, or automatically by the below process.
          */
-        closeAll(); // TODO seems wrong
+        closeAll(); // TODO seems wrong but likely needed for off-screen rendering to file
 
         // Each Event Graph needs to be opened first
         for (File eventGraph : eventGraphs) 
@@ -1438,7 +1438,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 imageFile = fileIterator.next();
                 LOG.info("captureEventGraphImages() image " + imageFile.getName() + "\n      {}", imageFile);
 
-                // Don't display an extra timerCallbackFrame while taking snapshots
+                // Don't display an extra timerCallbackFrame while taking snapshots from each display frame
                 timerCallback = new TimerCallback(imageFile, false, eventGraphViewFrame.getCurrentJgraphComponent());
 
                 // Make sure we have a directory ready to receive these images
