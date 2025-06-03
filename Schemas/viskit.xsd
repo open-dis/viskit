@@ -532,7 +532,11 @@
       </xs:sequence>
       <xs:attribute name="state" use="required" type="xs:IDREF"/>
       <xs:attribute name="index"/>
-      <xs:attribute name="description"/>
+      <xs:attribute name="description">
+        <xs:annotation>
+          <xs:documentation>unused, duplicative of state variable</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
   <xs:element name="EdgeParameter">
