@@ -426,28 +426,30 @@ public class MainFrame extends JFrame
             Model dirtyModel = null;
 
             // Make sure we save modified SimulationState Graphs if we wander off to the Assembly tab
-            for (Model nextModel : modelArray) {
-                if (nextModel.isModelDirty()) {
+            for (Model nextModel : modelArray) 
+            {
+                if (nextModel.isModelDirty()) 
+                {
                     dirtyModel = nextModel;
                     ViskitGlobals.instance().getEventGraphController().setModel((MvcModel) nextModel);
                     ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).save();
                 }
             }
 
-            if (dirtyModel != null && dirtyModel.isModelDirty()) {
-
+            if (dirtyModel != null && dirtyModel.isModelDirty()) 
+            {
                 // This will fire another call to stateChanged()
                 topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR]);
                 return;
             }
 
-            int i = topTabbedPane.getSelectedIndex();
+            int index = topTabbedPane.getSelectedIndex();
 
             // If we compiled and prepped an Assembly to run, but want to go
             // back and change something, then handle that here
-            if (i == tabIndices[TAB_INDEX_SIMULATION_RUN]) 
+            if (index == tabIndices[TAB_INDEX_SIMULATION_RUN]) 
             {
-                i = topTabbedPane.getTabCount() + getSimulationRunTabbedPane().getSelectedIndex();
+                index = topTabbedPane.getTabCount() + getSimulationRunTabbedPane().getSelectedIndex();
                 topTabbedPane.setToolTipTextAt(tabIndices[TAB_INDEX_SIMULATION_RUN], "Run replications of simulation defined by selected Assembly");
             }
             else if ((topTabbedPane != null) && (topTabbedPane.getTabCount() >= TAB_INDEX_SIMULATION_RUN)) // TODO why is this needed??

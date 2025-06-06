@@ -487,7 +487,7 @@ public class EventNodeInspectorDialog extends JDialog
 //                    }
 //                }
 
-                unloadWidgets(eventNode);
+                unloadWidgets(eventNode); // confirmed values are returned?
             }
             dispose(); // releases window assets; perhaps this is premature>  contained information not being saved...
         }

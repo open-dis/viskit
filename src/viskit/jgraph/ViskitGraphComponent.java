@@ -261,11 +261,22 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                     vEdgeCell edgeCell = (vEdgeCell) firstCell;
                     Edge edge = (Edge) edgeCell.getUserObject();
 
-                    if (edge instanceof SchedulingEdge) {
-
-                        if  (edgeCell instanceof vSelfEdgeCell)
-                             htmlBuilder.append("<p align='center'>Self Scheduling Edge</p>");
-                        else htmlBuilder.append("<p align='center'>Scheduling Edge</p>");
+                        if (edge instanceof SchedulingEdge)
+                        {
+                            if  (edgeCell instanceof vSelfEdgeCell)
+                                 htmlBuilder.append("<p align='center'>Self Scheduling Edge</p>");
+                            else htmlBuilder.append("<p align='center'>Scheduling Edge</p>");
+                        }
+                        else if (edge instanceof CancelingEdge) 
+                        {
+                            if  (edgeCell instanceof vSelfEdgeCell)
+                                 htmlBuilder.append("<p align='center'>Self-Canceling Edge</p>");
+                            else htmlBuilder.append("<p align='center'>Canceling Edge</p>");
+                        }
+                        else
+                        {
+                            LOG.error("unexpected edge type: {}", edge.getClass().getName());
+                        }
 
                         if (!edge.getDescription().isBlank() || (edge.getConditionalDescription() != null))
                         {
@@ -274,8 +285,9 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                             {
                                 if (!newDescription.isBlank() && !newDescription.endsWith(".") && 
                                     !edge.getConditionalDescription().isBlank())
-                                    newDescription += ".";
-                                newDescription += " " + edge.getConditionalDescription().trim();                                
+                                    newDescription += "."; // end with period for description readability in small space
+                                if (!edge.getConditionalDescription().trim().isBlank())
+                                    newDescription += " " + edge.getConditionalDescription().trim(); // not expected
                             }
                             if (newDescription.length() > 0) 
                             {
@@ -287,95 +299,104 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
 
                         double priority;
                         String s;
-
-                        // Assume numeric comes in, avoid NumberFormatException via Regex check
-                        if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) edge).priority))
+                        // Assume numeric priority might be used, avoid NumberFormatException via Regex check
+                        if (edge instanceof SchedulingEdge)
                         {
-                            priority = Double.parseDouble(((SchedulingEdge) edge).priority);
-                            NumberFormat decimalFormat = DecimalFormat.getNumberInstance();
-                            decimalFormat.setMaximumFractionDigits(3);
-                            decimalFormat.setMaximumIntegerDigits(3);
-                            if (Double.compare(priority, Double.MAX_VALUE) >= 0) {
-                                s = "MAX";
-                            } else if (Double.compare(priority, -Double.MAX_VALUE) <= 0) {
-                                s = "MIN";
-                            } else {
-                                s = decimalFormat.format(priority);
+                            if (Pattern.matches(SchedulingEdge.FLOATING_POINT_REGEX, ((SchedulingEdge) edge).priority))
+                            {
+                                priority = Double.parseDouble(((SchedulingEdge) edge).priority);
+                                NumberFormat decimalFormat = DecimalFormat.getNumberInstance();
+                                decimalFormat.setMaximumFractionDigits(3);
+                                decimalFormat.setMaximumIntegerDigits(3);
+                                if (Double.compare(priority, Double.MAX_VALUE) >= 0) {
+                                    s = "MAX";
+                                } 
+                                else if (Double.compare(priority, -Double.MAX_VALUE) <= 0) {
+                                    s = "MIN";
+                                } 
+                                else {
+                                    s = decimalFormat.format(priority);
+                                }
+                            } 
+                            else // non-numeric, simply use the value
+                            {
+                                s = ((SchedulingEdge) edge).priority;
                             }
-                        } else {
-                            s = ((SchedulingEdge) edge).priority;
+                            htmlBuilder.append("<u>priority</u><br>&nbsp;");
+                            htmlBuilder.append(s);
+                            htmlBuilder.append("<br>");
                         }
 
-                        htmlBuilder.append("<u>priority</u><br>&nbsp;");
-                        htmlBuilder.append(s);
-                        htmlBuilder.append("<br>");
-
-                        if (edge.getDelay() != null) {
-                            String dly = edge.getDelay().trim();
-                            if (dly.length() > 0) {
+                        if (edge.getDelay() != null) 
+                        {
+                            String delayValue = edge.getDelay().trim();
+                            if (delayValue.length() > 0) 
+                            {
                                 htmlBuilder.append("<u>delay</u><br>&nbsp;");
-                                htmlBuilder.append(dly);
+                                htmlBuilder.append(delayValue);
                                 htmlBuilder.append("<br>");
                             }
                         }
 
-                        int idx = 1;
-                        if (!edge.getParameters().isEmpty()) {
-
+                        int index = 1;
+                        if (!edge.getParameters().isEmpty()) 
+                        {
                             htmlBuilder.append("<u>edge parameters</u><br>");
                             ViskitEdgeParameter edgeParameter;
-                            for (ViskitElement element : edge.getParameters()) {
+                            for (ViskitElement element : edge.getParameters()) 
+                            {
+                                // TODO name and type appear to be missing
                                 edgeParameter = (ViskitEdgeParameter) element;
                                 htmlBuilder.append("&nbsp;");
-                                htmlBuilder.append(idx++);
-                                htmlBuilder.append(" ");
-                                htmlBuilder.append(edgeParameter.getValue());
-
-                                if (edgeParameter.getType() != null && !edgeParameter.getType().isEmpty()) {
+                                htmlBuilder.append(index++);
+                                htmlBuilder.append(". ");
+                                htmlBuilder.append(edgeParameter.getName());
+                                if (edgeParameter.getType() != null && !edgeParameter.getType().isBlank()) 
+                                {
+                                    // curious order (name before type) matches interface
                                     htmlBuilder.append(" ");
                                     htmlBuilder.append("(");
                                     htmlBuilder.append(edgeParameter.getType());
-                                    htmlBuilder.append(")");
+                                    htmlBuilder.append(") ");
                                 }
+                                if (edgeParameter.getName() != null && !edgeParameter.getName().isBlank()) 
+                                    htmlBuilder.append(" = ");
+                                htmlBuilder.append(edgeParameter.getValue());
+
                                 htmlBuilder.append("<br>");
                             }
                         }
 
-                    }
-                    else 
+//                    if (edge != null && edge.getConditionalDescription() != null) 
+//                    {
+//                        String newDescription = edge.getConditionalDescription().trim();
+//                        if (newDescription.length() > 0) 
+//                        {
+//                            htmlBuilder.append("<u>description</u><br>");
+//                            htmlBuilder.append(wrapStringAtPosition(escapeLTGT(newDescription), 60));
+//                            htmlBuilder.append("<br>");
+//                        }
+//                    }
+
+                    if ((edge.getConditional() != null) && !edge.getConditional().isBlank())
                     {
-                        if  (edgeCell instanceof vSelfEdgeCell)
-                             htmlBuilder.append("<p align='center'>Self-Canceling Edge</p>");
-                        else htmlBuilder.append("<p align='center'>Canceling Edge</p>");
-                    }
-
-                    if (edge != null && edge.getConditionalDescription() != null) {
-                        String newDescription = edge.getConditionalDescription().trim();
-                        if (newDescription.length() > 0) 
-                        {
-                            htmlBuilder.append("<u>description</u><br>");
-                            htmlBuilder.append(wrapStringAtPosition(escapeLTGT(newDescription), 60));
-                            htmlBuilder.append("<br>");
-                        }
-                    }
-
-                    if (edge != null && edge.getConditional() != null) {
                         String conditional = edge.getConditional().trim();
-                        if (conditional.length() > 0) {
-                            htmlBuilder.append("<u>condition</u><br>&nbsp;if ( <b>");
+                        if (conditional.length() > 0) 
+                        {
+                            htmlBuilder.append("<u>condition</u><br>&nbsp;if&nbsp;(&nbsp;<b>");
                             htmlBuilder.append(escapeLTGT(conditional));
-                            htmlBuilder.append("</b> )<br>");
+                            htmlBuilder.append("</b>&nbsp;)<br>");
                         }
                     }
-
                     // Strip out the last <br>
-                    if (htmlBuilder.substring(htmlBuilder.length() - 4).equalsIgnoreCase("<br>")) {
+                    if (htmlBuilder.substring(htmlBuilder.length() - 4).equalsIgnoreCase("<br>")) 
+                    {
                         htmlBuilder.setLength(htmlBuilder.length() - 4);
                     }
                     htmlBuilder.append("</html>");
                     return htmlBuilder.toString();
                 }
-                else if (firstCell instanceof vCircleCell) 
+                else if (firstCell instanceof vCircleCell) // now processing an Event Node
                 {
                     vCircleCell circleCell = (vCircleCell) firstCell;
                     EventNode eventNode = (EventNode) circleCell.getUserObject();
@@ -383,9 +404,10 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
 
                     // Show event node names w/ corresponding parameters if any
                     String nodeName = eventNode.getName();
-                    String[] arr = nodeName.split("_");
+                    String[] arr = nodeName.split("_"); // underscores in event name can facilitate display
 
-                    if (arr.length > 1) {
+                    if (arr.length > 1) 
+                    {
                         htmlBuilder.append(arr[0]);
                         htmlBuilder.append("<br>");
                         htmlBuilder.append("(");
@@ -407,6 +429,7 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
 //                            htmlBuilder.append("<br>");
 //                        }
 //                    }
+
                     if (!eventNode.getDescription().isEmpty()) {
                         String stripBrackets = eventNode.getDescription().trim();
                         if (stripBrackets.length() > 0) {
@@ -466,15 +489,17 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                     }
 
                     List<ViskitElement> stateTransitionsList = eventNode.getStateTransitions();
-                    if (!stateTransitionsList.isEmpty()) {
-
+                    if (!stateTransitionsList.isEmpty()) 
+                    {
                         htmlBuilder.append("<u>state transitions</u><br>");
-                        EventStateTransition est;
+                        EventStateTransition eventStateTransition;
                         String[] sa;
-                        for (ViskitElement ve : stateTransitionsList) {
-                            est = (EventStateTransition) ve;
-                            sa = est.toString().split("\\n");
-                            for (String s : sa) {
+                        for (ViskitElement viskitStateTransition : stateTransitionsList) 
+                        {
+                            eventStateTransition = (EventStateTransition) viskitStateTransition;
+                            sa = eventStateTransition.toString().split("\\n");
+                            for (String s : sa) 
+                            {
                                 htmlBuilder.append("&nbsp;");
                                 htmlBuilder.append(s);
                                 htmlBuilder.append("<br>");

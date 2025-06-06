@@ -695,7 +695,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph before saving");
             return;
         }
-        ViskitGlobals.instance().selectEventGraphEditorTab();
+        ViskitGlobals.instance().selectEventGraphEditorTab(); // making sure
         Model eventGraphModel = (Model) getModel();
         if (eventGraphModel == null)
             eventGraphModel = ViskitGlobals.instance().getActiveEventGraphModel();
@@ -768,7 +768,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
      */
     private void handleCompileAndSave(Model model, File file)
     {
-        ViskitGlobals.instance().selectEventGraphEditorTab();
+        ViskitGlobals.instance().selectEventGraphEditorTab(); // making sure
         if (model.saveModel(file))
         {
             // We don't need to recurse since we know this is a file, but make sure

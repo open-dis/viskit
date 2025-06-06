@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import viskit.ViskitStatics;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -116,14 +117,16 @@ public abstract class Edge extends ViskitElement
     /**
      * @return the description
      */
+    @Override
     public String getDescription() {
-        return description;
+        return ViskitStatics.emptyIfNull(description);
     }
 
     /**
-     * @param description the description to set
+     * @param newDescription the description to set
      */
-    public void setDescription(String description) {
-        this.description = description;
+    @Override
+    public void setDescription(String newDescription) {
+        this.description = ViskitStatics.emptyIfNull(newDescription);
     }
 }
