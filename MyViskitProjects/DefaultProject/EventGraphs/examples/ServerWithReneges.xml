@@ -7,7 +7,7 @@
     <StateVariable name="queue" type="java.util.LinkedList&lt;Integer&gt;" description="ordered list of waiting customers, First In FIrst Out (FIFO)"/>
     <StateVariable name="numberServed" type="int" description="how many customers have been successfully served"/>
     <StateVariable name="numberReneges" type="int" description="count number of customer reneges"/>
-    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
+    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling author to schedule commencement of first simulation activity.">
         <StateTransition state="numberAvailableServers">
             <Assignment value="getNumberServers()"/>
         </StateTransition>
