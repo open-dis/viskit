@@ -182,6 +182,7 @@
       <xs:attribute name="event" use="required" type="xs:IDREF"/>
       <xs:attribute name="condition"/>
       <xs:attribute name="description"/>
+      <!-- no priority -->
     </xs:complexType>
   </xs:element>
 </xs:schema>
