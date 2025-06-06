@@ -295,7 +295,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         Method setStopTimeMethod               = simulationRunAssemblyClass.getMethod(METHOD_setStopTime, double.class);
         Method getStopTimeMethod               = simulationRunAssemblyClass.getMethod(METHOD_getStopTime);
 
-        simulationRunPanel.numberReplicationsTF.setText("" + getNumberReplicationsMethod.invoke(simulationRunAssemblyInstance));
+        simulationRunPanel.numberReplicationsTF.setText(String.valueOf(getNumberReplicationsMethod.invoke(simulationRunAssemblyInstance)));
         simulationRunPanel.printReplicationReportsCB.setSelected((Boolean) isPrintReplicationReportsMethod.invoke(simulationRunAssemblyInstance));
         simulationRunPanel.printSummaryReportsCB.setSelected((Boolean) isPrintSummaryReportMethod.invoke(simulationRunAssemblyInstance));
         simulationRunPanel.saveReplicationDataCB.setSelected(saveReplicationDataToXml);
@@ -304,7 +304,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         setVerboseMethod.invoke(simulationRunAssemblyInstance, verbose);
         simulationRunPanel.vcrVerboseCB.setSelected((Boolean) isVerboseMethod.invoke(simulationRunAssemblyInstance));
         setStopTimeMethod.invoke(simulationRunAssemblyInstance, stopTime);
-        simulationRunPanel.vcrStopTimeTF.setText("" + getStopTimeMethod.invoke(simulationRunAssemblyInstance));
+        simulationRunPanel.vcrStopTimeTF.setText(String.valueOf(getStopTimeMethod.invoke(simulationRunAssemblyInstance)));
     }
 
     protected void prepareAndStartAssemblySimulationRun() // formerly initRun

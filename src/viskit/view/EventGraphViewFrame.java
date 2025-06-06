@@ -390,7 +390,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         parametersPanel.add(descriptionLabel);
 //        parametersPanel.add(Box.createVerticalStrut(5));
         
-        JLabel instructionsLabel = new JLabel("Edit Properties or Ctrl-E to Edit");
+        JLabel instructionsLabel = new JLabel("Edit Metadata Properties or Ctrl-E to Edit");
         instructionsLabel.setToolTipText(DESCRIPTION_HINT);
         instructionsLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         int bigSz = descriptionLabel.getFont().getSize();
@@ -554,7 +554,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         // the view holds only one model, so it gets overwritten with each tab
         // but this call serves also to register the view with the passed model
         // by virtue of calling stateChanged()
-        tabbedPane.add("" + untitledCount++, graphPane.drawingSplitPane);
+        tabbedPane.add(String.valueOf(untitledCount++), graphPane.drawingSplitPane);
 
         // Bring the JGraph component to front. Also, allows models their own
         // canvas to draw to prevent a NPE
@@ -1399,28 +1399,30 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
      * Ensures a unique file name by appending a count integer to the filename
      * until the system can detect that it is indeed unique
      *
-     * @param suggName the base file name to start with
+     * @param suggestedName the base file name to start with
      * @param parent the parent directory of the suggested file to be named
      * @return a unique filename based on the suggName with an integer appended
      * to ensure uniqueness
      */
-    public File getUniqueName(String suggName, File parent) {
-        String appnd = "";
-        String suffix = "";
+    public File getUniqueName(String suggestedName, File parent) 
+    {
+        String appendNumber = "";
+        String fileExtension = "";
 
-        int lastDot = suggName.lastIndexOf('.');
-        if (lastDot != -1) {
-            suffix = suggName.substring(lastDot);
-            suggName = suggName.substring(0, lastDot);
+        int lastDotIndex = suggestedName.lastIndexOf('.');
+        if (lastDotIndex != -1) 
+        {
+            fileExtension = suggestedName.substring(lastDotIndex);
+            suggestedName = suggestedName.substring(0, lastDotIndex);
         }
         int count = -1;
-        File fil = null;
+        File newFile = null;
         do {
-            fil = new File(parent, suggName + appnd + suffix);
-            appnd = "" + ++count;
-        } while (fil.exists());
+            newFile = new File(parent, suggestedName + appendNumber + fileExtension);
+            appendNumber = String.valueOf(++count);
+        } while (newFile.exists());
 
-        return fil;
+        return newFile;
     }
 
     @Override

@@ -531,10 +531,12 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             LOG.error("unable to save() null assemblyModel");
             return;
         }
-        if (assemblyModel.getCurrentFile() == null) {
+        if (assemblyModel.getCurrentFile() == null) 
+        {
             saveAs();
         } 
-        else {
+        else 
+        {
             assemblyModel.saveModel(assemblyModel.getCurrentFile());
         }
         assemblyViewFrame.toggleAssemblyStatusIndicators();
@@ -2372,8 +2374,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         List<String> v = new ArrayList<>();
 
         v.add(className);                                             // 0
-        v.add("" + ((AssemblyModel) getModel()).getMetadata().verbose); // 1
-        v.add(  ((AssemblyModel) getModel()).getMetadata().stopTime); // 2
+        v.add(String.valueOf(((AssemblyModel) getModel()).getMetadata().verbose)); // 1
+        v.add(                 ((AssemblyModel) getModel()).getMetadata().stopTime); // 2
 
         String[] ra = new String[v.size()];
         return v.toArray(ra);

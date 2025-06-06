@@ -22,6 +22,7 @@ import viskit.util.FileBasedAssemblyNode;
 import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.MvcAbstractModel;
 import viskit.util.XMLValidationTool;
+import static viskit.view.SimulationRunPanel.SIMULTION_STOP_TIME_DEFAULT;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
 
@@ -237,19 +238,24 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 jaxbRoot.getSchedule().setStopTime(graphMetadata.stopTime);
             } 
             else {
-                jaxbRoot.getSchedule().setStopTime("100.0"); // default
+                jaxbRoot.getSchedule().setStopTime(SIMULTION_STOP_TIME_DEFAULT); // default
             }
 
             // Schedule needs this value to properly sync with Enable Analyst Reports
             jaxbRoot.getSchedule().setSaveReplicationData(String.valueOf(ViskitGlobals.instance().getSimulationRunPanel().analystReportCB.isSelected()));
-            jaxbRoot.getSchedule().setVerbose("" + graphMetadata.verbose);
+            jaxbRoot.getSchedule().setVerbose(String.valueOf(graphMetadata.verbose));
 
             assemblyMarshaller.marshal(jaxbRoot, fileWriter);
 
             // OK, made it through the marshal, overwrite the "real" file
             Files.copy(tempAssemblyMarshallFile.toPath(), savableAssemblyModelFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            
+            String modelModifiedStatus;
+            if  (isModelDirty())
+                 modelModifiedStatus =    "saved modified";
+            else modelModifiedStatus = "re-saved unmodified";
             long bytesCopied = savableAssemblyModelFile.length();
-            LOG.info("Assembly file saved, {} bytes\n       {}" , bytesCopied, savableAssemblyModelFile);
+            LOG.info("{} Assembly file, {} bytes\n      {}" , modelModifiedStatus, bytesCopied, savableAssemblyModelFile);
 
             setModelDirty(false);
             currentAssemblyModelFile = savableAssemblyModelFile;
@@ -727,8 +733,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
         double x = propertyChangeListenerNode.getPosition().getX();
         double y = propertyChangeListenerNode.getPosition().getY();
         Coordinate coordinate = jaxbAssemblyObjectFactory.createCoordinate();
-        coordinate.setX("" + x);
-        coordinate.setY("" + y);
+        coordinate.setX(String.valueOf(x));
+        coordinate.setY(String.valueOf(y));
         propertyChangeListenerNode.getPosition().setLocation(x, y);
         jaxbPropertyChangeListener.setCoordinate(coordinate);
 
@@ -771,11 +777,11 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
         double x = eventGraphNode.getPosition().getX();
         double y = eventGraphNode.getPosition().getY();
-        Coordinate coor = jaxbAssemblyObjectFactory.createCoordinate();
-        coor.setX("" + x);
-        coor.setY("" + y);
+        Coordinate coordinate = jaxbAssemblyObjectFactory.createCoordinate();
+        coordinate.setX(String.valueOf(x));
+        coordinate.setY(String.valueOf(y));
         eventGraphNode.getPosition().setLocation(x, y);
-        jaxbSimEntity.setCoordinate(coor);
+        jaxbSimEntity.setCoordinate(coordinate);
 
         List<Object> parameterList = jaxbSimEntity.getParameters();
         parameterList.clear();

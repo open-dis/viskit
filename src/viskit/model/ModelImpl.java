@@ -276,7 +276,6 @@ public class ModelImpl extends MvcAbstractModel implements Model
             // OK, made it through the marshal, overwrite the "real" file
             Files.copy(tempFile.toPath(), currentFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            setModelDirty(false);
             returnValue = true;
         }
         catch (JAXBException e) {
@@ -311,8 +310,13 @@ public class ModelImpl extends MvcAbstractModel implements Model
         }
         if (returnValue)
         {
+            String modelModifiedStatus;
+            if  (isModelDirty())
+                 modelModifiedStatus =    "saved modified";
+            else modelModifiedStatus = "re-saved unmodified";
             long bytesSaved = currentFile.length();
-            LOG.info("Event graph file saved, {} bytes\n      {}", bytesSaved, currentFile.getPath());
+            LOG.info("{} Event Graph file, {} bytes\n      {}", modelModifiedStatus, bytesSaved, currentFile.getPath());
+            setModelDirty(false);
         }
         else
         {
@@ -1134,8 +1138,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
         double x = eventNode.getPosition().getX();
         double y = eventNode.getPosition().getY();
         Coordinate coordinate = jaxbEventGraphObjectFactory.createCoordinate();
-        coordinate.setX("" + x);
-        coordinate.setY("" + y);
+        coordinate.setX(String.valueOf(x));
+        coordinate.setY(String.valueOf(y));
         eventNode.getPosition().setLocation(x, y);
         jaxbEvent.setCoordinate(coordinate);
 
@@ -1309,7 +1313,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 //        schedule.getComment().clear();
 //        schedule.getComment().add(schedulingEdge.conditionalDescription);
         schedule.setDescription(schedulingEdge.getDescription());
-        schedule.setDelay("" + schedulingEdge.getDelay());
+        schedule.setDelay(String.valueOf(schedulingEdge.getDelay()));
 
         schedule.setEvent(schedulingEdge.getTo().opaqueModelObject);
         schedule.setPriority(((SchedulingEdge)schedulingEdge).priority);
