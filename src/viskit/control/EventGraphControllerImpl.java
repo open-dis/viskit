@@ -762,7 +762,20 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             markEventGraphFilesAsOpened();
         }
     }
-
+    /**
+     * Saves all modified event graphs
+     */
+    public void saveAll()
+    {
+        int numberOfEventGraphs = ViskitGlobals.instance().getEventGraphEditorViewFrame().getNumberEventGraphsLoaded();
+        for (int index = 0; index < numberOfEventGraphs; index++)
+        {
+            Model nextEventGraphModel = ViskitGlobals.instance().getEventGraphEditorViewFrame().getOpenEventGraphModels()[index];
+            if (nextEventGraphModel.isModelDirty())
+                nextEventGraphModel.save();
+        }
+    }
+    
     /**
      * Handles whether an XML Event Graph file gets its java source compiled and watchedmodel@param m the model of the XML Event Graph
      * @param file the XML file name to save to

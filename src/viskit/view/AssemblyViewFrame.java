@@ -745,17 +745,17 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         closeProjectMenuItem.setToolTipText("Close the current Viskit project");
         projectMenu.add(closeProjectMenuItem);
         
+        saveAllMenuItem = buildMenuItem(assemblyController, METHOD_saveAll,                "Save All Modified Models", KeyEvent.VK_Z,
+                null);
+        saveAllMenuItem.setToolTipText("Save all modified Assembly and Event Graph models in this project");
+        projectMenu.add(saveAllMenuItem);
+        
         zipProjectMenuItem = buildMenuItem(assemblyController, METHOD_zipProject,                "Zip Project", KeyEvent.VK_Z,
                 null);
         zipProjectMenuItem.setToolTipText("Zip the current Viskit project");
         projectMenu.add(zipProjectMenuItem);
 
         projectMenu.addSeparator();
-        
-        saveAllMenuItem = buildMenuItem(assemblyController, METHOD_saveAll,                "Save All Modified Models", KeyEvent.VK_Z,
-                null);
-        saveAllMenuItem.setToolTipText("Save all modified Event Graph and Assembly Models in this project");
-        projectMenu.add(saveAllMenuItem);
         
         userPreferencesMenuItem = buildMenuItem(assemblyController, METHOD_showViskitUserPreferences, "Viskit User Preferences", KeyEvent.VK_V, null);
         userPreferencesMenuItem.setToolTipText("Edit and save Viskit User Preference");

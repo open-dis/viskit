@@ -546,6 +546,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /** method name for reflection use */
     public static final String METHOD_saveAll= "saveAll";
 
+    /** Save all modified Assembly and Event Graph models */
     public void saveAll()
     {
         if (ViskitGlobals.instance().hasDirtyAssembly())
@@ -565,13 +566,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         if (ViskitGlobals.instance().hasDirtyEventGraph())
         {
-            int numberOfEventGraphs = ViskitGlobals.instance().getEventGraphEditorViewFrame().getNumberEventGraphsLoaded();
-            for (int index = 0; index < numberOfEventGraphs; index++)
-            {
-                Model nextEventGraphModel = ViskitGlobals.instance().getEventGraphEditorViewFrame().getOpenEventGraphModels()[index];
-                if (nextEventGraphModel.isModelDirty())
-                    nextEventGraphModel.save();
-            }
+            ViskitGlobals.instance().getEventGraphController().saveAll();
         }
     }
     
@@ -742,7 +737,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (ViskitGlobals.instance().hasViskitProject())
             eventGraphFiles = ViskitGlobals.instance().getViskitProject().getEventGraphsDirectory().listFiles();
         if (eventGraphFiles.length == 0) {
-            ((EventGraphController)ViskitGlobals.instance().getEventGraphController()).newEventGraph();
+            ViskitGlobals.instance().getEventGraphController().newEventGraph();
         }
     }
     
