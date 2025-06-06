@@ -23,7 +23,7 @@
         <Code></Code>
         <Coordinate x="70.0" y="70.0"/>
     </Event>
-    <Event name="Arrival">
+    <Event name="Arrival" description="customer has arrived">
         <Argument name="customer" type="java.lang.Integer" description=""/>
         <StateTransition state="queue">
             <Operation method="add(customer)"/>
@@ -35,8 +35,8 @@
         <Code></Code>
         <Coordinate x="70.0" y="170.0"/>
     </Event>
-    <Event name="StartService">
-        <LocalVariable name="customer" type="java.lang.Integer" value="queue.getFirst()" description=""/>
+    <Event name="StartService" description="begin servicing current customer">
+        <LocalVariable name="customer" type="java.lang.Integer" value="queue.getFirst()" description="ID number for current customer"/>
         <StateTransition state="queue">
             <Operation method="removeFirst()"/>
         </StateTransition>
@@ -52,7 +52,7 @@
         <Code></Code>
         <Coordinate x="210.0" y="160.0"/>
     </Event>
-    <Event name="EndService">
+    <Event name="EndService" description="customer service activity complete">
         <Argument name="customer1" type="java.lang.Integer" description=""/>
         <StateTransition state="numberAvailableServers">
             <Assignment value="numberAvailableServers+1"/>
@@ -64,7 +64,7 @@
         <Code></Code>
         <Coordinate x="340.0" y="160.0"/>
     </Event>
-    <Event name="Renege">
+    <Event name="Renege" description="customer reneges out of line, no longer requesting service">
         <Argument name="customer2" type="java.lang.Integer" description=""/>
         <StateTransition state="queue">
             <Operation method="remove(customer2)"/>
@@ -72,6 +72,7 @@
         <StateTransition state="numberReneges">
             <Assignment value="numberReneges+1"/>
         </StateTransition>
+        <Code></Code>
         <Coordinate x="140.0" y="280.0"/>
     </Event>
 </SimEntity>
