@@ -514,12 +514,14 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (!ViskitGlobals.instance().isSelectedAssemblyEditorTab())
         {
             ViskitGlobals.instance().selectAssemblyEditorTab();
-            if (ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded() > 1)
+            if ((ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded() > 1) &&
+                 ViskitGlobals.instance().hasDirtyAssembly())
             {
-                ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Assembly", "First select an Assembly before saving");
+                ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Assembly", "First select an Assembly in Assembly Editor before saving");
                 return;
             }
         }
+        ViskitGlobals.instance().selectAssemblyEditorTab(); // ensure proper focus
         if (assemblyModel == null)
             assemblyModel = (AssemblyModelImpl) getModel();
         if (assemblyModel == null)
@@ -535,8 +537,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         else {
             assemblyModel.saveModel(assemblyModel.getCurrentFile());
         }
-            assemblyViewFrame.toggleAssemblyStatusIndicators();
-            assemblyViewFrame.enableAssemblyMenuItems();
+        assemblyViewFrame.toggleAssemblyStatusIndicators();
+        assemblyViewFrame.enableAssemblyMenuItems();
     }
     
     /** method name for reflection use */

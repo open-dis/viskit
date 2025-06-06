@@ -42,11 +42,11 @@ public class EventNodeInspectorDialog extends JDialog
     private final JTextField eventNameTF;
 //    private final JTextField descriptionTF;
 //    private final JPanel descriptionPanel;
-    private final JTextArea   descriptionTextArea;
-    private final JScrollPane descriptionScrollPane;
-    private TransitionsPanel stateTransitionsPanel;
-    private ArgumentsPanel arguments;
-    private LocalVariablesPanel localVariablesPanel;
+    private final JTextArea      descriptionTextArea;
+    private final JScrollPane    descriptionScrollPane;
+    private TransitionsPanel     stateTransitionsPanel;
+    private ArgumentsPanel       arguments;
+    private LocalVariablesPanel  localVariablesPanel;
     private final CodeBlockPanel localCodeBlockPanel;
     private final JButton cancelButton;
     private final JButton okButton;

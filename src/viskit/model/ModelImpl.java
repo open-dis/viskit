@@ -235,11 +235,11 @@ public class ModelImpl extends MvcAbstractModel implements Model
         try {
             tempFile = TempFileManager.createTempFile("tempEventGraphMarshal", ".xml");
         } 
-        catch (IOException e) {
+        catch (IOException e) 
+        {
             ViskitGlobals.instance().messageUser(JOptionPane.ERROR_MESSAGE,
                     "I/O Error",
-                    "Exception creating temporary file, Model.saveModel():" +
-                    "\n" + e.getMessage()
+                    "Exception creating temporary file, Model.saveModel():" + "\n" + e.getMessage()
                     );
             return false;
         }
@@ -261,8 +261,8 @@ public class ModelImpl extends MvcAbstractModel implements Model
             jaxbRoot.setImplement  (ViskitStatics.nullIfEmpty(graphMetadata.implementsPackageName));
             
             // TODO do we need to update StateVariables, Parameters, Events?  isn't this handled in subclass?
-//          List<StateVariable> stateVariableList = jaxbRoot.getStateVariable(); // TODO confirm not needed
-            
+            List<StateVariable> stateVariableList = jaxbRoot.getStateVariable(); // TODO confirm not needed
+
             // obsolete
 //            List<String> clis = jaxbRoot.getComment();
 //            clis.clear();
@@ -309,7 +309,15 @@ public class ModelImpl extends MvcAbstractModel implements Model
                         this.getClass().getSimpleName(), currentFile.toPath(), ioe);
             }
         }
-        LOG.info("saveModel({}) result: {}", modelFile.getName(), returnValue);
+        if (returnValue)
+        {
+            long bytesSaved = currentFile.length();
+            LOG.info("Event graph file saved, {} bytes\n      {}", bytesSaved, currentFile.getPath());
+        }
+        else
+        {
+            LOG.error("Event graph file not saved: {}", modelFile.getName());
+        }
         return returnValue;
     }
 

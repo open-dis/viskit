@@ -689,13 +689,14 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     @Override
     public void save()
     {
-        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab())
+        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() &&
+             ViskitGlobals.instance().hasDirtyEventGraph())
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
-            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph before saving");
+            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph in Event Graph Editor before saving");
             return;
         }
-        ViskitGlobals.instance().selectEventGraphEditorTab(); // making sure
+        ViskitGlobals.instance().selectEventGraphEditorTab(); // ensure correct focus
         Model eventGraphModel = (Model) getModel();
         if (eventGraphModel == null)
             eventGraphModel = ViskitGlobals.instance().getActiveEventGraphModel();
@@ -1300,8 +1301,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             return; // not expected
         }
         graphMetadata = eventGraphModel.getMetadata();
-        boolean modified =
-                EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
+        boolean modified = EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
         if (modified) {
             ((Model) getModel()).changeMetadata(graphMetadata);
 

@@ -41,7 +41,6 @@ public class ViskitGraphUI extends BasicGraphUI {
         if (graph.isCellEditable(cell)) {
             createEditDialog(cell);
         }
-
         return false; // any returned boolean does nothing in JGraph v.5.14.0
     }
 
@@ -52,7 +51,8 @@ public class ViskitGraphUI extends BasicGraphUI {
     private void createEditDialog(Object cell) 
     {
         EventGraphController eventGraphController = (EventGraphController) ViskitGlobals.instance().getEventGraphController();
-        if (cell instanceof vEdgeCell) {
+        if (cell instanceof vEdgeCell) 
+        {
             Edge edge = (Edge) ((DefaultMutableTreeNode) cell).getUserObject();
             
             if (edge instanceof SchedulingEdge)
@@ -61,9 +61,11 @@ public class ViskitGraphUI extends BasicGraphUI {
                 eventGraphController.cancelingEdgeEdit(edge);
             
         } 
-        else if (cell instanceof vCircleCell) {
+        else if (cell instanceof vCircleCell) 
+        {
             EventNode eventNode = (EventNode) ((DefaultMutableTreeNode) cell).getUserObject();
             eventGraphController.nodeEdit(eventNode);
+            // TODO is value getting saved?
         }
     }
 }

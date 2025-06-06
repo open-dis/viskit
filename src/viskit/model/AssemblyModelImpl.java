@@ -248,6 +248,8 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
 
             // OK, made it through the marshal, overwrite the "real" file
             Files.copy(tempAssemblyMarshallFile.toPath(), savableAssemblyModelFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            long bytesCopied = savableAssemblyModelFile.length();
+            LOG.info("Assembly file saved, {} bytes\n       {}" , bytesCopied, savableAssemblyModelFile);
 
             setModelDirty(false);
             currentAssemblyModelFile = savableAssemblyModelFile;
