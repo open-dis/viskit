@@ -35,7 +35,7 @@
         <Code></Code>
         <Coordinate x="70.0" y="170.0"/>
     </Event>
-    <Event name="StartService" description="begin servicing current customer">
+    <Event name="StartService" description="commence service for current customer, schedule completion time">
         <LocalVariable name="customer" type="java.lang.Integer" value="queue.getFirst()" description="ID number for current customer"/>
         <StateTransition state="queue">
             <Operation method="removeFirst()"/>
