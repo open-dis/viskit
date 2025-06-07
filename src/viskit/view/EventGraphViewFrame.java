@@ -439,7 +439,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             ((EventGraphController) getController()).deleteSimParameter((ViskitParameter) event.getSource());
         });
         nextParametersPanel.addDoubleClickedListener((ActionEvent event) -> {
-            ((EventGraphController) getController()).simParameterEdit((ViskitParameter) event.getSource());
+            ((EventGraphController) getController()).simulationParameterEdit((ViskitParameter) event.getSource());
         });
 
         parametersPanel.add(nextParametersPanel);
@@ -468,22 +468,22 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
 
     private CodeBlockPanel buildCodeBlockPanel() 
     {
-        CodeBlockPanel odeBlockPanel = new CodeBlockPanel(this, true, "Event Graph Code Block");
-        odeBlockPanel.addUpdateListener((ActionEvent e) -> {
+        CodeBlockPanel codeBlockPanel = new CodeBlockPanel(this, true, "Event Graph Code Block");
+        codeBlockPanel.addUpdateListener((ActionEvent e) -> {
             String s = (String) e.getSource();
             if (s != null) {
                 ((EventGraphController) getController()).codeBlockEdit(s);
             }
         });
-        return odeBlockPanel;
+        return codeBlockPanel;
     }
 
     private JComponent buildCodeBlockComponent(CodeBlockPanel codeBlockPanel) 
     {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        JLabel globalCodeBlockLabel = new JLabel("Global Code Block");
-        globalCodeBlockLabel.setToolTipText("Code block source code can declare global variables, static variables, static methods, etc.");
+        JLabel globalCodeBlockLabel = new JLabel("Event Graph Code Block");
+        globalCodeBlockLabel.setToolTipText("Code block is Java source to declare global variables, static variables, methods, etc.");
         globalCodeBlockLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         panel.add(globalCodeBlockLabel);
         codeBlockPanel.setAlignmentX(JLabel.CENTER_ALIGNMENT);

@@ -694,6 +694,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
              saveAllMenuItem.setEnabled(isProjectLoaded && 
                      (ViskitGlobals.instance().hasDirtyAssembly() ||
                       ViskitGlobals.instance().hasDirtyEventGraph()));
+                      // TODO Analyst Report
           
         if  (ViskitGlobals.instance().isProjectOpen())
              openProjectMenuItem.setToolTipText("Open an existing Viskit project, closing current project");
@@ -717,19 +718,21 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         newProjectMenuItem = buildMenuItem(assemblyController, METHOD_newProject, "New Project", KeyEvent.VK_N,
                 null);
-        newProjectMenuItem.setToolTipText("Create a new Viskit project");
+        if  (ViskitGlobals.instance().isProjectOpen())
+             newProjectMenuItem.setToolTipText("Create a new Viskit project, which closes current project");
+        else newProjectMenuItem.setToolTipText("Create a new Viskit project");
         projectMenu.add(newProjectMenuItem);
         
         openProjectMenuItem = buildMenuItem(this, METHOD_openProject, "Open Project", KeyEvent.VK_O,
                 null);
         if  (ViskitGlobals.instance().isProjectOpen())
-             openProjectMenuItem.setToolTipText("Open an existing Viskit project, closing current project");
+             openProjectMenuItem.setToolTipText("Open an existing Viskit project, which closes current project");
         else openProjectMenuItem.setToolTipText("Open an existing Viskit project");
         projectMenu.add(openProjectMenuItem);
         
         openRecentProjectMenu = buildMenu("Open Recent Project");
         if  (ViskitGlobals.instance().isProjectOpen())
-             openRecentProjectMenu.setToolTipText("Select and open Recent Project, closing current project");
+             openRecentProjectMenu.setToolTipText("Select and open Recent Project, which closes current project");
         else openRecentProjectMenu.setToolTipText("Select and open Recent Project");
         projectMenu.add(openRecentProjectMenu);
         openRecentProjectMenu.setMnemonic('O');
@@ -745,7 +748,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         closeProjectMenuItem.setToolTipText("Close the current Viskit project");
         projectMenu.add(closeProjectMenuItem);
         
-        saveAllMenuItem = buildMenuItem(assemblyController, METHOD_saveAll,                "Save All Modified Models", KeyEvent.VK_Z,
+        saveAllMenuItem = buildMenuItem(assemblyController, METHOD_saveAll,                "Save All Modified Models", KeyEvent.VK_S,
                 null);
         saveAllMenuItem.setToolTipText("Save all modified Assembly and Event Graph models in this project");
         projectMenu.add(saveAllMenuItem);

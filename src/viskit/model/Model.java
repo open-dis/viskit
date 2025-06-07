@@ -172,9 +172,9 @@ public interface Model
 
     String generateIndexVariableName();
 
-    void resetLVNameGenerator();
+    void resetLocalVariableNameGenerator();
 
-    void resetIdxNameGenerator();
+    void resetIndexNameGenerator();
 
     String generateStateVariableName();
 

@@ -624,7 +624,7 @@ public class EventStateTransitionDialog extends JDialog
             arrayIndexField.setText("");
             actionField.setText("");
             localInvocationField.setText("");
-            ViskitGlobals.instance().getActiveEventGraphModel().resetIdxNameGenerator();
+            ViskitGlobals.instance().getActiveEventGraphModel().resetIndexNameGenerator();
             dispose();
         }
     }

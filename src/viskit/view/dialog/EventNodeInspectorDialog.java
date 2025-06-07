@@ -440,7 +440,7 @@ public class EventNodeInspectorDialog extends JDialog
             setModified(false);
 
             // To start numbering over next time
-            ViskitGlobals.instance().getActiveEventGraphModel().resetLVNameGenerator();
+            ViskitGlobals.instance().getActiveEventGraphModel().resetLocalVariableNameGenerator();
             dispose();
         }
     }

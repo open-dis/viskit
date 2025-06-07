@@ -73,7 +73,7 @@ public class SimulationRunPanel extends JPanel
     
     public static final String SIMULATION_RUN_PANEL_TITLE = "Simulation Run Console";
     
-    public static final String SIMULTION_STOP_TIME_DEFAULT = "100.0"; // seconds
+    public static final String SIMULATION_STOP_TIME_DEFAULT = "100.0"; // seconds
     
     public boolean dump = true;
     public boolean search;

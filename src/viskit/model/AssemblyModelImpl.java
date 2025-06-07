@@ -22,9 +22,9 @@ import viskit.util.FileBasedAssemblyNode;
 import viskit.control.AssemblyControllerImpl;
 import viskit.mvc.MvcAbstractModel;
 import viskit.util.XMLValidationTool;
-import static viskit.view.SimulationRunPanel.SIMULTION_STOP_TIME_DEFAULT;
 import viskit.xsd.bindings.assembly.*;
 import viskit.xsd.translator.assembly.SimkitAssemblyXML2Java;
+import static viskit.view.SimulationRunPanel.SIMULATION_STOP_TIME_DEFAULT;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -43,11 +43,11 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
     private static JAXBContext jaxbContext;
     private viskit.xsd.bindings.assembly.ObjectFactory jaxbAssemblyObjectFactory;
     private SimkitAssembly jaxbRoot;
-    private String currentAssemblyModelName = new String();
-    private File   currentAssemblyModelFile;
-    private String title = new String();
-    private boolean modelDirty = false;
-    private GraphMetadata graphMetadata;
+    private String         currentAssemblyModelName = new String();
+    private File           currentAssemblyModelFile;
+    private String         title = new String();
+    private boolean        modelDirty = false;
+    private GraphMetadata  graphMetadata;
 
     /** We require specific order on this Map's contents */
     private final Map<String, AssemblyNode> nodeCache;
@@ -238,7 +238,7 @@ public class AssemblyModelImpl extends MvcAbstractModel implements AssemblyModel
                 jaxbRoot.getSchedule().setStopTime(graphMetadata.stopTime);
             } 
             else {
-                jaxbRoot.getSchedule().setStopTime(SIMULTION_STOP_TIME_DEFAULT); // default
+                jaxbRoot.getSchedule().setStopTime(SIMULATION_STOP_TIME_DEFAULT); // default
             }
 
             // Schedule needs this value to properly sync with Enable Analyst Reports

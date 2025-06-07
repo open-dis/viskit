@@ -110,7 +110,7 @@ public interface EventGraphController {
      */
     void cancelingEdgeEdit(Edge cancelingEdge);
 
-    void simParameterEdit(ViskitParameter simParameter);
+    void simulationParameterEdit(ViskitParameter simParameter);
 
     void stateVariableEdit(ViskitStateVariable stateVariable);
 

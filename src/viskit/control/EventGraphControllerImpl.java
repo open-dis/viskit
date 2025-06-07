@@ -811,10 +811,10 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     }
 
     @Override
-    public void simParameterEdit(ViskitParameter param) {
-        boolean modified = ((EventGraphView) getView()).doEditParameter(param);
+    public void simulationParameterEdit(ViskitParameter newSimulationParameter) {
+        boolean modified = ((EventGraphView) getView()).doEditParameter(newSimulationParameter);
         if (modified) {
-            ((viskit.model.Model) getModel()).changeSimParameter(param);
+            ((viskit.model.Model) getModel()).changeSimParameter(newSimulationParameter);
         }
     }
 
