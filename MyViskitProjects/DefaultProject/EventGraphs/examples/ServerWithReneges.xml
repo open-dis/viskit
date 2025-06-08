@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="ServerWithReneges" package="examples" version="2.0" extend="SimEntityBase" description="Event graph for server handling customers and reneges" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<SimEntity name="ServerWithReneges" package="examples" version="2.0" extend="SimEntityBase" description="Event graph for server handling customer servicing and customer reneges" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="numberServers" type="int" description="total number of servers to process arriving customers"/>
     <Parameter name="serviceTime" type="simkit.random.RandomVariate" description="probablilistic time duration to service a customer"/>
     <Parameter name="renegeTime" type="simkit.random.RandomVariate" description="likely wait time before a customer decides to reneqe and get out of the service line"/>
