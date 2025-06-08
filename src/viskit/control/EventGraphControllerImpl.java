@@ -172,12 +172,12 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
             String title = "Confirm Run Event";
 
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
-            boolean modelDirty = false;
+            boolean modelModified = false;
             if (returnValue == JOptionPane.YES_OPTION) {
                 EventGraphControllerImpl.this.buildNewEventNode(new Point(30, 60), "Run");
-                modelDirty = true;
+                modelModified = true;
             }
-            ((Model) getModel()).setModelDirty(modelDirty);
+            ((Model) getModel()).setModelModified(modelModified);
         } 
         else 
         {
@@ -206,8 +206,8 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
                 
             case JOptionPane.NO_OPTION:
                 // No need to recompile
-                if (((Model) getModel()).isModelDirty()) {
-                    ((Model) getModel()).setModelDirty(false);
+                if (((Model) getModel()).isModelModified()) {
+                    ((Model) getModel()).setModelModified(false);
                 }
                 returnValue = true;
                 break;
@@ -514,7 +514,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     @Override
     public boolean preQuit() {
 
-        // Check for dirty models before exiting
+        // Check for modified models before exiting
         Model[] modelArray = ((EventGraphView) getView()).getOpenEventGraphModels();
         for (Model nextModel : modelArray) {
             setModel((MvcModel) nextModel);
@@ -542,7 +542,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         int numberOfEventGraphs = ViskitGlobals.instance().getEventGraphEditorViewFrame().getNumberEventGraphsLoaded();
         
         if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && // closing without checking first
-             ViskitGlobals.instance().hasDirtyEventGraph() &&
+ViskitGlobals.instance().hasModifiedEventGraph() &&
             !ViskitGlobals.instance().isSelectedAssemblyEditorTab())     // closing automatically when closing parent Assembly
         {
             ViskitGlobals.instance().selectEventGraphEditorTab(); // making sure
@@ -564,18 +564,18 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         }
         ViskitGlobals.instance().selectEventGraphEditorTab(); // making sure
         
-        boolean hasDirtyEventGraph = false; // TODO if needed
+        boolean hasModifiedEventGraph = false; // TODO if needed
         
         Model[] eventGraphModels = ((EventGraphView) getView()).getOpenEventGraphModels();
         for (Model model : eventGraphModels) 
         {
-            if (model.isModelDirty())
+            if (model.isModelModified())
             {
-                hasDirtyEventGraph = true;
+                hasModifiedEventGraph = true;
                 break;
             }
         }
-        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && hasDirtyEventGraph)
+        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && hasModifiedEventGraph)
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
             ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "View Event Graph Editor", "First review Event Graph models before closing");
@@ -643,7 +643,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         {
             return false;
         }
-        if (eventGraphModel.isModelDirty())
+        if (eventGraphModel.isModelModified())
         {
             return askToSaveAndContinue();
         }
@@ -697,7 +697,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public void save()
     {
         if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() &&
-             ViskitGlobals.instance().hasDirtyEventGraph())
+             ViskitGlobals.instance().hasModifiedEventGraph())
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
             ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph in Event Graph Editor before saving");
@@ -731,7 +731,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         {
             ViskitGlobals.instance().selectEventGraphEditorTab();
             if ((ViskitGlobals.instance().getEventGraphEditorViewFrame().getNumberEventGraphsLoaded() > 1) && 
-                !ViskitGlobals.instance().getActiveEventGraphModel().isModelDirty())
+                !ViskitGlobals.instance().getActiveEventGraphModel().isModelModified())
             {
                 ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Event Graph", "First select an Event Graph before saving");
                 return;
@@ -778,7 +778,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         for (int index = 0; index < numberOfEventGraphs; index++)
         {
             Model nextEventGraphModel = ViskitGlobals.instance().getEventGraphEditorViewFrame().getOpenEventGraphModels()[index];
-            if (nextEventGraphModel.isModelDirty())
+            if (nextEventGraphModel.isModelModified())
                 nextEventGraphModel.save();
         }
     }
@@ -793,11 +793,11 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         if (model.saveModel(file))
         {
             // We don't need to recurse since we know this is a file, but make sure
-            // it is re-compiled and re-validated later. model.isModelDirty will be set from this call.
+            // it is re-compiled and re-validated later. model.isModelModified will be set from this call.
             ViskitGlobals.instance().getAssemblyEditorViewFrame().addEventGraphsToLegoTree(file, false);
         }
         // Don't watch an XML file whose source couldn't be compiled correctly
-        if (!model.isModelDirty()) {
+        if (!model.isModelModified()) {
             fileWatchSave(file);
         }
     }
@@ -1205,7 +1205,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     {
         Model model = (Model) getModel();
         if (model == null) {return false;}
-        if (model.isModelDirty() || model.getLastFile() == null) {
+        if (model.isModelModified() || model.getLastFile() == null) {
             String message = "The model will be saved.\nContinue?";
             String title = "Confirm";
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
@@ -1380,7 +1380,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         boolean modified = EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
         if (modified) {
             ((Model) getModel()).changeMetadata(graphMetadata);
-            ViskitGlobals.instance().getActiveEventGraphModel().setModelDirty(true); // TODO move into dialog panel
+            ViskitGlobals.instance().getActiveEventGraphModel().setModelModified(true); // TODO move into dialog panel
 
             // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name);

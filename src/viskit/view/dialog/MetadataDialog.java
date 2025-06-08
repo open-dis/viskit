@@ -261,8 +261,8 @@ abstract public class MetadataDialog extends JDialog
         @Override
         public void actionPerformed(ActionEvent event) {
             // In this class, if the user hits the apply button, it is assumed that the data has been changed,
-            // so the model is marked dirty.  A different, more controlled scheme would be to have change listeners
-            // for all the widgets, and only mark dirty if data has been changed.  Else do a string compare between
+            // so the model is marked modified.  A different, more controlled scheme would be to have change listeners
+            // for all the widgets, and only mark modified if data has been changed.  Else do a string compare between
             // final data and ending data and set modified only if something had actually changed.
             modified = true;
             if (modified) {

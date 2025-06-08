@@ -126,7 +126,7 @@ public class ViskitProject
     private File srcDirectory;
     private File libDirectory;
     private boolean projectFileExists = false;
-    private boolean projectDirty;
+    private boolean projectModified;
     private boolean projectOpen = false;
     private Document projectDocument;
 
@@ -451,12 +451,12 @@ public class ViskitProject
         return projectDirectory.getAbsolutePath();
     }
 
-    public boolean isProjectDirty() {
-        return projectDirty;
+    public boolean isProjectModified() {
+        return projectModified;
     }
 
-    public void setProjectDirty(boolean newDirtyStatus) {
-        this.projectDirty = newDirtyStatus;
+    public void setProjectModified(boolean newModifiedStatus) {
+        this.projectModified = newModifiedStatus;
     }
 
     public File getBuildDirectory() {

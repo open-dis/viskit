@@ -423,20 +423,20 @@ public class MainFrame extends JFrame
                 return; // nothing to do, yet
 
             Model[] modelArray = ViskitGlobals.instance().getEventGraphEditorViewFrame().getOpenEventGraphModels();
-            Model dirtyModel = null;
+            Model modifiedModel = null;
 
             // Make sure we save modified SimulationState Graphs if we wander off to the Assembly tab
             for (Model nextModel : modelArray) 
             {
-                if (nextModel.isModelDirty()) 
+                if (nextModel.isModelModified()) 
                 {
-                    dirtyModel = nextModel;
+                    modifiedModel = nextModel;
                     ViskitGlobals.instance().getEventGraphController().setModel((MvcModel) nextModel);
                     ((EventGraphController) ViskitGlobals.instance().getEventGraphController()).save();
                 }
             }
 
-            if (dirtyModel != null && dirtyModel.isModelDirty()) 
+            if (modifiedModel != null && modifiedModel.isModelModified()) 
             {
                 // This will fire another call to stateChanged()
                 topTabbedPane.setSelectedIndex(tabIndices[TAB_INDEX_EVENTGRAPH_EDITOR]);

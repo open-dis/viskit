@@ -334,7 +334,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             // wish to have work saved when merely switching between tabs on
             // the Event Graph palette. However, when switching to the Assembly palette, we
             // will save all Event Graphs that have been modified
-//            if (((Model)getModel()).isDirty()) {
+//            if (((Model)getModel()).isModified()) {
 //                ((EventGraphController)getController()).save();
 //            }
 
@@ -1190,7 +1190,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
     }
 
     /** Changes the background/foreground color of Event Graph tabs depending on
-     * model.isDirty() status giving the user an indication of a good/bad
+     * model.isModified() status giving the user an indication of a good/bad
      * save and compile operation. Of note is that the default Look+Feel must be
      * selected for WIN machines, else no colors will be visible. On Macs, the
      * platform Look+Feel works best.
@@ -1203,7 +1203,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             // This will fire a call to stateChanged() which also sets the current model
             tabbedPane.setSelectedComponent(currentSwingComponent);
             // TODO tooltip text hints not appearing
-            if (((Model) getModel()).isModelDirty())
+            if (((Model) getModel()).isModelModified())
             {
                 // background changes seem excessive
 //                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());
@@ -1596,7 +1596,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
                 break;
         }
 
-        // Let model.isDirty() determine status color
+        // Let model.isModified() determine status color
         toggleEventGraphStatusIndicators();
         enableEventGraphMenuItems();
     }

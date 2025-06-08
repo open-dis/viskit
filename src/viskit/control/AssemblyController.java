@@ -187,7 +187,7 @@ public interface AssemblyController {
     /**
      * Perform Assembly Editor shutdown duties
      *
-     * @return true if Assembly was dirty (modified)
+     * @return true if Assembly was previously modified
      */
     boolean preQuit();
 

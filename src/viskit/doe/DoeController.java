@@ -94,12 +94,12 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         switch (c) {
             case OPEN_FILE:
                 // Todo remove menu
-                checkDirty();
+                checkModified();
                 olddoOpen(new File(((String) e.getSource())));
                 break;
 
             case OPEN_FILE_CHOOSE:
-                checkDirty();
+                checkModified();
                 openSaveFileChooser.setDialogTitle("Open Assembly or DOE File");
                 int retv = openSaveFileChooser.showOpenDialog(doeFrame);
                 if (retv != JFileChooser.APPROVE_OPTION) {
@@ -121,7 +121,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                 } else {
                     doSaveAs(dfm);
                 }
-                clearDirty();
+                clearModified();
                 break;
 
             case SAVE_FILE_AS:
@@ -130,7 +130,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
                     return;
                 }
                 doSaveAs(dfm);
-                clearDirty();
+                clearModified();
                 break;
 
             case EXIT_APP:
@@ -146,7 +146,7 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
     }
 
     public boolean preQuit() {
-        return (checkDirty() != JOptionPane.CANCEL_OPTION);
+        return (checkModified() != JOptionPane.CANCEL_OPTION);
     }
 
     public void postQuit() {
@@ -155,11 +155,11 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
 //        VGlobals.instance().systemExit(0);
     }
 
-    private int checkDirty() {
+    private int checkModified() {
         DoeFileModel dfm = doeFrame.getModel();
         int reti = JOptionPane.YES_OPTION;
         if (dfm != null) {
-            if (((ParameterTableModel) dfm.parameterTable.getModel()).dirty) {
+            if (((ParameterTableModel) dfm.parameterTable.getModel()).modified) {
                 reti = JOptionPane.showConfirmDialog(doeFrame, "Save changes?");
                 if (reti == JOptionPane.YES_OPTION) {
                     doSave(dfm);
@@ -169,10 +169,10 @@ public class DoeController implements DoeEvents, ActionListener, OpenAssembly.As
         return reti;
     }
 
-    private void clearDirty() {
-        DoeFileModel dfm = doeFrame.getModel();
-        if (dfm != null) {
-            ((ParameterTableModel) dfm.parameterTable.getModel()).dirty = false;
+    private void clearModified() {
+        DoeFileModel doeFileModel = doeFrame.getModel();
+        if (doeFileModel != null) {
+            ((ParameterTableModel) doeFileModel.parameterTable.getModel()).modified = false;
         }
     }
 

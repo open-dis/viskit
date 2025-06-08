@@ -719,8 +719,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         closeProjectMenuItem.setEnabled(isProjectLoaded);
           zipProjectMenuItem.setEnabled(isProjectLoaded);
              saveAllMenuItem.setEnabled(isProjectLoaded && 
-                     (ViskitGlobals.instance().hasDirtyAssembly() ||
-                      ViskitGlobals.instance().hasDirtyEventGraph()));
+                     (ViskitGlobals.instance().hasModifiedAssembly() ||
+                      ViskitGlobals.instance().hasModifiedEventGraph()));
                       // TODO Analyst Report
           
         if  (ViskitGlobals.instance().isProjectOpen())
@@ -1322,13 +1322,13 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
                 getCurrentViskitGraphAssemblyComponentWrapper().viskitModelChanged((ModelEvent) modelEvent);
                 break;
         }
-        // Let model.isDirty() determine status color
+        // Let model.isModified() determine status color
         toggleAssemblyStatusIndicators();
         enableAssemblyMenuItems();
     }
 
     /** Changes the background/foreground color of Assembly tabs depending on
-     * model.isDirty() status giving the user an indication of a good/bad
+     * model.isModified() status giving the user an indication of a good/bad
      * save and compile operation. Of note is that the default Look+Feel must be
      * selected for WIN machines, else no colors will be visible. On Macs, the
      * platform Look+Feel works best.
@@ -1342,7 +1342,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
             tabbedPane.setSelectedComponent(currentSwingComponent);
             // TODO tooltip text hints not appearing
 
-            if (((AssemblyModelImpl) getModel()).isModelDirty())
+            if (((AssemblyModelImpl) getModel()).isModelModified())
             {
                 // background color changes look excessive
 //                tabbedPane.setBackgroundAt(tabbedPane.getSelectedIndex(), Color.RED.brighter());

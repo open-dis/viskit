@@ -70,7 +70,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
     private final EventGraphControllerImpl eventGraphController;
 
     private GraphMetadata graphMetadata;
-    private boolean modelDirty = false;
+    private boolean modelModified = false;
     private boolean numericPriority;
 
     /** Constructor
@@ -109,14 +109,14 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
-    public boolean isModelDirty() {
-        return modelDirty;
+    public boolean isModelModified() {
+        return modelModified;
     }
 
     @Override
-    public void setModelDirty(boolean newDirtyStatus) 
+    public void setModelModified(boolean newModifiedStatus) 
     {
-        modelDirty = newDirtyStatus;
+        modelModified = newModifiedStatus;
         ViskitGlobals.instance().getEventGraphEditorViewFrame().enableEventGraphMenuItems();
         ViskitGlobals.instance().getAssemblyEditorViewFrame().enableProjectMenuItems(); // enable/disable Save All Models menu item
     }
@@ -130,7 +130,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
     public void changeMetadata(GraphMetadata newGraphMetadata) 
     {
         this.graphMetadata = newGraphMetadata;
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(newGraphMetadata, ModelEvent.METADATA_CHANGED, "Metadata changed"));
     }
 
@@ -176,8 +176,8 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
 
                 buildEventsFromJaxb(simEntityJaxbRoot.getEvent());
 
-                // The above change metadata and build set the model dirty
-                setModelDirty(false);
+                // The above change metadata and build set the model 
+                setModelModified(false);
                 // The following builds just notify
 
                 buildParametersFromJaxb(simEntityJaxbRoot.getParameter());
@@ -371,12 +371,12 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         if (returnValue)
         {
             String modelModifiedStatus;
-            if  (isModelDirty())
+            if  (isModelModified())
                  modelModifiedStatus =    "saved modified";
             else modelModifiedStatus = "re-saved unmodified";
             long bytesSaved = currentFile.length();
             LOG.info("{} Event Graph file, {} bytes\n      {}", modelModifiedStatus, bytesSaved, currentFile.getPath());
-            setModelDirty(false);
+            setModelModified(false);
         }
         else // returnValue == false, problem with saving or compilation
         {
@@ -680,7 +680,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
 
         edgeCacheMap.put(scheduleElement, schedulingEdge);
 
-        setModelDirty(true);
+        setModelModified(true);
         this.notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Edge added"));
     }
 
@@ -713,7 +713,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
 
         edgeCacheMap.put(cancelElement, cancelingEdge);
 
-//        setModelDirty(true); // likely erroneous, not expecting dirty if loading from file using JAXB
+//        setModelModified(true); // likely erroneous, not expecting  if loading from file using JAXB
         notifyChanged(new ModelEvent(cancelingEdge, ModelEvent.CANCELING_EDGE_ADDED, "Canceling edge added"));
     }
 
@@ -827,7 +827,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
 
         simEntityJaxbRoot.getParameter().add(parameter);
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(viskitParameter, ModelEvent.SIM_PARAMETER_ADDED, "new simulation parameter"));
     }
 
@@ -843,14 +843,14 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         }
         simulationParameterElements.remove(vp);
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(vp, ModelEvent.SIM_PARAMETER_DELETED, "vParameter deleted"));
     }
 
     @Override
     public void changeCodeBlock(String s) {
         simEntityJaxbRoot.setCode(s);
-        setModelDirty(true);
+        setModelModified(true);
     }
 
     @Override
@@ -872,7 +872,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
 //        parameter.getComment().add(newParameter.getDescription());
         parameter.setDescription(newParameter.getDescription());
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(newParameter, ModelEvent.SIM_PARAMETER_CHANGED, "vParameter changed"));
         return returnValue;
     }
@@ -898,7 +898,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         newStateVariable.opaqueModelObject = jaxbStateVariable;
         simEntityJaxbRoot.getStateVariable().add(jaxbStateVariable);
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(newStateVariable, ModelEvent.STATE_VARIABLE_ADDED, "State variable added"));
     }
 
@@ -915,7 +915,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         }
         stateVariableElements.remove(stateVariableToDelete);
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(stateVariableToDelete, ModelEvent.STATE_VARIABLE_DELETED, "State variable deleted"));
     }
 
@@ -935,7 +935,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
 //        stateVariable.getComment().add(vsv.getDescription());
         stateVariable.setDescription(ViskitStatics.emptyIfNull(newStateVariable.getDescription()));
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(newStateVariable, ModelEvent.STATE_VARIABLE_CHANGED, "State variable changed"));
         return returnValue;
     }
@@ -972,7 +972,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         node.opaqueModelObject = jaxbEvent;
         simEntityJaxbRoot.getEvent().add(jaxbEvent);
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(node, ModelEvent.EVENT_ADDED, "Event added"));
     }
 
@@ -987,7 +987,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         node.opaqueModelObject = jaxbEv;
         simEntityJaxbRoot.getEvent().add(jaxbEv);
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(node, ModelEvent.REDO_EVENT_NODE, "Event Node redone"));
     }
 
@@ -997,7 +997,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         eventNodeCacheMap.remove(jaxbEv);
         simEntityJaxbRoot.getEvent().remove(jaxbEv);
 
-        setModelDirty(true);
+        setModelModified(true);
         if (!eventGraphController.isUndo())
             notifyChanged(new ModelEvent(node, ModelEvent.EVENT_DELETED, "Event deleted"));
         else
@@ -1248,7 +1248,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
 
         jaxbEvent.setCode(eventNode.getCodeBlockString());
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENT_CHANGED, "Event changed"));
         return returnValue;
     }
@@ -1289,7 +1289,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
 
         edgeCacheMap.put(schedule, schedulingEdge);
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_ADDED, "Scheduling Edge added"));
     }
 
@@ -1309,7 +1309,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         sourceEvent.getScheduleOrCancel().add(schedule);
         edgeCacheMap.put(schedule, edge);
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(edge, ModelEvent.REDO_SCHEDULING_EDGE, "Scheduling Edge redone"));
     }
 
@@ -1342,7 +1342,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         }
         edgeCacheMap.put(cancel, cancelingEdge);
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(cancelingEdge, ModelEvent.CANCELING_EDGE_ADDED, "Canceling Edge added"));
     }
 
@@ -1363,7 +1363,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         sourceEveny.getScheduleOrCancel().add(cancel);
         edgeCacheMap.put(cancel, edge);
 
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(edge, ModelEvent.REDO_CANCELING_EDGE, "Canceling Edge redone"));
     }
 
@@ -1400,7 +1400,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
             edges.remove(jaxbEdge);
         }
         edgeCacheMap.remove(edge);
-        setModelDirty(true);
+        setModelModified(true);
     }
 
     @Override
@@ -1425,7 +1425,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
             edgeParameter.setValue(ViskitStatics.nullIfEmpty(nextEdgeParameter.getValue()));
             schedule.getEdgeParameter().add(edgeParameter);
         }
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(schedulingEdge, ModelEvent.EDGE_CHANGED, "Edge changed"));
     }
 
@@ -1446,7 +1446,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
             edgeParameter.setValue(ViskitStatics.nullIfEmpty(nextEdgeParameter.getValue()));
             cancel.getEdgeParameter().add(edgeParameter);
         }
-        setModelDirty(true);
+        setModelModified(true);
         notifyChanged(new ModelEvent(newCancelingEdge, ModelEvent.CANCELING_EDGE_CHANGED, "Canceling edge changed"));
     }
 

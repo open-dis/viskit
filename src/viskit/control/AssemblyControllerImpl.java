@@ -103,7 +103,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     JTabbedPane mainTabbedPane;
     int mainTabbedPaneIndex;
     
-    private boolean localDirty = false;
+    private boolean localModified = false;
     
     private AssemblyViewFrame assemblyViewFrame;
     
@@ -198,17 +198,17 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         return openAssembliesList;
     }
 
-    private boolean checkSaveIfDirty() 
+    private boolean checkSaveIfModified() 
     {
         if (assemblyModel == null)
             assemblyModel = (AssemblyModelImpl) getModel();
         if (assemblyModel == null)
             assemblyModel = ViskitGlobals.instance().getActiveAssemblyModel();
-        if (assemblyModel.isModelDirty()) 
+        if (assemblyModel.isModelModified()) 
         {
             StringBuilder sb = new StringBuilder("<html><p align='center'>Execution parameters have been modified.<br>(");
 
-            for (Iterator<OpenAssembly.AssemblyChangeListener> openAssemblyChangeListenerIterator = isLocalDirtySet.iterator(); openAssemblyChangeListenerIterator.hasNext();) {
+            for (Iterator<OpenAssembly.AssemblyChangeListener> openAssemblyChangeListenerIterator = isLocalModifiedSet.iterator(); openAssemblyChangeListenerIterator.hasNext();) {
                 sb.append(openAssemblyChangeListenerIterator.next().getHandle());
                 sb.append(", ");
             }
@@ -230,7 +230,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         boolean returnValue = true;
         
-        if (assemblyModel.isModelDirty())
+        if (assemblyModel.isModelModified())
         {
             return askToSaveAndContinue(); // blocks
         }
@@ -360,7 +360,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         return assemblyChangeListener;
     }
     
-    private Set<OpenAssembly.AssemblyChangeListener> isLocalDirtySet = new HashSet<>();
+    private Set<OpenAssembly.AssemblyChangeListener> isLocalModifiedSet = new HashSet<>();
     
     OpenAssembly.AssemblyChangeListener assemblyChangeListener = new OpenAssembly.AssemblyChangeListener() 
     {
@@ -375,25 +375,25 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             switch (assemblyChangeListenerAction) 
             {    
                 case JAXB_CHANGED:
-                    isLocalDirtySet.remove(sourceAssemblyChangeListener);
-                    if (isLocalDirtySet.isEmpty())
+                    isLocalModifiedSet.remove(sourceAssemblyChangeListener);
+                    if (isLocalModifiedSet.isEmpty())
                     {
-                        localDirty = false; // not expecting dirty if loaded from JAXB
+                        localModified = false; // not expecting modified if loaded from JAXB
                     }
-                    assemblyModel.setModelDirty(false);
+                    assemblyModel.setModelModified(false);
                     break;
 
                 case NEW_ASSEMBLY:
-                    isLocalDirtySet.clear();
-                    localDirty = false;
-                    ((AssemblyModel) getModel()).setModelDirty(false); // TODO watchout might cause infinite loop
+                    isLocalModifiedSet.clear();
+                    localModified = false;
+                    ((AssemblyModel) getModel()).setModelModified(false); // TODO watchout might cause infinite loop
                     break;
 
                 case PARAMETER_LOCALLY_EDITED:
                     // This gets hit when you type something in the last three tabs
-                    isLocalDirtySet.add(sourceAssemblyChangeListener);
-                    localDirty = true;
-                    assemblyModel.setModelDirty(true);
+                    isLocalModifiedSet.add(sourceAssemblyChangeListener);
+                    localModified = true;
+                    assemblyModel.setModelModified(true);
                     break;
 
                 case CLOSE_ASSEMBLY:
@@ -516,7 +516,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         {
             ViskitGlobals.instance().selectAssemblyEditorTab();
             if ((ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded() > 1) &&
-                 ViskitGlobals.instance().hasDirtyAssembly())
+                 ViskitGlobals.instance().hasModifiedAssembly())
             {
                 ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "Select Assembly", "First select an Assembly in Assembly Editor before saving");
                 return;
@@ -550,22 +550,22 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     /** Save all modified Assembly and Event Graph models */
     public void saveAll()
     {
-        if (ViskitGlobals.instance().hasDirtyAssembly())
+        if (ViskitGlobals.instance().hasModifiedAssembly())
         {
             int numberOfAssemblies = ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded();
-            if (ViskitGlobals.instance().hasDirtyAssembly())
+            if (ViskitGlobals.instance().hasModifiedAssembly())
             {                
                 for (int index = 0; index < numberOfAssemblies; index++)
                 {
                     AssemblyModel nextAssemblyModel = ViskitGlobals.instance().getAssemblyEditorViewFrame().getOpenAssemblyModels()[index];
-                    if (nextAssemblyModel.isModelDirty())
+                    if (nextAssemblyModel.isModelModified())
                     {
                         ((AssemblyModelImpl) nextAssemblyModel).saveModel(nextAssemblyModel.getCurrentFile());
                     }
                 }
             }
         }
-        if (ViskitGlobals.instance().hasDirtyEventGraph())
+        if (ViskitGlobals.instance().hasModifiedEventGraph())
         {
             ViskitGlobals.instance().getEventGraphController().saveAll();
         }
@@ -652,7 +652,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (modified) 
         {
             assemblyModel.changeMetadata(graphMetadata);
-            ViskitGlobals.instance().getActiveAssemblyModel().setModelDirty(true);
+            ViskitGlobals.instance().getActiveAssemblyModel().setModelModified(true);
 
             // update title bar for frame
             ViskitGlobals.instance().getAssemblyEditorViewFrame().setSelectedAssemblyName(graphMetadata.name);
@@ -1001,7 +1001,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     @Override
     public boolean preQuit()
     {
-        // Check for dirty models before exiting
+        // Check for modified models before exiting
         AssemblyModel[] assemblyModelArray = ViskitGlobals.instance().getAssemblyEditorViewFrame().getOpenAssemblyModels();
         for (AssemblyModel vmod : assemblyModelArray) {
             setModel((MvcModel) vmod);
@@ -1033,7 +1033,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         
         int numberOfAssemblies = ViskitGlobals.instance().getAssemblyEditorViewFrame().getNumberAssembliesLoaded();
         
-        if ( ViskitGlobals.instance().hasDirtyAssembly() && 
+        if ( ViskitGlobals.instance().hasModifiedAssembly() && 
             !ViskitGlobals.instance().isSelectedAssemblyEditorTab() && (numberOfAssemblies != 0))
         {
             ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
@@ -1101,18 +1101,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         }
         ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
         
-//        boolean hasDirtyEventGraph = false; // TODO if needed
+//        boolean hasModifiedEventGraph = false; // TODO if needed
 //        
 //        Model[] eventGraphModels = ((EventGraphView) getView()).getOpenEventGraphModels();
 //        for (Model model : eventGraphModels) 
 //        {
-//            if (model.isDirty())
+//            if (model.isModified())
 //            {
-//                hasDirtyEventGraph = true;
+//                hasModifiedEventGraph = true;
 //                break;
 //            }
 //        }
-//        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && hasDirtyEventGraph)
+//        if (!ViskitGlobals.instance().isSelectedEventGraphEditorTab() && hasModifiedEventGraph)
 //        {
 //            ViskitGlobals.instance().selectEventGraphEditorTab();
 //            ViskitGlobals.instance().messageUser(JOptionPane.INFORMATION_MESSAGE, "View Event Graph Editor", "First review Event Graphs before closing");
@@ -1132,9 +1132,9 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             return false;
         }
         LOG.debug("preClose() close assembly {}", assemblyModel.getCurrentAssemblyModelName());
-        if (assemblyModel.isModelDirty()) 
+        if (assemblyModel.isModelModified()) 
         {
-            return checkSaveIfDirty();
+            return checkSaveIfModified();
         }
         return true;
     }
@@ -1269,7 +1269,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             case JOptionPane.YES_OPTION:
                 save();
                 // TODO: Can't remember why this is here after a save?
-                if (((AssemblyModel) getModel()).isModelDirty()) {
+                if (((AssemblyModel) getModel()).isModelModified()) {
                     return false;
                 } // we cancelled
                 return true;
@@ -1277,8 +1277,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             case JOptionPane.NO_OPTION:
 
                 // No need to recompile
-                if (((AssemblyModel) getModel()).isModelDirty()) {
-                    ((AssemblyModel) getModel()).setModelDirty(false);
+                if (((AssemblyModel) getModel()).isModelModified()) {
+                    ((AssemblyModel) getModel()).setModelModified(false);
                 }
                 return true;
                 
@@ -1851,7 +1851,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
         // Perhaps a cached file is no longer present in the path
         if (assemblyModel == null) {return false;}
-        if (assemblyModel.isModelDirty() || assemblyModel.getCurrentFile() == null) {
+        if (assemblyModel.isModelModified() || assemblyModel.getCurrentFile() == null) {
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo("Confirm", "The model will be saved.\nContinue?");
             if (returnValue != JOptionPane.YES_OPTION) {
                 return false;

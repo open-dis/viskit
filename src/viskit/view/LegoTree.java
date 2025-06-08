@@ -368,12 +368,12 @@ public class LegoTree extends JTree implements DragGestureListener, DragSourceLi
                 }
                 // Note
                 // On initial startup with valid XML, but bad compilation,
-                // dirty won't get set b/c the graph model is null until the
+                // modified won't get set because the graph model is null until the
                 // model tab is created and the Event Graph file is opened. First pass
                 // is only for inclusion in the LEGOs tree
                 if (ViskitGlobals.instance().getActiveEventGraphModel() != null) 
                 {
-                    ViskitGlobals.instance().getActiveEventGraphModel().setModelDirty(fileBasedAssemblyNode == null);
+                    ViskitGlobals.instance().getActiveEventGraphModel().setModelModified(fileBasedAssemblyNode == null);
                     ViskitGlobals.instance().getEventGraphEditorViewFrame().toggleEventGraphStatusIndicators();
                     ViskitGlobals.instance().getEventGraphEditorViewFrame().enableEventGraphMenuItems();
                 }

@@ -170,7 +170,7 @@ public class AnalystReportController extends MvcAbstractController
     {
         ViskitGlobals.instance().selectAnalystReportTab();
         
-        if ((analystReportViewFrame != null) && analystReportViewFrame.isReportDirty()) 
+        if ((analystReportViewFrame != null) && analystReportViewFrame.isReportModified()) 
         {
             int result = JOptionPane.showConfirmDialog(analystReportViewFrame,
                     "Save current simulation data and Analyst Report annotations?",
@@ -346,7 +346,7 @@ public class AnalystReportController extends MvcAbstractController
         
         try {
             getAnalystReportModel().writeToXMLFile(reportFile);
-            analystReportViewFrame.setReportDirty(false);
+            analystReportViewFrame.setReportModified(false);
         } 
         catch (Exception e) {
             LOG.error("saveReport(" + reportFile.getAbsolutePath() + ") exception: " + e);
@@ -364,7 +364,7 @@ public class AnalystReportController extends MvcAbstractController
         AnalystReportModel analystReportModelLocal = new AnalystReportModel(selectedFile);
         setContent(analystReportModelLocal);
         getAnalystReportModel().setAnalystReportFile(selectedFile);
-        analystReportViewFrame.setReportDirty(false);
+        analystReportViewFrame.setReportModified(false);
     }
 
     private void buildAnalystReport(File targetFile)
@@ -384,12 +384,12 @@ public class AnalystReportController extends MvcAbstractController
         }
         setContent(analystReportModelLocal);
         getAnalystReportModel().setAnalystReportFile(targetFile);
-        analystReportViewFrame.setReportDirty(false);
+        analystReportViewFrame.setReportModified(false);
         analystReportModelLocal.setReportReady(true);
     }
 
     private void setContent(AnalystReportModel analystReportModelLocal) {
-        if (analystReportModelLocal != null && analystReportViewFrame.isReportDirty()) {
+        if (analystReportModelLocal != null && analystReportViewFrame.isReportModified()) {
             int resp = JOptionPane.showConfirmDialog(analystReportViewFrame,
                     "<html><body><p align='center'>The experiment has completed and the report is ready to be displayed.<br>" +
                     "The current report data has not been saved. Save current report before continuing?</p></body></html>",
@@ -401,7 +401,7 @@ public class AnalystReportController extends MvcAbstractController
             }
         }
 
-        analystReportViewFrame.setReportDirty(false);
+        analystReportViewFrame.setReportModified(false);
 
         this.analystReportModel = analystReportModelLocal;
         analystReportViewFrame.setReportBuilder(analystReportModelLocal);

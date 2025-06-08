@@ -77,7 +77,7 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
     ArrayList<Object[]> rows;
     public Set<Integer> noEditRows = new HashSet<>();
     public Set<Integer> multiRows = new HashSet<>();
-    public boolean dirty = false;
+    public boolean modified = false;
 
     /**
      *
@@ -106,7 +106,7 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
                 processDesignParameter(terminalParameter);
             }
         }
-        dirty = false;
+        modified = false;
         this.addTableModelListener(ParameterTableModel.this);
     }
 
@@ -340,7 +340,7 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
     @Override
     public void setValueAt(Object value, int row, int col) {
         mydata[row][col] = value;
-        dirty = true;
+        modified = true;
 
         fireTableCellUpdated(row, col);
     }

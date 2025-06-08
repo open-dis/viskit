@@ -1545,42 +1545,42 @@ public class ViskitGlobals
         this.viskitProject = viskitProject;
     }
     
-    /** Return whether one or more open Assembly models are dirty and possibly need to be saved.
-     * @return whether dirty Assembly is loaded
+    /** Return whether one or more open Assembly models are modified and possibly need to be saved.
+     * @return whether modified Assembly is loaded
      */
-    public boolean hasDirtyAssembly()
+    public boolean hasModifiedAssembly()
     {
         int numberOfAssemblies = getAssemblyEditorViewFrame().getNumberAssembliesLoaded();
         if (numberOfAssemblies == 0)
             return false;
         
-        boolean hasDirtyAssembly = false;
+        boolean hasModifiedAssembly = false;
             
         for (int index = 0; index < numberOfAssemblies; index++)
         {
-            hasDirtyAssembly = hasDirtyAssembly || 
-                               ViskitGlobals.instance().getAssemblyEditorViewFrame().getOpenAssemblyModels()[index].isModelDirty();
+            hasModifiedAssembly = hasModifiedAssembly || 
+                               ViskitGlobals.instance().getAssemblyEditorViewFrame().getOpenAssemblyModels()[index].isModelModified();
         }
-        return hasDirtyAssembly;
+        return hasModifiedAssembly;
     }
     
-    /** Return whether one or more open Even Graph models are dirty and possibly need to be saved.
-     * @return whether dirty Event Graph is loaded
+    /** Return whether one or more open Even Graph models are modified and possibly need to be saved.
+     * @return whether modified Event Graph is loaded
      */
-    public boolean hasDirtyEventGraph()
+    public boolean hasModifiedEventGraph()
     {
         int numberOfEventGraphs = getEventGraphEditorViewFrame().getNumberEventGraphsLoaded();
         if (numberOfEventGraphs == 0)
             return false;
         
-        boolean hasDirtyEventGraph = false;
+        boolean hasModifiedEventGraph = false;
             
         for (int index = 0; index < numberOfEventGraphs; index++)
         {
-            hasDirtyEventGraph = hasDirtyEventGraph || 
-                                 ViskitGlobals.instance().getEventGraphEditorViewFrame().getOpenEventGraphModels()[index].isModelDirty();
+            hasModifiedEventGraph = hasModifiedEventGraph || 
+                                 ViskitGlobals.instance().getEventGraphEditorViewFrame().getOpenEventGraphModels()[index].isModelModified();
         }
-        return hasDirtyEventGraph;
+        return hasModifiedEventGraph;
     }
 
 } // end class file ViskitGlobals.java

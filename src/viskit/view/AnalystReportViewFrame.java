@@ -105,7 +105,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
      * TODO: rewire this functionality?
      * boolean to show that raw report has not been saved to AnalystReports
      */
-    private boolean dirty = false;
+    private boolean modified = false;
     private JMenuBar myMenuBar;
     private JFileChooser locationImageFileChooser;
     private static AnalystReportController analystReportController;
@@ -183,12 +183,12 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         return myMenuBar;
     }
 
-    public boolean isReportDirty() {
-        return dirty;
+    public boolean isReportModified() {
+        return modified;
     }
 
-    public void setReportDirty(boolean b) {
-        dirty = b;
+    public void setReportModified(boolean newValue) {
+        modified = newValue;
     }
 
     public void setReportBuilder(AnalystReportModel newAnalystReportModel) 
