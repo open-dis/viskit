@@ -299,7 +299,8 @@ public class ParameterTableModel extends DefaultTableModel implements TableModel
     }
 
     @Override
-    public Class getColumnClass(int c) {
+    public Class getColumnClass(int c) // class name miscapitalization by Java superclass
+    {
         //return getValueAt(0, c).getClass();
         switch (c) {
             case NAME_COL:
