@@ -49,7 +49,7 @@ import viskit.mvc.MvcController;
  * @since 1:09:38 PM
  * @version $Id$
  */
-public class ModelImpl extends MvcAbstractModel implements Model
+public class EventGraphModelImpl extends MvcAbstractModel implements Model
 {
     static final Logger LOG = LogManager.getLogger();
     
@@ -75,7 +75,7 @@ public class ModelImpl extends MvcAbstractModel implements Model
 
     /** Constructor
      * @param newEventGraphController provide corresponding controller */
-    public ModelImpl(MvcController newEventGraphController) 
+    public EventGraphModelImpl(MvcController newEventGraphController) 
     {
         eventGraphController = (EventGraphControllerImpl) newEventGraphController;
         graphMetadata = new GraphMetadata(this);
@@ -1450,4 +1450,4 @@ public class ModelImpl extends MvcAbstractModel implements Model
         notifyChanged(new ModelEvent(newCancelingEdge, ModelEvent.CANCELING_EDGE_CHANGED, "Canceling edge changed"));
     }
 
-} // end class file ModelImpl.java
+} // end class file EventGraphModelImpl.java
