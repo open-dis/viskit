@@ -197,20 +197,32 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private JToggleButton selectModeToggleButton;
     private JToggleButton adapterModeToggleButton,  simEventListenerModeToggleButton,  propertyChangeListenerModeToggleButton;
     private LegoTree legoEventGraphsTree, propertyChangeListenerTree;
-    private JMenuBar            myMenuBar;
-    private JMenuItem         quitMenuItem;
-    private JMenuItem   newProjectMenuItem;
-    private JMenuItem  openProjectMenuItem;
-    private JMenuItem closeProjectMenuItem;
-    private JMenuItem   zipProjectMenuItem;
-    private JMenuItem      saveAllMenuItem;
-    private JMenuItem userPreferencesMenuItem;
+    private JMenuBar                 myMenuBar;
+    private JMenuItem              quitMenuItem;
+    private JMenuItem        newProjectMenuItem;
+    private JMenuItem       openProjectMenuItem;
+    private JMenuItem      closeProjectMenuItem;
+    private JMenuItem        zipProjectMenuItem;
+    private JMenuItem           saveAllMenuItem;
+    private JMenuItem   userPreferencesMenuItem;
+    private JMenuItem              undoMenuItem;
+    private JMenuItem              redoMenuItem;
+    private JMenuItem               cutMenuItem;
+    private JMenuItem              copyMenuItem;
+    private JMenuItem             pasteMenuItem;
+    private JMenuItem            deleteMenuItem;
+    private JMenuItem  addNewEventGraphMenuItem;
+    private JMenuItem            addPclMenuItem;
+    private JMenuItem      editMetadataMenuItem;
+    private JMenuItem       newAssemblyMenuItem;
+    private JMenuItem      openAssemblyMenuItem;
+    
     private RecentProjectFileSetListener recentProjectFileSetListener;
     private RecentAssemblyFileListener   recentAssemblyFileListener; // TODO public?
     private AssemblyControllerImpl assemblyController;
     private JMenu projectMenu;
     private JMenu assemblyMenu;
-    private JMenu editMenu;
+//    private JMenu editMenu;
     private JMenu helpMenu;
     
     private JMenu helpResourcesMenu;
@@ -226,7 +238,6 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private int untitledCount = 0;
     
     private JMenu     editAssemblySubMenu;
-    private JMenuItem editMetadataPropertiesMenuItem;
     private JMenuItem closeAssemblyMenuItem;
     private JMenuItem closeAllAssembliesMenuItem;
     private JMenuItem saveAssemblyMenuItem;
@@ -271,7 +282,6 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         if (assemblyController == null)
             assemblyController = new AssemblyControllerImpl();
         
-        buildAssemblyEditMenu(); // must be first
         buildAssemblyMenuItems();
         buildToolbar();
         buildProjectMenu();
@@ -463,55 +473,59 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         }
     }
 
-    private void buildAssemblyEditMenu()
+    private void buildEditAssemblySubMenu()
     {
         int accelMod = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
-        ActionIntrospector.getAction(assemblyController, METHOD_undo).setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, METHOD_redo).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_undo  ).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_redo  ).setEnabled(false);
         
         // These start off being disabled, until something is selected
-        ActionIntrospector.getAction(assemblyController, METHOD_cut).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_cut   ).setEnabled(false);
         ActionIntrospector.getAction(assemblyController, METHOD_remove).setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, METHOD_copy).setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, METHOD_paste).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_copy  ).setEnabled(false);
+        ActionIntrospector.getAction(assemblyController, METHOD_paste ).setEnabled(false);
 
-        // Set up edit menu
-        editMenu = new JMenu("Edit");
-        editMenu.setMnemonic(KeyEvent.VK_E);
-        
-//        JMenu whichMenu;
-//        if  (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
-//             whichMenu = editMenu;
-//        else whichMenu = assemblyMenu;
-
-        // TODO tooltips
-
-        editMenu.add(buildMenuItem(assemblyController, METHOD_undo, "Undo", KeyEvent.VK_U,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
-        editMenu.add(buildMenuItem(assemblyController, METHOD_redo, "Redo", KeyEvent.VK_R,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.ALT_DOWN_MASK)));
-        editMenu.addSeparator();
+        undoMenuItem = buildMenuItem(assemblyController, METHOD_undo, "Undo", KeyEvent.VK_U,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK));
+        undoMenuItem.setToolTipText("Undo prior action");
+        editAssemblySubMenu.add(undoMenuItem);
+        redoMenuItem = buildMenuItem(assemblyController, METHOD_redo, "Redo", KeyEvent.VK_R,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.ALT_DOWN_MASK));
+        redoMenuItem.setToolTipText("Redo prior action");
+        editAssemblySubMenu.add(redoMenuItem);
+        editAssemblySubMenu.addSeparator();
 
         // the next four are disabled until something is selected
-        editMenu.add(buildMenuItem(assemblyController, METHOD_cut, "Cut", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK)));
-        editMenu.getItem(editMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
-        editMenu.add(buildMenuItem(assemblyController, METHOD_copy, "Copy", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK)));
-        editMenu.add(buildMenuItem(assemblyController, METHOD_paste, "Paste Event Node", KeyEvent.VK_P,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK)));
-        editMenu.add(buildMenuItem(assemblyController, METHOD_remove, "Delete", KeyEvent.VK_R,
-                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK)));
-        editMenu.addSeparator();
+        cutMenuItem = buildMenuItem(assemblyController, METHOD_cut, "Cut", KeyEvent.VK_C,
+                KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK));
+        cutMenuItem.setToolTipText("Cut selected item (not yet supported in Viskit)");
+        editAssemblySubMenu.add(cutMenuItem);
+        copyMenuItem = buildMenuItem(assemblyController, METHOD_copy, "Copy", KeyEvent.VK_C,
+                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK));
+        copyMenuItem.setToolTipText("Copy selected item");
+        editAssemblySubMenu.add(copyMenuItem);
+        pasteMenuItem = buildMenuItem(assemblyController, METHOD_paste, "Paste Event Node", KeyEvent.VK_P,
+                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK));
+        pasteMenuItem.setToolTipText("Paste selected item");
+        editAssemblySubMenu.add(pasteMenuItem);
+        deleteMenuItem = buildMenuItem(assemblyController, METHOD_remove, "Delete", KeyEvent.VK_R,
+                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK));
+        deleteMenuItem.setToolTipText("Delete selected item");
+        editAssemblySubMenu.add(deleteMenuItem);
+        editAssemblySubMenu.addSeparator();
 
-        editMenu.add(buildMenuItem(assemblyController, METHOD_newEventGraphNode, "Add a new Event Graph", KeyEvent.VK_A, null));
-        editMenu.add(buildMenuItem(assemblyController, METHOD_newPropertyChangeListenerNode, "Add a new Property Change Listener", KeyEvent.VK_A, null));
-        editMenu.addSeparator();
+        addNewEventGraphMenuItem = buildMenuItem(assemblyController, METHOD_newEventGraphNode, "Add a new Event Graph", KeyEvent.VK_A, null);
+        addNewEventGraphMenuItem.setToolTipText("Add new Event Graph component (SimEvent node) to the Assembly");
+        editAssemblySubMenu.add(addNewEventGraphMenuItem);
+        addPclMenuItem = buildMenuItem(assemblyController, METHOD_newPropertyChangeListenerNode, "Add a new Property Change Listener", KeyEvent.VK_A, null);
+        addPclMenuItem.setToolTipText("Add new Property Change Listener (PCL) to the Assembly");
+        editAssemblySubMenu.add(addPclMenuItem);
+        editAssemblySubMenu.addSeparator();
 
         if (ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus())
         {
-        editMenu.add(buildMenuItem(assemblyController, METHOD_editGraphMetadata, "Edit selected Assembly Metadata Properties", KeyEvent.VK_E,
+        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_editGraphMetadata, "Edit selected Assembly Metadata Properties", KeyEvent.VK_E,
                 KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK)));
         }
     }
@@ -520,15 +534,15 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     {
         boolean isAssemblyLoaded = (ViskitGlobals.instance().hasViskitProject() && ViskitGlobals.instance().isProjectOpen() &&
                                     hasAssembliesLoaded());
-        editAssemblySubMenu.setEnabled(isAssemblyLoaded);
-        editMetadataPropertiesMenuItem.setEnabled(isAssemblyLoaded);
-        closeAssemblyMenuItem.setEnabled(isAssemblyLoaded);
-        closeAllAssembliesMenuItem.setEnabled(isAssemblyLoaded);
-        saveAssemblyMenuItem.setEnabled(isAssemblyLoaded);
-        saveAsAssemblyMenuItem.setEnabled(isAssemblyLoaded);
-        assemblyGraphImageSave.setEnabled(isAssemblyLoaded);
+                       editAssemblySubMenu.setEnabled(isAssemblyLoaded);
+                      editMetadataMenuItem.setEnabled(isAssemblyLoaded);
+                     closeAssemblyMenuItem.setEnabled(isAssemblyLoaded);
+                closeAllAssembliesMenuItem.setEnabled(isAssemblyLoaded);
+                      saveAssemblyMenuItem.setEnabled(isAssemblyLoaded);
+                    saveAsAssemblyMenuItem.setEnabled(isAssemblyLoaded);
+                    assemblyGraphImageSave.setEnabled(isAssemblyLoaded);
         assemblyGenerateJavaSourceMenuItem.setEnabled(isAssemblyLoaded);
-        assemblyXmlViewMenuItem.setEnabled(isAssemblyLoaded);
+                   assemblyXmlViewMenuItem.setEnabled(isAssemblyLoaded);
     }
 
     private void buildAssemblyMenuItems()
@@ -547,45 +561,50 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 
         // Set up edit submenu
         editAssemblySubMenu = new JMenu("Edit Assembly...");
-        editAssemblySubMenu.setToolTipText("Edit functions for selected Asssembly");
+        editAssemblySubMenu.setToolTipText("Edit selected Asssembly elements");
         editAssemblySubMenu.setMnemonic(KeyEvent.VK_E);
+        
+        buildEditAssemblySubMenu();
+        assemblyMenu.add(editAssemblySubMenu);
+        
         if (!ViskitGlobals.instance().getMainFrame().hasOriginalModalMenus()) // combined menu integration
         {
-        ActionIntrospector.getAction(assemblyController, METHOD_undo).setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, METHOD_redo).setEnabled(false);
+//        ActionIntrospector.getAction(assemblyController, METHOD_undo).setEnabled(false);
+//        ActionIntrospector.getAction(assemblyController, METHOD_redo).setEnabled(false);
+//        
+//        // These start off being disabled, until something is selected
+//        ActionIntrospector.getAction(assemblyController, METHOD_cut).setEnabled(false);
+//        ActionIntrospector.getAction(assemblyController, METHOD_remove).setEnabled(false);
+//        ActionIntrospector.getAction(assemblyController, METHOD_copy).setEnabled(false);
+//        ActionIntrospector.getAction(assemblyController, METHOD_paste).setEnabled(false);
+
+////        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_undo, "Undo", KeyEvent.VK_Z,
+////                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+////        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_redo, "Redo", KeyEvent.VK_Y,
+////                KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+////        editAssemblySubMenu.addSeparator();
+////
+////        // the next four are disabled until something is selected
+////        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_cut, "Cut", KeyEvent.VK_X,
+////                KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+////        editAssemblySubMenu.getItem(editAssemblySubMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
+////        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_copy, "Copy", KeyEvent.VK_C,
+////                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+////        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_paste, "Paste Event Node", KeyEvent.VK_V,
+////                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+////        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_remove, "Delete", KeyEvent.VK_DELETE,
+////                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+////        editAssemblySubMenu.addSeparator();
+////
+////        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_newEventGraphNode, "Add a new Event Graph", KeyEvent.VK_G, null));
+////        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_newPropertyChangeListenerNode, "Add a new Property Change Listener", KeyEvent.VK_L, null));
+////        
+////        assemblyMenu.add(editAssemblySubMenu);
         
-        // These start off being disabled, until something is selected
-        ActionIntrospector.getAction(assemblyController, METHOD_cut).setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, METHOD_remove).setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, METHOD_copy).setEnabled(false);
-        ActionIntrospector.getAction(assemblyController, METHOD_paste).setEnabled(false);
-
-        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_undo, "Undo", KeyEvent.VK_Z,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_redo, "Redo", KeyEvent.VK_Y,
-                KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        editAssemblySubMenu.addSeparator();
-
-        // the next four are disabled until something is selected
-        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_cut, "Cut", KeyEvent.VK_X,
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        editAssemblySubMenu.getItem(editAssemblySubMenu.getItemCount()-1).setToolTipText("Cut is not supported in Viskit.");
-        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_copy, "Copy", KeyEvent.VK_C,
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_paste, "Paste Event Node", KeyEvent.VK_V,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_remove, "Delete", KeyEvent.VK_DELETE,
-                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
-        editAssemblySubMenu.addSeparator();
-
-        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_newEventGraphNode, "Add a new Event Graph", KeyEvent.VK_G, null));
-        editAssemblySubMenu.add(buildMenuItem(assemblyController, METHOD_newPropertyChangeListenerNode, "Add a new Property Change Listener", KeyEvent.VK_L, null));
-        
-        assemblyMenu.add(editAssemblySubMenu);
-        editMetadataPropertiesMenuItem = buildMenuItem(assemblyController, METHOD_editGraphMetadata, "Edit Assembly Metadata", KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
-        editMetadataPropertiesMenuItem.setToolTipText("Edit selected Assembly Metadata Properties");
-        assemblyMenu.add(editMetadataPropertiesMenuItem);
+        editMetadataMenuItem = buildMenuItem(assemblyController, METHOD_editGraphMetadata, "Edit Assembly Metadata", KeyEvent.VK_E,
+           KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+        editMetadataMenuItem.setToolTipText("Edit selected Assembly Metadata Properties");
+        assemblyMenu.add(     editMetadataMenuItem);
         assemblyMenu.addSeparator();
         }
 
@@ -612,12 +631,18 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         recentProjectFileSetListener.addMenuItem(openRecentProjectMenu);
         assemblyController.addRecentProjectFileSetListener(getRecentProjectFileSetListener());
         
-        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_newAssembly, "New Assembly", KeyEvent.VK_N,
-                KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+        newAssemblyMenuItem= buildMenuItem(assemblyController, METHOD_newAssembly, "New Assembly", KeyEvent.VK_N,
+                KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+        newAssemblyMenuItem.setToolTipText("Create new Assembly");
+        assemblyMenu.add(newAssemblyMenuItem);
 
-        assemblyMenu.add(buildMenuItem(assemblyController, METHOD_open, "Open Assembly", KeyEvent.VK_O,
-                KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)));
+        openAssemblyMenuItem = buildMenuItem(assemblyController, METHOD_open, "Open Assembly", KeyEvent.VK_O,
+                KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+        openAssemblyMenuItem.setToolTipText("Open an existing Assembly");
+        assemblyMenu.add(openAssemblyMenuItem);
+        
         assemblyMenu.add(openRecentAssemblyMenu = buildMenu("Open Recent Assembly"));
+        openRecentAssemblyMenu.setToolTipText("Open a recently edited Assembly");
         openRecentAssemblyMenu.setMnemonic('O');
         openRecentAssemblyMenu.setEnabled(false); // inactive until needed, reset by listener
 
@@ -680,7 +705,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         // Create a new menu bar and add the menus we created above to it
         myMenuBar = new JMenuBar();
         myMenuBar.add(assemblyMenu);
-        myMenuBar.add(editMenu);
+//        myMenuBar.add(editMenu);
         
         enableAssemblyMenuItems();
 

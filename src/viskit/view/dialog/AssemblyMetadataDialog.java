@@ -25,7 +25,7 @@ public class AssemblyMetadataDialog extends MetadataDialog
     
     public static boolean showDialog(JFrame frame, GraphMetadata graphMetadata) 
     {
-        ViskitGlobals.instance().selectAssemblyEditorTab();
+        ViskitGlobals.instance().selectAssemblyEditorTab(); // making sure
         if (dialog == null) {
             dialog = new AssemblyMetadataDialog(frame, graphMetadata);
         } 
