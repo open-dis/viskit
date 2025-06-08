@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="ServerGeneric" package="examples" version="2.0" author="Arnie Buss" extend="SimEntityBase" description="Simple event graph example" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter name="totalNumberServers" type="int" description="total number of servers available to serve customers"/>
     <Parameter name="serviceTimeGenerator" type="simkit.random.RandomVariate" description="random value for latest time duration to serve customer"/>
+    <Parameter name="totalNumberServers" type="int" description="total number of servers available to serve customers"/>
+    <StateVariable name="delayInQueue" type="double" description="any fixed waiting time that all customers encounter"/>
     <StateVariable name="numberAvailableServers" type="int" description="how many servers can serve customers"/>
     <StateVariable name="queue" type="java.util.LinkedList&lt;simkit.Entity&gt;" description="the queue holds customers who are waiting in line"/>
-    <StateVariable name="delayInQueue" type="double" description="any fixed waiting time that all customers encounter"/>
     <StateVariable name="timeInSystem" type="double" description="how much time did the current customer need"/>
+    <Event name="Arrival">
+        <Argument name="customer" type="simkit.Entity" description=""/>
+        <StateTransition state="queue">
+            <Operation method="add(customer)"/>
+        </StateTransition>
+        <Schedule delay="0.0" event="StartService" condition="numberAvailableServers &gt; 0" priority="HIGH"/>
+        <Code>customer.stampTime();</Code>
+        <Coordinate x="30.0" y="170.0"/>
+    </Event>
+    <Event name="EndService">
+        <Argument name="customer" type="simkit.Entity" description=""/>
+        <StateTransition state="numberAvailableServers">
+            <Assignment value="numberAvailableServers + 1"/>
+        </StateTransition>
+        <StateTransition state="timeInSystem">
+            <Assignment value="customer.getElapsedTime()"/>
+        </StateTransition>
+        <Schedule delay="0.0" event="StartService" condition="queue.size() &gt; 0" priority="HIGH"/>
+        <Code></Code>
+        <Coordinate x="290.0" y="160.0"/>
+    </Event>
     <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
         <StateTransition state="numberAvailableServers">
             <Assignment value="totalNumberServers"/>
@@ -15,15 +36,6 @@
         </StateTransition>
         <Code></Code>
         <Coordinate x="30.0" y="30.0"/>
-    </Event>
-    <Event name="Arrival">
-        <Argument name="customer" type="simkit.Entity" description=""/>
-        <StateTransition state="queue">
-            <Operation method="add(customer)"/>
-        </StateTransition>
-        <Schedule delay="0.0" event="StartService" condition="numberAvailableServers &gt; 0" priority="HIGH"/>
-        <Code>customer.stampTime();</Code>
-        <Coordinate x="30.0" y="170.0"/>
     </Event>
     <Event name="StartService">
         <StateTransition state="numberAvailableServers">
@@ -40,17 +52,5 @@
         </Schedule>
         <Code>Entity customer = queue.getFirst();</Code>
         <Coordinate x="170.0" y="160.0"/>
-    </Event>
-    <Event name="EndService">
-        <Argument name="customer" type="simkit.Entity" description=""/>
-        <StateTransition state="numberAvailableServers">
-            <Assignment value="numberAvailableServers + 1"/>
-        </StateTransition>
-        <StateTransition state="timeInSystem">
-            <Assignment value="customer.getElapsedTime()"/>
-        </StateTransition>
-        <Schedule delay="0.0" event="StartService" condition="queue.size() &gt; 0" priority="HIGH"/>
-        <Code></Code>
-        <Coordinate x="290.0" y="160.0"/>
     </Event>
 </SimEntity>

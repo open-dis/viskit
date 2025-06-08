@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimEntity name="SimpleMachineFailure" package="examples" version="2.0" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Parameter name="totalNumberMachines" type="int"/>
-    <Parameter name="totalNumberRepairPeople" type="int"/>
-    <Parameter name="timeToFailure" type="simkit.random.RandomVariate"/>
-    <Parameter name="repairTime" type="simkit.random.RandomVariate"/>
-    <StateVariable name="numberFailedMachines" type="int"/>
-    <StateVariable name="numberAvailableRepairPeople" type="int"/>
+    <Parameter name="repairTime" type="simkit.random.RandomVariate" description=""/>
+    <Parameter name="timeToFailure" type="simkit.random.RandomVariate" description=""/>
+    <Parameter name="totalNumberMachines" type="int" description=""/>
+    <Parameter name="totalNumberRepairPeople" type="int" description=""/>
+    <StateVariable name="numberAvailableRepairPeople" type="int" description=""/>
+    <StateVariable name="numberFailedMachines" type="int" description=""/>
+    <Event name="EndRepair">
+        <StateTransition state="numberAvailableRepairPeople">
+            <Assignment value="numberAvailableRepairPeople + 1"/>
+        </StateTransition>
+        <StateTransition state="numberFailedMachines">
+            <Assignment value="numberFailedMachines - 1"/>
+        </StateTransition>
+        <Schedule delay="0.0" event="StartRepair" condition="numberFailedMachines &gt;= totalNumberRepairPeople" priority="HIGH"/>
+        <Schedule delay="timeToFailure.generate()" event="Failure" priority="DEFAULT"/>
+        <Coordinate x="280.0" y="30.0"/>
+    </Event>
+    <Event name="Failure">
+        <StateTransition state="numberFailedMachines">
+            <Assignment value="numberFailedMachines + 1"/>
+        </StateTransition>
+        <Schedule delay="0.0" event="StartRepair" condition="numberAvailableRepairPeople &gt; 0" priority="DEFAULT"/>
+        <Coordinate x="80.0" y="180.0"/>
+    </Event>
     <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
         <StateTransition state="numberFailedMachines">
             <Assignment value="totalNumberMachines"/>
@@ -25,29 +43,11 @@
         <Schedule delay="0.0" event="StartMachine" condition="numberFailedMachines &gt; 0" priority="DEFAULT"/>
         <Coordinate x="80.0" y="20.0"/>
     </Event>
-    <Event name="Failure">
-        <StateTransition state="numberFailedMachines">
-            <Assignment value="numberFailedMachines + 1"/>
-        </StateTransition>
-        <Schedule delay="0.0" event="StartRepair" condition="numberAvailableRepairPeople &gt; 0" priority="DEFAULT"/>
-        <Coordinate x="80.0" y="180.0"/>
-    </Event>
     <Event name="StartRepair">
         <StateTransition state="numberAvailableRepairPeople">
             <Assignment value="numberAvailableRepairPeople - 1"/>
         </StateTransition>
         <Schedule delay="repairTime.generate()" event="EndRepair" priority="DEFAULT"/>
         <Coordinate x="280.0" y="180.0"/>
-    </Event>
-    <Event name="EndRepair">
-        <StateTransition state="numberAvailableRepairPeople">
-            <Assignment value="numberAvailableRepairPeople + 1"/>
-        </StateTransition>
-        <StateTransition state="numberFailedMachines">
-            <Assignment value="numberFailedMachines - 1"/>
-        </StateTransition>
-        <Schedule delay="0.0" event="StartRepair" condition="numberFailedMachines &gt;= totalNumberRepairPeople" priority="HIGH"/>
-        <Schedule delay="timeToFailure.generate()" event="Failure" priority="DEFAULT"/>
-        <Coordinate x="280.0" y="30.0"/>
     </Event>
 </SimEntity>

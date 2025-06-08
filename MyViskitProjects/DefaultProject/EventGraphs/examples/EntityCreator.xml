@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<SimEntity name="EntityCreator" package="examples" version="$Id: EntityCreator.xml 1590 2007-10-07 05:41:19Z tdnorbra $" author="Arnie Buss" extend="SimEntityBase" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Event name="Arrival">
-        <Schedule delay="0.0" event="EntityArrival" condition="true" priority="DEFAULT">
+<SimEntity name="EntityCreator" package="examples" version="$Id: EntityCreator.xml 1590 2007-10-07 05:41:19Z tdnorbra $" author="Arnie Buss" extend="SimEntityBase" description="minimalist arrival event graph" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Event name="Arrival" description="Event node stub">
+        <Schedule delay="0.1" event="EntityArrival" condition="true" priority="DEFAULT" description="schedule next arrival after short fixed time delay for preprocessing">
             <EdgeParameter value="new simkit.Entity()"/>
         </Schedule>
         <Code></Code>
         <Coordinate x="20.0" y="190.0"/>
     </Event>
-    <Event name="EntityArrival">
-        <Argument name="customer" type="simkit.Entity"/>
+    <Event name="EntityArrival" description="the latest customer arrives">
+        <Argument name="customer" type="simkit.Entity" description="the latest customer"/>
         <Code></Code>
-        <Coordinate x="120.0" y="190.0"/>
+        <Coordinate x="110.0" y="190.0"/>
     </Event>
 </SimEntity>

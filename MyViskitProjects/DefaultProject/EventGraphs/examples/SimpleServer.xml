@@ -2,18 +2,8 @@
 <SimEntity name="SimpleServer" package="examples" version="2.0" author="Arnie Buss" extend="SimEntityBase" description="One of the most fundamental examples, a simple server that handles client customers" xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="serviceTime" type="simkit.random.RandomVariate" description="time duration to perform service"/>
     <Parameter name="totalNumberServers" type="int" description="how many servers are provided"/>
-    <StateVariable name="numberInQueue" type="int" description="number of customers in queue"/>
     <StateVariable name="numberAvailableServers" type="int" description="number of available servers at a given time"/>
-    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
-        <StateTransition state="numberInQueue">
-            <Assignment value="0"/>
-        </StateTransition>
-        <StateTransition state="numberAvailableServers">
-            <Assignment value="totalNumberServers"/>
-        </StateTransition>
-        <Code></Code>
-        <Coordinate x="20.0" y="30.0"/>
-    </Event>
+    <StateVariable name="numberInQueue" type="int" description="number of customers in queue"/>
     <Event name="Arrival" description="Upon getting activated by a scheduling event, Arrival adds a customer to the queue and schedules a server to handle it">
         <StateTransition state="numberInQueue">
             <Assignment value="numberInQueue + 1"/>
@@ -23,6 +13,26 @@
         </Schedule>
         <Code></Code>
         <Coordinate x="20.0" y="130.0"/>
+    </Event>
+    <Event name="EndService" description="server has completed serving its customer">
+        <StateTransition state="numberAvailableServers">
+            <Assignment value="numberAvailableServers + 1"/>
+        </StateTransition>
+        <Schedule delay="0.0" event="StartService" condition="numberInQueue &gt; 0" priority="HIGH" description="when service starts, select a random number from service distribution to predict duration of service time interval">
+            <EdgeParameter value="0"/>
+        </Schedule>
+        <Code></Code>
+        <Coordinate x="330.0" y="130.0"/>
+    </Event>
+    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
+        <StateTransition state="numberInQueue">
+            <Assignment value="0"/>
+        </StateTransition>
+        <StateTransition state="numberAvailableServers">
+            <Assignment value="totalNumberServers"/>
+        </StateTransition>
+        <Code></Code>
+        <Coordinate x="20.0" y="30.0"/>
     </Event>
     <Event name="StartService" description="Begin operations, server handling customer">
         <Argument name="arg_0" type="int" description=""/>
@@ -35,15 +45,5 @@
         <Schedule delay="serviceTime.generate()" event="EndService" priority="DEFAULT" description="schedule server to handle next customer following a probabilistic delay"/>
         <Code>System.out.println("numberAvailableServers="+arg_0);</Code>
         <Coordinate x="150.0" y="130.0"/>
-    </Event>
-    <Event name="EndService" description="server has completed serving its customer">
-        <StateTransition state="numberAvailableServers">
-            <Assignment value="numberAvailableServers + 1"/>
-        </StateTransition>
-        <Schedule delay="0.0" event="StartService" condition="numberInQueue &gt; 0" priority="HIGH" description="when service starts, select a random number from service distribution to predict duration of service time interval">
-            <EdgeParameter value="0"/>
-        </Schedule>
-        <Code></Code>
-        <Coordinate x="330.0" y="130.0"/>
     </Event>
 </SimEntity>
