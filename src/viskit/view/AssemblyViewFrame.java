@@ -887,6 +887,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         
         JButton metadataButton = makeButton(null, "viskit/images/Information24.gif",
                 "Edit Assembly Metadata");
+        metadataButton.setToolTipText("Edit Assembly Metadata");
         metadataButton.addActionListener((ActionEvent e) -> {
             ((AssemblyControllerImpl) getController()).editGraphMetadata();
         });

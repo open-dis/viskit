@@ -1071,6 +1071,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         
         JButton metadataButton = makeButton(null, "viskit/images/Information24.gif",
                 "Edit Event Graph Metadata");
+        metadataButton.setToolTipText("Edit Event Graph Metadata");
         metadataButton.addActionListener((ActionEvent e) -> {
             ((EventGraphController) getController()).editGraphMetadata();
         });
@@ -1121,7 +1122,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         selectModeButton.setSelected(true);
 
         metadataLabel = new JLabel("Metadata: ");
-        metadataLabel.setToolTipText("Edit event graph metadata");
+        metadataLabel.setToolTipText("Edit Event Graph metadata");
         getToolBar().add(metadataLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
         getToolBar().add(metadataButton);

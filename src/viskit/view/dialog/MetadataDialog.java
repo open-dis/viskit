@@ -55,7 +55,7 @@ abstract public class MetadataDialog extends JDialog
         
         this.graphMetadata = graphMetadata;
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new myCloseListener());
+        this.addWindowListener(new MyCloseListener());
 
         //Create and populate the panel
         JPanel contentPanel = new JPanel();
@@ -186,8 +186,8 @@ abstract public class MetadataDialog extends JDialog
         contentPanel.add(buttonPanel);
 
         // attach listeners
-        cancelButton.addActionListener(new cancelButtonListener());
-            okButton.addActionListener(new applyButtonListener());
+        cancelButton.addActionListener(new CancelButtonListener());
+            okButton.addActionListener(new ApplyButtonListener());
 
         setParameters(frame, graphMetadata);
     }
@@ -247,16 +247,17 @@ abstract public class MetadataDialog extends JDialog
         graphMetadata.verbose = verboseCB.isSelected();
     }
 
-    class cancelButtonListener implements ActionListener {
+    class CancelButtonListener implements ActionListener {
 
         @Override
-        public void actionPerformed(ActionEvent event) {
+        public void actionPerformed(ActionEvent event) 
+        {
             modified = false;
             dispose();
         }
     }
 
-    class applyButtonListener implements ActionListener {
+    class ApplyButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -265,13 +266,14 @@ abstract public class MetadataDialog extends JDialog
             // for all the widgets, and only mark modified if data has been changed.  Else do a string compare between
             // final data and ending data and set modified only if something had actually changed.
             modified = true;
-            if (modified) {
-                if (nameTF.getText().isBlank()) {
-                    ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "Error", "Must have a non-zero length name");
+            if (modified) 
+            {
+                if (nameTF.getText().isBlank())
+                {
+                    ViskitGlobals.instance().getMainFrame().genericReport(JOptionPane.ERROR_MESSAGE, "Error", "Must have a non-blank name");
                     nameTF.requestFocus();
                     return;
                 }
-
                 // OK, we're good....
                 unloadWidgets();
             }
@@ -279,19 +281,23 @@ abstract public class MetadataDialog extends JDialog
         }
     }
 
-    class myCloseListener extends WindowAdapter {
-
+    class MyCloseListener extends WindowAdapter 
+    {
         @Override
-        public void windowClosing(WindowEvent e) {
-            if (modified) {
-                int ret = JOptionPane.showConfirmDialog(MetadataDialog.this, "Apply changes?",
+        public void windowClosing(WindowEvent e) 
+        {
+            if (modified)
+            {
+                int returnValue = JOptionPane.showConfirmDialog(MetadataDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (ret == JOptionPane.YES_OPTION) {
+                if (returnValue == JOptionPane.YES_OPTION) {
                     okButton.doClick();
-                } else {
+                } 
+                else {
                     cancelButton.doClick();
                 }
-            } else {
+            } 
+            else {
                 cancelButton.doClick();
             }
         }
