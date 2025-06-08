@@ -131,7 +131,9 @@ public class ViskitStatics
 
     public static boolean      debug = false;
 
-    public static String DESCRIPTION_HINT = "Good descriptions reveal model meaning and author intent";
+    public static final String DESCRIPTION_HINT             = "Good descriptions reveal model meaning and author intent";
+    public static final String NO_DESCRIPTION_PROVIDED      = "no description provided";
+    public static final String NO_DESCRIPTION_PROVIDED_HTML = "<i>" + NO_DESCRIPTION_PROVIDED + "</i>";
 
     /**
      * Convert a class name array type to human readable form.

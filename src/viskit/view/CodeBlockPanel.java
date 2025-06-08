@@ -59,7 +59,7 @@ public class CodeBlockPanel extends JPanel {
     private final Window owner;
     private final String title;
     private final JButton editButton;
-    private static final String CODEBLOCK_HINT = "Please remember to enter fully qualified class names and include terminating semicolons";
+    private static final String CODEBLOCK_HINT = "Use fully qualified class names, and end statements with semicolons";
 
     public CodeBlockPanel(Window owner, boolean multilined, String title) {
         this.owner = owner;

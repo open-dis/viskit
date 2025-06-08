@@ -414,10 +414,10 @@ public class MainFrame extends JFrame
     }
 
     /** Utility class to handle tab selections on the main frame */
-    class MyTabChangeListener implements ChangeListener {
-
+    class MyTabChangeListener implements ChangeListener 
+    {
         @Override
-        public void stateChanged(ChangeEvent e)
+        public void stateChanged(ChangeEvent changeEvent)
         {
             if (topTabbedPane == null)
                 return; // nothing to do, yet

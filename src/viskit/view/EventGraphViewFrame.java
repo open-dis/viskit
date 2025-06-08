@@ -805,6 +805,8 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
             enableEventGraphMenuItems();
         });
         
+        // TODO tooltips
+        
         editEventGraphSubMenu = new JMenu("Edit Event Graph..."); // submenu
         editEventGraphSubMenu.setToolTipText("Edit functions for selected Event Graph");
         editEventGraphSubMenu.setMnemonic(KeyEvent.VK_E);

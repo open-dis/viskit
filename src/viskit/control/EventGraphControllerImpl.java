@@ -48,6 +48,7 @@ import viskit.view.EventGraphView;
 import viskit.xsd.translator.eventgraph.SimkitEventGraphXML2Java;
 import viskit.mvc.MvcModel;
 import viskit.mvc.MvcRecentFileListener;
+import static viskit.ViskitStatics.NO_DESCRIPTION_PROVIDED_HTML;
 
 /**
  * OPNAV N81 - NPS World Class Modeling (WCM) 2004 Projects
@@ -412,9 +413,11 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
      * Trim to RECENTLISTSIZE
      * @param file an event graph file to add to the list
      */
-    private void adjustRecentEventGraphFileSet(File file) {
+    private void adjustRecentEventGraphFileSet(File file)
+    {
         String eventGraphName;
-        for (Iterator<String> iterator = recentEventGraphFileSet.iterator(); iterator.hasNext();) {
+        for (Iterator<String> iterator = recentEventGraphFileSet.iterator(); iterator.hasNext();) 
+        {
             eventGraphName = iterator.next();
             if (file.getPath().equals(eventGraphName)) {
                 iterator.remove();
@@ -898,30 +901,79 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
     public static final String METHOD_remove = "remove";
 
     @Override
-    public void remove() 
+    @SuppressWarnings("unchecked")
+    public void remove()
     {
-        if (!selectionVector.isEmpty()) {
+        String foundObjectName = "", description = "", message, specialNodeMessage;
+        ViskitGlobals.instance().selectEventGraphEditorTab();
+        
+        // Prevent concurrent update while looping over selectionVector
+        Vector<Object> selectionVectorClone = (Vector<Object>) selectionVector.clone(); // TODO unchecked cast warning
+        if (!selectionVectorClone.isEmpty()) 
+        {
             // first ask:
-            String foundObjectName, message = "";
             int localNodeCount = 0;  // different msg for edge delete
-            for (Object nextObject : selectionVector) {
-                if (nextObject != null && nextObject instanceof EventNode) {
+            for (Object nextSelectionObject : selectionVectorClone) 
+            {
+                if (nextSelectionObject == null)
+                {
+                    LOG.error("remove() selection vector included null object, ignored"); // unexpected
+                }
+                else if (nextSelectionObject instanceof EventNode)
+                {
                     localNodeCount++;
-                    foundObjectName = nextObject.toString();
-                    foundObjectName = foundObjectName.replace('\n', ' ');
-                    message += ", \n" + foundObjectName;
+                    foundObjectName =  "EventNode " + ((EventNode)nextSelectionObject).getName();
+                    description     =                 ((EventNode)nextSelectionObject).getDescription();
+                    if (description.length() > 40)
+                        description = description.substring(0,40) + "... ";
+                    foundObjectName = foundObjectName.replace('\n', ' ').trim();
+                }
+                else if (nextSelectionObject instanceof SchedulingEdge)
+                {
+                    localNodeCount++;
+                    foundObjectName = "SchedulingEdge " + ((SchedulingEdge)nextSelectionObject).getName();
+                    description     =                     ((SchedulingEdge)nextSelectionObject).getDescription();
+                    if (description.length() > 40)
+                        description = description.substring(0,40) + "... ";
+                    foundObjectName = foundObjectName.replace('\n', ' ').trim();
+                }
+                else if (nextSelectionObject instanceof CancelingEdge) 
+                {
+                    localNodeCount++;
+                    foundObjectName =  "CancelingEdge " + ((CancelingEdge)nextSelectionObject).getName();
+                    description     =                     ((CancelingEdge)nextSelectionObject).getDescription();
+                    if (description.length() > 40)
+                        description = description.substring(0,40) + "... ";
+                    foundObjectName = foundObjectName.replace('\n', ' ').trim();
+                }
+                else
+                {
+                    foundObjectName = nextSelectionObject.getClass().getName();
+                    LOG.error("remove() found unexpected deletion type: {}", foundObjectName);
+                }
+                if ((description == null) || description.isBlank())
+                     description = NO_DESCRIPTION_PROVIDED_HTML;
+                specialNodeMessage = ((localNodeCount > 0) && (nextSelectionObject instanceof EventNode)) ? 
+                       "<p align='center'>Note that all unselected but attached edges are also removed.</p>" : "";
+                message = "<html><body><center>" +
+                          "<p align='center'>Confirm removal of " + foundObjectName + "?" + "</p>" + 
+                          "<br /><p align='center'>(description: " + description + ")" + "</p><br />" + 
+                          specialNodeMessage +
+                          "</center></body></html>";
+                doRemove = ViskitGlobals.instance().getMainFrame().genericAskYesNo(
+                        "Remove element from Event Graph?", message) == JOptionPane.YES_OPTION;
+                if (doRemove)
+                {
+                    // LOG.info messages are found in removeSelectedGraphObjects()
+                    LOG.debug("remove() {} element from Event Graph approved by auther", foundObjectName);
+                }
+                else // deselect
+                {
+                    selectionVector.removeElement(nextSelectionObject); // change master while continuing to loop over clone
                 }
             }
-            if (message.length() > 3) {
-                message = message.substring(3);
-            } // remove leading stuff
-
-            String specialNodeMessage = (localNodeCount > 0 ? "\n(All unselected, but attached edges are permanently removed.)" : "");
-            doRemove = ViskitGlobals.instance().getMainFrame().genericAskYesNo("Remove element(s)?", "Confirm remove " + message + "?" + specialNodeMessage) == JOptionPane.YES_OPTION;
-            if (doRemove) {
-                // TODO do edges first?
-                delete();
-            }
+            if (!selectionVector.isEmpty())
+                removeSelectedGraphObjects();
         }
     }
     /** method name for reflection use */
@@ -986,28 +1038,35 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
 
     /** Permanently delete, or undo selected nodes and attached edges from the cache */
     @SuppressWarnings("unchecked")
-    private void delete() 
+    private void removeSelectedGraphObjects() 
     {
         EventNode eventNode;
 
-        // Prevent concurrent modification
-        Vector<Object> selectionObjectVector = (Vector<Object>) selectionVector.clone();
-        for (Object nextObject : selectionObjectVector) {
-            if (nextObject instanceof Edge) {
+        // Prevent concurrent modification while looping over selectionObjectVector
+        Vector<Object> selectionObjectVector = (Vector<Object>) selectionVector.clone(); // TODO unchecked cast warning
+        
+        for (Object nextObject : selectionObjectVector) 
+        {
+            if (nextObject instanceof Edge) 
+            {
+                LOG.info("removeSelectedGraphObjects() Edge {} element from Event Graph", ((Edge) nextObject).getName());
                 removeEdge((Edge) nextObject);
             } 
-            else if (nextObject instanceof EventNode) {
+            else if (nextObject instanceof EventNode) 
+            {
                 eventNode = (EventNode) nextObject;
-                for (ViskitElement nextEdge : eventNode.getConnections()) {
+                for (ViskitElement nextEdge : eventNode.getConnections()) 
+                {
+                    LOG.info("removeSelectedGraphObjects() Edge {} element from Event Graph", ((Edge) nextEdge).getName());
                     removeEdge((Edge) nextEdge);
                 }
+                LOG.info("removeSelectedGraphObjects() EventNode {} element from Event Graph", eventNode.getName());
                 ((Model) getModel()).deleteEvent(eventNode);
             }
         }
-
         // Clear the cache after a delete to prevent unnecessary buildup
         if (!selectionVector.isEmpty())
-            selectionVector.clear();
+             selectionVector.clear();
     }
 
     /** Removes the JAXB (XML) binding from the model for this edge
@@ -1317,6 +1376,7 @@ public class EventGraphControllerImpl extends MvcAbstractController implements E
         boolean modified = EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
         if (modified) {
             ((Model) getModel()).changeMetadata(graphMetadata);
+            ViskitGlobals.instance().getActiveEventGraphModel().setModelDirty(true); // TODO move into dialog panel
 
             // update title bar
             ((EventGraphView) getView()).setSelectedEventGraphName(graphMetadata.name);

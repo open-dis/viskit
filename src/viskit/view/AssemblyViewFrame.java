@@ -485,6 +485,8 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
 //             whichMenu = editMenu;
 //        else whichMenu = assemblyMenu;
 
+        // TODO tooltips
+
         editMenu.add(buildMenuItem(assemblyController, METHOD_undo, "Undo", KeyEvent.VK_U,
                 KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)));
         editMenu.add(buildMenuItem(assemblyController, METHOD_redo, "Redo", KeyEvent.VK_R,

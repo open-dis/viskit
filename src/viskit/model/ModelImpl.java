@@ -262,9 +262,16 @@ public class ModelImpl extends MvcAbstractModel implements Model
             simEntityJaxbRoot.setExtend     (ViskitStatics.nullIfEmpty(graphMetadata.extendsPackageName));
             simEntityJaxbRoot.setImplement  (ViskitStatics.nullIfEmpty(graphMetadata.implementsPackageName));
             
-            // TODO do we need to update StateVariables, Parameters, Events?  isn't this handled in subclass?
-
-            simEntityJaxbRoot.getParameter().clear();
+            // sort the List of Parameter elements for consistent file saving
+            Collections.sort((Vector<ViskitElement>)simulationParameterElements, 
+                             new Comparator<ViskitElement>() {
+                @Override
+                public int compare(ViskitElement lhs, ViskitElement rhs) {
+                    // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
+            simEntityJaxbRoot.getParameter().clear(); // reset list
             for (ViskitElement nextParameterElement : simulationParameterElements) 
             {
                 Parameter nextParameter = new Parameter();
@@ -273,7 +280,17 @@ public class ModelImpl extends MvcAbstractModel implements Model
                 nextParameter.setDescription(nextParameterElement.getDescription());
                 simEntityJaxbRoot.getParameter().add(nextParameter);
             }
-            simEntityJaxbRoot.getStateVariable().clear();
+            
+            // sort the List of StateVariable elements for consistent file saving
+            Collections.sort((Vector<ViskitElement>)stateVariableElements, 
+                             new Comparator<ViskitElement>() {
+                @Override
+                public int compare(ViskitElement lhs, ViskitElement rhs) {
+                    // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
+            simEntityJaxbRoot.getStateVariable().clear(); // reset list
             for (ViskitElement nextStateVariableElement : stateVariableElements) 
             {
                 StateVariable nextStateVariable = new StateVariable();
@@ -283,7 +300,24 @@ public class ModelImpl extends MvcAbstractModel implements Model
                 simEntityJaxbRoot.getStateVariable().add(nextStateVariable);
             }
             
-            // TODO Events, StateTransition, Assignment
+            // https://stackoverflow.com/questions/46898/how-do-i-efficiently-iterate-over-each-entry-in-a-java-map
+            simEntityJaxbRoot.getEvent().clear(); // reset list
+            for (var nodeEntry: eventNodeCacheMap.entrySet())
+            {
+                Event     nextEvent     = nodeEntry.getKey();
+                EventNode nextEventNode = nodeEntry.getValue();
+                
+               simEntityJaxbRoot.getEvent().add(nextEvent);
+            }
+            // sort the List of Event elements for consistent file saving, which includes StateTransition and Assignment
+            Collections.sort((List<Event>)simEntityJaxbRoot.getEvent(), 
+                             new Comparator<Event>() {
+                @Override
+                public int compare(Event lhs, Event rhs) {
+                    // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                    return lhs.getName().compareTo(rhs.getName());
+                }
+            });
             
             // Already handled: CodeBlock
             

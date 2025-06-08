@@ -71,6 +71,7 @@ import viskit.assembly.SimulationRunInterface;
 import viskit.control.InternalAssemblyRunner.SimulationState;
 import viskit.view.MainFrame;
 import viskit.view.SimulationRunPanel;
+import static viskit.ViskitStatics.NO_DESCRIPTION_PROVIDED_HTML;
 
 /**
  * AssemblyController full implementation.
@@ -651,6 +652,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         if (modified) 
         {
             assemblyModel.changeMetadata(graphMetadata);
+            ViskitGlobals.instance().getActiveAssemblyModel().setModelDirty(true);
 
             // update title bar for frame
             ViskitGlobals.instance().getAssemblyEditorViewFrame().setSelectedAssemblyName(graphMetadata.name);
@@ -944,15 +946,15 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             oldGraphMetadata = viskitAssemblyModel.getMetadata();
         }
 
-        AssemblyModelImpl assemblyModel = new AssemblyModelImpl(this);
-        assemblyModel.initialize();
-        assemblyModel.newAssemblyModel(null); // should create new assembly file
+        AssemblyModelImpl newAssemblyModel = new AssemblyModelImpl(this);
+        newAssemblyModel.initialize();
+        newAssemblyModel.newAssemblyModel(null); // should create new assembly file
 
         // No vAMod set in controller yet...it gets set
         // when TabbedPane changelistener detects a tab change.
-        ViskitGlobals.instance().getAssemblyEditorViewFrame().addTab(assemblyModel);
+        ViskitGlobals.instance().getAssemblyEditorViewFrame().addTab(newAssemblyModel);
 
-        GraphMetadata graphMetadata = new GraphMetadata(assemblyModel);   // build a new one, specific to Assembly
+        GraphMetadata graphMetadata = new GraphMetadata(newAssemblyModel);   // build a new one, specific to Assembly
         if (oldGraphMetadata != null) {
             graphMetadata.packageName = oldGraphMetadata.packageName;
         }
@@ -961,6 +963,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 AssemblyMetadataDialog.showDialog(ViskitGlobals.instance().getAssemblyEditorViewFrame(), graphMetadata);
         if (modified) 
         {
+            // TODO NPE
             ((AssemblyModel) getModel()).changeMetadata(graphMetadata);
 
             // update title bar
@@ -971,7 +974,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         } 
         else 
         {
-            ViskitGlobals.instance().getAssemblyEditorViewFrame().deleteTab(assemblyModel);
+            ViskitGlobals.instance().getAssemblyEditorViewFrame().deleteTab(newAssemblyModel);
         }
     }
     
@@ -1496,27 +1499,61 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public static final String METHOD_remove = "remove";
 
     @Override
+    @SuppressWarnings("unchecked")
     public void remove()
     {
+        String foundObjectName = "", description = "", message, specialNodeMessage;
         ViskitGlobals.instance().selectAssemblyEditorTab();
-        if (!selectionVector.isEmpty()) {
+        
+        // Prevent concurrent update while looping over selectionVector
+        Vector<Object> selectionVectorClone = (Vector<Object>) selectionVector.clone(); // TODO unchecked cast warning
+        if (!selectionVectorClone.isEmpty()) 
+        {
             // first ask:
-            String s, message = "";
             int nodeCount = 0;  // different message for edge delete
-            for (Object o : selectionVector) {
-                if (o instanceof AssemblyNode) {
+            for (Object nextSelectionObject : selectionVectorClone) 
+            {
+                if (nextSelectionObject == null)
+                {
+                    LOG.error("remove() selection vector included null object, ignored"); // unexpected
+                }
+                else if (nextSelectionObject instanceof AssemblyNode) 
+                {
                     nodeCount++;
-                    s = o.toString();
-                    s = s.replace('\n', ' ');
-                    message += ", \n" + s;
+                    foundObjectName = ((AssemblyNode)nextSelectionObject).getName();
+                    description     = ((AssemblyNode)nextSelectionObject).getDescription();
+                    if (description.length() > 40)
+                        description = description.substring(0,40) + "... ";
+                    foundObjectName = foundObjectName.replace('\n', ' ').trim();
+                }
+                else
+                {
+                    foundObjectName = nextSelectionObject.getClass().getName();
+                    LOG.error("remove() found unexpected deletion type: {}", foundObjectName);
+                }
+                if ((description == null) || description.isBlank())
+                    description = NO_DESCRIPTION_PROVIDED_HTML;
+                specialNodeMessage = (nodeCount > 0) ? 
+                        "<p align='center'>Note that all unselected but attached edges are also removed.</p>" : "";
+                message = "<html><body><center>" +
+                          "<p align='center'>Confirm removal of " + foundObjectName + "?" + "</p>" + 
+                          "<p align='center'>(description: " + description + ")" + "</p><br />" + 
+                          specialNodeMessage +
+                          "</center></body></html>";
+                doRemove = ViskitGlobals.instance().getMainFrame().genericAsk(
+                        "Remove element from Assembly?", message) == JOptionPane.YES_OPTION;
+               if (doRemove)
+                {
+                    // LOG.info messages are found in removeSelectedGraphObjects()
+                    LOG.debug("remove() {} element from Assembly approved by auther", foundObjectName);
+                }
+                else // deselect
+                {
+                    selectionVector.removeElement(nextSelectionObject); // change master while continuing to loop over clone
                 }
             }
-            String specialNodeMessage = (nodeCount > 0) ? "\n(All unselected but attached edges will also be removed.)" : "";
-            doRemove = ViskitGlobals.instance().getMainFrame().genericAsk("Remove element(s)?", "Confirm remove" + message + "?" + specialNodeMessage) == JOptionPane.YES_OPTION;
-            if (doRemove) {
-                // do edges first?
-                delete();
-            }
+            if (!selectionVector.isEmpty())
+                removeSelectedGraphObjects();
         }
     }
     
@@ -1587,14 +1624,18 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
 
     /** Permanently delete, or undo selected nodes and attached edges from the cache */
     @SuppressWarnings("unchecked")
-    private void delete() 
+    private void removeSelectedGraphObjects() 
     {
-        Vector<Object> selectionVectorClone = (Vector<Object>) selectionVector.clone();   // avoid concurrent update
         AssemblyNode assemblyNode;
+        
+        // Prevent concurrent update while looping over selectionVector
+        Vector<Object> selectionVectorClone = (Vector<Object>) selectionVector.clone(); // TODO unchecked cast warning
+        
         for (Object nextNode : selectionVectorClone) 
         {
             if (nextNode instanceof AssemblyEdge) 
             {
+                LOG.info("removeSelectedGraphObjects() AssemblyEdge {} element from Assembly", ((AssemblyEdge) nextNode).getName());
                 removeEdge((AssemblyEdge) nextNode);
             } 
             else if (nextNode instanceof EventGraphNode) 
@@ -1602,6 +1643,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 assemblyNode = (EventGraphNode) nextNode;
                 for (AssemblyEdge nextAssemblyEdge : assemblyNode.getConnections()) 
                 {
+                    LOG.info("removeSelectedGraphObjects() AssemblyEdge {} element from Assembly", nextAssemblyEdge.getName());
                     removeEdge(nextAssemblyEdge);
                 }
                 ((AssemblyModel) getModel()).deleteEventGraphNode((EventGraphNode) assemblyNode);
@@ -1611,8 +1653,10 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 assemblyNode = (PropertyChangeListenerNode) nextNode;
                 for (AssemblyEdge nextAssemblyEdge : assemblyNode.getConnections()) 
                 {
+                    LOG.info("removeSelectedGraphObjects() AssemblyEdge {} element from Assembly", nextAssemblyEdge.getName());
                     removeEdge(nextAssemblyEdge);
                 }
+                LOG.info("removeSelectedGraphObjects() PropertyChangeListenerNode {} element from Assembly", ((PropertyChangeListenerNode) assemblyNode).getName());
                 ((AssemblyModel) getModel()).deletePropertyChangeListener((PropertyChangeListenerNode) assemblyNode);
             }
         }
@@ -2044,7 +2088,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 LOG.debug("compileJavaClassFromString(): " + 
                          "autogenerated Java compilation result\n" +
                          "=====================================\n" + 
-                         diagnostic + "n" +
+                         diagnostic + "\n" +
                          "=====================================\n");
                 return compiledClassFile;
             } 
@@ -2053,7 +2097,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 String errorResults = 
                          "autogenerated Java compilation error\n" +
                          "====================================\n" + 
-                         diagnostic + "n" +
+                         diagnostic + "\n" +
                          "====================================\n";
                 if (!errorsByteArrayOutputStream.toString().isBlank())
                     errorResults +=
