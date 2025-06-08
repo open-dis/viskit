@@ -2,14 +2,6 @@
 <SimEntity name="ArrivalProcess" package="examples" version="0.2" author="Arnie Buss" extend="SimEntityBase" description="Getting started: producing customers at random intervals." xsi:noNamespaceSchemaLocation="../../../../Schemas/simkit.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Parameter name="interarrivalTime" type="simkit.random.RandomVariate" description="typical time duration between arrivals"/>
     <StateVariable name="numberArrivals" type="int" description="how many customers have arrived"/>
-    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
-        <StateTransition state="numberArrivals">
-            <Assignment value="0"/>
-        </StateTransition>
-        <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT" description="initiate arrival process upon startup"/>
-        <Code></Code>
-        <Coordinate x="40.0" y="70.0"/>
-    </Event>
     <Event name="Arrival">
         <StateTransition state="numberArrivals">
             <Assignment value="numberArrivals + 1"/>
@@ -17,5 +9,13 @@
         <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT" description="after reporting latest arrival, schedule the next arrival to occur after a duration determined by the interarrival time delay probability distribution function (PDF)."/>
         <Code></Code>
         <Coordinate x="260.0" y="70.0"/>
+    </Event>
+    <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
+        <StateTransition state="numberArrivals">
+            <Assignment value="0"/>
+        </StateTransition>
+        <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT" description="initiate arrival process upon startup"/>
+        <Code></Code>
+        <Coordinate x="40.0" y="70.0"/>
     </Event>
 </SimEntity>
