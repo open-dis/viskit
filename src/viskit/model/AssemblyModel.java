@@ -138,7 +138,7 @@ import viskit.xsd.bindings.assembly.SimkitAssembly;
      * Supports redo of a SimEvLisEdge
      * @param sele the edge to redo
      */
-    void redoSimEvLisEdge(SimEventListenerEdge sele);
+    void redoSimEventListenerEdge(SimEventListenerEdge sele);
 
     /** Retrieve a list of detailed output entity names
      *

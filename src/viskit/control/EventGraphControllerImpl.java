@@ -827,7 +827,7 @@ ViskitGlobals.instance().hasModifiedEventGraph() &&
 
     @Override
     public void codeBlockEdit(String codeBlockString) {
-        ((viskit.model.Model) getModel()).changeCodeBlock(codeBlockString);
+        ((viskit.model.Model) getModel()).changeSourceCodeBlock(codeBlockString);
     }
 
     @Override

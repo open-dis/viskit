@@ -476,8 +476,9 @@ public class ViskitGraphComponent extends JGraph implements GraphModelListener
                         }
                     }
 
-                    String codeBlockString = eventNode.getCodeBlockString();
-                    if (codeBlockString != null && !codeBlockString.isEmpty()) {
+                    String codeBlockString = eventNode.getSourceCodeBlockString();
+                    if (codeBlockString != null && !codeBlockString.isEmpty()) 
+                    {
                         htmlBuilder.append("<u>code block</u><br>");
 
                         String[] sa = codeBlockString.split("\\n");

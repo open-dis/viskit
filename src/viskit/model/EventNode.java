@@ -89,7 +89,7 @@ public class EventNode extends ViskitElement
         this.codeBlockString = newCodeBlockString;
     }
 
-    public String getCodeBlockString() {
+    public String getSourceCodeBlockString() {
         return codeBlockString;
     }
 

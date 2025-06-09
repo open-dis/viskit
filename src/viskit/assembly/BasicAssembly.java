@@ -967,7 +967,7 @@ public abstract class BasicAssembly extends BasicSimEntity implements Runnable
         if ((projectDirectory != null) && projectDirectory.isDirectory())
         {
              // found it!
-             LOG.info("run() findProjectWorkingDirectoryFromWithinThread() found working directory!\n      " + getWorkingDirectory().getAbsolutePath());
+             LOG.info("run() findProjectWorkingDirectoryFromWithinThread() worked!\n      " + getWorkingDirectory().getAbsolutePath());
              viskitProject = new ViskitProject(projectDirectory);
         }
         else LOG.error("BLOCKER: run() findProjectWorkingDirectoryFromWithinThread() not successful, analyst reports will fail");

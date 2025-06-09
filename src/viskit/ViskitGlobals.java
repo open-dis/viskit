@@ -279,6 +279,20 @@ public class ViskitGlobals
     public AssemblyControllerImpl getActiveAssemblyController() {
         return assemblyController;
     }
+    /** Whether one or more assemblies are open
+     * @return whether any assemblies are open
+     */
+    public final boolean isAssemblyOpen()
+    {
+        return (getNumberAssembliesLoaded() > 0);
+    }
+    /** Whether one or more assemblies are open
+     * @return whether any assemblies are open
+     */
+    public final int getNumberAssembliesLoaded()
+    {
+        return getAssemblyEditorViewFrame().getNumberAssembliesLoaded();
+    }
 
     ActionListener defaultAssemblyQuitActionListener = new ActionListener() {
 

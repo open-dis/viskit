@@ -182,7 +182,7 @@ public class SimkitEventGraphXML2Java
         buildConstructors(constructors);
         buildEventBlock(runBlock, eventBlock);
         buildToString(toStringBlock);
-        buildCodeBlock(codeBlock);
+        buildSourceCodeBlock(codeBlock);
 
         buildSource(source, head, parameters, stateVariables, parameterMap,
                 constructors, runBlock, eventBlock, accessorBlock,
@@ -777,13 +777,16 @@ public class SimkitEventGraphXML2Java
 
         if (!liLocalV.isEmpty()) {pw.println();}
 
-        if (run.getCode() != null && !run.getCode().isEmpty()) {
-            pw.println(SP_8 + "/* Code insertion for Event " + run.getName() + " */");
-            String[] lines = run.getCode().split("\\n");
+        if ((run.getSourceCodeBlock()            != null) && 
+            (run.getSourceCodeBlock().getValue() != null) &&
+            !run.getSourceCodeBlock().getValue().isEmpty())
+        {
+            pw.println(SP_8 + "/* SourceCodeBlock insertion for Event " + run.getName() + " */");
+            String[] lines = run.getSourceCodeBlock().getValue().split("\\n");
             for (String line : lines) {
                 pw.println(SP_8 + line);
             }
-            pw.println(SP_8 + "/* End Code insertion */");
+            pw.println(SP_8 + "/* End SourceCodeBlock insertion */");
             pw.println();
         }
 
@@ -930,13 +933,16 @@ public class SimkitEventGraphXML2Java
             pw.println();
         }
 
-        if (e.getCode() != null && !e.getCode().isEmpty()) {
-            pw.println(SP_8 + "/* Code insertion for Event " + eventName + " */");
-            lines = e.getCode().split("\\n");
+        if ((e.getSourceCodeBlock()            != null) && 
+            (e.getSourceCodeBlock().getValue() != null) && 
+            !e.getSourceCodeBlock().getValue().isEmpty()) 
+        {
+            pw.println(SP_8 + "/* SourceCodeBlock insertion for Event " + eventName + " */");
+            lines = e.getSourceCodeBlock().getValue().split("\\n");
             for (String line : lines)
                 pw.println(SP_8 + line);
 
-            pw.println(SP_8 + "/* End Code insertion */");
+            pw.println(SP_8 + "/* End SourceCodeBlock insertion */");
             pw.println();
         }
 
@@ -1134,11 +1140,16 @@ public class SimkitEventGraphXML2Java
         pw.println(SP_4 + CB);
     }
 
-    void buildCodeBlock(StringWriter t) {
+    void buildSourceCodeBlock(StringWriter t) 
+    {
         PrintWriter pw = new PrintWriter(t);
-        String code = root.getCode();
+        String code = "";
+        if ((root.getSourceCodeBlock()            != null) &&
+            (root.getSourceCodeBlock().getValue() != null))
+             code = root.getSourceCodeBlock().getValue();
         String[] lines;
-        if (code != null) {
+        if ((code != null) && !code.isBlank())
+        {
             pw.println(SP_4 + "/* Inserted code for " + root.getName() + " */");
             lines = code.split("\\n");
             for (String codeLines : lines) {
@@ -1356,7 +1367,7 @@ public class SimkitEventGraphXML2Java
                 
             } catch (NullPointerException npe) {
                 LOG.error(npe);
-//            npe.printStackTrace();
+                npe.printStackTrace();
             }
         } catch (IOException fnfe) {
             LOG.error(fnfe);

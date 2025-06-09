@@ -198,7 +198,16 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         return openAssembliesList;
     }
 
-    private boolean checkSaveIfModified() 
+    /** Whether one or more assemblies are open
+     * @return whether any assemblies are open
+     */
+    public final boolean isAssemblyOpen()
+    {  
+//      return (!getOpenAssemblyFileList(true).isEmpty()); // TODO not working
+        return ViskitGlobals.instance().isAssemblyOpen();
+    }
+
+    private boolean checkSaveIfModified()
     {
         if (assemblyModel == null)
             assemblyModel = (AssemblyModelImpl) getModel();
@@ -254,6 +263,22 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     public void open()
     {
         ViskitGlobals.instance().selectAssemblyEditorTab();
+        
+        // TODO fix: avoid problems when multiple assemblies are open
+        if (isAssemblyOpen())
+        {
+            String title = "Close Current Assembly?";
+            String assemblyName = ViskitGlobals.instance().getActiveAssemblyName();
+            String message = "<html><p align='center'>Are you sure that you first want to close</p><br/>";
+            message += "<p align='center'><i>"         + assemblyName + "</i></p><br/><p align='center'> as the currently active Assembly?</p><br/>";
+            int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
+            if (returnValue == JOptionPane.NO_OPTION)
+            {
+                return;
+            }
+            else closeAll();
+        }
+        
         File[] filesArray = ViskitGlobals.instance().getAssemblyEditorViewFrame().openFilesAsk();
         if (filesArray == null)
             return; // no matching event graphs for this assembly to open
@@ -1770,7 +1795,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             } 
             else {
                 SimEventListenerEdge nextSimEventListenerEdge = (SimEventListenerEdge) redoGraphCell.getUserObject();
-                ((AssemblyModel) getModel()).redoSimEvLisEdge(nextSimEventListenerEdge);
+                ((AssemblyModel) getModel()).redoSimEventListenerEdge(nextSimEventListenerEdge);
             }
         } 
         else 
@@ -1983,7 +2008,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
             eventGraphSource = simkitXML2Java.translate();
         } 
         catch (Exception e) {
-            LOG.error("buildJavaEventGraphSource() error building Java from {}: {}, erroneous event-graph xml found", simkitXML2Java.getFileBaseName(), e.getMessage());
+            LOG.error("buildJavaEventGraphSource() error building Java from\n      {}\n      Exception: {}; erroneous event-graph xml or conversion found", simkitXML2Java.getFileBaseName(), e.getMessage());
+            e.printStackTrace(); // trace is usually needed here
         }
         return eventGraphSource;
     }
@@ -2110,7 +2136,8 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
                 return null;
             }
         } 
-        catch (IOException ioe) {
+        catch (IOException ioe) 
+        {
             LOG.error("compileJavaClassFromString() exception" + ioe);
             ioe.printStackTrace();
         } 
@@ -2582,23 +2609,27 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
      *
      * @param f the Assembly File to open EventGraphs for (not used)
      */
-    private void openEventGraphs(File f) {
+    private void openEventGraphs(File f) 
+    {
         File tempFile = f;
         try {
             List<File> eventGraphFiles = EventGraphCache.instance().getEventGraphFilesList();
-            for (File file : eventGraphFiles) {
+            for (File file : eventGraphFiles) 
+            {
                 tempFile = file;
 
                 // _doOpenEventGraph checks if a tab is already opened
                 ((EventGraphControllerImpl) ViskitGlobals.instance().getEventGraphController())._doOpenEventGraph(file);
             }
         } 
-        catch (Exception ex) {
+        catch (Exception ex) 
+        {
             LOG.error("Opening EventGraph file: {} caused error: {}", tempFile, ex);
             ViskitGlobals.instance().messageUser(JOptionPane.WARNING_MESSAGE,
                     "EventGraph Opening Error",
                     "EventGraph file: " + tempFile + "\nencountered error: " + ex + " while loading."
                     );
+            ex.printStackTrace(); // debug usually needed
             closeAll();
         }
     }
@@ -2657,24 +2688,27 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
     private List<String> openAssembliesList;
 
     @SuppressWarnings("unchecked")
-    private void recordAssemblyFiles() {
+    private void recordAssemblyFiles() // TODO check
+    {
         openAssembliesList = new ArrayList<>(4);
         List<Object> valueList = historyConfiguration.getList(ViskitUserConfiguration.ASSEMBLY_HISTORY_KEY + "[@value]");
         LOG.debug("recordAssemblyFiles() valueAr size is: {}", valueList.size());
-        int idx = 0;
+        int count = 0;
         String op;
-        String assemblyFile;
-        for (Object s : valueList) {
-            assemblyFile = (String) s;
-            if (recentAssemblyFileSet.add(assemblyFile)) {
-                op = historyConfiguration.getString(ViskitUserConfiguration.ASSEMBLY_HISTORY_KEY + "(" + idx + ")[@open]");
+        String assemblyFileName;
+        for (Object nextValue : valueList) 
+        {
+            assemblyFileName = (String) nextValue;
+            if (recentAssemblyFileSet.add(assemblyFileName)) 
+            {
+                op = historyConfiguration.getString(ViskitUserConfiguration.ASSEMBLY_HISTORY_KEY + "(" + count + ")[@open]");
 
                 if (op != null && (op.toLowerCase().equals("true")))
-                    openAssembliesList.add(assemblyFile);
+                    openAssembliesList.add(assemblyFileName);
 
                 notifyRecentAssemblyFileListeners();
             }
-            idx++;
+            count++;
         }
     }
 

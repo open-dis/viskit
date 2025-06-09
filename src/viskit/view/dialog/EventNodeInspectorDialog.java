@@ -346,7 +346,7 @@ public class EventNodeInspectorDialog extends JDialog
 //      hideShowDescription(s != null && !s.isEmpty());
         hideShowDescription(true); // always show
 
-        s = eventNode.getCodeBlockString();
+        s = eventNode.getSourceCodeBlockString();
         localCodeBlockPanel.setData(s);
         localCodeBlockPanel.setVisibleLines(1);
         hideShowCodeBlock(s != null && !s.isEmpty());

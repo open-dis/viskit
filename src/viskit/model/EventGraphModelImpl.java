@@ -182,8 +182,11 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
 
                 buildParametersFromJaxb(simEntityJaxbRoot.getParameter());
                 buildStateVariablesFromJaxb(simEntityJaxbRoot.getStateVariable());
-                buildCodeBlockFromJaxb(simEntityJaxbRoot.getCode());
-            } 
+                
+                if (simEntityJaxbRoot.getSourceCodeBlock() == null)
+                    simEntityJaxbRoot.setSourceCodeBlock(this.jaxbEventGraphObjectFactory.createSourceCodeBlock());
+                buildSourceCodeBlockFromJaxb(simEntityJaxbRoot.getSourceCodeBlock().getValue());
+            }
             catch (JAXBException ee) 
             {
                 // want a clear way to know if they're trying to load an assembly vs. some unspecified XML.
@@ -319,7 +322,7 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
                 }
             });
             
-            // Already handled: CodeBlock
+            // Already handled: Code block
             
             // obsolete
 //            List<String> clis = simEntityJaxbRoot.getComment();
@@ -372,8 +375,8 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         {
             String modelModifiedStatus;
             if  (isModelModified())
-                 modelModifiedStatus =    "saved modified";
-            else modelModifiedStatus = "re-saved unmodified";
+                 modelModifiedStatus =   "saved modified";
+            else modelModifiedStatus = "resaved unmodified";
             long bytesSaved = currentFile.length();
             LOG.info("{} Event Graph file, {} bytes\n      {}", modelModifiedStatus, bytesSaved, currentFile.getPath());
             setModelModified(false);
@@ -534,7 +537,8 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
                 eventNode.getLocalVariables().add(eventLocalVariableElement);
             }
         }
-        eventNode.setCodeBlockString(eventElement.getCode());
+        if (eventElement.getSourceCodeBlock() != null)
+            eventNode.setCodeBlockString(eventElement.getSourceCodeBlock().getValue());
         eventNode.getStateTransitions().clear();
 
         EventStateTransition eventStateTransition;
@@ -728,11 +732,11 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         return arrayList;
     }
 
-    private void buildCodeBlockFromJaxb(String newCodeBlock) 
+    private void buildSourceCodeBlockFromJaxb(String newSourceCodeBlock) 
     {
-        newCodeBlock = (newCodeBlock == null) ? "" : newCodeBlock;
+        newSourceCodeBlock = (newSourceCodeBlock == null) ? "" : newSourceCodeBlock;
         // TODO where is class variable??
-        notifyChanged(new ModelEvent(newCodeBlock, ModelEvent.CODEBLOCK_CHANGED, "Code block changed"));
+        notifyChanged(new ModelEvent(newSourceCodeBlock, ModelEvent.CODEBLOCK_CHANGED, "SourceCodeBlock changed"));
     }
 
     private void buildStateVariablesFromJaxb(List<StateVariable> stateVariableElementList) 
@@ -848,8 +852,11 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
     }
 
     @Override
-    public void changeCodeBlock(String s) {
-        simEntityJaxbRoot.setCode(s);
+    public void changeSourceCodeBlock(String newSourceCodeBlock) 
+    {
+        if (simEntityJaxbRoot.getSourceCodeBlock() == null)
+            simEntityJaxbRoot.setSourceCodeBlock(this.jaxbEventGraphObjectFactory.createSourceCodeBlock());
+        simEntityJaxbRoot.getSourceCodeBlock().setValue(newSourceCodeBlock);
         setModelModified(true);
     }
 
@@ -1246,7 +1253,9 @@ public class EventGraphModelImpl extends MvcAbstractModel implements Model
         // following must follow above
         cloneTransitions(jaxbEvent.getStateTransition(), eventNode.getStateTransitions());
 
-        jaxbEvent.setCode(eventNode.getCodeBlockString());
+        if (jaxbEvent.getSourceCodeBlock() == null)
+            jaxbEvent.setSourceCodeBlock(this.jaxbEventGraphObjectFactory.createSourceCodeBlock());
+        jaxbEvent.getSourceCodeBlock().setValue(eventNode.getSourceCodeBlockString());
 
         setModelModified(true);
         notifyChanged(new ModelEvent(eventNode, ModelEvent.EVENT_CHANGED, "Event changed"));

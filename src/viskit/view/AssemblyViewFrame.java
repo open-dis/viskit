@@ -959,7 +959,7 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getToolBar().add(modeLabel);
         getToolBar().addSeparator(new Dimension(5, 24));
         
-        getToolBar().addSeparator(new Dimension(24, 24));
+//        getToolBar().addSeparator(new Dimension(24, 24));
 
         getToolBar().add(selectModeToggleButton);
         getToolBar().addSeparator(new Dimension(5, 24));
@@ -970,7 +970,6 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         getToolBar().addSeparator(new Dimension(24, 24));
         getToolBar().add(propertyChangeListenerModeToggleButton);
 
-        getToolBar().add(new JLabel("Zoom: "));
         zoomLabel = new JLabel("Zoom: ");
         zoomLabel.setToolTipText("Zoom in or out");
         getToolBar().add(zoomLabel);

@@ -338,7 +338,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
             // the follow-on initializations using ViskitGlobals and ViskitUserPreferencesDialog
             // must occur prior to threading and new RunSimulationClassLoader
 ////            basicAssembly.resetRunSimulationClassLoader(); // TODO wrong place for this, likely out of place
-            
+
             getBasicAssembly().setWorkingDirectory(ViskitGlobals.instance().getProjectWorkingDirectory()); // TODO duplicate invocation?
             setClassPathUrlArray(ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray());
             
@@ -443,6 +443,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         catch (Exception ue) // any other unexpected exceptions?? sometimes strange things happen with reflection and threading
         {
             LOG.error("prepareAssemblySimulationRun() reflection uncaught exception: " + ue);
+            ue.printStackTrace(); // whassup?
         }
     } // end prepareAndStartAssemblySimulationRun()
 

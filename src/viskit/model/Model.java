@@ -154,7 +154,7 @@ public interface Model
 
     boolean changeSimParameter(ViskitParameter p);
 
-    void changeCodeBlock(String s);
+    void changeSourceCodeBlock(String s);
 
     void deleteStateVariable(ViskitStateVariable sv);
 
