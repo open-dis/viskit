@@ -157,16 +157,16 @@
   </xs:element>
   <xs:element name="SimEventListenerConnection">
     <xs:complexType>
-      <xs:attribute name="listener" use="required"/>
       <xs:attribute name="source" use="required"/>
+      <xs:attribute name="listener" use="required"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="PropertyChangeListenerConnection">
     <xs:complexType>
+      <xs:attribute name="source" use="required"/>
       <xs:attribute name="property"/>
       <xs:attribute name="listener" use="required"/>
-      <xs:attribute name="source" use="required"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
@@ -222,12 +222,12 @@
   <xs:element name="AssemblySchedule">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SourceCodeBlock"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="EdgeParameter"/>
       </xs:sequence>
-      <xs:attribute name="delay" default="0.0"/>
       <xs:attribute name="event" use="required" type="xs:IDREF"/>
+      <xs:attribute name="delay" default="0.0"/>
       <xs:attribute name="condition"/>
       <xs:attribute name="priority" default="DEFAULT">
         <xs:simpleType>
@@ -307,9 +307,9 @@
         <xs:element ref="PropertyChange"/>
         <xs:element ref="Errors"/>
       </xs:choice>
+      <xs:attribute name="index"/>
       <xs:attribute name="sample" use="required"/>
       <xs:attribute name="designPoint" use="required"/>
-      <xs:attribute name="index"/>
       <xs:attribute name="job"/>
       <xs:attribute name="description"/>
     </xs:complexType>
@@ -414,7 +414,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Parameter"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="StateVariable"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Event"/>
-        <xs:element minOccurs="0" ref="Code"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SourceCodeBlock"/>
       </xs:sequence>
       <xs:attribute name="name" type="xs:NMTOKEN" use="required"/>
       <xs:attribute name="package" default="examples"/>
@@ -427,7 +427,7 @@
   </xs:element>
   <xs:element name="Comment" type="xs:string">
     <xs:annotation>
-      <xs:documentation>Comment is actually a Description field. JAXB already uses 'Description' so the name can't be overloaded, ouch.</xs:documentation>
+      <xs:documentation>No longer used, Comment is actually a Description field. JAXB already uses 'Description' so the name can't be overloaded, ouch.</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:element name="Parameter">
@@ -444,7 +444,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SourceCodeBlock"/>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:ID"/>
       <xs:attribute name="type" use="required"/>
@@ -462,16 +462,23 @@
           <xs:element ref="AssemblySchedule"/>
           <xs:element ref="Cancel"/>
         </xs:choice>
-        <!-- Regardless of this sequence, code blocks will appear in the correct
-             place in generated source code -->
-        <xs:element minOccurs="0" ref="Code"/>
+        <!-- Regardless of this sequence, SourceCodeBlock will appear in the correct place in generated source code -->
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SourceCodeBlock"/>
         <xs:element minOccurs="0" ref="Coordinate"/>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:ID"/>
       <xs:attribute name="description"/>
     </xs:complexType>
   </xs:element>
-  <xs:element name="Code" type="xs:string"/>
+  <xs:element name="SourceCodeBlock">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="language" type="xs:NMTOKEN" default="Java"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="Argument">
     <xs:complexType>
       <xs:sequence>
@@ -486,7 +493,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SourceCodeBlock"/>
       </xs:sequence>
       <xs:attribute name="name" use="required" type="xs:NMTOKEN"/>
       <xs:attribute name="type" use="required"/>
@@ -528,7 +535,7 @@
         </xs:choice>
         <xs:element minOccurs="0" maxOccurs="1" ref="LocalVariableAssignment"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="LocalVariableInvocation"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SourceCodeBlock"/>
       </xs:sequence>
       <xs:attribute name="state" use="required" type="xs:IDREF"/>
       <xs:attribute name="index"/>
@@ -548,7 +555,7 @@
   <xs:element name="Cancel">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Code"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="SourceCodeBlock"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="Comment"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="EdgeParameter"/>
       </xs:sequence>
