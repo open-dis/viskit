@@ -224,7 +224,7 @@ public class MainFrame extends JFrame
             topTabbedPane.add(((AssemblyViewFrame) assemblyViewFrame).getContent());
             currentPaneIndex = topTabbedPane.indexOfComponent(((AssemblyViewFrame) assemblyViewFrame).getContent());
             topTabbedPane.setTitleAt(currentPaneIndex, "Assembly Editor");
-            topTabbedPane.setToolTipTextAt(currentPaneIndex, "Visual editor for assembly definitions");
+            topTabbedPane.setToolTipTextAt(currentPaneIndex, "Visual editor for Assembly definitions");
             mainFrameMenuBar = ((AssemblyViewFrame) assemblyViewFrame).getMenus();
             modalMenuBarList.add(mainFrameMenuBar);
             doCommonHelp(mainFrameMenuBar);

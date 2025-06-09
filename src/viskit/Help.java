@@ -71,7 +71,10 @@ public class Help
     public static final String SIMKIT_DES_MODELING_MANUAL            = "documents/references/SimkitDiscreteEventSimulationModelingManual.pdf";
     public static final String MV3302_SIMKIT_JAVA_PROGRAMMING_VIDEOS = "https://www.youtube.com/playlist?list=PL25IAuhExzo5UPi5TnUyq23N9jXhApFPi";
     public static final String SIMKIT_GITHUB_URL                     = "https://github.com/ahbuss/simkit";
-    public static final String VISKIT_GITHUB_URL                     = "https://github.com/open-dis/viskit";
+    public static final String VISKIT_URL                            = "https://github.com/open-dis/viskit";
+    public static final String VISKIT_GITHUB_ISSUES_URL              = "https://github.com/open-dis/viskit/issues";
+    public static final String VISKIT_GITHUB_README                  = "https://github.com/open-dis/viskit/blob/master/README.md";
+//  public static final String BUGZILLA_URL                          = "https://github.com/terry-norbraten/viskit/issues";
     
             
     public static final String CR = "<br>";
@@ -81,10 +84,6 @@ public class Help
     public static final String ABOUT_ASSEMBLY_STRING =
             "Viskit Assembly Editor" + CR + "   version " + VERSION_STRING + CR
             + "last modified: " + VERSION.getLastModified() + CR + CR;
-    public static final String SIMKIT_URL   = "https://github.com/ahbuss/Simkit";
-    public static final String VISKIT_URL   = "https://github.com/open-dis/viskit";
-    public static final String ISSUES_URL   = "https://github.com/open-dis/viskit/issues";
-//  public static final String BUGZILLA_URL = "https://github.com/terry-norbraten/viskit/issues";
     public static final String DEVELOPERS =
             "Copyright &copy; 1995-2025 under BSD-style open-source license" + CR + CR
             + "<b>Developers:</b>" + CR
@@ -99,7 +98,7 @@ public class Help
     public static final String SIMKIT_PAGE =
             CR
             + "Visit the Simkit home page at" + CR
-            + LinkURLString(SIMKIT_URL) + CR;
+            + LinkURLString(SIMKIT_GITHUB_URL) + CR;
     public static final String VISKIT_PAGE = CR
             + "Visit the Viskit home page at" + CR
             + LinkURLString(VISKIT_URL);
@@ -110,7 +109,7 @@ public class Help
             + System.getProperty("java.version");
     public static final String VISKIT_ISSUES_PAGE = CR
             + "Viskit Issue tracker:" + CR
-            + LinkURLString(ISSUES_URL);
+            + LinkURLString(VISKIT_GITHUB_ISSUES_URL);
 
     private HelpBroker helpBroker;
 
@@ -292,11 +291,25 @@ public class Help
     public void launchGithubViskit() 
     {
         try {
-            Desktop.getDesktop().browse(new URI(VISKIT_GITHUB_URL));
+            Desktop.getDesktop().browse(new URI(VISKIT_GITHUB_README));
         }
         catch (IOException | URISyntaxException ex) {
             
             LOG.error("launchGithubSimkit() problem: {}", ex);
+        }
+    }
+    
+    /** method name for reflection use */
+    public static final String METHOD_launchGithubViskitIssues = "launchGithubViskitIssues";
+
+    public void launchGithubViskitIssues() 
+    {
+        try {
+            Desktop.getDesktop().browse(new URI(VISKIT_GITHUB_ISSUES_URL));
+        }
+        catch (IOException | URISyntaxException ex) {
+            
+            LOG.error("launchGithubViskitIssues() problem: {}", ex);
         }
     }
 

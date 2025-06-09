@@ -101,9 +101,9 @@ public class ViskitUserPreferencesDialog extends JDialog
     private JRadioButton platformLafRB;
     private JRadioButton otherLafRB;
     private JTextField   otherLafTF;
-    private JTextField   analyst_nameTF;
-    private JTextField   analyst_emailTF;
-    private JTextField   analyst_websiteTF;
+    private JTextField   author_nameTF;
+    private JTextField   author_emailTF;
+    private JTextField   author_websiteTF;
     
     private static final int        ANALYST_TAB_INDEX = 0;
     private static final int      CLASSPATH_TAB_INDEX = 1;
@@ -202,31 +202,31 @@ public class ViskitUserPreferencesDialog extends JDialog
         analystPanel.add(Box.createVerticalStrut(10));
         
         // TODO add listeners to save values
-        JLabel analyst_nameLabel = new JLabel("Analyst name");
-        analyst_nameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        JLabel author_nameLabel = new JLabel("Author name");
+        author_nameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 //      analystPanel.add(Box.createHorizontalGlue());
-        analyst_nameTF    = new JTextField();
-        analyst_nameTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        analystPanel.add(analyst_nameLabel);
-        analystPanel.add(analyst_nameTF);
+        author_nameTF    = new JTextField();
+        author_nameTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        analystPanel.add(author_nameLabel);
+        analystPanel.add(author_nameTF);
         analystPanel.add(Box.createVerticalStrut(10));
         
-        JLabel analyst_emailLabel = new JLabel("Analyst email");
-        analyst_emailLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        analyst_emailTF   = new JTextField();
-        analyst_emailTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        analystPanel.add(analyst_emailLabel);
+        JLabel author_emailLabel = new JLabel("Author email");
+        author_emailLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        author_emailTF   = new JTextField();
+        author_emailTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        analystPanel.add(author_emailLabel);
 //      analystPanel.add(Box.createHorizontalGlue());
-        analystPanel.add(analyst_emailTF);
+        analystPanel.add(author_emailTF);
         analystPanel.add(Box.createVerticalStrut(10));
         
-        JLabel analyst_websiteLabel = new JLabel("Analyst website");
-        analyst_websiteLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        analyst_websiteTF = new JTextField();
-        analyst_websiteTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-        analystPanel.add(analyst_websiteLabel);
+        JLabel author_websiteLabel = new JLabel("Author website");
+        author_websiteLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        author_websiteTF = new JTextField();
+        author_websiteTF.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+        analystPanel.add(author_websiteLabel);
 //      analystPanel.add(Box.createHorizontalGlue());
-        analystPanel.add(analyst_websiteTF);
+        analystPanel.add(author_websiteTF);
         analystPanel.add(Box.createVerticalStrut(10));
         
         // name, affilation, email; where does this information get saved? .viskit somewhere?
@@ -526,16 +526,16 @@ public class ViskitUserPreferencesDialog extends JDialog
         // developer convenience support
         if (getUserName().equalsIgnoreCase("brutzman"))
         {
-               analyst_nameTF.setText("Don Brutzman");
-              analyst_emailTF.setText("brutzman@nps.edu");
-            analyst_websiteTF.setText("https://faculty.nps.edu/brutzman");
+               author_nameTF.setText("Don Brutzman");
+              author_emailTF.setText("brutzman@nps.edu");
+            author_websiteTF.setText("https://faculty.nps.edu/brutzman");
             repaint();
         }
         else
         {
-            analyst_nameTF.setText(getUserName());
-           analyst_emailTF.setText(getUserEmail());
-         analyst_websiteTF.setText(getUserWebsite());
+            author_nameTF.setText(getUserName());
+           author_emailTF.setText(getUserEmail());
+         author_websiteTF.setText(getUserWebsite());
         }
         
         DefaultListModel<String> mod = (DefaultListModel<String>) classpathJList.getModel();
@@ -579,14 +579,14 @@ public class ViskitUserPreferencesDialog extends JDialog
     private void unloadWidgets() 
     {
         // immediately save value rather than waiting for eventual unfillWidgets()
-        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_NAME_KEY,    analyst_nameTF.getText());
-        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_NAME_KEY,    analyst_nameTF.getText());
+        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_NAME_KEY,    author_nameTF.getText());
+        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_NAME_KEY,    author_nameTF.getText());
         
-        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_EMAIL_KEY,   analyst_emailTF.getText());
-        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_EMAIL_KEY,   analyst_emailTF.getText());
+        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_EMAIL_KEY,   author_emailTF.getText());
+        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_EMAIL_KEY,   author_emailTF.getText());
         
-        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_WEBSITE_KEY, analyst_websiteTF.getText());
-        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_WEBSITE_KEY, analyst_websiteTF.getText());
+        ViskitUserConfiguration.instance().setSessionValue(ViskitUserConfiguration.USER_WEBSITE_KEY, author_websiteTF.getText());
+        ViskitUserConfiguration.instance().setValue       (ViskitUserConfiguration.USER_WEBSITE_KEY, author_websiteTF.getText());
                     
         // most everything gets instantly updated;  check for pending text entry
         if(otherLafRB.isSelected()) {
@@ -617,9 +617,9 @@ public class ViskitUserPreferencesDialog extends JDialog
         @Override
         public void actionPerformed(ActionEvent event)
         {
-            analyst_nameTF   .setText("");
-            analyst_emailTF  .setText("");
-            analyst_websiteTF.setText("");
+            author_nameTF   .setText("");
+            author_emailTF  .setText("");
+            author_websiteTF.setText("");
             unloadWidgets();
         }
     }

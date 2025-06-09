@@ -444,6 +444,7 @@ public class InternalAssemblyRunner implements PropertyChangeListener
         {
             LOG.error("prepareAssemblySimulationRun() reflection uncaught exception: " + ue);
             ue.printStackTrace(); // whassup?
+            mutex--;
         }
     } // end prepareAndStartAssemblySimulationRun()
 

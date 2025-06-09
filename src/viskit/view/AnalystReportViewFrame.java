@@ -324,11 +324,16 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
     /** user interface creation */
     private JPanel createHeaderPanel()
     {
+        JLabel titleLabel, authorLabel;
+        
         if (headerPanel == null)
             headerPanel = new JPanel(new SpringLayout());
-        headerPanel.add(new JLabel("Title"));
+        headerPanel.add(titleLabel = new JLabel("Title"));
+        titleLabel.setToolTipText("Title for the Analyst Report");
         headerPanel.add(titleTF);
-        headerPanel.add(new JLabel("Author"));
+        headerPanel.add(authorLabel = new JLabel("Author"));
+        authorLabel.setToolTipText("Also see Project, Viskit User Preferences, Analyst information");
+        
         headerPanel.add(analystNameTF);
         JLabel analysisDateLabel = new JLabel("Analysis Date");
         analysisDateLabel.setToolTipText("Analysis Date");
@@ -336,6 +341,7 @@ public class AnalystReportViewFrame extends MvcAbstractViewFrame implements Open
         headerPanel.add(analysisDateTF);
         JLabel documentAccessLabel = new JLabel("Document Access ");
         documentAccessLabel.setToolTipText("Document Access Label");
+        documentAccessRightsLabelTF.setEditable(true);
         headerPanel.add(documentAccessLabel);
         headerPanel.add(documentAccessRightsLabelTF);
         

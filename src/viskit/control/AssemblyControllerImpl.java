@@ -269,7 +269,7 @@ public class AssemblyControllerImpl extends MvcAbstractController implements Ass
         {
             String title = "Close Current Assembly?";
             String assemblyName = ViskitGlobals.instance().getActiveAssemblyName();
-            String message = "<html><p align='center'>Are you sure that you first want to close</p><br/>";
+            String message = "<html><p align='center'>Are you sure that you want to first close</p><br/>";
             message += "<p align='center'><i>"         + assemblyName + "</i></p><br/><p align='center'> as the currently active Assembly?</p><br/>";
             int returnValue = ViskitGlobals.instance().getMainFrame().genericAskYesNo(title, message);
             if (returnValue == JOptionPane.NO_OPTION)

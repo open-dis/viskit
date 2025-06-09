@@ -66,6 +66,7 @@ import static viskit.Help.METHOD_doSearch;
 import static viskit.Help.METHOD_doTutorial;
 import static viskit.Help.METHOD_launchGithubSimkit;
 import static viskit.Help.METHOD_launchGithubViskit;
+import static viskit.Help.METHOD_launchGithubViskitIssues;
 import static viskit.Help.METHOD_launchMV3302SimkitJavaProgrammingVideos;
 import static viskit.Help.METHOD_launchSimkitDesModelingManual;
 
@@ -226,10 +227,14 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
     private JMenu helpMenu;
     
     private JMenu helpResourcesMenu;
+    private JMenuItem helpContentsMenuItem;
+    private JMenuItem helpSearchMenuItem;
+    private JMenuItem helpTutorialMenuItem;
     private JMenuItem simkitDesModelingManualMenuItem;
     private JMenuItem simkitJavaProgrammingVideosMenuItem;
     private JMenuItem simkitGithubMenuItem;
     private JMenuItem viskitGithubMenuItem;
+    private JMenuItem aboutViskitMenuItem;
     
     private JLabel metadataLabel;
     private JLabel modeLabel;
@@ -805,28 +810,51 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         ViskitGlobals.instance().setHelp(help); // single instance for all viskit frames
 
         helpMenu = new JMenu("Help");
+//      helpMenu.setToolTipText("Help assets"); // clutter
         getHelpMenu().setMnemonic(KeyEvent.VK_H);
 
         // https://stackoverflow.com/questions//15266351/make-f1-shortcut-key-in-swing
-        getHelpMenu().add(buildMenuItem(help, METHOD_doContents,  "Contents",     KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_F1,0)));
-        getHelpMenu().add(buildMenuItem(help, METHOD_doSearch,    "Search",       KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.SHIFT_DOWN_MASK)));
-        getHelpMenu().add(buildMenuItem(help, METHOD_doTutorial,  "Tutorial",     KeyEvent.VK_T, null));
+        helpContentsMenuItem = buildMenuItem(help, METHOD_doContents,  "Contents",     KeyEvent.VK_C, KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
+        helpContentsMenuItem.setToolTipText("Help Contents");
+        getHelpMenu().add(helpContentsMenuItem);
+        
+        helpSearchMenuItem = buildMenuItem(help, METHOD_doSearch,    "Search",       KeyEvent.VK_S, KeyStroke.getKeyStroke(KeyEvent.VK_F1, InputEvent.SHIFT_DOWN_MASK));
+        getHelpMenu().add(helpSearchMenuItem);
+        helpSearchMenuItem.setToolTipText("Help Search");
+        
+        helpTutorialMenuItem = buildMenuItem(help, METHOD_doTutorial,  "Tutorial",     KeyEvent.VK_T, null);
+        getHelpMenu().add(helpTutorialMenuItem);
+        helpTutorialMenuItem.setToolTipText("Help Tutorial");
         
         getHelpMenu().addSeparator();
-        helpResourcesMenu = new JMenu("Resources");
+        helpResourcesMenu = new JMenu("Help Resources");
+        helpResourcesMenu.setToolTipText("Additional information");
         
         simkitDesModelingManualMenuItem = buildMenuItem(help, METHOD_launchSimkitDesModelingManual, "Simkit DES Modeling Manual", KeyEvent.VK_M, null);
-        simkitJavaProgrammingVideosMenuItem = buildMenuItem(help, METHOD_launchMV3302SimkitJavaProgrammingVideos, "Simkit Java Programming Videos", KeyEvent.VK_V, null);
-        simkitGithubMenuItem = buildMenuItem(help, METHOD_launchGithubSimkit, "Github Simkit Repository", KeyEvent.VK_G, null);
-        viskitGithubMenuItem = buildMenuItem(help, METHOD_launchGithubViskit, "Github Viskit Repository", KeyEvent.VK_G, null);
-                
+        simkitDesModelingManualMenuItem.setToolTipText("Comprehensive manual on Simkit Discrete Event Simulation (DES) Modeling");
         helpResourcesMenu.add(simkitDesModelingManualMenuItem);
+        
+        simkitJavaProgrammingVideosMenuItem = buildMenuItem(help, METHOD_launchMV3302SimkitJavaProgrammingVideos, "Simkit Java Programming Videos", KeyEvent.VK_V, null);
+        simkitJavaProgrammingVideosMenuItem.setToolTipText("Video lessons on Simkit and Java");
         helpResourcesMenu.add(simkitJavaProgrammingVideosMenuItem);
+        
+        simkitGithubMenuItem = buildMenuItem(help, METHOD_launchGithubSimkit, "Github Simkit Repository", KeyEvent.VK_G, null);
+        simkitGithubMenuItem.setToolTipText("Github Simkit Repository for open source");
         helpResourcesMenu.add(simkitGithubMenuItem);
+        
+        viskitGithubMenuItem = buildMenuItem(help, METHOD_launchGithubViskitIssues, "Github Viskit Issues", KeyEvent.VK_G, null);
+        viskitGithubMenuItem.setToolTipText("Issue tracking and contributions to Viskit source code");
         helpResourcesMenu.add(viskitGithubMenuItem);
+        
+        viskitGithubMenuItem = buildMenuItem(help, METHOD_launchGithubViskit, "Github Viskit Repository", KeyEvent.VK_G, null);
+        viskitGithubMenuItem.setToolTipText("\"Github Viskit Repository for open source");
+        helpResourcesMenu.add(viskitGithubMenuItem);
+        
         helpMenu.add(helpResourcesMenu);
         
-        getHelpMenu().add(buildMenuItem(help, METHOD_aboutViskit, "About Viskit", KeyEvent.VK_A, null));
+        aboutViskitMenuItem = buildMenuItem(help, METHOD_aboutViskit, "About Viskit", KeyEvent.VK_A, null);
+        aboutViskitMenuItem.setToolTipText("Viskit version information");
+        getHelpMenu().add(aboutViskitMenuItem);
     }
 
     private JMenu buildMenu(String name) 
