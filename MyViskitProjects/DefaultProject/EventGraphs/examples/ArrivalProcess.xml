@@ -7,7 +7,7 @@
             <Assignment value="numberArrivals + 1"/>
         </StateTransition>
         <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT" description="after reporting latest arrival, schedule the next arrival to occur after a duration determined by the interarrival time delay probability distribution function (PDF)."/>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="260.0" y="70.0"/>
     </Event>
     <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
@@ -15,7 +15,8 @@
             <Assignment value="0"/>
         </StateTransition>
         <Schedule delay="interarrivalTime.generate()" event="Arrival" priority="DEFAULT" description="initiate arrival process upon startup"/>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="40.0" y="70.0"/>
     </Event>
+    <SourceCodeBlock/>
 </SimEntity>

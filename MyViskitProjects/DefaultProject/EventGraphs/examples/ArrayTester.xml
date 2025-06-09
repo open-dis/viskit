@@ -10,14 +10,15 @@
         <Schedule delay="0.0" event="Init" condition="i &lt; (param_0.length - 1)" priority="DEFAULT" description="Continue looping until array length reached">
             <EdgeParameter value="i + 1"/>
         </Schedule>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="180.0" y="30.0"/>
     </Event>
     <Event name="Run" description="The run event is started automatically by Simkit when execution starts.">
         <Schedule delay="0.0" event="Init" condition="true" priority="DEFAULT" description="always schedule event to initialize index at 0">
             <EdgeParameter value="0"/>
         </Schedule>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="30.0" y="30.0"/>
     </Event>
+    <SourceCodeBlock/>
 </SimEntity>

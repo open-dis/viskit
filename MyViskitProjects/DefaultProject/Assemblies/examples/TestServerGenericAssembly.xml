@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SimkitAssembly name="TestServerGenericAssembly" version="2.0" package="examples" author="Arnie Buss" extend="viskit.assembly.ViskitAssembly" description="Provide a unit test for ServerGeneric event graph" xsi:noNamespaceSchemaLocation="../../../../Schemas/assembly.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <SimEntity name="ServerGeneric" type="examples.ServerGeneric" description="">
-        <TerminalParameter name="totalNumberServers" value="1" type="int"/>
-        <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
-            <TerminalParameter name="" value="Constant" type="java.lang.String"/>
-            <TerminalParameter name="" value="1.1" type="double"/>
-        </FactoryParameter>
-        <Coordinate x="390.0" y="200.0"/>
-    </SimEntity>
     <SimEntity name="ArrivalProcess" type="examples.ArrivalProcess" description="Provide arriving customers">
         <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
             <TerminalParameter name="" value="Exponential" type="java.lang.String"/>
@@ -17,6 +9,14 @@
     </SimEntity>
     <SimEntity name="EntityCreator" type="examples.EntityCreator" description="create entities">
         <Coordinate x="260.0" y="200.0"/>
+    </SimEntity>
+    <SimEntity name="ServerGeneric" type="examples.ServerGeneric" description="">
+        <TerminalParameter name="serviceTimeGenerator" value="1" type="int"/>
+        <FactoryParameter factory="simkit.random.RandomVariateFactory" type="simkit.random.RandomVariate">
+            <TerminalParameter name="" value="Constant" type="java.lang.String"/>
+            <TerminalParameter name="" value="1.1" type="double"/>
+        </FactoryParameter>
+        <Coordinate x="390.0" y="200.0"/>
     </SimEntity>
     <SimEventListenerConnection listener="EntityCreator" source="ArrivalProcess"/>
     <Adapter name="arrivalAdapter" eventHeard="EntityArrival" eventSent="Arrival" from="EntityCreator" to="ServerGeneric" description=""/>

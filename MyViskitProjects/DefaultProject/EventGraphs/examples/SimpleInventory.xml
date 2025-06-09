@@ -14,6 +14,7 @@
             <Assignment value="inventoryPosition - demand.generate()"/>
         </StateTransition>
         <Schedule delay="timeBetweenDemands.generate()" event="Demand" priority="DEFAULT"/>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="160.0" y="20.0"/>
     </Event>
     <Event name="PlaceOrder">
@@ -24,6 +25,7 @@
         <Schedule delay="leadTime.generate()" event="ReceiveOrder" priority="DEFAULT">
             <EdgeParameter value="newOrderAmount"/>
         </Schedule>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="190.0" y="150.0"/>
     </Event>
     <Event name="ReceiveOrder">
@@ -34,6 +36,7 @@
         <StateTransition state="inventoryPosition">
             <Assignment value="inventoryPosition + receivedOrderAmount"/>
         </StateTransition>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="310.0" y="150.0"/>
     </Event>
     <Event name="Review">
@@ -41,6 +44,7 @@
             <EdgeParameter value="(orderUpTo - inventoryPosition - amountOnOrder)"/>
         </Schedule>
         <Schedule delay="timeBetweenReviews" event="Review" priority="DEFAULT"/>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="80.0" y="140.0"/>
     </Event>
     <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
@@ -52,7 +56,8 @@
         </StateTransition>
         <Schedule delay="timeBetweenReviews" event="Review" priority="DEFAULT"/>
         <Schedule delay="timeBetweenDemands.generate()" event="Demand" priority="DEFAULT"/>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="10.0" y="20.0"/>
     </Event>
+    <SourceCodeBlock/>
 </SimEntity>

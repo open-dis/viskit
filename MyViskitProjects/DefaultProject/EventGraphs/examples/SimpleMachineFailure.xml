@@ -15,6 +15,7 @@
         </StateTransition>
         <Schedule delay="0.0" event="StartRepair" condition="numberFailedMachines &gt;= totalNumberRepairPeople" priority="HIGH"/>
         <Schedule delay="timeToFailure.generate()" event="Failure" priority="DEFAULT"/>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="280.0" y="30.0"/>
     </Event>
     <Event name="Failure">
@@ -22,6 +23,7 @@
             <Assignment value="numberFailedMachines + 1"/>
         </StateTransition>
         <Schedule delay="0.0" event="StartRepair" condition="numberAvailableRepairPeople &gt; 0" priority="DEFAULT"/>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="80.0" y="180.0"/>
     </Event>
     <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
@@ -32,7 +34,7 @@
             <Assignment value="totalNumberRepairPeople"/>
         </StateTransition>
         <Schedule delay="0.0" event="StartMachine" priority="DEFAULT"/>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="0.0" y="20.0"/>
     </Event>
     <Event name="StartMachine">
@@ -41,6 +43,7 @@
         </StateTransition>
         <Schedule delay="timeToFailure.generate()" event="Failure" priority="DEFAULT"/>
         <Schedule delay="0.0" event="StartMachine" condition="numberFailedMachines &gt; 0" priority="DEFAULT"/>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="80.0" y="20.0"/>
     </Event>
     <Event name="StartRepair">
@@ -48,6 +51,8 @@
             <Assignment value="numberAvailableRepairPeople - 1"/>
         </StateTransition>
         <Schedule delay="repairTime.generate()" event="EndRepair" priority="DEFAULT"/>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="280.0" y="180.0"/>
     </Event>
+    <SourceCodeBlock/>
 </SimEntity>

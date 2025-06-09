@@ -8,19 +8,20 @@
         <Schedule delay="0.0" event="CustomerArrival" priority="DEFAULT" description="Each arriving customer produces an event">
             <EdgeParameter value="nextID"/>
         </Schedule>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="30.0" y="120.0"/>
     </Event>
     <Event name="CustomerArrival">
         <Argument name="customer" type="Integer" description=""/>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="190.0" y="120.0"/>
     </Event>
     <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
         <StateTransition state="nextID">
             <Assignment value="0"/>
         </StateTransition>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="30.0" y="10.0"/>
     </Event>
+    <SourceCodeBlock/>
 </SimEntity>

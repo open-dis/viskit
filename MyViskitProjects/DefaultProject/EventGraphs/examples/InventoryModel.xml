@@ -14,6 +14,7 @@
     <StateVariable name="immediatelyServedCustomers" type="int" description="Customers immediately served"/>
     <Event name="Arrival" description="Feeder event for schedulling the Demand event via Arrivals from the Arrival Process">
         <Schedule delay="0.0" event="Demand" priority="DEFAULT" description="Passing along tA"/>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="40.0" y="100.0"/>
     </Event>
     <Event name="Demand" description="">
@@ -25,13 +26,13 @@
         <StateTransition state="B">
             <Assignment value="Math.max(0, -net)"/>
         </StateTransition>
-        <Code>firePropertyChange("demand", demand);
+        <SourceCodeBlock language="Java">firePropertyChange("demand", demand);
 
 if (net &gt;= 0) {
    int oldImmediatelyServedCustomers = immediatelyServedCustomers;
    immediatelyServedCustomers += 1;
    firePropertyChange("immediatelyServedCustomers", oldImmediatelyServedCustomers, immediatelyServedCustomers);
-}</Code>
+}</SourceCodeBlock>
         <Coordinate x="150.0" y="100.0"/>
     </Event>
     <Event name="OrderArrives">
@@ -46,7 +47,7 @@ if (net &gt;= 0) {
         <StateTransition state="B">
             <Assignment value="Math.max(0, -net)"/>
         </StateTransition>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="400.0" y="300.0"/>
     </Event>
     <Event name="PlaceOrder">
@@ -63,7 +64,7 @@ if (net &gt;= 0) {
         <Schedule delay="tL.generate()" event="OrderArrives" priority="DEFAULT">
             <EdgeParameter value="A"/>
         </Schedule>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="280.0" y="300.0"/>
     </Event>
     <Event name="Review">
@@ -71,6 +72,7 @@ if (net &gt;= 0) {
             <EdgeParameter value="bigS - I + B - T"/>
         </Schedule>
         <Schedule delay="tR.generate()" event="Review" priority="DEFAULT"/>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="140.0" y="290.0"/>
     </Event>
     <Event name="Run" description="This event is fired first to facilitate initialization of all simulation state variables">
@@ -93,6 +95,8 @@ if (net &gt;= 0) {
             <Assignment value="0"/>
         </StateTransition>
         <Schedule delay="tR.generate()" event="Review" priority="DEFAULT"/>
+        <SourceCodeBlock></SourceCodeBlock>
         <Coordinate x="40.0" y="200.0"/>
     </Event>
+    <SourceCodeBlock></SourceCodeBlock>
 </SimEntity>

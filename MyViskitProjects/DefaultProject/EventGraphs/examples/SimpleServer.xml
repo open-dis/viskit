@@ -11,7 +11,7 @@
         <Schedule delay="0.0" event="StartService" condition="numberAvailableServers &gt; 0" priority="DEFAULT" description="schedule a StartService only if a server is available">
             <EdgeParameter value="numberAvailableServers"/>
         </Schedule>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="20.0" y="130.0"/>
     </Event>
     <Event name="EndService" description="server has completed serving its customer">
@@ -21,7 +21,7 @@
         <Schedule delay="0.0" event="StartService" condition="numberInQueue &gt; 0" priority="HIGH" description="when service starts, select a random number from service distribution to predict duration of service time interval">
             <EdgeParameter value="0"/>
         </Schedule>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="330.0" y="130.0"/>
     </Event>
     <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
@@ -31,7 +31,7 @@
         <StateTransition state="numberAvailableServers">
             <Assignment value="totalNumberServers"/>
         </StateTransition>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="20.0" y="30.0"/>
     </Event>
     <Event name="StartService" description="Begin operations, server handling customer">
@@ -43,7 +43,8 @@
             <Assignment value="numberAvailableServers - 1"/>
         </StateTransition>
         <Schedule delay="serviceTime.generate()" event="EndService" priority="DEFAULT" description="schedule server to handle next customer following a probabilistic delay"/>
-        <Code>System.out.println("numberAvailableServers="+arg_0);</Code>
+        <SourceCodeBlock language="Java">System.out.println("numberAvailableServers="+arg_0);</SourceCodeBlock>
         <Coordinate x="150.0" y="130.0"/>
     </Event>
+    <SourceCodeBlock></SourceCodeBlock>
 </SimEntity>

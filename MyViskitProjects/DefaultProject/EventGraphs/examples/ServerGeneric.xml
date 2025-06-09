@@ -12,7 +12,7 @@
             <Operation method="add(customer)"/>
         </StateTransition>
         <Schedule delay="0.0" event="StartService" condition="numberAvailableServers &gt; 0" priority="HIGH"/>
-        <Code>customer.stampTime();</Code>
+        <SourceCodeBlock language="Java">customer.stampTime();</SourceCodeBlock>
         <Coordinate x="30.0" y="170.0"/>
     </Event>
     <Event name="EndService">
@@ -24,7 +24,7 @@
             <Assignment value="customer.getElapsedTime()"/>
         </StateTransition>
         <Schedule delay="0.0" event="StartService" condition="queue.size() &gt; 0" priority="HIGH"/>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="290.0" y="160.0"/>
     </Event>
     <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling an author to schedule commencement of the first activity">
@@ -34,7 +34,7 @@
         <StateTransition state="queue">
             <Assignment value="new java.util.LinkedList&lt;simkit.Entity&gt;()"/>
         </StateTransition>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="30.0" y="30.0"/>
     </Event>
     <Event name="StartService">
@@ -50,7 +50,8 @@
         <Schedule delay="serviceTimeGenerator.generate()" event="EndService" condition="true" priority="DEFAULT">
             <EdgeParameter value="customer"/>
         </Schedule>
-        <Code>Entity customer = queue.getFirst();</Code>
+        <SourceCodeBlock language="Java">Entity customer = queue.getFirst();</SourceCodeBlock>
         <Coordinate x="170.0" y="160.0"/>
     </Event>
+    <SourceCodeBlock/>
 </SimEntity>

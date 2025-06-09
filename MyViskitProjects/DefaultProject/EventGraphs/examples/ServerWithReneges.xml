@@ -16,7 +16,7 @@
             <EdgeParameter value="customer"/>
         </Schedule>
         <Schedule delay="0.0" event="StartService" condition="getNumberAvailableServers() &gt; 0" priority="DEFAULT" description="activate the next server to handle this customer arrival"/>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="70.0" y="170.0"/>
     </Event>
     <Event name="EndService" description="customer service activity complete">
@@ -28,7 +28,7 @@
             <Assignment value="numberServed+1"/>
         </StateTransition>
         <Schedule delay="0.0" event="StartService" condition="queue.size() &gt; 0" priority="HIGH" description="once prior customer has been served, announce availability of this server for next customer"/>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="340.0" y="160.0"/>
     </Event>
     <Event name="Renege" description="customer reneges out of line, no longer requesting service">
@@ -39,7 +39,7 @@
         <StateTransition state="numberReneges">
             <Assignment value="numberReneges+1"/>
         </StateTransition>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="140.0" y="280.0"/>
     </Event>
     <Event name="Run" description="This event is automatically scheduled to occur when the simulation begins to run, enabling author to schedule commencement of first simulation activity.">
@@ -55,7 +55,7 @@
         <StateTransition state="numberReneges">
             <Assignment value="0"/>
         </StateTransition>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="70.0" y="70.0"/>
     </Event>
     <Event name="StartService" description="commence service for current customer, schedule completion time">
@@ -72,8 +72,8 @@
         <Schedule delay="serviceTime.generate()" event="EndService" priority="DEFAULT" description="schedule completion of this customer following a probabilistic serviceTime interval">
             <EdgeParameter value="customer"/>
         </Schedule>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="210.0" y="160.0"/>
     </Event>
-    <Code></Code>
+    <SourceCodeBlock language="Java"></SourceCodeBlock>
 </SimEntity>

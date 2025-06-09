@@ -4,12 +4,13 @@
         <Schedule delay="0.1" event="EntityArrival" condition="true" priority="DEFAULT" description="schedule next arrival after short fixed time delay for preprocessing">
             <EdgeParameter value="new simkit.Entity()"/>
         </Schedule>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="20.0" y="190.0"/>
     </Event>
     <Event name="EntityArrival" description="the latest customer arrives">
         <Argument name="customer" type="simkit.Entity" description="the latest customer"/>
-        <Code></Code>
+        <SourceCodeBlock language="Java"></SourceCodeBlock>
         <Coordinate x="110.0" y="190.0"/>
     </Event>
+    <SourceCodeBlock/>
 </SimEntity>

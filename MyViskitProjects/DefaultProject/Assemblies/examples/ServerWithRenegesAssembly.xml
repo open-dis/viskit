@@ -7,7 +7,7 @@
         </FactoryParameter>
         <Coordinate x="40.0" y="140.0"/>
     </SimEntity>
-    <SimEntity name="creator" type="examples.Creator" description="Creator process generates customer entities">
+    <SimEntity name="creator" type="examples.Creator" description="Creator SimEntity process generates customer entities">
         <Coordinate x="190.0" y="140.0"/>
     </SimEntity>
     <SimEntity name="serverWithReneges" type="examples.ServerWithReneges" description="Event graph for server handling customers, either for service or for reneges">
@@ -24,39 +24,39 @@
         </FactoryParameter>
         <Coordinate x="350.0" y="140.0"/>
     </SimEntity>
-    <PropertyChangeListener name="numberInQueueStat" type="simkit.stat.CollectionSizeTimeVaryingStats" mode="replicationStat" meanStatistics="false" countStatistics="true" description="statistics collection for numberInQueue">
-        <TerminalParameter name="p[0] : " value="queue" type="java.lang.String"/>
-        <Coordinate x="560.0" y="60.0"/>
+    <PropertyChangeListener name="numberArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="statistics collection for numberArrivals">
+        <TerminalParameter name="p[0] : " value="numberArrivals" type="java.lang.String"/>
+        <Coordinate x="40.0" y="260.0"/>
     </PropertyChangeListener>
     <PropertyChangeListener name="numberAvailableServersStat" type="simkit.stat.SimpleStatsTally" mode="replicationStat" meanStatistics="false" countStatistics="true" description="statistics collection for numberAvailableServers">
         <TerminalParameter name="p[0] : " value="numberAvailableServers" type="java.lang.String"/>
         <Coordinate x="350.0" y="290.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="numberServedStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="statistics collection for numberServed">
-        <TerminalParameter name="p[0] : " value="numberServed" type="java.lang.String"/>
-        <Coordinate x="350.0" y="20.0"/>
+    <PropertyChangeListener name="numberInQueueStat" type="simkit.stat.CollectionSizeTimeVaryingStats" mode="replicationStat" meanStatistics="false" countStatistics="true" description="statistics collection for numberInQueue">
+        <TerminalParameter name="p[0] : " value="queue" type="java.lang.String"/>
+        <Coordinate x="560.0" y="60.0"/>
     </PropertyChangeListener>
     <PropertyChangeListener name="numberRenegesStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="statistics collection for numberReneges">
         <TerminalParameter name="p[0] : " value="numberReneges" type="java.lang.String"/>
         <Coordinate x="560.0" y="140.0"/>
     </PropertyChangeListener>
-    <PropertyChangeListener name="numberArrivalsStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="statistics collection for numberArrivals">
-        <TerminalParameter name="p[0] : " value="numberArrivals" type="java.lang.String"/>
-        <Coordinate x="40.0" y="260.0"/>
+    <PropertyChangeListener name="numberServedStat" type="simkit.stat.SimpleStatsTimeVarying" mode="replicationStat" meanStatistics="false" countStatistics="true" description="statistics collection for numberServed">
+        <TerminalParameter name="p[0] : " value="numberServed" type="java.lang.String"/>
+        <Coordinate x="350.0" y="20.0"/>
     </PropertyChangeListener>
     <SimEventListenerConnection listener="creator" source="arrivalProcess" description="delivers arrivals to creator for customer preparation"/>
+    <PropertyChangeListenerConnection property="numberArrivals" listener="numberArrivalsStat" source="arrivalProcess"/>
     <PropertyChangeListenerConnection property="queue" listener="numberInQueueStat" source="serverWithReneges" description="count the number of customers in queue"/>
     <PropertyChangeListenerConnection property="numberAvailableServers" listener="numberAvailableServersStat" source="serverWithReneges" description="count the number of available servers to help determine if system has good capacity"/>
     <PropertyChangeListenerConnection property="numberServed" listener="numberServedStat" source="serverWithReneges" description="count the number of served customers"/>
     <PropertyChangeListenerConnection property="numberReneges" listener="numberRenegesStat" source="serverWithReneges" description="count the number of reneging customers"/>
-    <PropertyChangeListenerConnection property="numberArrivals" listener="numberArrivalsStat" source="arrivalProcess"/>
     <Adapter name="arrivalAdapter" eventHeard="CustomerArrival" eventSent="Arrival" from="creator" to="serverWithReneges" description="celivers arrivals from customerArrival to serverWithReneges arrivals"/>
-    <Output entity="creator"/>
-    <Output entity="arrivalProcess"/>
-    <Output entity="serverWithReneges"/>
-    <Output entity="Creator"/>
     <Output entity="ArrivalProcess"/>
+    <Output entity="Creator"/>
     <Output entity="ServerWithReneges"/>
+    <Output entity="arrivalProcess"/>
+    <Output entity="creator"/>
+    <Output entity="serverWithReneges"/>
     <Schedule stopTime="100" verbose="false" saveReplicationData="true"/>
     <Experiment replicationsPerDesignPoint="30" totalSamples="1" timeout="5000"/>
 </SimkitAssembly>
