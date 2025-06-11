@@ -1,4 +1,4 @@
-<img style="float: right; margin-top: 0;" src="src/viskit/images/ViskitSplash2.png"/>
+ <img style="float: right; margin-top: 0;" src="src/viskit/images/ViskitSplash2.png"/>
 ## Welcome to Viskit 
 
 Viskit is an open-source application to build Discrete Event Simulation (DES)
@@ -10,7 +10,6 @@ that describe the behavior of multiple entities in a simulation environment.
 Capabilities include Simkit Event Graphs, Assemblies, Run Simulation replication
 tools, and an Analyst Report generator suitable for thesis and research efforts.
 Further details are found in the
-[overview presentation](documentation/presentations/ViskitOverviewPresentation.pdf).
 
 The 2025 software release is a thorough refactoring of the underlying Viskit 
 source code, facilitating ongoing project maintenance and development.
