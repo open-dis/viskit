@@ -9,7 +9,7 @@ that describe the behavior of multiple entities in a simulation environment.
 Capabilities include Simkit Event Graphs, Assemblies, Run Simulation replication
 tools, and an Analyst Report generator suitable for thesis and research efforts.
 Further details are found in the
-[overview presentation](documentation/presentations/ViskitOverviewPresentation.pdf)
+[overview presentation](documentation/presentations/ViskitOverviewPresentation.pdf).
 
 The 2025 software release is a thorough refactoring of the underlying Viskit 
 source code, facilitating ongoing project maintenance and development.
