@@ -6,8 +6,10 @@ models that autogenerate Java source for simulation using the Simkit library.
 The Viskit application enables authors to assemble a collection of event graphs
 that describe the behavior of multiple entities in a simulation environment.
 
-Capabilities include Simkit Event Graphs, Assemblies, simulation replication
+Capabilities include Simkit Event Graphs, Assemblies, Run Simulation replication
 tools, and an Analyst Report generator suitable for thesis and research efforts.
+Further details are found in the
+[overview presentation](documentation/presentations/ViskitOverviewPresentation.pdf)
 
 The 2025 software release is a thorough refactoring of the underlying Viskit 
 source code, facilitating ongoing project maintenance and development.
@@ -21,10 +23,10 @@ and Live Virtual Constructive (LVC) simulations.
 
 Software and model development efforts are ongoing.
 
-
 Public archive
 * https://github.com/open-dis/viskit
 
 Original private NPS archive
 * https://gitlab.nps.edu/Savage/viskit
 * Teams channel: [SAVAGE Networked VEs, DES Simkit Viskit Discrete Event Simulation](https://teams.microsoft.com/l/channel/19%3A6a7ebd3032244ce8a01ddef11ce8b515%40thread.tacv2/DES%20Simkit%20Viskit%20Discrete%20Event%20Simulation?groupId=38c76514-70d0-4294-954f-06b42626a6f5&tenantId=6d936231-a517-40ea-9199-f7578963378e)
+
