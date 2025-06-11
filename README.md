@@ -22,6 +22,9 @@ is used for state-distribution capabilities that integrates the
 Distributed Interactive Simulation (DIS) protocol for networked agent behaviors 
 and Live Virtual Constructive (LVC) simulations.
 
+We currently use [Apache NetBeans](https://netbeans.apache.org) to run and develop Viskit.
+We are planning on releasing binary executables starting in summer 2025.
+
 Software and model development efforts are ongoing.
 
 Public archive
@@ -30,6 +33,3 @@ Public archive
 Original private NPS archive
 * https://gitlab.nps.edu/Savage/viskit
 * Teams channel: [SAVAGE Networked VEs, DES Simkit Viskit Discrete Event Simulation](https://teams.microsoft.com/l/channel/19%3A6a7ebd3032244ce8a01ddef11ce8b515%40thread.tacv2/DES%20Simkit%20Viskit%20Discrete%20Event%20Simulation?groupId=38c76514-70d0-4294-954f-06b42626a6f5&tenantId=6d936231-a517-40ea-9199-f7578963378e)
-
-We currently use [Apache NetBeans](https://netbeans.apache.org) to run and develop Viskit.
-We are planning on releasing binary executables starting in summer 2025.
