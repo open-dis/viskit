@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AnalystReport name="ServerAssembly3 Analyst Report" accessRights="" author="Don Brutzman" date="9 Jun 2025, 0405 PDT" version="2.0 beta">
+  <ExecutiveSummary showDescription="true">
+    <ExecutiveSummaryDescription text="***ENTER EXECUTIVE SUMMARY HERE***" />
+  </ExecutiveSummary>
+  <ScenarioLocation showDescription="true" showImage="true">
+    <ScenarioLocationDescription text="***ENTER SCENARIO LOCATION DESCRIPTION HERE***" />
+    <ScenarioLocationProductionNotes text="***ENTER SCENARIO LOCATION PRODUCTION NOTES HERE***" />
+    <ScenarioLocationConclusions text="***ENTER SCENARIO LOCATION CONCLUSIONS HERE***" />
+  </ScenarioLocation>
+  <SimulationConfiguration assemblyName="ServerAssembly3" showDescription="true" showImage="true" showEntityTable="true">
+    <SimulationConfigurationDescription text="***ENTER SIMULATION CONFIGURATION CONSIDERATIONS HERE***" />
+    <SimulationConfigurationProductionNotes text="***ENTER SIMULATION CONFIGURATION PRODUCTION NOTES HERE***" />
+    <SimulationConfigurationConclusions text="***ENTER SIMULATION CONFIGURATION CONCLUSIONS HERE***" />
+  </SimulationConfiguration>
+  <EntityParameters showDescription="true" showParameterTables="true" showOverview="true" parameterTables="true">
+    <EntityParametersDescription text="***ENTER ENTITY PARAMETERS OVERVIEW HERE***" />
+    <EntityParametersConclusions text="***ENTER ENTITY PARAMETERS CONCLUSIONS HERE***" />
+  </EntityParameters>
+  <BehaviorDescriptions showDescription="true" showDetails="true" showImage="true" showDtails="true">
+    <BehaviorList />
+    <BehaviorDescriptionsDescription text="***ENTER ENTITY BEHAVIOR DESCRIPTION HERE***" />
+    <BehaviorDescriptionsConclusions text="***ENTER ENTITY BEHAVIOR CONCLUSIONS HERE***" />
+  </BehaviorDescriptions>
+  <StatisticalResults showDescription="true" replicationStatistics="true" summaryStatistics="true" file="C:\x3d-github\viskit\MyViskitProjects\DefaultProject\AnalystReports\statistics\ServerAssembly3_Statistics_20250609.1605.xml">
+    <ReplicationReports>
+      <SimEntity name="" property="numberInQueueStatistic">
+        <Replication number="1" count="1165" minObs="0" maxObs="30" mean="8.260" stdDeviation="7.217" variance="52.083" />
+        <Replication number="2" count="1146" minObs="0" maxObs="30" mean="9.033" stdDeviation="7.795" variance="60.758" />
+        <Replication number="3" count="1197" minObs="0" maxObs="58" mean="30.476" stdDeviation="13.838" variance="191.481" />
+        <Replication number="4" count="1148" minObs="0" maxObs="37" mean="19.282" stdDeviation="9.183" variance="84.326" />
+        <Replication number="5" count="1177" minObs="0" maxObs="34" mean="16.350" stdDeviation="9.736" variance="94.784" />
+        <Replication number="6" count="1141" minObs="0" maxObs="19" mean="3.809" stdDeviation="3.924" variance="15.398" />
+        <Replication number="7" count="1203" minObs="0" maxObs="74" mean="40.551" stdDeviation="18.982" variance="360.319" />
+        <Replication number="8" count="1145" minObs="0" maxObs="17" mean="3.688" stdDeviation="3.515" variance="12.353" />
+        <Replication number="9" count="1147" minObs="0" maxObs="22" mean="6.112" stdDeviation="5.848" variance="34.195" />
+        <Replication number="10" count="1198" minObs="0" maxObs="36" mean="10.231" stdDeviation="8.403" variance="70.615" />
+        <Replication number="11" count="1147" minObs="0" maxObs="29" mean="9.552" stdDeviation="6.965" variance="48.505" />
+        <Replication number="12" count="1182" minObs="0" maxObs="29" mean="15.746" stdDeviation="7.350" variance="54.015" />
+        <Replication number="13" count="1162" minObs="0" maxObs="41" mean="20.641" stdDeviation="10.711" variance="114.731" />
+        <Replication number="14" count="1150" minObs="0" maxObs="28" mean="6.420" stdDeviation="6.512" variance="42.400" />
+        <Replication number="15" count="1138" minObs="0" maxObs="50" mean="17.801" stdDeviation="14.946" variance="223.391" />
+        <Replication number="16" count="1135" minObs="0" maxObs="25" mean="6.408" stdDeviation="6.203" variance="38.479" />
+        <Replication number="17" count="1180" minObs="0" maxObs="25" mean="5.051" stdDeviation="5.095" variance="25.963" />
+        <Replication number="18" count="1233" minObs="0" maxObs="59" mean="15.137" stdDeviation="14.095" variance="198.661" />
+        <Replication number="19" count="1150" minObs="0" maxObs="13" mean="3.519" stdDeviation="3.011" variance="9.069" />
+        <Replication number="20" count="1122" minObs="0" maxObs="23" mean="7.100" stdDeviation="5.508" variance="30.339" />
+        <Replication number="21" count="1124" minObs="0" maxObs="16" mean="6.075" stdDeviation="4.251" variance="18.070" />
+        <Replication number="22" count="1097" minObs="0" maxObs="18" mean="4.851" stdDeviation="4.776" variance="22.807" />
+        <Replication number="23" count="1187" minObs="0" maxObs="35" mean="13.426" stdDeviation="8.614" variance="74.206" />
+        <Replication number="24" count="1152" minObs="0" maxObs="21" mean="10.151" stdDeviation="5.282" variance="27.898" />
+        <Replication number="25" count="1166" minObs="0" maxObs="54" mean="29.217" stdDeviation="12.795" variance="163.705" />
+        <Replication number="26" count="1151" minObs="0" maxObs="36" mean="14.595" stdDeviation="10.912" variance="119.082" />
+        <Replication number="27" count="1169" minObs="0" maxObs="19" mean="5.190" stdDeviation="4.162" variance="17.323" />
+        <Replication number="28" count="1183" minObs="0" maxObs="48" mean="16.408" stdDeviation="15.890" variance="252.497" />
+        <Replication number="29" count="1154" minObs="0" maxObs="29" mean="9.477" stdDeviation="6.840" variance="46.782" />
+        <Replication number="30" count="1183" minObs="0" maxObs="45" mean="13.403" stdDeviation="13.779" variance="189.854" />
+        <Replication number="31" count="1207" minObs="0" maxObs="47" mean="14.776" stdDeviation="13.222" variance="174.833" />
+        <Replication number="32" count="1175" minObs="0" maxObs="31" mean="11.113" stdDeviation="10.255" variance="105.166" />
+        <Replication number="33" count="1207" minObs="0" maxObs="18" mean="5.895" stdDeviation="4.031" variance="16.251" />
+        <Replication number="34" count="1140" minObs="0" maxObs="35" mean="16.589" stdDeviation="9.147" variance="83.675" />
+        <Replication number="35" count="1174" minObs="0" maxObs="29" mean="10.162" stdDeviation="6.969" variance="48.561" />
+        <Replication number="36" count="1159" minObs="0" maxObs="21" mean="6.878" stdDeviation="5.412" variance="29.293" />
+        <Replication number="37" count="1210" minObs="0" maxObs="57" mean="24.267" stdDeviation="19.684" variance="387.455" />
+        <Replication number="38" count="1118" minObs="0" maxObs="22" mean="6.358" stdDeviation="6.025" variance="36.298" />
+        <Replication number="39" count="1168" minObs="0" maxObs="21" mean="8.176" stdDeviation="5.449" variance="29.694" />
+        <Replication number="40" count="1158" minObs="0" maxObs="41" mean="14.984" stdDeviation="11.354" variance="128.902" />
+        <Replication number="41" count="1114" minObs="0" maxObs="14" mean="4.103" stdDeviation="3.499" variance="12.245" />
+        <Replication number="42" count="1133" minObs="0" maxObs="23" mean="6.288" stdDeviation="5.876" variance="34.525" />
+        <Replication number="43" count="1127" minObs="0" maxObs="20" mean="5.075" stdDeviation="4.220" variance="17.806" />
+        <Replication number="44" count="1224" minObs="0" maxObs="30" mean="10.768" stdDeviation="7.743" variance="59.957" />
+        <Replication number="45" count="1178" minObs="0" maxObs="41" mean="15.779" stdDeviation="10.999" variance="120.988" />
+        <Replication number="46" count="1183" minObs="0" maxObs="30" mean="13.221" stdDeviation="9.860" variance="97.213" />
+        <Replication number="47" count="1219" minObs="0" maxObs="54" mean="22.783" stdDeviation="13.278" variance="176.316" />
+        <Replication number="48" count="1150" minObs="0" maxObs="20" mean="6.960" stdDeviation="5.147" variance="26.494" />
+        <Replication number="49" count="1141" minObs="0" maxObs="22" mean="8.085" stdDeviation="5.342" variance="28.534" />
+        <Replication number="50" count="1153" minObs="0" maxObs="26" mean="11.975" stdDeviation="7.557" variance="57.103" />
+        <Replication number="51" count="1140" minObs="0" maxObs="42" mean="18.866" stdDeviation="11.380" variance="129.508" />
+        <Replication number="52" count="1128" minObs="0" maxObs="47" mean="18.762" stdDeviation="15.669" variance="245.516" />
+        <Replication number="53" count="1184" minObs="0" maxObs="40" mean="21.519" stdDeviation="7.645" variance="58.442" />
+        <Replication number="54" count="1191" minObs="0" maxObs="82" mean="33.960" stdDeviation="26.760" variance="716.092" />
+        <Replication number="55" count="1186" minObs="0" maxObs="22" mean="7.289" stdDeviation="5.388" variance="29.027" />
+        <Replication number="56" count="1164" minObs="0" maxObs="28" mean="12.197" stdDeviation="6.430" variance="41.345" />
+        <Replication number="57" count="1163" minObs="0" maxObs="16" mean="5.129" stdDeviation="4.034" variance="16.270" />
+        <Replication number="58" count="1170" minObs="0" maxObs="52" mean="13.889" stdDeviation="12.883" variance="165.979" />
+        <Replication number="59" count="1204" minObs="0" maxObs="41" mean="17.491" stdDeviation="9.425" variance="88.836" />
+        <Replication number="60" count="1132" minObs="0" maxObs="25" mean="9.912" stdDeviation="6.844" variance="46.837" />
+        <Replication number="61" count="1155" minObs="0" maxObs="19" mean="7.481" stdDeviation="4.423" variance="19.562" />
+        <Replication number="62" count="1206" minObs="0" maxObs="19" mean="6.358" stdDeviation="4.695" variance="22.046" />
+        <Replication number="63" count="1202" minObs="0" maxObs="51" mean="24.992" stdDeviation="9.011" variance="81.197" />
+        <Replication number="64" count="1146" minObs="0" maxObs="22" mean="7.437" stdDeviation="6.387" variance="40.799" />
+        <Replication number="65" count="1162" minObs="0" maxObs="29" mean="11.470" stdDeviation="6.335" variance="40.129" />
+        <Replication number="66" count="1135" minObs="0" maxObs="19" mean="5.720" stdDeviation="4.567" variance="20.861" />
+        <Replication number="67" count="1141" minObs="0" maxObs="16" mean="4.805" stdDeviation="3.825" variance="14.630" />
+        <Replication number="68" count="1196" minObs="0" maxObs="21" mean="8.437" stdDeviation="5.184" variance="26.878" />
+        <Replication number="69" count="1156" minObs="0" maxObs="34" mean="12.401" stdDeviation="9.872" variance="97.449" />
+        <Replication number="70" count="1137" minObs="0" maxObs="34" mean="13.862" stdDeviation="7.915" variance="62.653" />
+        <Replication number="71" count="1181" minObs="0" maxObs="68" mean="40.320" stdDeviation="18.560" variance="344.490" />
+        <Replication number="72" count="1112" minObs="0" maxObs="13" mean="2.571" stdDeviation="3.016" variance="9.094" />
+        <Replication number="73" count="1110" minObs="0" maxObs="21" mean="5.927" stdDeviation="5.788" variance="33.498" />
+        <Replication number="74" count="1151" minObs="0" maxObs="22" mean="5.889" stdDeviation="5.888" variance="34.672" />
+        <Replication number="75" count="1179" minObs="0" maxObs="26" mean="10.631" stdDeviation="5.811" variance="33.766" />
+        <Replication number="76" count="1142" minObs="0" maxObs="26" mean="5.488" stdDeviation="6.691" variance="44.766" />
+        <Replication number="77" count="1206" minObs="0" maxObs="41" mean="17.845" stdDeviation="12.349" variance="152.492" />
+        <Replication number="78" count="1213" minObs="0" maxObs="64" mean="25.095" stdDeviation="20.184" variance="407.401" />
+        <Replication number="79" count="1245" minObs="0" maxObs="50" mean="27.066" stdDeviation="11.391" variance="129.764" />
+        <Replication number="80" count="1175" minObs="0" maxObs="41" mean="21.173" stdDeviation="8.620" variance="74.304" />
+        <Replication number="81" count="1069" minObs="0" maxObs="24" mean="5.116" stdDeviation="6.291" variance="39.578" />
+        <Replication number="82" count="1162" minObs="0" maxObs="40" mean="14.593" stdDeviation="10.921" variance="119.275" />
+        <Replication number="83" count="1196" minObs="0" maxObs="20" mean="7.704" stdDeviation="5.332" variance="28.434" />
+        <Replication number="84" count="1173" minObs="0" maxObs="26" mean="8.600" stdDeviation="6.427" variance="41.306" />
+        <Replication number="85" count="1161" minObs="0" maxObs="28" mean="10.186" stdDeviation="8.201" variance="67.262" />
+        <Replication number="86" count="1132" minObs="0" maxObs="40" mean="14.614" stdDeviation="11.624" variance="135.115" />
+        <Replication number="87" count="1134" minObs="0" maxObs="22" mean="5.526" stdDeviation="5.118" variance="26.196" />
+        <Replication number="88" count="1151" minObs="0" maxObs="24" mean="9.780" stdDeviation="6.234" variance="38.864" />
+        <Replication number="89" count="1082" minObs="0" maxObs="17" mean="7.151" stdDeviation="4.685" variance="21.952" />
+        <Replication number="90" count="1121" minObs="0" maxObs="21" mean="6.938" stdDeviation="5.238" variance="27.436" />
+        <Replication number="91" count="1148" minObs="0" maxObs="22" mean="6.033" stdDeviation="5.134" variance="26.354" />
+        <Replication number="92" count="1115" minObs="0" maxObs="32" mean="10.470" stdDeviation="9.791" variance="95.868" />
+        <Replication number="93" count="1100" minObs="0" maxObs="47" mean="21.768" stdDeviation="14.418" variance="207.877" />
+        <Replication number="94" count="1152" minObs="0" maxObs="61" mean="26.386" stdDeviation="16.631" variance="276.600" />
+        <Replication number="95" count="1192" minObs="0" maxObs="24" mean="8.600" stdDeviation="5.765" variance="33.241" />
+        <Replication number="96" count="1042" minObs="0" maxObs="15" mean="3.397" stdDeviation="3.859" variance="14.891" />
+        <Replication number="97" count="1197" minObs="0" maxObs="52" mean="23.081" stdDeviation="12.079" variance="145.897" />
+        <Replication number="98" count="1195" minObs="0" maxObs="68" mean="33.096" stdDeviation="20.357" variance="414.392" />
+        <Replication number="99" count="1122" minObs="0" maxObs="22" mean="8.540" stdDeviation="6.722" variance="45.191" />
+        <Replication number="100" count="1227" minObs="0" maxObs="80" mean="45.571" stdDeviation="24.342" variance="592.555" />
+        <HistogramChart dir="images/charts/ServerAssembly3_numberInQueueStatisticHistogram.png" />
+        <LinearRegressionChart dir="images/charts/ServerAssembly3_numberInQueueStatisticLinearRegression.png" />
+      </SimEntity>
+      <SimEntity name="" property="numberAvailableServersStatistic">
+        <Replication number="1" count="1133" minObs="0" maxObs="2" mean="0.054" stdDeviation="0.274" variance="0.075" />
+        <Replication number="2" count="1143" minObs="0" maxObs="2" mean="0.100" stdDeviation="0.350" variance="0.123" />
+        <Replication number="3" count="1155" minObs="0" maxObs="2" mean="0.027" stdDeviation="0.199" variance="0.039" />
+        <Replication number="4" count="1131" minObs="0" maxObs="2" mean="0.028" stdDeviation="0.189" variance="0.036" />
+        <Replication number="5" count="1145" minObs="0" maxObs="2" mean="0.032" stdDeviation="0.204" variance="0.042" />
+        <Replication number="6" count="1131" minObs="0" maxObs="2" mean="0.175" stdDeviation="0.465" variance="0.216" />
+        <Replication number="7" count="1133" minObs="0" maxObs="2" mean="0.006" stdDeviation="0.105" variance="0.011" />
+        <Replication number="8" count="1143" minObs="0" maxObs="2" mean="0.187" stdDeviation="0.508" variance="0.258" />
+        <Replication number="9" count="1143" minObs="0" maxObs="2" mean="0.147" stdDeviation="0.448" variance="0.201" />
+        <Replication number="10" count="1161" minObs="0" maxObs="2" mean="0.056" stdDeviation="0.258" variance="0.067" />
+        <Replication number="11" count="1135" minObs="0" maxObs="2" mean="0.080" stdDeviation="0.341" variance="0.116" />
+        <Replication number="12" count="1179" minObs="0" maxObs="2" mean="0.071" stdDeviation="0.336" variance="0.113" />
+        <Replication number="13" count="1131" minObs="0" maxObs="2" mean="0.063" stdDeviation="0.331" variance="0.110" />
+        <Replication number="14" count="1145" minObs="0" maxObs="2" mean="0.113" stdDeviation="0.393" variance="0.155" />
+        <Replication number="15" count="1097" minObs="0" maxObs="2" mean="0.127" stdDeviation="0.424" variance="0.180" />
+        <Replication number="16" count="1115" minObs="0" maxObs="2" mean="0.160" stdDeviation="0.474" variance="0.225" />
+        <Replication number="17" count="1159" minObs="0" maxObs="2" mean="0.150" stdDeviation="0.445" variance="0.198" />
+        <Replication number="18" count="1173" minObs="0" maxObs="2" mean="0.019" stdDeviation="0.164" variance="0.027" />
+        <Replication number="19" count="1145" minObs="0" maxObs="2" mean="0.177" stdDeviation="0.493" variance="0.243" />
+        <Replication number="20" count="1113" minObs="0" maxObs="2" mean="0.093" stdDeviation="0.356" variance="0.127" />
+        <Replication number="21" count="1115" minObs="0" maxObs="2" mean="0.087" stdDeviation="0.344" variance="0.118" />
+        <Replication number="22" count="1096" minObs="0" maxObs="2" mean="0.233" stdDeviation="0.552" variance="0.305" />
+        <Replication number="23" count="1177" minObs="0" maxObs="2" mean="0.045" stdDeviation="0.256" variance="0.066" />
+        <Replication number="24" count="1137" minObs="0" maxObs="2" mean="0.030" stdDeviation="0.210" variance="0.044" />
+        <Replication number="25" count="1123" minObs="0" maxObs="2" mean="0.003" stdDeviation="0.079" variance="0.006" />
+        <Replication number="26" count="1115" minObs="0" maxObs="2" mean="0.117" stdDeviation="0.401" variance="0.161" />
+        <Replication number="27" count="1159" minObs="0" maxObs="2" mean="0.102" stdDeviation="0.371" variance="0.138" />
+        <Replication number="28" count="1147" minObs="0" maxObs="2" mean="0.056" stdDeviation="0.293" variance="0.086" />
+        <Replication number="29" count="1139" minObs="0" maxObs="2" mean="0.059" stdDeviation="0.290" variance="0.084" />
+        <Replication number="30" count="1147" minObs="0" maxObs="2" mean="0.107" stdDeviation="0.386" variance="0.149" />
+        <Replication number="31" count="1175" minObs="0" maxObs="2" mean="0.103" stdDeviation="0.367" variance="0.135" />
+        <Replication number="32" count="1149" minObs="0" maxObs="2" mean="0.127" stdDeviation="0.410" variance="0.168" />
+        <Replication number="33" count="1203" minObs="0" maxObs="2" mean="0.064" stdDeviation="0.308" variance="0.095" />
+        <Replication number="34" count="1103" minObs="0" maxObs="2" mean="0.078" stdDeviation="0.347" variance="0.120" />
+        <Replication number="35" count="1157" minObs="0" maxObs="2" mean="0.099" stdDeviation="0.378" variance="0.143" />
+        <Replication number="36" count="1157" minObs="0" maxObs="2" mean="0.090" stdDeviation="0.355" variance="0.126" />
+        <Replication number="37" count="1155" minObs="0" maxObs="2" mean="0.113" stdDeviation="0.395" variance="0.156" />
+        <Replication number="38" count="1095" minObs="0" maxObs="2" mean="0.206" stdDeviation="0.539" variance="0.290" />
+        <Replication number="39" count="1159" minObs="0" maxObs="2" mean="0.091" stdDeviation="0.358" variance="0.128" />
+        <Replication number="40" count="1135" minObs="0" maxObs="2" mean="0.130" stdDeviation="0.418" variance="0.175" />
+        <Replication number="41" count="1111" minObs="0" maxObs="2" mean="0.159" stdDeviation="0.467" variance="0.218" />
+        <Replication number="42" count="1117" minObs="0" maxObs="2" mean="0.187" stdDeviation="0.501" variance="0.251" />
+        <Replication number="43" count="1121" minObs="0" maxObs="2" mean="0.122" stdDeviation="0.416" variance="0.173" />
+        <Replication number="44" count="1201" minObs="0" maxObs="2" mean="0.052" stdDeviation="0.275" variance="0.076" />
+        <Replication number="45" count="1151" minObs="0" maxObs="2" mean="0.054" stdDeviation="0.271" variance="0.073" />
+        <Replication number="46" count="1159" minObs="0" maxObs="2" mean="0.049" stdDeviation="0.240" variance="0.057" />
+        <Replication number="47" count="1163" minObs="0" maxObs="2" mean="0.037" stdDeviation="0.221" variance="0.049" />
+        <Replication number="48" count="1147" minObs="0" maxObs="2" mean="0.077" stdDeviation="0.324" variance="0.105" />
+        <Replication number="49" count="1141" minObs="0" maxObs="2" mean="0.118" stdDeviation="0.427" variance="0.182" />
+        <Replication number="50" count="1151" minObs="0" maxObs="2" mean="0.050" stdDeviation="0.269" variance="0.072" />
+        <Replication number="51" count="1115" minObs="0" maxObs="2" mean="0.042" stdDeviation="0.236" variance="0.056" />
+        <Replication number="52" count="1087" minObs="0" maxObs="2" mean="0.147" stdDeviation="0.458" variance="0.210" />
+        <Replication number="53" count="1159" minObs="0" maxObs="2" mean="0.004" stdDeviation="0.074" variance="0.005" />
+        <Replication number="54" count="1117" minObs="0" maxObs="2" mean="0.018" stdDeviation="0.173" variance="0.030" />
+        <Replication number="55" count="1175" minObs="0" maxObs="2" mean="0.079" stdDeviation="0.338" variance="0.114" />
+        <Replication number="56" count="1155" minObs="0" maxObs="2" mean="0.035" stdDeviation="0.240" variance="0.058" />
+        <Replication number="57" count="1157" minObs="0" maxObs="2" mean="0.124" stdDeviation="0.392" variance="0.154" />
+        <Replication number="58" count="1117" minObs="0" maxObs="2" mean="0.117" stdDeviation="0.407" variance="0.165" />
+        <Replication number="59" count="1185" minObs="0" maxObs="2" mean="0.024" stdDeviation="0.172" variance="0.030" />
+        <Replication number="60" count="1105" minObs="0" maxObs="2" mean="0.118" stdDeviation="0.404" variance="0.163" />
+        <Replication number="61" count="1143" minObs="0" maxObs="2" mean="0.062" stdDeviation="0.304" variance="0.092" />
+        <Replication number="62" count="1197" minObs="0" maxObs="2" mean="0.073" stdDeviation="0.324" variance="0.105" />
+        <Replication number="63" count="1149" minObs="0" maxObs="2" mean="0.012" stdDeviation="0.141" variance="0.020" />
+        <Replication number="64" count="1127" minObs="0" maxObs="2" mean="0.131" stdDeviation="0.439" variance="0.192" />
+        <Replication number="65" count="1143" minObs="0" maxObs="2" mean="0.049" stdDeviation="0.268" variance="0.072" />
+        <Replication number="66" count="1125" minObs="0" maxObs="2" mean="0.140" stdDeviation="0.439" variance="0.193" />
+        <Replication number="67" count="1131" minObs="0" maxObs="2" mean="0.091" stdDeviation="0.330" variance="0.109" />
+        <Replication number="68" count="1177" minObs="0" maxObs="2" mean="0.055" stdDeviation="0.287" variance="0.083" />
+        <Replication number="69" count="1143" minObs="0" maxObs="2" mean="0.096" stdDeviation="0.372" variance="0.139" />
+        <Replication number="70" count="1129" minObs="0" maxObs="2" mean="0.060" stdDeviation="0.287" variance="0.082" />
+        <Replication number="71" count="1127" minObs="0" maxObs="2" mean="0.039" stdDeviation="0.240" variance="0.058" />
+        <Replication number="72" count="1109" minObs="0" maxObs="2" mean="0.259" stdDeviation="0.571" variance="0.326" />
+        <Replication number="73" count="1087" minObs="0" maxObs="2" mean="0.144" stdDeviation="0.435" variance="0.189" />
+        <Replication number="74" count="1150" minObs="0" maxObs="2" mean="0.094" stdDeviation="0.347" variance="0.120" />
+        <Replication number="75" count="1165" minObs="0" maxObs="2" mean="0.056" stdDeviation="0.289" variance="0.083" />
+        <Replication number="76" count="1115" minObs="0" maxObs="2" mean="0.155" stdDeviation="0.435" variance="0.189" />
+        <Replication number="77" count="1175" minObs="0" maxObs="2" mean="0.056" stdDeviation="0.282" variance="0.079" />
+        <Replication number="78" count="1151" minObs="0" maxObs="2" mean="0.055" stdDeviation="0.271" variance="0.073" />
+        <Replication number="79" count="1217" minObs="0" maxObs="2" mean="0.009" stdDeviation="0.112" variance="0.013" />
+        <Replication number="80" count="1153" minObs="0" maxObs="2" mean="0.019" stdDeviation="0.175" variance="0.031" />
+        <Replication number="81" count="1047" minObs="0" maxObs="2" mean="0.205" stdDeviation="0.512" variance="0.263" />
+        <Replication number="82" count="1127" minObs="0" maxObs="2" mean="0.105" stdDeviation="0.408" variance="0.167" />
+        <Replication number="83" count="1187" minObs="0" maxObs="2" mean="0.068" stdDeviation="0.302" variance="0.091" />
+        <Replication number="84" count="1147" minObs="0" maxObs="2" mean="0.070" stdDeviation="0.327" variance="0.107" />
+        <Replication number="85" count="1139" minObs="0" maxObs="2" mean="0.154" stdDeviation="0.468" variance="0.219" />
+        <Replication number="86" count="1125" minObs="0" maxObs="2" mean="0.110" stdDeviation="0.407" variance="0.166" />
+        <Replication number="87" count="1117" minObs="0" maxObs="2" mean="0.161" stdDeviation="0.483" variance="0.234" />
+        <Replication number="88" count="1151" minObs="0" maxObs="2" mean="0.017" stdDeviation="0.160" variance="0.025" />
+        <Replication number="89" count="1073" minObs="0" maxObs="2" mean="0.073" stdDeviation="0.319" variance="0.102" />
+        <Replication number="90" count="1109" minObs="0" maxObs="2" mean="0.129" stdDeviation="0.419" variance="0.176" />
+        <Replication number="91" count="1143" minObs="0" maxObs="2" mean="0.084" stdDeviation="0.345" variance="0.119" />
+        <Replication number="92" count="1109" minObs="0" maxObs="2" mean="0.096" stdDeviation="0.369" variance="0.136" />
+        <Replication number="93" count="1065" minObs="0" maxObs="2" mean="0.097" stdDeviation="0.387" variance="0.149" />
+        <Replication number="94" count="1101" minObs="0" maxObs="2" mean="0.010" stdDeviation="0.127" variance="0.016" />
+        <Replication number="95" count="1177" minObs="0" maxObs="2" mean="0.090" stdDeviation="0.362" variance="0.131" />
+        <Replication number="96" count="1037" minObs="0" maxObs="2" mean="0.235" stdDeviation="0.548" variance="0.300" />
+        <Replication number="97" count="1183" minObs="0" maxObs="2" mean="0.002" stdDeviation="0.063" variance="0.004" />
+        <Replication number="98" count="1137" minObs="0" maxObs="2" mean="0.014" stdDeviation="0.158" variance="0.025" />
+        <Replication number="99" count="1113" minObs="0" maxObs="2" mean="0.147" stdDeviation="0.452" variance="0.204" />
+        <Replication number="100" count="1177" minObs="0" maxObs="2" mean="0.028" stdDeviation="0.201" variance="0.040" />
+        <HistogramChart dir="images/charts/ServerAssembly3_numberAvailableServersStatisticHistogram.png" />
+        <LinearRegressionChart dir="images/charts/ServerAssembly3_numberAvailableServersStatisticLinearRegression.png" />
+      </SimEntity>
+    </ReplicationReports>
+    <SummaryReport>
+      <SummaryRecord entity="" property="numberAvailableServersStatistic" numRuns="100" minObs="1037" maxObs="1217" mean="1138.640" stdDeviation="31.507" variance="992.697" />
+      <SummaryRecord entity="" property="numberInQueueStatistic" numRuns="100" minObs="1042" maxObs="1245" mean="1160.530" stdDeviation="35.531" variance="1262.454" />
+    </SummaryReport>
+    <StatisticalResultsDescription text="***ENTER STATISTICAL RESULTS DESCRIPTION HERE***" />
+    <StatisticalResultsConclusions text="***ENTER STATISTICAL RESULTS CONCLUSIONS HERE***" />
+  </StatisticalResults>
+  <ConclusionsRecommendations showDescription="true">
+    <ConclusionsRecommendationsDescription text="***ENTER ANALYST CONCLUSIONS HERE***" />
+    <ConclusionsRecommendationsConclusions text="***ENTER RECOMMENDATIONS FOR FUTURE WORK HERE***" />
+  </ConclusionsRecommendations>
+</AnalystReport>
+
