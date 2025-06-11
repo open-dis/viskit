@@ -1,5 +1,6 @@
 ## Welcome to Viskit
 
+<img style="float: right;" src="src/viskit/images/ViskitSplash2.png)"/>
 Viskit is an open-source application to build Discrete Event Simulation (DES)
 models that autogenerate Java source for simulation using the Simkit library.
 
