@@ -1,4 +1,5 @@
 <img style="float: right; margin-top: 0;" src="src/viskit/images/ViskitSplash2.png"/>
+
 ## Welcome to Viskit 
 
 Viskit is an open-source application to build Discrete Event Simulation (DES)
