@@ -25,7 +25,7 @@ and Live Virtual Constructive (LVC) simulations.
 We currently use [Apache NetBeans](https://netbeans.apache.org) to run and develop Viskit.
 We are planning on releasing binary executables starting in summer 2025.
 
-Software and model development efforts are ongoing.
+Software and model development efforts are ongoing.  The [viskit wiki](https://github.com/open-dis/viskit/wiki/Viskit-Visual-Editor-for-Simkit) provides an overview presentation video and slideset.
 
 Public archive
 * https://github.com/open-dis/viskit
