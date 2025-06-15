@@ -63,6 +63,7 @@ import viskit.ViskitGlobals;
 import viskit.ViskitStatics;
 import viskit.ViskitProject;
 import static viskit.ViskitStatics.DESCRIPTION_HINT;
+import viskit.control.AssemblyControllerImpl;
 import static viskit.control.AssemblyControllerImpl.METHOD_captureWindow;
 import static viskit.control.AssemblyControllerImpl.METHOD_newProject;
 import static viskit.control.AssemblyControllerImpl.METHOD_openProject;
@@ -395,18 +396,18 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         parametersPanel.setLayout(new BoxLayout(parametersPanel, BoxLayout.Y_AXIS)); //BorderLayout());
         parametersPanel.add(Box.createVerticalStrut(5));
 
-        JLabel descriptionLabel = new JLabel("Event Graph Description"); // TODO fix this functionality
+        JLabel descriptionLabel = new JLabel("Event Graph Description"); 
         descriptionLabel.setToolTipText("(" + DESCRIPTION_HINT + ")");
         descriptionLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
         parametersPanel.add(descriptionLabel);
 //        parametersPanel.add(Box.createVerticalStrut(5));
         
-        JLabel instructionsLabel = new JLabel("Edit Metadata Properties or Ctrl-E to Edit");
-        instructionsLabel.setToolTipText(DESCRIPTION_HINT);
-        instructionsLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-        int bigSz = descriptionLabel.getFont().getSize();
-        instructionsLabel.setFont(descriptionLabel.getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
-        parametersPanel.add(instructionsLabel);
+//        JLabel instructionsLabel = new JLabel("Edit Metadata Properties or Ctrl-E to Edit");
+//        instructionsLabel.setToolTipText(DESCRIPTION_HINT);
+//        instructionsLabel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+//        int bigSz = descriptionLabel.getFont().getSize();
+//        instructionsLabel.setFont(descriptionLabel.getFont().deriveFont(Font.ITALIC, (float) (bigSz - 2)));
+//        parametersPanel.add(instructionsLabel);
 //        parametersPanel.add(Box.createVerticalStrut(5));
 
         JTextArea descriptionTA = new JTextArea();
@@ -416,6 +417,32 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         descriptionTA.setWrapStyleWord(true);
         descriptionTA.setLineWrap(true);
         descriptionTA.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+        
+        // instead of editing text directly, launch metadata dialog
+        descriptionTA.addFocusListener(
+          // https://stackoverflow.com/questions/3902553/workaround-for-adding-actionlistener-to-jtextarea
+          new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e)
+            {
+                // shift (deselect) focus so that dialog cancel doesn't keep repeating
+                SwingUtilities.invokeLater( () -> {
+                    ViskitGlobals.instance().getMainFrame().requestFocusInWindow();
+                    ((EventGraphController) getController()).editGraphMetadata();
+                });
+            }
+            @Override
+            public void focusLost(FocusEvent e) { }
+          });
+        // problem with cancel, refuses to close andkeeps looping :(
+
+//        JButton metadataButton = makeButton(null, "viskit/images/Information24.gif",
+//                "Edit Event Graph Metadata");
+//        metadataButton.setToolTipText("Edit Event Graph Metadata (Ctrl-E)");
+//        metadataButton.addActionListener((ActionEvent e) -> {
+//            ((EventGraphController) getController()).editGraphMetadata();
+//        });
+
 
         JScrollPane descriptionScrollPane = new JScrollPane(descriptionTA);
         descriptionScrollPane.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
@@ -424,6 +451,7 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         // This works, you just have to have several lines of typed text to cause
         // the etched scrollbar to appear
         parametersPanel.add(descriptionScrollPane);
+//        parametersPanel.add(metadataButton);
         parametersPanel.add(Box.createVerticalStrut(5));
         parametersPanel.setMinimumSize(new Dimension(20, 20));
 
@@ -1067,11 +1095,11 @@ public class EventGraphViewFrame extends MvcAbstractViewFrame implements EventGr
         setToolBar(new JToolBar());
 
         metadataLabel = new JLabel("Metadata: ");
-        metadataLabel.setToolTipText("Edit Event Graph Metadata");
+        metadataLabel.setToolTipText("Edit Event Graph Metadata (Ctrl-E)");
         
         JButton metadataButton = makeButton(null, "viskit/images/Information24.gif",
                 "Edit Event Graph Metadata");
-        metadataButton.setToolTipText("Edit Event Graph Metadata");
+        metadataButton.setToolTipText("Edit Event Graph Metadata (Ctrl-E)");
         metadataButton.addActionListener((ActionEvent e) -> {
             ((EventGraphController) getController()).editGraphMetadata();
         });

@@ -34,16 +34,16 @@ public class AdapterEdge extends AssemblyEdge
         return targetEvent;
     }
 
-    public void setTargetEvent(String ev) {
-        targetEvent = ev;
+    public void setTargetEvent(String eventName) {
+        targetEvent = eventName;
     }
 
     public String getSourceEvent() {
         return sourceEvent;
     }
 
-    public void setSourceEvent(String ev) {
-        sourceEvent = ev;
+    public void setSourceEvent(String eventName) {
+        sourceEvent = eventName;
     }
 
     @Override

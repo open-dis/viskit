@@ -911,11 +911,11 @@ public class AssemblyViewFrame extends MvcAbstractViewFrame implements AssemblyV
         setToolBar(new JToolBar());
 
         metadataLabel = new JLabel("Metadata: ");
-        metadataLabel.setToolTipText("Edit Assembly Metadata");
+        metadataLabel.setToolTipText("Edit Assembly Metadata (Alt-Shift-E)");
         
         JButton metadataButton = makeButton(null, "viskit/images/Information24.gif",
                 "Edit Assembly Metadata");
-        metadataButton.setToolTipText("Edit Assembly Metadata");
+        metadataButton.setToolTipText("Edit Assembly Metadata (Alt-Shift-E");
         metadataButton.addActionListener((ActionEvent e) -> {
             ((AssemblyControllerImpl) getController()).editGraphMetadata();
         });

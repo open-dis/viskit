@@ -1378,7 +1378,8 @@ ViskitGlobals.instance().hasModifiedEventGraph() &&
         }
         graphMetadata = eventGraphModel.getMetadata();
         boolean modified = EventGraphMetadataDialog.showDialog((JFrame) getView(), graphMetadata);
-        if (modified) {
+        if (modified)
+        {
             ((Model) getModel()).changeMetadata(graphMetadata);
             ViskitGlobals.instance().getActiveEventGraphModel().setModelModified(true); // TODO move into dialog panel
 
