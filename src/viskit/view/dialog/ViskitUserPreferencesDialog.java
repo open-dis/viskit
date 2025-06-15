@@ -86,7 +86,7 @@ public class ViskitUserPreferencesDialog extends JDialog
     private static boolean modified = false;
     private final JButton cancelButton;
     private final JButton clearButton;
-    private final JButton closeButton;
+    private final JButton saveButton;
     private final JTabbedPane tabbedPane;
     private JList<String> classpathJList;
     private JCheckBox eventGraphCB;
@@ -148,15 +148,15 @@ public class ViskitUserPreferencesDialog extends JDialog
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         cancelButton = new JButton("Cancel"); // not used
-        closeButton     = new JButton("Close");
-        closeButton.setToolTipText("Close dialog with changed values saved");
-        clearButton     = new JButton("Clear");
+         saveButton  = new JButton("Save");
+         saveButton.setToolTipText("Close dialog with changed values saved");
+        clearButton  = new JButton("Clear");
         clearButton.setToolTipText("Clear and save values");
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(clearButton);
         // https://stackoverflow.com/questions/8335997/how-can-i-add-a-space-in-between-two-buttons-in-a-boxlayout
         buttonPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-        buttonPanel.add(closeButton);
+        buttonPanel.add(saveButton);
 //      buttonPanel.add(Box.createHorizontalGlue());
 //      buttonPanel.add(cancelButton); // not used
 
@@ -167,7 +167,7 @@ public class ViskitUserPreferencesDialog extends JDialog
         // attach listeners
         cancelButton.addActionListener(new CancelButtonListener());
         clearButton.addActionListener(new ClearButtonListener());
-        closeButton.addActionListener(new ApplyButtonListener());
+        saveButton.addActionListener(new ApplyButtonListener());
         VisibilityHandler visibilityHandler = new VisibilityHandler();
         eventGraphCB.addActionListener(visibilityHandler);
         assemblyCB.addActionListener(visibilityHandler);
@@ -632,7 +632,7 @@ public class ViskitUserPreferencesDialog extends JDialog
                 int ret = JOptionPane.showConfirmDialog(ViskitUserPreferencesDialog.this, "Apply changes?",
                         "Question", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (ret == JOptionPane.YES_OPTION) {
-                    closeButton.doClick();
+                    saveButton.doClick();
                 } else {
                     cancelButton.doClick();
                 }
