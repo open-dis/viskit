@@ -77,7 +77,6 @@ import static viskit.model.ViskitElement.METHOD_getName;
 import static viskit.model.ViskitElement.METHOD_getType;
 
 import viskit.reports.ReportStatisticsConfiguration;
-import viskit.view.SimulationRunPanel;
 import static viskit.model.PropertyChangeListenerNode.METHOD_isStatisticTypeCount;
 import static viskit.view.SimulationRunPanel.METHOD_setNumberReplications;
 
