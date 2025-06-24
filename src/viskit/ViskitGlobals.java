@@ -1105,22 +1105,22 @@ public class ViskitGlobals
      */
     public ClassLoader getViskitApplicationClassLoader()
     {
-            if (viskitApplicationClassLoader == null) // workingClassLoader should only get created once
-            {
-                URL[] urls = ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray();
-                viskit.doe.LocalBootLoader localBootLoader = new LocalBootLoader(
-                        urls,
-                        Thread.currentThread().getContextClassLoader(),
-                        getProjectWorkingDirectory(),
-                        "ViskitApplicationBootLoader");
+        if (viskitApplicationClassLoader == null) // workingClassLoader should only get created once
+        {
+            URL[] urls = ViskitUserPreferencesDialog.getExtraClassPathArraytoURLArray();
+            viskit.doe.LocalBootLoader localBootLoader = new LocalBootLoader(
+                    urls,
+                    Thread.currentThread().getContextClassLoader(),
+                    getProjectWorkingDirectory(),
+                    "ViskitApplicationBootLoader");
 
-                // Allow Assembly files in the ClassLoader
-                viskitApplicationClassLoader = localBootLoader.initialize(true);
+            // Allow Assembly files in the ClassLoader
+            viskitApplicationClassLoader = localBootLoader.initialize(true);
 
-                // TODO experimenting with context
-                Thread.currentThread().setContextClassLoader(viskitApplicationClassLoader);
-                LOG.debug("getViskitApplicationClassLoader() currentThread\n      contextClassLoader='" + viskitApplicationClassLoader.getName() + "'" + "\n");
-            }
+            // TODO experimenting with context
+            Thread.currentThread().setContextClassLoader(viskitApplicationClassLoader);
+            LOG.debug("getViskitApplicationClassLoader() currentThread\n      contextClassLoader='" + viskitApplicationClassLoader.getName() + "'" + "\n");
+        }
         if (viskitApplicationClassLoader == null)
         {
             LOG.error("getWorkingClassLoader() ran without exception but returned null");
