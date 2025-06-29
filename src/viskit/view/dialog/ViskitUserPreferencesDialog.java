@@ -524,10 +524,10 @@ public class ViskitUserPreferencesDialog extends JDialog
     private void fillWidgets() 
     {
         // developer convenience support
-        if (getUserName().equalsIgnoreCase("brutzman"))
+        if (getUserName().equalsIgnoreCase("brutzman") || getUserName().equalsIgnoreCase("brutzman"))
         {
                author_nameTF.setText("Don Brutzman");
-              author_emailTF.setText("brutzman@nps.edu");
+              author_emailTF.setText("don.brutzman@gmail.com");
             author_websiteTF.setText("https://faculty.nps.edu/brutzman");
             repaint();
         }
